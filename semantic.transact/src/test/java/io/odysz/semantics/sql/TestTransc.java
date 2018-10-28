@@ -20,7 +20,7 @@ public class TestTransc {
 
 		user = new User("admin", "123456");
 
-		DataSource ds0 = new DataSource();
+		DataSource ds0 = new DataSource("stub");
 		st = new Transc(ds0);
 		assertFalse(ds0 == null);
 	}
