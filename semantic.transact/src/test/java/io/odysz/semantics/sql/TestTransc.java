@@ -37,7 +37,7 @@ public class TestTransc {
 			.commit(sqls);
 
 		Utils.logi(sqls);
-		// .. ..
+		// .. .. ..
 		// nothing 
 	}
 
