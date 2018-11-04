@@ -1,5 +1,7 @@
 package io.odysz.semantics.sql;
 
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
+
 /**Transaction / Batching context
  * @author ody
  *
@@ -25,6 +27,10 @@ public class Transc {
 	public Update update(String tabl) {
 		
 		return new Update(this, tabl);
+	}
+
+	public DbTable getTable(String tabl) {
+		return ds.getTable(tabl);
 	}
 	
 }

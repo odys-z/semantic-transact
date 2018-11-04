@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
+import io.odysz.semantics.sql.parts.Sql;
+import io.odysz.semantics.x.StException;
 
 public class TestTransc {
 
@@ -26,19 +28,30 @@ public class TestTransc {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws StException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
 			.j("a_rolefunc rf", Sql.condt("f.funcId=rf.funcId rf.roleId='%s'", user.userId()))
-			.column("f.funcName", "func")
-			.column("f.funcId", "fid")
+			.col("f.funcName", "func")
+			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
 			.commit(sqls);
 
+		st.select("a_log", "lg")
+			.col("stamp", "logtime")
+			.where(">=", "lg.stamp", "'1776-07-04'")
+			.where(Sql.condt("userId in (%s)", Sql.str(users())))
+			.commit(sqls);
+
 		Utils.logi(sqls);
+		
 		// .. .. ..
 		// nothing 
+	}
+
+	private String[] users() {
+		return new String[] {"usr1", "user2"};
 	}
 
 }

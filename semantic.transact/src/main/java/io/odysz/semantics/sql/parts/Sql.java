@@ -1,13 +1,6 @@
-package io.odysz.semantics.sql;
+package io.odysz.semantics.sql.parts;
 
-import java.util.HashMap;
-
-import com.healthmarketscience.sqlbuilder.BinaryCondition;
-import com.healthmarketscience.sqlbuilder.Condition;
-import com.healthmarketscience.sqlbuilder.InCondition;
-
-import io.odysz.semantics.sql.parts.ExprBuilder;
-
+import java.util.ArrayList;
 
 public class Sql {
 	
@@ -17,14 +10,35 @@ public class Sql {
 
 	public static class Condt {
 		
+		private ArrayList<ExprBuilder> ands;
+
+		private ArrayList<Object> ors;
+
 		public Condt(ExprBuilder expr) {
 		}
 
-		public static Condt and(String logic, String from, String... to) {
+		public Condt and(String logic, String from, String... to) {
 			ExprBuilder expr = new ExprBuilder(logic).left(from).right(to == null || to.length == 0 ? null : to[0]);
-			return new Condt(expr);
+			if (ands == null)
+				ands = new ArrayList<ExprBuilder>(1);
+			ands.add(expr);
+			return this;
 		}
-		
+
+		public Condt or(String logic, String from, String... to) {
+			ExprBuilder expr = new ExprBuilder(logic).left(from).right(to == null || to.length == 0 ? null : to[0]);
+			
+			if (ands != null) {
+				ors.add(ands);
+				ors.clear();
+			}
+
+			if (ors == null)
+				ors.add(expr);
+
+			return this;
+		}
+	
 //		private static Condition formatCond(String connId, HashMap<String, String> aliases, String maintbl, String oper,
 //				String ltabl, String lcol, String lconst,
 //				String rtabl, String rcol, String rconst) {
@@ -75,6 +89,14 @@ public class Sql {
 //			return BinaryCondition.like(lop, String.format("%s%%", rconst));
 //		}
 	
+	}
+
+	/**
+	 * @param users
+	 * @return "'ele1','ele2','ele3',..."
+	 */
+	public static String str(String[] ele) {
+		return "'ele1','ele2','ele3'";
 	}
 
 }

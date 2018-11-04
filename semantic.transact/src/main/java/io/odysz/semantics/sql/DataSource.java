@@ -8,7 +8,7 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 
 /**Database meta data, not data source in DA.<br>
- * The caller of semantic transaction should prepare this before call it. 
+ * The caller of Semantic Transaction should prepare this before call it. 
  * @author ody
  */
 public class DataSource {
@@ -37,6 +37,10 @@ public class DataSource {
 		DbColumn col = tab.addColumn(colname, type, len);
 
 		return this;
+	}
+
+	public DbTable getTable(String tabl) {
+		return tables.get(tabl);
 	}
 	
 }
