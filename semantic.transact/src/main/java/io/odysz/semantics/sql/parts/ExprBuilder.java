@@ -5,8 +5,10 @@ public class ExprBuilder {
 	private String loperand;
 	private String roperand;
 
-	public ExprBuilder(String logic) {
-		// TODO Auto-generated constructor stub
+	public ExprBuilder(String logicFormat, Object[] args) {
+	}
+
+	public ExprBuilder(String logicFormat) {
 	}
 
 	public ExprBuilder left(String operand) {

@@ -22,8 +22,8 @@ public class DataSource {
 		this.srcId = srcId;
 
 		dbSchema = new DbSpec().addDefaultSchema();
-		HashMap<String, DbTable> tables = new HashMap<String, DbTable>();
-		HashMap<String, HashMap<String, DbColumn>> tablCols = new HashMap<String, HashMap<String, DbColumn>>();
+		tables = new HashMap<String, DbTable>();
+		tablCols = new HashMap<String, HashMap<String, DbColumn>>();
 	}
 
 	public DataSource addTabl(String tabl) {
@@ -35,12 +35,20 @@ public class DataSource {
 	public DataSource addColumn(String tabl, String colname, String type, int len) {
 		DbTable tab = tables.get(tabl);
 		DbColumn col = tab.addColumn(colname, type, len);
+		
+		if (!tablCols.containsKey(tabl))
+			tablCols.put(tabl, new HashMap<String, DbColumn>());
+		tablCols.get(tabl).put(colname, col);
 
 		return this;
 	}
 
 	public DbTable getTable(String tabl) {
 		return tables.get(tabl);
+	}
+
+	public DbColumn getColumn(String tabl, String col) {
+		return tablCols.containsKey(tabl) ? tablCols.get(tabl).get(col) : null;
 	}
 	
 }

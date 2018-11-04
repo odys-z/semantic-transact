@@ -23,6 +23,20 @@ public class TestTransc {
 		user = new User("admin", "123456");
 
 		DataSource ds0 = new DataSource("stub");
+		ds0.addTabl("a_funcs");
+		ds0.addColumn("a_funcs", "funcName", "varchar", 50);
+		ds0.addColumn("a_funcs", "funcId", "varchar", 50);
+		ds0.addColumn("a_funcs", "isUsed", "varchar", 2);
+
+		ds0.addTabl("a_rolefunc");
+		ds0.addColumn("a_rolefunc", "funcId", "varchar", 50);
+		ds0.addColumn("a_rolefunc", "roleId", "varchar", 50);
+
+		ds0.addTabl("a_log");
+		ds0.addColumn("a_log", "stamp", "datetime", 50);
+		ds0.addColumn("a_log", "userId", "varchar", 50);
+		ds0.addColumn("a_log", "txt", "text", 0);
+		
 		st = new Transc(ds0);
 		assertFalse(ds0 == null);
 	}
@@ -35,13 +49,20 @@ public class TestTransc {
 			.j("a_rolefunc rf", Sql.condt("f.funcId=rf.funcId rf.roleId='%s'", user.userId()))
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
-			.where("=", "f.isUsed", "'Y'")
+			.where("=", "f.isUsed", "Y")
 			.commit(sqls);
 
 		st.select("a_log", "lg")
-			.col("stamp", "logtime")
-			.where(">=", "lg.stamp", "'1776-07-04'")
+			.col("lg.stamp", "logtime")
+			.col("lg.txt", "log")
+			.where(">=", "lg.stamp", "1776-07-04")
 			.where(Sql.condt("userId in (%s)", Sql.str(users())))
+			.commit(sqls);
+		
+		st.select("a_log", "lg")
+			.col("count(*)", "cnt")
+			.where("=", "userId", "user1")
+			.where(Sql.condt("userId = '%s'", "user2").or(Sql.condt("<=", "stamp", "'1911-10-10'"), Sql.condt("userId = '%s'", "user3")))
 			.commit(sqls);
 
 		Utils.logi(sqls);

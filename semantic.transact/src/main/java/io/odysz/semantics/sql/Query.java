@@ -2,13 +2,13 @@ package io.odysz.semantics.sql;
 
 import java.util.ArrayList;
 
-import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.Condition;
+import com.healthmarketscience.sqlbuilder.CustomSql;
 import com.healthmarketscience.sqlbuilder.dbspec.RejoinTable;
 import com.healthmarketscience.sqlbuilder.dbspec.Table;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 
 import io.odysz.semantics.hms.SelectQry;
-import io.odysz.semantics.sql.parts.Logic;
-import io.odysz.semantics.x.StException;
 
 public class Query extends Statement {
 	private SelectQry q;
@@ -26,14 +26,51 @@ public class Query extends Statement {
 		allColumn = true;
 	}
 
+	/**
+	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
+	 * @param alias
+	 * @return
+	 */
 	public Query col(String col, String... alias) {
 		allColumn = false;
 		if (alias == null || alias.length <= 0 || alias[0] == null)
-			q.addCustomColumns(col);
-		else
+			// q.addCustomColumns(col);
+			addCol(q, col);
+		else {
 			// TODO test expression as col
-			q.addAliasedColumn(col, alias[0]);
+			DbColumn dcol = transc.getColumn(mt, col);
+			if (dcol != null)
+				// TODO
+				// "stamp", "st" -> "t2.stamp AS st" (malias == null)
+				// "stamp", "st" -> "lg.stamp AS st" (malias != null)
+				q.addAliasedColumn(dcol, alias[0]);
+			else
+				// "l.stamp", "st" -> "l.stamp AS st"
+				q.addAliasedColumn(new CustomSql(col), alias[0]);
+		}
 		return this;
+	}
+
+	/**Try figure out is the col is an expression (a.col1, f(a.col), ...), then add the col to qry.
+	 * @param qry
+	 * @param col
+	 */
+	private void addCol(SelectQry qry, String col) {
+		// TODO
+		// parse col
+		String[] colss = col.split(".");
+		String colAlias = colss[0];
+		String colExpr = colss[1];
+
+		if (colAlias == null) {
+			DbColumn dbcol = transc.getColumn(mt, colExpr);
+			if (dbcol != null) {
+				qry.addColumns(dbcol);
+				return;
+			}
+		}
+
+		qry.addCustomColumns(col);
 	}
 
 	/**Inner Join
@@ -41,26 +78,12 @@ public class Query extends Statement {
 	 * @param onCondtion e.g "t.f1='a' t.f2='b'", 2 AND conditions
 	 * @return
 	 */
-	public Query j(String withTabl, String onCondtion) {
+	public Query j(String withTabl, Condition onCondtion) {
 		return this;
 	}
 
-	public Query where(String logic, String loperand, String roperand) throws StException {
-		switch (Logic.op(logic)) {
-		case eq:
-			q.addCondition(BinaryCondition.equalTo(loperand, roperand));
-			break;
-		default:
-			throw new StException("Logic not recogonized: %s", logic);
-		}
-		return this;
-	}
-
-	public Query where(String condt) {
-		return this;
-	}
-
-	public Query commit(ArrayList<String> sqls) {
+	@Override
+	public Statement commit(ArrayList<String> sqls) {
 		sqls.add(q.validate().toString());
 		return this;
 	}

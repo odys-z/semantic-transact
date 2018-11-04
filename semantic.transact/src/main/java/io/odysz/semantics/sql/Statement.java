@@ -1,10 +1,18 @@
 package io.odysz.semantics.sql;
 
 
+import java.util.ArrayList;
+
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.ComboCondition;
 import com.healthmarketscience.sqlbuilder.Condition;
 import com.healthmarketscience.sqlbuilder.CustomSql;
 import com.healthmarketscience.sqlbuilder.InCondition;
+
+import io.odysz.semantics.sql.parts.Logic;
+import io.odysz.semantics.sql.parts.Sql;
+import io.odysz.semantics.sql.parts.Sql.Condt;
+import io.odysz.semantics.x.StException;
 
 public abstract class Statement {
 	public enum Type { select, insert, update, delete }
@@ -15,13 +23,39 @@ public abstract class Statement {
 
 	protected String mt;
 	protected String malias;
+	
+	/**Conditions of where condtions
+	 * 
+	 */
+	protected ArrayList<Condt> wheres;
 
-	private Transc transc;
+	protected Transc transc;
 
 	public Statement(Transc transc, String tabl, String alias) {
 		this.transc = transc;
 		this.mt = tabl;
 		this.malias = alias; // == null || alias.length == 0 ? null : alias[0];
+	}
+
+	public Statement where(String logic, String loperand, String roperand) throws StException {
+		// try find operand in columns
+		switch (Logic.op(logic)) {
+		case eq:
+			// orWheres.add(BinaryCondition.equalTo(loperand, roperand));
+			wheres.add(Sql.Condt(logic, loperand, roperand));
+			break;
+		case ge:
+			wheres.add(BinaryCondition.greaterThanOrEq(loperand, roperand));
+			break;
+		default:
+			throw new StException("Logic not recogonized: %s", logic);
+		}
+		return this;
+	}
+
+	public Statement where(Condt condt) {
+		wheres.add(condt);
+		return this;
 	}
 	
 	protected static Condition formatCond(String maintbl, String oper,
@@ -42,8 +76,9 @@ public abstract class Statement {
    					 : "<".equals(op) || "lt".equals(op) ? BinaryCondition.lessThan(lop, rop)
    					 : ">=".equals(op) || "ge".equals(op) ? BinaryCondition.greaterThanOrEq(lop, rop)
    					 : ">".equals(op) || "gt".equals(op) ? BinaryCondition.greaterThan(lop, rop)
-   					 : "><".equals(op) || "[]".equals(op) || "in".equals(op) ? new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")) // join condition shouldn't reach here.
-   					 : "][".equals(op) || "notin".equals(op) || "not in".equals(op) ? new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")).setNegate(true)
+   					 : "[]".equals(op) || "in".equals(op) ? new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")) // join condition shouldn't reach here.
+   					 : "][".equals(op) || "notin".equals(op) || "not in".equals(op) || "><".equals(op) ?
+   							 new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")).setNegate(true)
    					 : BinaryCondition.notEqualTo(lop, rop); // <> !=
 		return jc;
 	}
@@ -93,6 +128,10 @@ public abstract class Statement {
 	 */
 	private static Condition formatRLikeCondition(Object lop, String rconst) {
 		return BinaryCondition.like(lop, String.format("%s%%", rconst));
+	}
+
+	public Statement commit(ArrayList<String> sqls) throws StException {
+		throw new StException("Shouldn't reach here");
 	}
 
 }

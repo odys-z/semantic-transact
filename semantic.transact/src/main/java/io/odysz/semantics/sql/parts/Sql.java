@@ -2,11 +2,14 @@ package io.odysz.semantics.sql.parts;
 
 import java.util.ArrayList;
 
+import com.healthmarketscience.sqlbuilder.Condition;
+import com.healthmarketscience.sqlbuilder.CustomCondition;
+
 public class Sql {
 	
-	public static String condt(String format, String... args) {
-		return String.format(format, (Object[])args);
-	}
+//	public static Condt condt(String format, String... args) {
+//		return new Condt(new ExprBuilder (format, (Object[])args));
+//	}
 
 	public static class Condt {
 		
@@ -39,6 +42,10 @@ public class Sql {
 			return this;
 		}
 	
+		public Condt or(Condt c1, Condt... c2) {
+			return this;
+		}
+
 //		private static Condition formatCond(String connId, HashMap<String, String> aliases, String maintbl, String oper,
 //				String ltabl, String lcol, String lconst,
 //				String rtabl, String rcol, String rconst) {

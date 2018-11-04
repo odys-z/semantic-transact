@@ -32,7 +32,7 @@ public class Utils {
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
 				if (stElements.length > 3)
-				System.out.println(String.format("called by      %s.%s(%s %s)", 
+				System.out.println(String.format("called by      %s.%s(%s:%s)", 
 								stElements[3].getClassName(), stElements[3].getMethodName(),
 								stElements[3].getFileName(), stElements[3].getLineNumber()));
 			}
@@ -57,7 +57,7 @@ public class Utils {
 //				System.out.println(String.format("logger called by %s.%s(%s %s)", 
 //								stElements[1].getClassName(), stElements[1].getMethodName(),
 //								stElements[1].getFileName(), stElements[1].getLineNumber()));
-				System.out.println(String.format("logger:        %s.%s(%s %s)", 
+				System.out.println(String.format("logger:        %s.%s(%s:%s)", 
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
 			}
