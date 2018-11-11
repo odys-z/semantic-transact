@@ -20,13 +20,13 @@ public class Sql {
 		public Condt(ExprBuilder expr) {
 		}
 
-		public Condt and(String logic, String from, String... to) {
-			ExprBuilder expr = new ExprBuilder(logic).left(from).right(to == null || to.length == 0 ? null : to[0]);
-			if (ands == null)
-				ands = new ArrayList<ExprBuilder>(1);
-			ands.add(expr);
-			return this;
-		}
+//		public Condt and(String logic, String from, String... to) {
+//			ExprBuilder expr = new ExprBuilder(logic).left(from).right(to == null || to.length == 0 ? null : to[0]);
+//			if (ands == null)
+//				ands = new ArrayList<ExprBuilder>(1);
+//			ands.add(expr);
+//			return this;
+//		}
 
 		public Condt or(String logic, String from, String... to) {
 			ExprBuilder expr = new ExprBuilder(logic).left(from).right(to == null || to.length == 0 ? null : to[0]);

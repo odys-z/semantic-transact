@@ -24,9 +24,7 @@ public abstract class Statement {
 	protected String mt;
 	protected String malias;
 	
-	/**Conditions of where condtions
-	 * 
-	 */
+	/**Conditions of where clause * */
 	protected ArrayList<Condt> wheres;
 
 	protected Transc transc;
