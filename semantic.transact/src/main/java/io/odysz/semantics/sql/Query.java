@@ -2,13 +2,13 @@ package io.odysz.semantics.sql;
 
 import java.util.ArrayList;
 
-import com.healthmarketscience.sqlbuilder.Condition;
 import com.healthmarketscience.sqlbuilder.CustomSql;
 import com.healthmarketscience.sqlbuilder.dbspec.RejoinTable;
 import com.healthmarketscience.sqlbuilder.dbspec.Table;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 
 import io.odysz.semantics.hms.SelectQry;
+import io.odysz.semantics.sql.parts.condition.Condit;
 
 public class Query extends Statement {
 	private SelectQry q;
@@ -78,7 +78,7 @@ public class Query extends Statement {
 	 * @param onCondtion e.g "t.f1='a' t.f2='b'", 2 AND conditions
 	 * @return
 	 */
-	public Query j(String withTabl, Condition onCondtion) {
+	public Query j(String withTabl, Condit onCondtion) {
 		return this;
 	}
 

@@ -4,14 +4,13 @@ package io.odysz.semantics.sql;
 import java.util.ArrayList;
 
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
-import com.healthmarketscience.sqlbuilder.ComboCondition;
 import com.healthmarketscience.sqlbuilder.Condition;
 import com.healthmarketscience.sqlbuilder.CustomSql;
 import com.healthmarketscience.sqlbuilder.InCondition;
 
 import io.odysz.semantics.sql.parts.Logic;
 import io.odysz.semantics.sql.parts.Sql;
-import io.odysz.semantics.sql.parts.Sql.Condt;
+import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.x.StException;
 
 public abstract class Statement {
@@ -24,8 +23,15 @@ public abstract class Statement {
 	protected String mt;
 	protected String malias;
 	
+<<<<<<< HEAD
 	/**Conditions of where clause * */
 	protected ArrayList<Condt> wheres;
+=======
+	/**Conditions of where condtions
+	 * 
+	 */
+	protected Condit where;
+>>>>>>> branch 'master' of https://github.com/odys-z/semantic-transact.git
 
 	protected Transc transc;
 
@@ -37,22 +43,38 @@ public abstract class Statement {
 
 	public Statement where(String logic, String loperand, String roperand) throws StException {
 		// try find operand in columns
+		/*
 		switch (Logic.op(logic)) {
 		case eq:
 			// orWheres.add(BinaryCondition.equalTo(loperand, roperand));
-			wheres.add(Sql.Condt(logic, loperand, roperand));
+			where.and(Sql.Condt(logic, loperand, roperand));
 			break;
 		case ge:
-			wheres.add(BinaryCondition.greaterThanOrEq(loperand, roperand));
+			where.and(BinaryCondition.greaterThanOrEq(loperand, roperand));
 			break;
 		default:
 			throw new StException("Logic not recogonized: %s", logic);
-		}
-		return this;
+		}*/
+		
+		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
 
-	public Statement where(Condt condt) {
-		wheres.add(condt);
+	public Statement where(Condit condt, Condit... ands) {
+		if (where == null)
+			where = condt;
+
+//		Condt top = null;
+//		if (whereAnds.size() > 0) {
+//			top = whereAnds.remove(whereAnds.size() - 1);
+//		}
+//
+//		if (top != null) 
+//			top.and(condt);
+//		else top = condt;
+
+		if (ands != null)
+			for (Condit and : ands)
+				where.and(and);
 		return this;
 	}
 	
