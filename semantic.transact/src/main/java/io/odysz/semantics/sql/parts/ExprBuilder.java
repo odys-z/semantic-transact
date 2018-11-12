@@ -1,12 +1,20 @@
 package io.odysz.semantics.sql.parts;
 
+import io.odysz.semantics.sql.parts.Logic.op;
+
+@Deprecated
 public class ExprBuilder {
 
 	private String loperand;
 	private String roperand;
 
-	public ExprBuilder(String logic) {
-		// TODO Auto-generated constructor stub
+	public ExprBuilder(String logicFormat, Object[] args) {
+	}
+
+	public ExprBuilder(String logicFormat) {
+	}
+
+	public ExprBuilder(op op, String loperand, String roperand) {
 	}
 
 	public ExprBuilder left(String operand) {
