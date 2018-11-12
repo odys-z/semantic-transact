@@ -23,15 +23,13 @@ public abstract class Statement {
 	protected String mt;
 	protected String malias;
 	
-<<<<<<< HEAD
 	/**Conditions of where clause * */
-	protected ArrayList<Condt> wheres;
-=======
+	// protected ArrayList<Condt> wheres;
+
 	/**Conditions of where condtions
 	 * 
 	 */
 	protected Condit where;
->>>>>>> branch 'master' of https://github.com/odys-z/semantic-transact.git
 
 	protected Transc transc;
 
