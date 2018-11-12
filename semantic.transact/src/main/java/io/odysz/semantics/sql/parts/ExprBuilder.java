@@ -1,5 +1,8 @@
 package io.odysz.semantics.sql.parts;
 
+import io.odysz.semantics.sql.parts.Logic.op;
+
+@Deprecated
 public class ExprBuilder {
 
 	private String loperand;
@@ -9,6 +12,9 @@ public class ExprBuilder {
 	}
 
 	public ExprBuilder(String logicFormat) {
+	}
+
+	public ExprBuilder(op op, String loperand, String roperand) {
 	}
 
 	public ExprBuilder left(String operand) {
