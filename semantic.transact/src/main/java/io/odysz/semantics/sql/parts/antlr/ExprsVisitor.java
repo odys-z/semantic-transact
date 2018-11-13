@@ -1,5 +1,7 @@
 package io.odysz.semantics.sql.parts.antlr;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -11,11 +13,8 @@ import gen.antlr.sql.exprs.SearchExprs.Search_condition_andContext;
 import gen.antlr.sql.exprs.SearchExprs.Search_condition_notContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
 import gen.antlr.sql.exprs.TSqlLexer;
-import io.odysz.semantics.sql.parts.Logic;
 import io.odysz.semantics.sql.parts.condition.Condit;
-import io.odysz.semantics.sql.parts.condition.ConditAnd;
-
-import static java.util.stream.Collectors.toList;
+import io.odysz.semantics.sql.parts.condition.Predicate;
 
 /**Sample: https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example
  * @author ody
@@ -64,9 +63,11 @@ public class ExprsVisitor extends SearchExprsBaseVisitor<Condit> {
 
 	@Override
 	public Condit visitSearch_condition_not(Search_condition_notContext ctx) {
-		Condit predicate = ctx.predicate().accept(new PredicatVisitor());
+		// Predicate predicate = ctx.predicate().accept(new PredicatVisitor());
+		PredicatVisitor vist = new PredicatVisitor();
+		Predicate predicate = vist.visit(ctx.predicate());
 		predicate.not(ctx.NOT());
-		return predicate;
+		return (Condit) predicate;
 	}
 
 

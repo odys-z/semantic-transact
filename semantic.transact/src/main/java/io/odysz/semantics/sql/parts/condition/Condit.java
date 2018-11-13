@@ -8,6 +8,7 @@ public class Condit extends Predicate {
 
 	// Predicate predict;
 
+
 	public Condit(op op, String lop, String rop) {
 		super(op, lop, rop);
 	}
