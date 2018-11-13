@@ -1,5 +1,7 @@
 package io.odysz.semantics.sql.parts.condition;
 
+import java.util.List;
+
 import io.odysz.semantics.sql.parts.Logic.op;
 
 public class Condit extends Predicate {
@@ -8,6 +10,11 @@ public class Condit extends Predicate {
 
 	public Condit(op op, String lop, String rop) {
 		super(op, lop, rop);
+	}
+
+	public Condit(List<Condit> condts) {
+		// FIXME
+		super(null, null, null);
 	}
 
 	public Condit and(Condit and) {

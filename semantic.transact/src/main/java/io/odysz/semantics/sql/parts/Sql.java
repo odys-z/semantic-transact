@@ -19,8 +19,8 @@ public class Sql {
 	}
 
 	private static Condit parseCondit(String exp) {
-		ExprsVisitor expr = ExprsVisitor.parse(exp);
-		return new Condit(expr.op(), expr.lop(), expr.rop());
+		return ExprsVisitor.parse(exp);
+		// return new Condit(expr.op(), expr.lop(), expr.rop());
 	}
 
 	public static Condit condt(op op, String loperand, String roperand) {
