@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class PredicatVisitor implements ParseTreeVisitor {
+public class PredicatVisitor implements SearchExprsBaseVisitor<Predicate> {
 
 	@Override
 	public Object visit(ParseTree tree) {
