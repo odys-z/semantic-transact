@@ -13,13 +13,27 @@ import gen.antlr.sql.exprs.SearchExprs.Search_condition_andContext;
 import gen.antlr.sql.exprs.SearchExprs.Search_condition_notContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
 import gen.antlr.sql.exprs.TSqlLexer;
+import io.odysz.semantics.sql.parts.Logic.type;
 import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.sql.parts.condition.Predicate;
 
-/**Sample: https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example
+/**Sample: <a href='https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example'>at stackoverflow</a>
+ * <pre>
+search_condition
+    : search_condition_and (OR search_condition_and)*
+    ;
+
+search_condition_and
+    : search_condition_not (AND search_condition_not)*
+    ;
+
+search_condition_not
+    : NOT? predicate
+    ;</pre>
  * @author ody
  *
  */
+@SuppressWarnings("deprecation")
 public class ExprsVisitor extends SearchExprsBaseVisitor<Condit> {
 	public static Condit parse(String strExpr) {
 		ANTLRInputStream inputStream = new ANTLRInputStream(strExpr);
@@ -37,7 +51,10 @@ public class ExprsVisitor extends SearchExprsBaseVisitor<Condit> {
 	
 	@Override
 	public Condit visitSearch_condition(Search_conditionContext ctx) {
-		/* http://jakubdziworski.github.io/java/2016/04/01/antlr_visitor_vs_listener.html
+		/* For antlr4 visitor tutorial: http://jakubdziworski.github.io/java/2016/04/01/antlr_visitor_vs_listener.html
+		 * For JDK 8 Stream tutorial: https://www.baeldung.com/java-8-streams-introduction
+		 * and https://www.baeldung.com/java-8-streams
+		 * 
 		String className = ctx.className().getText();
         MethodVisitor methodVisitor = new MethodVisitor();
         List<Method> methods = ctx.method()
@@ -49,16 +66,16 @@ public class ExprsVisitor extends SearchExprsBaseVisitor<Condit> {
 		List<Condit> condts = ctx.search_condition_and()
 				.stream().map(condAnd -> condAnd.accept(this))
 				.collect(toList());
-		return new Condit(condts);
+		return new Condit(type.or, condts);
 	}
 
 	@Override
 	public Condit visitSearch_condition_and(Search_condition_andContext ctx) {
 		// return super.visitSearch_condition_and(ctx);
 		List<Condit> condts = ctx.search_condition_not()
-				.stream().map(condAnd -> condAnd.accept(this))
+				.stream().map(condNot -> condNot.accept(this))
 				.collect(toList());
-		return new Condit(condts);
+		return new Condit(type.and, condts);
 	}
 
 	@Override

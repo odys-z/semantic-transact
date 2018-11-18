@@ -70,9 +70,8 @@ public class Utils {
 						System.out.println(it);
 
 		} catch (Exception ex) {
-			StackTraceElement[] x = ex.getStackTrace();
-			System.err.println(String.format("logi(): Can't print. Error: %s. called by %s.%s()",
-					ex.getMessage(), x[0].getClassName(), x[0].getMethodName()));
+			System.err.println("logi(): Can't print. Error:");
+			ex.printStackTrace();
 		}
 	
 	}

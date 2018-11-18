@@ -86,6 +86,7 @@ public abstract class Statement {
 
    		String op = oper == null ? null : oper.trim().toLowerCase();
 
+   		// TODO merge with Statement.where()
 	   	Condition jc = "%".equals(op) || "like".equals(op) ? formatLikeCondition(lop, rconst)
 	   				 : "=%".equals(op) || "rlike".equals(op) ? formatRLikeCondition(lop, rconst)
 	   				 : "%=".equals(op) || "llike".equals(op) ? formatLLikeCondition(lop, rconst)

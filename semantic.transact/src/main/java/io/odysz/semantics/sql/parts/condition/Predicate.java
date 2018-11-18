@@ -9,7 +9,10 @@ public class Predicate extends AbsPart {
 	private boolean negative = false;
 
 	public Predicate(op op, String lop, String rop) {
-		// TODO Auto-generated constructor stub
+	}
+
+
+	public Predicate() {
 	}
 
 
