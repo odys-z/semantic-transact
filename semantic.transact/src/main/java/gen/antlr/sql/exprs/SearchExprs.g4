@@ -9,7 +9,7 @@ parser grammar SearchExprs;
 options { tokenVocab=TSqlLexer; }
 
 search_condition
-    : search_condition_and (OR search_condition_and)* EOF
+    : search_condition_and (OR search_condition_and)*
     ;
 
 search_condition_and

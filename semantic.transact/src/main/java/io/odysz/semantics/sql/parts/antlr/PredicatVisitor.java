@@ -89,7 +89,7 @@ public class PredicatVisitor extends SearchExprsBaseVisitor<Predicate> {
 		else {
 			ConditVisitor vist = new ConditVisitor();
 			Condit condit = vist.visit(ctx.search_condition());
-			return condit;
+			return new Predicate(condit);
 		}
 	}
 
