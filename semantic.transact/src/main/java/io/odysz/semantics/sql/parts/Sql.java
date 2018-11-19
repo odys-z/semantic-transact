@@ -2,7 +2,7 @@ package io.odysz.semantics.sql.parts;
 
 
 import io.odysz.semantics.sql.parts.Logic.op;
-import io.odysz.semantics.sql.parts.antlr.ExprsVisitor;
+import io.odysz.semantics.sql.parts.antlr.ConditVisitor;
 import io.odysz.semantics.sql.parts.condition.Condit;
 
 public class Sql {
@@ -19,7 +19,7 @@ public class Sql {
 	}
 
 	private static Condit parseCondit(String exp) {
-		return ExprsVisitor.parse(exp);
+		return ConditVisitor.parse(exp);
 		// return new Condit(expr.op(), expr.lop(), expr.rop());
 	}
 
