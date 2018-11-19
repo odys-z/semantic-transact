@@ -1,27 +1,13 @@
 package io.odysz.semantics.sql.parts.antlr;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
-import org.antlr.v4.runtime.CommonTokenStream;
-
-import gen.antlr.sql.exprs.SearchExprs;
 import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
 import gen.antlr.sql.exprs.SearchExprs.Full_column_nameContext;
 import gen.antlr.sql.exprs.SearchExprs.Primitive_expressionContext;
-import gen.antlr.sql.exprs.SearchExprs.Search_conditionContext;
-import gen.antlr.sql.exprs.SearchExprs.Search_condition_andContext;
-import gen.antlr.sql.exprs.SearchExprs.Search_condition_notContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
-import gen.antlr.sql.exprs.TSqlLexer;
 import io.odysz.semantics.sql.parts.Logic;
-import io.odysz.semantics.sql.parts.Logic.type;
-import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.sql.parts.condition.ExprPart;
-import io.odysz.semantics.sql.parts.condition.Predicate;
 
-/**
+/**Full or part of an expression.
  * <pre>
 expression_list
     : expression (',' expression)*
@@ -125,6 +111,7 @@ expression
 	public ExprPart visitExpression(ExpressionContext ctx) {
 		// return super.visitExpression(ctx);
 		if (ctx.op != null)
+			// TODO
 			return new ExprPart(Logic.op.eq, "A", "B");
 		else {
 			Primitive_expressionContext pe = ctx.primitive_expression();
@@ -134,7 +121,6 @@ expression
 			Full_column_nameContext fn = ctx.full_column_name();
 			if (fn != null)
 				return new ExprPart(fn.getText());
-
 
 			return null;
 		}

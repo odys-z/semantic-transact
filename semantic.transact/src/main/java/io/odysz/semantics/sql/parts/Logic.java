@@ -1,7 +1,16 @@
 package io.odysz.semantics.sql.parts;
 
 public class Logic {
-	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull};
+	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
+
+	public String sql(op op, String rop) {
+		switch(op) {
+		case eq:
+			return "= " + rop;
+		default:
+			return " TODO ";
+		}
+	}};
 	
 	//public static final String eq = "=";
 

@@ -17,7 +17,7 @@ import io.odysz.semantics.sql.parts.Logic.type;
 import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.sql.parts.condition.Predicate;
 
-/**Sample: <a href='https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example'>at stackoverflow</a>
+/**For simple exprssion visitor sample, see <a href='https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example'>Question at StackoverFlow</a>
  * <pre>
 parser grammar SearchExprs;
 
@@ -32,6 +32,8 @@ search_condition_and
 search_condition_not
     : NOT? predicate
     ;</pre>
+ * For predicate definition, see {@link PredicatVisitor}.<br>
+ * For expression definition, see {@link ExprsVisitor}.
  * @author ody
  *
  */

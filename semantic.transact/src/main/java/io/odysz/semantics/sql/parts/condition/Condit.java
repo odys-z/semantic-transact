@@ -2,20 +2,29 @@ package io.odysz.semantics.sql.parts.condition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.odysz.semantics.sql.parts.Logic;
 import io.odysz.semantics.sql.parts.Logic.op;
 import io.odysz.semantics.sql.parts.Logic.type;
+import io.odysz.semantics.sql.parts.antlr.ConditVisitor;
 
 
+/**For grammar definition, see {@link ConditVisitor} 
+ * @author ody
+ *
+ */
 public class Condit extends Predicate {
 
-	private type logitype;
-	private List<Condit> condts;
+	protected type logitype;
+	protected List<Condit> condts;
 
-	// TODO bug?
-	Predicate predict;
-
+	/**When this is not null, this object is representing search_condition_not:<pre>
+search_condition_not
+    : NOT? predicate
+    ;</pre>
+	 */
+	protected Predicate predict;
 
 	public Condit(op op, String lop, String rop) {
 		super(op, lop, rop);
@@ -29,6 +38,7 @@ public class Condit extends Predicate {
 
 	public Condit(Predicate predicate) {
 		this.predict = predicate;
+		// condts = new ArrayList<Condit>();
 	}
 
 	public Condit and(Condit and) {
@@ -61,8 +71,29 @@ public class Condit extends Predicate {
 	}
 
 	public String sql() {
-		// TODO Auto-generated method stub
-		return "";
+		// handling in 3 grammar rule: search_condition, search_condition_and, search_condition_not
+		// 1. search_condition_not
+		if (predict != null)
+			return predict.sql();
+		// search_condition_and
+		else if (logitype == type.and) {
+			if (condts != null && condts.size() > 0) {
+				String sql = condts.stream()
+					.map(cdt -> cdt.sql())
+					.collect(Collectors.joining(" AND "));
+				return sql;
+			}
+		}
+		else if (logitype == type.or) {
+			if (condts != null && condts.size() > 0) {
+				String sql = condts.stream()
+					.map(cdt -> cdt.sql())
+					.collect(Collectors.joining(" OR "));
+				return sql;
+			}
+		}
+		// search_condition
+		return super.sql();
 	}
 
 }

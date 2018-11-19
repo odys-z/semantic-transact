@@ -42,4 +42,8 @@ public class Predicate extends AbsPart {
 	public void not(TerminalNode not) {
 		negative = not != null && not.getText() != null && not.getText().length() > 0;
 	}
+
+	public String sql() {
+		return String.format("%s %s", l.sql(), op.sql(op, r.sql()));
+	}
 }

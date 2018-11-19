@@ -18,4 +18,10 @@ public class ExprPart extends AbsPart {
 		lexp = id;
 	}
 
+	public String sql() {
+		if (logic == null)
+			return lexp;
+		else return String.format("%s %s %s", lexp, logic.sql(logic, rexp == null ? "" : rexp));
+	}
+
 }
