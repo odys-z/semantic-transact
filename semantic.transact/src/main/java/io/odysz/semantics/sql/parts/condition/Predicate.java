@@ -28,9 +28,6 @@ public class Predicate extends AbsPart {
 		this.r = rexpr;
 	}
 
-//	public Predicate(op op, List<ExprPart> expression,
-//			Expression_listContext expression_list, boolean... not) { }
-
 	public Predicate(Logic.op inlike, ExprPart expression,
 			List<ExprPart> expressions, boolean... not) {
 	}
