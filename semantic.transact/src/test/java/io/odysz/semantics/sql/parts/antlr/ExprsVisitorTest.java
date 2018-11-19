@@ -15,19 +15,4 @@ public class ExprsVisitorTest {
 		assertEquals(condt.toString(), strExpr);
 	}
 
-	@Test
-	public void testOp() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRop() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testLop() {
-		fail("Not yet implemented");
-	}
-
 }
