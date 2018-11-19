@@ -1,13 +1,15 @@
 package io.odysz.semantics.sql.parts.antlr;
 
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import gen.antlr.sql.exprs.SearchExprs.PredicateContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
+import io.odysz.semantics.sql.parts.Logic;
+import io.odysz.semantics.sql.parts.condition.Condit;
+import io.odysz.semantics.sql.parts.condition.ExprPart;
 import io.odysz.semantics.sql.parts.condition.Predicate;
 
 /**
@@ -46,7 +48,51 @@ public class PredicatVisitor extends SearchExprsBaseVisitor<Predicate> {
 	@Override
 	public Predicate visitPredicate(PredicateContext ctx) {
 		super.visitPredicate(ctx);
-		return new Predicate();
+		
+		ExprsVisitor expvisit = new ExprsVisitor();
+
+		List<ExprPart> exprs = ctx.expression()
+				.stream()
+				.map(expr -> expr.accept(expvisit))
+				.collect(Collectors.toList());
+
+		boolean not = ctx.NOT() != null;
+
+		if (ctx.comparison_operator() != null) {
+			Logic.op op = Logic.op(ctx.comparison_operator().getText());
+			return new Predicate(op, exprs.get(0), exprs.get(1));
+		}
+		// IN
+		else if (ctx.IN() != null) {
+			List<ExprPart> exprlst = ctx.expression()
+				.stream()
+				.map(expr -> expr.accept(expvisit))
+				.collect(Collectors.toList());
+			return new Predicate(not ? Logic.op.notin : Logic.op.in,
+					exprs.get(0), exprlst, not);
+		}
+		// LIKE
+		else if (ctx.LIKE() != null) {
+			// TODO modify token LIKE
+			Logic.op op = Logic.op(ctx.LIKE().getText(), not);
+			List<ExprPart> expr2 = ctx.expression()
+				.stream()
+				.map(expr -> expr.accept(expvisit))
+				.collect(Collectors.toList());
+			return new Predicate(op, exprs.get(0), expr2);
+		}
+		// is (not) null
+		else if (ctx.IS() != null) {
+			Logic.op op = ctx.null_notnull().NOT() == null ? Logic.op.isnull : Logic.op.isNotnull;
+			String rnull = ctx.null_notnull().getText();
+			return new Predicate(op, exprs.get(0), rnull);
+		}
+		// (search_conditons)
+		else {
+			ConditVisitor vist = new ConditVisitor();
+			Condit condit = vist.visit(ctx.search_condition());
+			return condit;
+		}
 	}
 
 

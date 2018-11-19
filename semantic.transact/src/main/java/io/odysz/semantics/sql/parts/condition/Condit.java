@@ -13,7 +13,8 @@ public class Condit extends Predicate {
 	private type logitype;
 	private List<Condit> condts;
 
-	// Predicate predict;
+	// TODO bug?
+	Predicate predict;
 
 
 	public Condit(op op, String lop, String rop) {
@@ -24,6 +25,10 @@ public class Condit extends Predicate {
 		super();
 		this.logitype = type;
 		this.condts = condts;
+	}
+
+	public Condit(Predicate predicate) {
+		this.predict = predicate;
 	}
 
 	public Condit and(Condit and) {
@@ -53,6 +58,11 @@ public class Condit extends Predicate {
 
 	public Condit or(String logic, String from, String... to) {
 		return this;
+	}
+
+	public String sql() {
+		// TODO Auto-generated method stub
+		return "";
 	}
 
 }

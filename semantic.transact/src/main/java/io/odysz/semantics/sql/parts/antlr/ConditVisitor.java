@@ -19,6 +19,8 @@ import io.odysz.semantics.sql.parts.condition.Predicate;
 
 /**Sample: <a href='https://stackoverflow.com/questions/23092081/antlr4-visitor-pattern-on-simple-arithmetic-example'>at stackoverflow</a>
  * <pre>
+parser grammar SearchExprs;
+
 search_condition
     : search_condition_and (OR search_condition_and)*
     ;
@@ -86,7 +88,7 @@ public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
 		PredicatVisitor vist = new PredicatVisitor();
 		Predicate predicate = vist.visit(ctx.predicate());
 		predicate.not(ctx.NOT());
-		return (Condit) predicate;
+		return new Condit(predicate);
 	}
 
 
