@@ -7,6 +7,20 @@ public class Logic {
 		switch(op) {
 		case eq:
 			return "= " + rop;
+		case ne:
+			return "<> " + rop;
+		case lt:
+			return "< " + rop;
+		case le:
+			return "<= " + rop;
+		case gt:
+			return "> " + rop;
+		case ge:
+			return ">= " + rop;
+		case like:
+			return "like " + rop;
+		case in:
+			return "in (" + rop + ")";
 		default:
 			return " TODO ";
 		}

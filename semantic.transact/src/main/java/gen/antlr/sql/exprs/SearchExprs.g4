@@ -1,13 +1,15 @@
 /* Search condtion 
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * section select_statement, seach_conditon_list and expression
+ * compile:
+ * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
  */
 
 parser grammar SearchExprs;
 options { tokenVocab=TSqlLexer; }
 
 search_condition
-    : search_condition_and (OR search_condition_and)*
+    : search_condition_and (OR search_condition_and)* EOF
     ;
 
 search_condition_and
