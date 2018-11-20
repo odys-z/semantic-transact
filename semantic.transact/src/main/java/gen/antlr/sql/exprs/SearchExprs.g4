@@ -2,6 +2,7 @@
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * section select_statement, seach_conditon_list and expression
  * compile:
+ * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
  * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
  */
 
