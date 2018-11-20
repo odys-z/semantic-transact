@@ -14,7 +14,7 @@ import io.odysz.semantics.x.StException;
 public class TestTransc {
 
 	private User user;
-	private Transc st;
+	private Transcxt st;
 
 	@Before
 	public void setUp() throws Exception {
@@ -37,7 +37,7 @@ public class TestTransc {
 		ds0.addColumn("a_log", "userId", "varchar", 50);
 		ds0.addColumn("a_log", "txt", "text", 0);
 		
-		st = new Transc(ds0);
+		st = new Transcxt(ds0);
 		assertFalse(ds0 == null);
 	}
 

@@ -7,12 +7,11 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
  * @author ody
  *
  */
-public class Transc {
-
+public class Transcxt {
 
 	private DataSource ds;
 
-	protected Transc(DataSource ds) {
+	protected Transcxt(DataSource ds) {
 		this.ds = ds;
 	}
 

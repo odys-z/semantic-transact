@@ -15,4 +15,5 @@ expression           : expression op expression
  */
 abstract public class AbsPart {
 
+	public abstract String sql();
 }
