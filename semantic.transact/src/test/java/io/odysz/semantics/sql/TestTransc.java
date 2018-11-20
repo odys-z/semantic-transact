@@ -46,7 +46,7 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
-			.j("a_rolefunc rf", Sql.condt("f.funcId=rf.funcId rf.roleId='%s'", user.userId()))
+			.j("a_rolefunc rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "Y")
