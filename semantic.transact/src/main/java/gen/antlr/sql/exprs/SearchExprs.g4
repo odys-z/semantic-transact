@@ -5,6 +5,7 @@
  * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
  * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
  */
+ 
 
 parser grammar SearchExprs;
 options { tokenVocab=TSqlLexer; }
