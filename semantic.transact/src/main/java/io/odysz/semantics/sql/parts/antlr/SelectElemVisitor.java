@@ -4,10 +4,17 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import gen.antlr.sql.exprs.SearchExprs;
-import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
 import gen.antlr.sql.exprs.TSqlLexer;
 import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
+import gen.antlr.sql.select.SelectParts;
+import gen.antlr.sql.select.SelectPartsBaseVisitor;
+import gen.antlr.sql.select.SelectParts.As_column_aliasContext;
+import gen.antlr.sql.select.SelectParts.AsteriskContext;
+import gen.antlr.sql.select.SelectParts.Column_elemContext;
+import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
+import gen.antlr.sql.select.SelectParts.Table_nameContext;
 import io.odysz.semantics.sql.parts.select.SelectElem;
+import io.odysz.semantics.sql.parts.select.SelectElem.ElemType;
 
 /**<pre>
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
@@ -34,13 +41,17 @@ column_elem
     // changed:
     : (table_name '.')? (column_name=id) as_column_alias?
     ;
+
+asterisk
+    : '*'
+    | table_name '.' asterisk
+    ;
 </pre> 
  * @author ody
  *
  */
 @SuppressWarnings("deprecation")
-public class SelectElemVisitor extends SearchExprsBaseVisitor<SelectElem> {
-	static SelectElemVisitor selemVisitor = new SelectElemVisitor();
+public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 
 	/**Parse column expression (select_list_elem without alias).
 	 * @param colExpr
@@ -50,10 +61,35 @@ public class SelectElemVisitor extends SearchExprsBaseVisitor<SelectElem> {
 		ANTLRInputStream inputStream = new ANTLRInputStream(colExpr);
         TSqlLexer markupLexer = new TSqlLexer(inputStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(markupLexer);
-        SearchExprs exprParser = new SearchExprs(commonTokenStream);
+        SelectParts elemParser = new SelectParts(commonTokenStream);
  
-        ExpressionContext ctx = exprParser.expression();
+        Select_list_elemContext ctx = elemParser.select_list_elem();
+
+        SelectElemVisitor selemVisitor = new SelectElemVisitor();
         return selemVisitor.visit(ctx);  
+	}
+
+	@Override
+	public SelectElem visitSelect_list_elem(Select_list_elemContext ctx) {
+		// return super.visitSelect_list_elem(ctx);
+		AsteriskContext asterisk = ctx.asterisk();
+		if (asterisk != null) {
+			// Table_nameContext t = asterisk.table_name();
+			return new SelectElem(ElemType.asterisk, asterisk.getText());
+		}
+		else {
+			Column_elemContext colElem = ctx.column_elem();
+			Table_nameContext tabl = colElem.table_name();
+			SelectElem ele;
+			if (tabl == null)
+				ele = new SelectElem(ElemType.col, colElem.column_name.getText());
+			else
+				ele = new SelectElem(ElemType.tableCol, tabl.getText(), colElem.column_name.getText());
+			As_column_aliasContext alias = colElem.as_column_alias();
+			if (alias != null && alias.column_alias() != null)
+				ele.as(alias.column_alias().getText());
+			return ele;
+		}
 	}
 
 }

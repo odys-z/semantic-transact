@@ -35,13 +35,36 @@ column_elem
  */
 public class SelectElem extends AbsPart {
 
+	public enum ElemType { asterisk, tableCol, col, func, expr }
+
+	private ElemType elemtype;
+	private String tabl;
+	private String col;
+	private String alias;
+
+	public SelectElem(ElemType elemType, String col) {
+		this.elemtype = elemType;
+		this.col = col;
+	}
+
+	public SelectElem(ElemType type, String tabl, String col) {
+		this.elemtype = type;
+		this.tabl = tabl;
+		this.col = col;
+	}
+
 	@Override
 	public String sql() {
-		return null;
+		if (elemtype == ElemType.asterisk)
+			return col;
+		if (alias == null)
+			return tabl + "." + col;
+		else 
+			return tabl + "." + col + " " + alias;
 	}
 
 	public void as(String alias) {
-		
+		this.alias = alias;
 	}
 
 }

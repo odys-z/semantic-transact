@@ -1,6 +1,7 @@
 /* Select parts, such as select_list_elem.
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * compile:
+ * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.exprs
  */
 
 parser grammar SelectParts;
@@ -11,6 +12,7 @@ import SearchExprs;
 select_list
     : select_list_elem (',' select_list_elem)*
 	;
+
 select_list_elem
     : asterisk
     | column_elem
@@ -37,8 +39,8 @@ column_elem
     : (table_name '.')? (column_name=id) as_column_alias?
     ;
 
-
-
-
-
+asterisk
+    : '*'
+    | table_name '.' asterisk
+    ;
 
