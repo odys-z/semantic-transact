@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+import io.odysz.semantics.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.sql.parts.select.SelectElem;
 
@@ -159,13 +159,13 @@ public class Query extends Statement {
 	 */
 	public Query col(String col, String... alias) {
 		// parser...
-		// SelectElemVisitor.visit(col) 
-		SelectElem colElem = null;
-		selectList.add(colElem);
+		SelectElem colElem = SelectElemVisitor.parse(col) ;
+
 		if (alias != null && alias.length > 0 && alias[0] != null)
 			colElem.as(alias[0]);
 		if (selectList == null)
 			selectList = new ArrayList<SelectElem>();
+
 		selectList.add(colElem);
 		return this;
 	}

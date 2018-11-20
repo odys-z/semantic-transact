@@ -39,17 +39,16 @@ search_condition_not
  */
 @SuppressWarnings("deprecation")
 public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
+	static ConditVisitor visitor = new ConditVisitor();                
+	static PredicatVisitor predVist = new PredicatVisitor();
+
 	public static Condit parse(String strExpr) {
 		ANTLRInputStream inputStream = new ANTLRInputStream(strExpr);
-//		ANTLRInputStream inputStream = new ANTLRInputStream(
-//	            "I would like to [b][i]emphasize[/i][/b] this and [u]underline [b]that[/b][/u] ." +
-//	            "Let's not forget to quote: [quote author=\"John\"]You're wrong![/quote]");
 	        TSqlLexer markupLexer = new TSqlLexer(inputStream);
 	        CommonTokenStream commonTokenStream = new CommonTokenStream(markupLexer);
 	        SearchExprs exprParser = new SearchExprs(commonTokenStream);
 	 
 	        Search_conditionContext ctx = exprParser.search_condition();                
-	        ConditVisitor visitor = new ConditVisitor();                
 	        return visitor.visit(ctx);  
 	}
 	
@@ -87,8 +86,7 @@ public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
 	@Override
 	public Condit visitSearch_condition_not(Search_condition_notContext ctx) {
 		// Predicate predicate = ctx.predicate().accept(new PredicatVisitor());
-		PredicatVisitor vist = new PredicatVisitor();
-		Predicate predicate = vist.visit(ctx.predicate());
+		Predicate predicate = predVist.visit(ctx.predicate());
 		predicate.not(ctx.NOT());
 		return new Condit(predicate);
 	}
