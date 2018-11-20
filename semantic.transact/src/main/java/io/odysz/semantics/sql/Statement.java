@@ -20,8 +20,8 @@ public abstract class Statement {
 
 	// private DataSource ds;
 
-	protected String mt;
-	protected String malias;
+	protected String mainTabl;
+	protected String mainAlias;
 	
 	/**Conditions of where clause * */
 	// protected ArrayList<Condt> wheres;
@@ -31,12 +31,12 @@ public abstract class Statement {
 	 */
 	protected Condit where;
 
-	protected Transc transc;
+	protected Transcxt transc;
 
-	public Statement(Transc transc, String tabl, String alias) {
+	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
-		this.mt = tabl;
-		this.malias = alias; // == null || alias.length == 0 ? null : alias[0];
+		this.mainTabl = tabl;
+		this.mainAlias = alias; // == null || alias.length == 0 ? null : alias[0];
 	}
 
 	public Statement where(String logic, String loperand, String roperand) throws StException {

@@ -71,11 +71,11 @@ search_condition_not
 	}
 
 	public String sql() {
-		// handling in 3 grammar rule: search_condition, search_condition_and, search_condition_not
+		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
 		if (predict != null)
 			return predict.sql();
-		// search_condition_and
+		// 2. search_condition_and
 		else if (logitype == type.and) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
@@ -84,6 +84,7 @@ search_condition_not
 				return sql;
 			}
 		}
+		// 3. search_conditon_not
 		else if (logitype == type.or) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
@@ -92,7 +93,7 @@ search_condition_not
 				return sql;
 			}
 		}
-		// search_condition
+		// 4. search_condition
 		return super.sql();
 	}
 

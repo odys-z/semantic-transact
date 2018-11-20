@@ -117,7 +117,8 @@ constant
     | BINARY
     | sign? DECIMAL
     | sign? (REAL | FLOAT)  // float or decimal
-    | sign? dollar='$' (DECIMAL | FLOAT)       // money
+    // TODO - WHAT FOR?
+    // | sign? dollar='$' (DECIMAL | FLOAT)       // money
     ;
 
 sign
