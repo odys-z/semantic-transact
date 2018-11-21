@@ -1,6 +1,7 @@
 package io.odysz.semantics.sql.parts.condition;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -15,8 +16,10 @@ public class Predicate extends AbsPart {
 	private boolean brace;
 	private Condit search_condit;
 
-	public Predicate(Logic.op op, ExprPart exprPart, String nnn) {
-		// TODO Auto-generated constructor stub
+	public Predicate(Logic.op op, ExprPart lexpr, String rop) {
+		this.op = op;
+		this.l = lexpr;
+		this.r = new ExprPart(rop);
 	}
 
 	public Predicate() {
@@ -29,7 +32,13 @@ public class Predicate extends AbsPart {
 	}
 
 	public Predicate(Logic.op inlike, ExprPart expression,
-			List<ExprPart> expressions, boolean... not) {
+			List<ExprPart> inlikes, boolean... not) {
+		op = inlike;
+		l = expression;
+		String rstr = inlikes.stream()
+			.map(var -> var.sql()) // variable resolving goes here 
+			.collect(Collectors.joining(", "));
+		r = new ExprPart(rstr);
 	}
 
 	public Predicate(Logic.op op, String from, String nnn) {
@@ -53,7 +62,8 @@ public class Predicate extends AbsPart {
 	public String sql() {
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql());
-		else
-			return String.format("%s %s", l.sql(), op.sql(op, r.sql()));
+		else {
+			return String.format("%s %s", l.sql(), op.sql(op, r.sql(), negative));
+		}
 	}
 }

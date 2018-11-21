@@ -8,7 +8,11 @@ import io.odysz.semantics.sql.parts.condition.Condit;
 public class Sql {
 	
 	public static Condit condt(String format, Object... args) {
-		// return new Condt(new ExprBuilder(format, (Object[])args));
+		// try format == op - user can be confused like condt("=", "f.c1", "v1");
+		op op = Logic.op(format);
+		if (op != null && args != null && args.length == 2)
+			return condt(op, (String)args[0], (String)args[1]);
+
 
 		// TODO parse
 		String exp = String.format(format, args);

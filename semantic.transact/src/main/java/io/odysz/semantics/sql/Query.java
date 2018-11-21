@@ -1,11 +1,19 @@
 package io.odysz.semantics.sql;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import io.odysz.semantics.sql.parts.antlr.ConditVisitor;
 import io.odysz.semantics.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.semantics.sql.parts.condition.Condit;
+import io.odysz.semantics.sql.parts.condition.ExprPart;
+import io.odysz.semantics.sql.parts.select.JoinTabl;
+import io.odysz.semantics.sql.parts.select.JoinTabl.join;
 import io.odysz.semantics.sql.parts.select.SelectElem;
 
 /**
@@ -80,6 +88,7 @@ column_elem
  */
 public class Query extends Statement {
 	private List<SelectElem> selectList;
+	private List<JoinTabl> joins;
 
 	/**
 	private SelectQry q;
@@ -170,23 +179,30 @@ public class Query extends Statement {
 		return this;
 	}
 
-	/**Try figure out is the col is an expression (a.col1, f(a.col), ...), then add the col to qry.
-	 * @param qry
-	 * @param col
-	private void addCol(String col) {
-		// parser...
-		// SelectElemVisitor.visit(col) 
-		SelectElem colElem = null;
-		selectList.add(colElem);
-	}
-	 */
-
 	/**Inner Join
 	 * @param withTabl
 	 * @param onCondtion e.g "t.f1='a' t.f2='b'", 2 AND conditions
 	 * @return
 	 */
-	public Query j(String withTabl, Condit onCondtion) {
+	public Query j(String withTabl, Condit onCondit) {
+		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
+		if (joins == null)
+			joins = new ArrayList<JoinTabl>();
+		joins.add(joining);
+		return this;
+	}
+
+	public Query j(String withTabl, String alias, Condit onCondit) {
+		JoinTabl joining = new JoinTabl(join.j, withTabl, alias, onCondit);
+		if (joins == null)
+			joins = new ArrayList<JoinTabl>();
+		joins.add(joining);
+		return this;
+	}
+
+	public Query j(String withTabl, String onCondit) {
+		Condit condit = ConditVisitor.parse(onCondit);
+		j(withTabl, condit);
 		return this;
 	}
 
@@ -197,13 +213,34 @@ public class Query extends Statement {
 	}
 
 	public String sql() {
+		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
+
+		Stream<String> s = Stream.concat(
+				// select ... from ... join ...
+				Stream.concat(
+						// select ...
+						Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
+						// from ... join ...
+						Stream.concat(
+								Stream.concat(Stream.of(new ExprPart("from")),
+										Stream.of(new JoinTabl(join.main, mainTabl, mainAlias))),
+								// join can be null
+								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
+					),
+				// where ... group by ... order by ...
+				Stream.of(new ExprPart("where")).filter(w -> false)
+				// Stream.concat(null, null).filter(m -> m != null).map(e -> (ExprPart)e)
+			).map(m -> m.sql());
+
+		return s.collect(Collectors.joining(" "));
+
 		// FIXME append to buffer?
-		return String.format("select %s from %s",
-				selectList
-					.stream()
-					.map(ele -> ele.sql())
-					.collect(Collectors.joining(", ")),
-				"joinings..."
-				);
+//		return String.format("select %s from %s",
+//				selectList
+//					.stream()
+//					.map(ele -> ele.sql())
+//					.collect(Collectors.joining(", ")),
+//				"joinings..."
+//				);
 	}
 }

@@ -57,10 +57,14 @@ public class SelectElem extends AbsPart {
 	public String sql() {
 		if (elemtype == ElemType.asterisk)
 			return col;
-		if (alias == null)
-			return tabl + "." + col;
+		String sql;
+		if (tabl == null)
+			sql = col;
 		else 
-			return tabl + "." + col + " " + alias;
+			sql = tabl + "." + col;
+		if (alias != null)
+			return sql += " " + alias;
+		return sql;
 	}
 
 	public void as(String alias) {

@@ -62,7 +62,7 @@ public class PredicatVisitor extends SearchExprsBaseVisitor<Predicate> {
 		}
 		// IN
 		else if (ctx.IN() != null) {
-			List<ExprPart> exprlst = ctx.expression()
+			List<ExprPart> exprlst = ctx.expression_list().expression()
 				.stream()
 				.map(expr -> expr.accept(expvisit))
 				.collect(Collectors.toList());
@@ -71,10 +71,9 @@ public class PredicatVisitor extends SearchExprsBaseVisitor<Predicate> {
 		}
 		// LIKE
 		else if (ctx.LIKE() != null) {
-			// TODO modify token LIKE
 			Logic.op op = Logic.op(ctx.LIKE().getText(), not);
 			List<ExprPart> expr2 = ctx.expression()
-				.stream()
+				.stream().skip(1)
 				.map(expr -> expr.accept(expvisit))
 				.collect(Collectors.toList());
 			return new Predicate(op, exprs.get(0), expr2);

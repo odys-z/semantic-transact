@@ -18,6 +18,8 @@ select_list_elem
     | column_elem
     // TODO to be understood
     // | udt_elem
+    // Odys-z function-call
+    | function_call as_column_alias
     
     // Modified
     // | expression_elem

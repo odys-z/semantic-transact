@@ -3,9 +3,7 @@ package io.odysz.semantics.sql.parts.antlr;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import gen.antlr.sql.exprs.SearchExprs;
 import gen.antlr.sql.exprs.TSqlLexer;
-import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
 import gen.antlr.sql.select.SelectParts;
 import gen.antlr.sql.select.SelectPartsBaseVisitor;
 import gen.antlr.sql.select.SelectParts.As_column_aliasContext;

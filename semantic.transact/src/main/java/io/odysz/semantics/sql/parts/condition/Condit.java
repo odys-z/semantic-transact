@@ -67,6 +67,12 @@ search_condition_not
 	}
 
 	public Condit or(String logic, String from, String... to) {
+		// TODO
+		// TODO
+		// TODO
+		// TODO
+		// TODO
+		// TODO
 		return this;
 	}
 
@@ -93,7 +99,9 @@ search_condition_not
 				return sql;
 			}
 		}
-		// 4. search_condition
+		else if (predict == null && condts == null)
+			return "";
+		// 4. search_condition - CAN'T reach here, it's Predicat's business.
 		return super.sql();
 	}
 

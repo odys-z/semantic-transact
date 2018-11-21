@@ -3,7 +3,7 @@ package io.odysz.semantics.sql.parts;
 public class Logic {
 	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
-	public String sql(op op, String rop) {
+	public String sql(op op, String rop, boolean... not) {
 		switch(op) {
 		case eq:
 			return "= " + rop;
@@ -18,9 +18,22 @@ public class Logic {
 		case ge:
 			return ">= " + rop;
 		case like:
-			return "like " + rop;
+			if (not != null && not.length > 0 && not[0])
+				return "not like " + rop;
+			else
+				return "like " + rop;
 		case in:
-			return "in (" + rop + ")";
+			if (not != null && not.length > 0 && not[0])
+				return "not in (" + rop + ")";
+			else
+				return "in (" + rop + ")";
+		case isnull:
+			if (not != null && not.length > 0 && not[0])
+				return "is not null";
+			else
+				return "is null";
+		case isNotnull:
+			return "is not null";
 		default:
 			return " TODO ";
 		}
@@ -29,6 +42,7 @@ public class Logic {
 	//public static final String eq = "=";
 
 	public static op op(String oper, boolean... withNot) {
+		oper = oper.toLowerCase();
 		op jc = "=".equals(oper) || "eq".equals(oper) ? op.eq
 	   				 : "%".equals(oper) || "like".equals(oper) ? op.like
 	   				 : "=%".equals(oper) || "rlike".equals(oper) ? op.rlike
