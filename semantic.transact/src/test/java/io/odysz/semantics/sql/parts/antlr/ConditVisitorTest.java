@@ -11,10 +11,15 @@ public class ConditVisitorTest {
 	@Test
 	public void testLike() {
 		String expr = "f.col LIKE 'abc'";
-		String expect = "f.col like 'abc'";
+		String expect = "f.col like '%abc%'";
 		test(expr, expect);
 
 		expr = "f.col % 'abc'";
+//		expect = "f.col like '%abc'";
+		test(expr, expect);
+
+		expr = "f.col %~ 'abc'";
+		expect = "f.col like '%abc'";
 		test(expr, expect);
 	}
 

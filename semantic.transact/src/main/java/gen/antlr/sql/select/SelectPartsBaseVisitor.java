@@ -2,34 +2,6 @@
 package gen.antlr.sql.select;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
-import gen.antlr.sql.select.SelectParts.Aggregate_windowed_functionContext;
-import gen.antlr.sql.select.SelectParts.As_column_aliasContext;
-import gen.antlr.sql.select.SelectParts.Assignment_operatorContext;
-import gen.antlr.sql.select.SelectParts.AsteriskContext;
-import gen.antlr.sql.select.SelectParts.Bracket_expressionContext;
-import gen.antlr.sql.select.SelectParts.Column_aliasContext;
-import gen.antlr.sql.select.SelectParts.Column_elemContext;
-import gen.antlr.sql.select.SelectParts.Comparison_operatorContext;
-import gen.antlr.sql.select.SelectParts.ConstantContext;
-import gen.antlr.sql.select.SelectParts.Constant_expressionContext;
-import gen.antlr.sql.select.SelectParts.ExpressionContext;
-import gen.antlr.sql.select.SelectParts.Expression_listContext;
-import gen.antlr.sql.select.SelectParts.Full_column_nameContext;
-import gen.antlr.sql.select.SelectParts.Func_proc_nameContext;
-import gen.antlr.sql.select.SelectParts.Function_callContext;
-import gen.antlr.sql.select.SelectParts.IdContext;
-import gen.antlr.sql.select.SelectParts.Null_notnullContext;
-import gen.antlr.sql.select.SelectParts.PredicateContext;
-import gen.antlr.sql.select.SelectParts.Primitive_expressionContext;
-import gen.antlr.sql.select.SelectParts.Search_conditionContext;
-import gen.antlr.sql.select.SelectParts.Search_condition_andContext;
-import gen.antlr.sql.select.SelectParts.Search_condition_notContext;
-import gen.antlr.sql.select.SelectParts.Select_listContext;
-import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
-import gen.antlr.sql.select.SelectParts.SignContext;
-import gen.antlr.sql.select.SelectParts.Table_nameContext;
-import gen.antlr.sql.select.SelectParts.Unary_operator_expressionContext;
-
 /**
  * This class provides an empty implementation of {@link SelectPartsVisitor},
  * which can be extended to create a visitor which only needs to handle a subset

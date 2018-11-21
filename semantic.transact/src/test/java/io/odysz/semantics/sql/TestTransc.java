@@ -62,8 +62,8 @@ public class TestTransc {
 		
 		st.select("a_log", "lg")
 			// TODO test count(*)
-			// .col("COUNT(*)", "cnt")
-			.col("count", "cnt")
+			.col("COUNT(*)", "cnt")
+			// .col("count", "cnt")
 			.where("=", "userId", "user1")
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
 			.where(Sql.condt("userId = '%s'", "user2").or("userId = '%s'", "user2"),

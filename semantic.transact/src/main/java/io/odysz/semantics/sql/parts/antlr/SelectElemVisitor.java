@@ -3,12 +3,14 @@ package io.odysz.semantics.sql.parts.antlr;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import gen.antlr.sql.select.SelectParts.Function_callContext;
 import gen.antlr.sql.exprs.TSqlLexer;
 import gen.antlr.sql.select.SelectParts;
 import gen.antlr.sql.select.SelectPartsBaseVisitor;
 import gen.antlr.sql.select.SelectParts.As_column_aliasContext;
 import gen.antlr.sql.select.SelectParts.AsteriskContext;
 import gen.antlr.sql.select.SelectParts.Column_elemContext;
+import gen.antlr.sql.select.SelectParts.ExpressionContext;
 import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
 import gen.antlr.sql.select.SelectParts.Table_nameContext;
 import io.odysz.semantics.sql.parts.select.SelectElem;
@@ -75,10 +77,11 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			// Table_nameContext t = asterisk.table_name();
 			return new SelectElem(ElemType.asterisk, asterisk.getText());
 		}
-		else {
-			Column_elemContext colElem = ctx.column_elem();
+
+		SelectElem ele;
+		Column_elemContext colElem = ctx.column_elem();
+		if (colElem != null) {
 			Table_nameContext tabl = colElem.table_name();
-			SelectElem ele;
 			if (tabl == null)
 				ele = new SelectElem(ElemType.col, colElem.column_name.getText());
 			else
@@ -88,6 +91,26 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 				ele.as(alias.column_alias().getText());
 			return ele;
 		}
+
+		String text = null;
+		Function_callContext f = ctx.function_call();
+		if (f != null) 
+			text = f.getText();
+		else {
+			ExpressionContext exp = ctx.expression();
+			if (exp != null) 
+				text = exp.getText();
+		}
+		
+		if (text != null) {
+			ele = new SelectElem(ElemType.func, text);
+			As_column_aliasContext alias = ctx.as_column_alias();
+			if (alias != null && alias.column_alias() != null)
+				ele.as(alias.column_alias().getText());
+			return ele;
+		}
+		
+		return null;
 	}
 
 }
