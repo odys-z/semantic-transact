@@ -99,8 +99,8 @@ search_condition_not
 				return sql;
 			}
 		}
-		else if (predict == null && condts == null)
-			return "";
+//		else if (predict == null && condts == null)
+//			return "";
 		// 4. search_condition - CAN'T reach here, it's Predicat's business.
 		return super.sql();
 	}

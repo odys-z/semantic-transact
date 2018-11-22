@@ -36,6 +36,9 @@ public class JoinTabl extends Condit {
 	}
 
 	public String sql() {
+		if (jtype == join.main)
+			return String.format("from %s %s", jtabl, jtablias == null ? "" : jtablias);
+
 		String condt = super.sql();
 		if (condt != null && condt.length() > 0)
 			return String.format("%s %s %s on %s", sql(jtype), jtabl,

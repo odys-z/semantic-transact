@@ -50,13 +50,13 @@ public class TestTransc {
 			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
-			.where("=", "f.isUsed", "Y")
+			.where("=", "f.isUsed", "'Y'")
 			.commit(sqls);
 
 		st.select("a_log", "lg")
 			.col("lg.stamp", "logtime")
 			.col("lg.txt", "log")
-			.where(">=", "lg.stamp", "1776-07-04")
+			.where(">=", "lg.stamp", "'1776-07-04'")
 			.where(Sql.condt("userId IN (%s)", Sql.str(users())))
 			.commit(sqls);
 		

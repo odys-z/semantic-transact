@@ -222,14 +222,13 @@ public class Query extends Statement {
 						Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
 						// from ... join ...
 						Stream.concat(
-								Stream.concat(Stream.of(new ExprPart("from")),
-										Stream.of(new JoinTabl(join.main, mainTabl, mainAlias))),
+								Stream.of(new JoinTabl(join.main, mainTabl, mainAlias)),
 								// join can be null
 								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
-					),
-				// where ... group by ... order by ...
-				Stream.of(new ExprPart("where")).filter(w -> false)
-				// Stream.concat(null, null).filter(m -> m != null).map(e -> (ExprPart)e)
+				), Stream.concat(
+						// where ... group by ... order by ...
+						Stream.of(new ExprPart("where")).filter(w -> where != null),
+						Stream.of(where).filter(w -> where != null))
 			).map(m -> m.sql());
 
 		return s.collect(Collectors.joining(" "));

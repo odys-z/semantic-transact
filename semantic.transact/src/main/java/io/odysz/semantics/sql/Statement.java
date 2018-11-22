@@ -3,11 +3,6 @@ package io.odysz.semantics.sql;
 
 import java.util.ArrayList;
 
-import com.healthmarketscience.sqlbuilder.BinaryCondition;
-import com.healthmarketscience.sqlbuilder.Condition;
-import com.healthmarketscience.sqlbuilder.CustomSql;
-import com.healthmarketscience.sqlbuilder.InCondition;
-
 import io.odysz.semantics.sql.parts.Logic;
 import io.odysz.semantics.sql.parts.Sql;
 import io.odysz.semantics.sql.parts.condition.Condit;
@@ -76,56 +71,56 @@ public abstract class Statement {
 		return this;
 	}
 	
-	protected static Condition formatCond(String maintbl, String oper,
-			String ltabl, String lcol, String lconst,
-			String rtabl, String rcol, String rconst) {
-		Object lop = formatOperand(ltabl, lconst, lcol);
-		Object rop = formatOperand(rtabl, rconst, rcol);
-		
-		if (lop == null || rop == null) return null;
-
-   		String op = oper == null ? null : oper.trim().toLowerCase();
-
-   		// TODO merge with Statement.where()
-	   	Condition jc = "%".equals(op) || "like".equals(op) ? formatLikeCondition(lop, rconst)
-	   				 : "=%".equals(op) || "rlike".equals(op) ? formatRLikeCondition(lop, rconst)
-	   				 : "%=".equals(op) || "llike".equals(op) ? formatLLikeCondition(lop, rconst)
-   					 : "=".equals(op) || "eq".equals(op) ? BinaryCondition.equalTo(lop, rop)
-   					 : "<=".equals(op) || "le".equals(op) ? BinaryCondition.lessThanOrEq(lop, rop)
-   					 : "<".equals(op) || "lt".equals(op) ? BinaryCondition.lessThan(lop, rop)
-   					 : ">=".equals(op) || "ge".equals(op) ? BinaryCondition.greaterThanOrEq(lop, rop)
-   					 : ">".equals(op) || "gt".equals(op) ? BinaryCondition.greaterThan(lop, rop)
-   					 : "[]".equals(op) || "in".equals(op) ? new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")) // join condition shouldn't reach here.
-   					 : "][".equals(op) || "notin".equals(op) || "not in".equals(op) || "><".equals(op) ?
-   							 new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")).setNegate(true)
-   					 : BinaryCondition.notEqualTo(lop, rop); // <> !=
-		return jc;
-	}
+//	protected static Condition formatCond(String maintbl, String oper,
+//			String ltabl, String lcol, String lconst,
+//			String rtabl, String rcol, String rconst) {
+//		Object lop = formatOperand(ltabl, lconst, lcol);
+//		Object rop = formatOperand(rtabl, rconst, rcol);
+//		
+//		if (lop == null || rop == null) return null;
+//
+//   		String op = oper == null ? null : oper.trim().toLowerCase();
+//
+//   		// TODO merge with Statement.where()
+//	   	Condition jc = "%".equals(op) || "like".equals(op) ? formatLikeCondition(lop, rconst)
+//	   				 : "=%".equals(op) || "rlike".equals(op) ? formatRLikeCondition(lop, rconst)
+//	   				 : "%=".equals(op) || "llike".equals(op) ? formatLLikeCondition(lop, rconst)
+//   					 : "=".equals(op) || "eq".equals(op) ? BinaryCondition.equalTo(lop, rop)
+//   					 : "<=".equals(op) || "le".equals(op) ? BinaryCondition.lessThanOrEq(lop, rop)
+//   					 : "<".equals(op) || "lt".equals(op) ? BinaryCondition.lessThan(lop, rop)
+//   					 : ">=".equals(op) || "ge".equals(op) ? BinaryCondition.greaterThanOrEq(lop, rop)
+//   					 : ">".equals(op) || "gt".equals(op) ? BinaryCondition.greaterThan(lop, rop)
+//   					 : "[]".equals(op) || "in".equals(op) ? new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")) // join condition shouldn't reach here.
+//   					 : "][".equals(op) || "notin".equals(op) || "not in".equals(op) || "><".equals(op) ?
+//   							 new InCondition(lop, rop == null ? new Object[] {""} : (Object[])rconst.split(",")).setNegate(true)
+//   					 : BinaryCondition.notEqualTo(lop, rop); // <> !=
+//		return jc;
+//	}
 	
-	private static Object formatOperand(String tabl, String conststr, String col) {
-		Object lop;
-		if (conststr != null)
-			lop = conststr.replaceFirst("^'", "").replaceAll("'$", "");
-		else {
-//			if (aliases == null || !aliases.containsKey(tabl)) {
-//				lop = ds.getColumn(connId, tabl, col);
-//				// t11.lever -> t11."LEVEL"
-//				if (lop != null && ds.isKeywords(connId, col))
-//					lop = new CustomSql(String.format("%s.%s", tabl, ds.formatFieldName(connId, col)));
-//				else if (lop == null)
-//					if (verbose)
-//						Utils.logi("Can't find column: ltabl = %s, lcol = %s, lconst = %s, condition ignored.", tabl, col, conststr);
-//			}
-//			else
-//				lop = new CustomSql(String.format("%s.%s", tabl, col));
-			lop = new CustomSql(String.format("%s.%s", tabl, col));
-		}
-		return lop;
-	}
+//	private static Object formatOperand(String tabl, String conststr, String col) {
+//		Object lop;
+//		if (conststr != null)
+//			lop = conststr.replaceFirst("^'", "").replaceAll("'$", "");
+//		else {
+////			if (aliases == null || !aliases.containsKey(tabl)) {
+////				lop = ds.getColumn(connId, tabl, col);
+////				// t11.lever -> t11."LEVEL"
+////				if (lop != null && ds.isKeywords(connId, col))
+////					lop = new CustomSql(String.format("%s.%s", tabl, ds.formatFieldName(connId, col)));
+////				else if (lop == null)
+////					if (verbose)
+////						Utils.logi("Can't find column: ltabl = %s, lcol = %s, lconst = %s, condition ignored.", tabl, col, conststr);
+////			}
+////			else
+////				lop = new CustomSql(String.format("%s.%s", tabl, col));
+//			lop = new CustomSql(String.format("%s.%s", tabl, col));
+//		}
+//		return lop;
+//	}
 		
-	private static Condition formatLikeCondition(Object lop, String rconst) {
-		return BinaryCondition.like(lop, String.format("%%%s%%", rconst));
-	}
+//	private static Condition formatLikeCondition(Object lop, String rconst) {
+//		return BinaryCondition.like(lop, String.format("%%%s%%", rconst));
+//	}
 
 	/** lop like 'val%'
 	 * @param connId
@@ -134,9 +129,9 @@ public abstract class Statement {
 	 * @param rconst
 	 * @return
 	 */
-	private static Condition formatLLikeCondition(Object lop, String rconst) {
-		return BinaryCondition.like(lop, String.format("%%%s", rconst));
-	}
+//	private static Condition formatLLikeCondition(Object lop, String rconst) {
+//		return BinaryCondition.like(lop, String.format("%%%s", rconst));
+//	}
 
 	/** lop like '%val'
 	 * @param connId
@@ -145,9 +140,9 @@ public abstract class Statement {
 	 * @param rconst
 	 * @return
 	 */
-	private static Condition formatRLikeCondition(Object lop, String rconst) {
-		return BinaryCondition.like(lop, String.format("%s%%", rconst));
-	}
+//	private static Condition formatRLikeCondition(Object lop, String rconst) {
+//		return BinaryCondition.like(lop, String.format("%s%%", rconst));
+//	}
 
 	public Statement commit(ArrayList<String> sqls) throws StException {
 		throw new StException("Shouldn't reach here");
