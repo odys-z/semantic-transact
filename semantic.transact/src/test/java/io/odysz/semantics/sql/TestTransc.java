@@ -68,7 +68,7 @@ public class TestTransc {
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
 			.where(Sql.condt("userId = '%s'", "user2").or("userId = '%s'", "user2"),
 					Sql.condt("<=", "stamp", "'1911-10-10'"),
-					Sql.condt(op.eq, "userId", "'abc'"))
+					Sql.condt(op.eq, "userId", "'Sun Yat-sen'"))
 			.commit(sqls);
 
 		Utils.logi(sqls);
