@@ -34,7 +34,15 @@ public abstract class Statement {
 		this.mainAlias = alias; // == null || alias.length == 0 ? null : alias[0];
 	}
 
-	public Statement where(String logic, String loperand, String roperand) throws StException {
+	protected ArrayList<Object[]> nvs;
+
+	public Statement nv(String n, Object v) {
+		if (nvs == null)
+			nvs = new ArrayList<Object[]>();
+		return this;
+	}
+
+	public Statement where(String logic, String loperand, String roperand) {
 		// try find operand in columns
 		/*
 		switch (Logic.op(logic)) {

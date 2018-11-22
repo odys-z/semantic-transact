@@ -3,6 +3,7 @@ package io.odysz.semantics.sql;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -84,6 +85,7 @@ public class TestTransc {
 			.nv("funcId", "'a01'")
 			.commit(sqls);
 		
+		List<Object[]> vals = null;
 		st.insert("a_log")
 			.cols("logId", "stamp", "txt")
 			.values(vals)
@@ -101,7 +103,7 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.update("a_users")
 			.nv("", "")
-			.where("", "");
+			.where("=", "userId", "admin");
 	}
 
 	private String[] users() {
