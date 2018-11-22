@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.semantics.sql.parts.Sql;
 import io.odysz.semantics.sql.parts.antlr.ConditVisitor;
 import io.odysz.semantics.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.semantics.sql.parts.condition.Condit;
@@ -204,6 +205,10 @@ public class Query extends Statement {
 		Condit condit = ConditVisitor.parse(onCondit);
 		j(withTabl, condit);
 		return this;
+	}
+
+	public Query j(String withTabl, String alias, String on, Object...args) {
+		return j(withTabl, alias, Sql.condt(on, args));
 	}
 
 	@Override

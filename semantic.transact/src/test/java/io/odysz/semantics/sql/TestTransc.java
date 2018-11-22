@@ -43,7 +43,7 @@ public class TestTransc {
 	}
 
 	@Test
-	public void test() throws StException {
+	public void testSelect() throws StException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
@@ -75,6 +75,33 @@ public class TestTransc {
 		
 		// .. .. ..
 		// nothing 
+	}
+	
+	@Test
+	public void testInsert() {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_funcs")
+			.nv("funcId", "'a01'")
+			.commit(sqls);
+		
+		st.insert("a_log")
+			.cols("logId", "stamp", "txt")
+			.values(vals)
+			.commit(sqls);
+		
+		st.insert("a_rolefunc")
+			.select(st.select("a_functions", "f")
+						.col("f.funcId").col("'admin'")
+						.j("a_roles", "r", "r.roleId='%s'", "admin"))
+			.commit(sqls);
+	}
+	
+	@Test
+	public void testUpdate() {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_users")
+			.nv("", "")
+			.where("", "");
 	}
 
 	private String[] users() {
