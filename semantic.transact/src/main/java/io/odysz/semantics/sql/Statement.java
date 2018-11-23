@@ -5,10 +5,11 @@ import java.util.ArrayList;
 
 import io.odysz.semantics.sql.parts.Logic;
 import io.odysz.semantics.sql.parts.Sql;
+import io.odysz.semantics.sql.parts.condition.AbsPart;
 import io.odysz.semantics.sql.parts.condition.Condit;
 import io.odysz.semantics.x.StException;
 
-public abstract class Statement {
+public abstract class Statement extends AbsPart {
 	public enum Type { select, insert, update, delete }
 
 	protected static boolean verbose = true;
@@ -34,13 +35,8 @@ public abstract class Statement {
 		this.mainAlias = alias; // == null || alias.length == 0 ? null : alias[0];
 	}
 
-	protected ArrayList<Object[]> nvs;
+//	protected ArrayList<Object[]> nvs;
 
-	public Statement nv(String n, Object v) {
-		if (nvs == null)
-			nvs = new ArrayList<Object[]>();
-		return this;
-	}
 
 	public Statement where(String logic, String loperand, String roperand) {
 		// try find operand in columns
@@ -153,7 +149,8 @@ public abstract class Statement {
 //	}
 
 	public Statement commit(ArrayList<String> sqls) throws StException {
-		throw new StException("Shouldn't reach here");
+		sqls.add(sql());
+		return this;
 	}
 
 }

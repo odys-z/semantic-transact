@@ -32,7 +32,7 @@ public class Utils {
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
 				if (stElements.length > 3)
-				System.out.println(String.format("called by      %s.%s(%s:%s)", 
+				System.out.println(String.format("              %s.%s(%s:%s)", 
 								stElements[3].getClassName(), stElements[3].getMethodName(),
 								stElements[3].getFileName(), stElements[3].getLineNumber()));
 			}
@@ -54,9 +54,6 @@ public class Utils {
 		try {
 			if (printCaller) {
 				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-//				System.out.println(String.format("logger called by %s.%s(%s %s)", 
-//								stElements[1].getClassName(), stElements[1].getMethodName(),
-//								stElements[1].getFileName(), stElements[1].getLineNumber()));
 				System.out.println(String.format("logger:        %s.%s(%s:%s)", 
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
@@ -73,6 +70,54 @@ public class Utils {
 			System.err.println("logi(): Can't print. Error:");
 			ex.printStackTrace();
 		}
-	
 	}
+
+	public static void warn(String format, Object... args) {
+		try {
+			if (printCaller) {
+				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+				System.out.println(String.format("log by        %s.%s(%s:%s)", 
+								stElements[2].getClassName(), stElements[2].getMethodName(),
+								stElements[2].getFileName(), stElements[2].getLineNumber()));
+				if (stElements.length > 3)
+				System.out.println(String.format("              %s.%s(%s:%s)", 
+								stElements[3].getClassName(), stElements[3].getMethodName(),
+								stElements[3].getFileName(), stElements[3].getLineNumber()));
+			}
+
+			if (format != null)
+				if (args != null && args.length > 0)
+					System.err.println(String.format(format, args));
+				else
+					System.err.println(format);
+
+		} catch (Exception ex) {
+			StackTraceElement[] x = ex.getStackTrace();
+			System.err.println(String.format("logi(): Can't print. Error: %s. called by %s.%s()",
+					ex.getMessage(), x[0].getClassName(), x[0].getMethodName()));
+		}
+	}
+
+	public static void warn(ArrayList<String> list, Object... args) {
+		try {
+			if (printCaller) {
+				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+				System.out.println(String.format("logger:        %s.%s(%s:%s)", 
+								stElements[2].getClassName(), stElements[2].getMethodName(),
+								stElements[2].getFileName(), stElements[2].getLineNumber()));
+			}
+
+			if (list != null)
+				for (String it : list)
+					if (args != null && args.length > 0)
+						System.err.println(String.format(it, args));
+					else
+						System.err.println(it);
+
+		} catch (Exception ex) {
+			System.err.println("logi(): Can't print. Error:");
+			ex.printStackTrace();
+		}
+	}
+
 }

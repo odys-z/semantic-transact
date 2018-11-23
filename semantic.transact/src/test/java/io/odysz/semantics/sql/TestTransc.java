@@ -3,7 +3,6 @@ package io.odysz.semantics.sql;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ public class TestTransc {
 		ds0.addColumn("a_log", "txt", "text", 0);
 		
 		st = new Transcxt(ds0);
-		assertFalse(ds0 == null);
 	}
 
 	@Test
@@ -62,12 +60,11 @@ public class TestTransc {
 			.commit(sqls);
 		
 		st.select("a_log", "lg")
-			// TODO test count(*)
-			.col("COUNT(*)", "cnt")
-			// .col("count", "cnt")
-			.where("=", "userId", "user1")
+			.col("count(*)", "cnt")
+			 .col("count", "cnt")
+			.where("=", "userId", "funders")
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
-			.where(Sql.condt("userId = '%s'", "user2").or("userId = '%s'", "user2"),
+			.where(Sql.condt("userId = '%s'", "George").or("userId = '%s'", "Washinton"),
 					Sql.condt("<=", "stamp", "'1911-10-10'"),
 					Sql.condt(op.eq, "userId", "'Sun Yat-sen'"))
 			.commit(sqls);
@@ -79,13 +76,17 @@ public class TestTransc {
 	}
 	
 	@Test
-	public void testInsert() {
+	public void testInsert() throws StException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_funcs")
-			.nv("funcId", "'a01'")
+			.nv("funcId", "a01")
 			.commit(sqls);
 		
-		List<Object[]> vals = null;
+		ArrayList<Object[]> vals = new ArrayList<Object[]>(2);
+		vals.add(new String[]{ "logId", "b01"});
+		vals.add(null);
+		vals.add(new String[]{ "txt", "log .... 01"});
+
 		st.insert("a_log")
 			.cols("logId", "stamp", "txt")
 			.values(vals)
@@ -96,14 +97,18 @@ public class TestTransc {
 						.col("f.funcId").col("'admin'")
 						.j("a_roles", "r", "r.roleId='%s'", "admin"))
 			.commit(sqls);
+
+		Utils.logi(sqls);
 	}
 	
 	@Test
 	public void testUpdate() {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.update("a_users")
-			.nv("", "")
+			.nv("userName", "'abc-x01'")
 			.where("=", "userId", "admin");
+
+		Utils.logi(sqls);
 	}
 
 	private String[] users() {

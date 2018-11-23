@@ -217,6 +217,7 @@ public class Query extends Statement {
 		return this;
 	}
 
+	@Override
 	public String sql() {
 		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
 

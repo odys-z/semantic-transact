@@ -20,7 +20,7 @@ public class ExprPart extends AbsPart {
 
 	public String sql() {
 		if (logic == null)
-			return lexp;
+			return lexp == null ? "" : lexp;
 		else return String.format("%s %s %s", lexp, logic.sql(logic, rexp == null ? "" : rexp));
 	}
 
