@@ -26,19 +26,19 @@ public class TestTransc {
 		user = new User("admin", "123456");
 
 		DataSource ds0 = new DataSource("stub");
-		ds0.addTabl("a_funcs");
-		ds0.addColumn("a_funcs", "funcName", "varchar", 50);
-		ds0.addColumn("a_funcs", "funcId", "varchar", 50);
-		ds0.addColumn("a_funcs", "isUsed", "varchar", 2);
-
-		ds0.addTabl("a_rolefunc");
-		ds0.addColumn("a_rolefunc", "funcId", "varchar", 50);
-		ds0.addColumn("a_rolefunc", "roleId", "varchar", 50);
-
-		ds0.addTabl("a_log");
-		ds0.addColumn("a_log", "stamp", "datetime", 50);
-		ds0.addColumn("a_log", "userId", "varchar", 50);
-		ds0.addColumn("a_log", "txt", "text", 0);
+//		ds0.addTabl("a_funcs");
+//		ds0.addColumn("a_funcs", "funcName", "varchar", 50);
+//		ds0.addColumn("a_funcs", "funcId", "varchar", 50);
+//		ds0.addColumn("a_funcs", "isUsed", "varchar", 2);
+//
+//		ds0.addTabl("a_rolefunc");
+//		ds0.addColumn("a_rolefunc", "funcId", "varchar", 50);
+//		ds0.addColumn("a_rolefunc", "roleId", "varchar", 50);
+//
+//		ds0.addTabl("a_log");
+//		ds0.addColumn("a_log", "stamp", "datetime", 50);
+//		ds0.addColumn("a_log", "userId", "varchar", 50);
+//		ds0.addColumn("a_log", "txt", "text", 0);
 		
 		st = new Transcxt(ds0);
 	}

@@ -1,11 +1,7 @@
 package io.odysz.transact.sql;
 
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
-
 /**Transaction / Batching context
  * @author ody
- *
  */
 public class Transcxt {
 
@@ -29,12 +25,12 @@ public class Transcxt {
 		return new Update(this, tabl);
 	}
 
-	public DbTable getTable(String tabl) {
-		return ds.getTable(tabl);
-	}
-
-	public DbColumn getColumn(String tabl, String col) {
-		return ds.getColumn(tabl, col);
-	}
+//	public DbTable getTable(String tabl) {
+//		return ds.getTable(tabl);
+//	}
+//
+//	public DbColumn getColumn(String tabl, String col) {
+//		return ds.getColumn(tabl, col);
+//	}
 	
 }
