@@ -1,12 +1,5 @@
 package io.odysz.transact.sql.parts.select;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import io.odysz.transact.sql.parts.Logic;
-import io.odysz.transact.sql.parts.Logic.op;
-import io.odysz.transact.sql.parts.Logic.type;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 

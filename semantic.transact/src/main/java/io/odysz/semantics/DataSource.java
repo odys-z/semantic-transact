@@ -1,6 +1,10 @@
-package io.odysz.transact.sql;
+package io.odysz.semantics;
 
 import java.util.HashMap;
+
+import io.odysz.semantics.meta.ColumnMeta;
+import io.odysz.semantics.meta.TableMeta;
+import io.odysz.semantics.x.SemanticException;
 
 /**Database meta data, not data source in DA.<br>
  * The caller of Semantic Transaction should prepare this before call it. 
@@ -10,8 +14,8 @@ public class DataSource {
 
 	private String srcId;
 //	private DbSchema dbSchema;
-//	private HashMap<String, DbTable> tables;
-//	private HashMap<String, HashMap<String, DbColumn>> tablCols;
+	private HashMap<String, TableMeta> tables;
+	private HashMap<String, HashMap<String, ColumnMeta>> tablCols;
 //
 	public DataSource(String srcId) {
 		this.srcId = srcId;
@@ -38,12 +42,18 @@ public class DataSource {
 //		return this;
 //	}
 //
-//	public DbTable getTable(String tabl) {
-//		return tables.get(tabl);
-//	}
+	public TableMeta getTable(String tabl) {
+		return tables.get(tabl);
+	}
+
+	public TableMeta getTable(String srcId, String tabl) throws SemanticException {
+		if (this.srcId == null || !this.srcId.equals(srcId))
+			throw new SemanticException("Datasources are not matched.");
+		return getTable(tabl);
+	}
 //
-//	public DbColumn getColumn(String tabl, String col) {
-//		return tablCols.containsKey(tabl) ? tablCols.get(tabl).get(col) : null;
-//	}
+	public ColumnMeta getColumn(String tabl, String col) {
+		return tablCols.containsKey(tabl) ? tablCols.get(tabl).get(col) : null;
+	}
 	
 }

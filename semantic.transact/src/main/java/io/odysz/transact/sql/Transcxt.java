@@ -1,10 +1,13 @@
 package io.odysz.transact.sql;
 
+import io.odysz.semantics.DataSource;
+
 /**Transaction / Batching context
  * @author ody
  */
 public class Transcxt {
 
+	// FIXME should be <interface>DA ?
 	private DataSource ds;
 
 	protected Transcxt(DataSource ds) {
@@ -25,11 +28,11 @@ public class Transcxt {
 		return new Update(this, tabl);
 	}
 
-//	public DbTable getTable(String tabl) {
+//	public TableMeta getTable(String tabl) {
 //		return ds.getTable(tabl);
 //	}
 //
-//	public DbColumn getColumn(String tabl, String col) {
+//	public ColumnMeta getColumn(String tabl, String col) {
 //		return ds.getColumn(tabl, col);
 //	}
 	
