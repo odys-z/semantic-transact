@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
-import io.odysz.transact.x.StException;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.select.ConstList;
@@ -44,9 +44,9 @@ public class Insert extends Statement {
 		return this;
 	}
 
-	public Insert cols(String col0, String... cols) throws StException {
+	public Insert cols(String col0, String... cols) throws TransException {
 		if (valuesNv != null && valuesNv.size() > 0)
-			throw new StException("cols() must been called before any rows' value been added (calling values())");
+			throw new TransException("cols() must been called before any rows' value been added (calling values())");
 			
 		if (insertCols == null)
 			insertCols = new HashMap<String, Integer>();
@@ -63,14 +63,14 @@ public class Insert extends Statement {
 		return this;
 	}
 
-	public Insert values(ArrayList<Object[]> rowFields) throws StException {
+	public Insert values(ArrayList<Object[]> rowFields) throws TransException {
 		if (rowFields == null)
 			return this;
 		if (insertCols.size() != rowFields.size())
-			throw new StException("columns' number didn't match rows field count.");
+			throw new TransException("columns' number didn't match rows field count.");
 
 		if (selectValues != null)
-			throw new StException("Semantic-Transact only support one of insert-select or insert-values.");
+			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 
 		if (valuesNv == null)
 			valuesNv = new ArrayList<ArrayList<Object[]>>(rowFields.size());
@@ -82,15 +82,15 @@ public class Insert extends Statement {
 		return this;
 	}
 
-	public Insert select(Query values) throws StException {
+	public Insert select(Query values) throws TransException {
 		if (valuesNv != null && valuesNv.size() > 0)
-			throw new StException("Semantic-Transact only support one of insert-select or insert-values.");
+			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 		selectValues = values;
 		return this;
 	}
 
 	/**sql: insert into tabl(...) values(...) / select ...
-	 * @throws StException 
+	 * @throws TransException 
 	 * @see io.odysz.transact.sql.Statement#sql()
 	 */
 	@Override
@@ -154,7 +154,7 @@ public class Insert extends Statement {
 			}
 			try {
 				vs.constv(idx, (String) nv[1]);
-			} catch (StException e) {
+			} catch (TransException e) {
 				e.printStackTrace();
 			}
 		}

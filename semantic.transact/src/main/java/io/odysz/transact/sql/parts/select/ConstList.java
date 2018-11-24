@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import io.odysz.transact.x.StException;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.condition.AbsPart;
 
 public class ConstList extends AbsPart {
@@ -19,20 +19,20 @@ public class ConstList extends AbsPart {
 		valsArrIsnull = true;
 	}
 
-	public void constv(int idx, String v) throws StException {
+	public void constv(int idx, String v) throws TransException {
 		if (idx < 0 || v == null)
 			return;
 
 		if (valst != null)
-			throw new StException("Don't use both list and array mode in ConstList.");
+			throw new TransException("Don't use both list and array mode in ConstList.");
 
 		valsArr[idx] = v;
 		valsArrIsnull = false;
 	}
 
-	public void constv(String v) throws StException {
+	public void constv(String v) throws TransException {
 		if (valsArr != null)
-			throw new StException("Don't use both list and array mode in ConstList.");
+			throw new TransException("Don't use both list and array mode in ConstList.");
 
 		if (valst == null)
 			valst = new ArrayList<String>();

@@ -3,7 +3,7 @@ package io.odysz.transact.sql;
 
 import java.util.ArrayList;
 
-import io.odysz.transact.x.StException;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.AbsPart;
@@ -50,7 +50,7 @@ public abstract class Statement extends AbsPart {
 			where.and(BinaryCondition.greaterThanOrEq(loperand, roperand));
 			break;
 		default:
-			throw new StException("Logic not recogonized: %s", logic);
+			throw new TransException("Logic not recogonized: %s", logic);
 		}*/
 		
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
@@ -148,7 +148,7 @@ public abstract class Statement extends AbsPart {
 //		return BinaryCondition.like(lop, String.format("%s%%", rconst));
 //	}
 
-	public Statement commit(ArrayList<String> sqls) throws StException {
+	public Statement commit(ArrayList<String> sqls) throws TransException {
 		sqls.add(sql());
 		return this;
 	}

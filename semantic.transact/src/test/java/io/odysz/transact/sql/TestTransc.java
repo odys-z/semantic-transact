@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
-import io.odysz.transact.x.StException;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.DataSource;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.parts.Sql;
@@ -44,7 +44,7 @@ public class TestTransc {
 	}
 
 	@Test
-	public void testSelect() throws StException {
+	public void testSelect() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
@@ -78,7 +78,7 @@ public class TestTransc {
 	}
 	
 	@Test
-	public void testInsert() throws StException {
+	public void testInsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_funcs")
 			.nv("funcId", "a01")
