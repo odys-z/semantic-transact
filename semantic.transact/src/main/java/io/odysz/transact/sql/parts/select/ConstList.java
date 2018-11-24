@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import io.odysz.semantics.x.StException;
+import io.odysz.transact.x.StException;
 import io.odysz.transact.sql.parts.condition.AbsPart;
 
 public class ConstList extends AbsPart {

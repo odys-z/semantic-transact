@@ -3,7 +3,7 @@ package io.odysz.transact.sql;
 
 import java.util.ArrayList;
 
-import io.odysz.semantics.x.StException;
+import io.odysz.transact.x.StException;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.AbsPart;

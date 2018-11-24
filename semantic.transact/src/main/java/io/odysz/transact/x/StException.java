@@ -1,4 +1,4 @@
-package io.odysz.semantics.x;
+package io.odysz.transact.x;
 
 public class StException extends Exception {
 	private static final long serialVersionUID = 1L;

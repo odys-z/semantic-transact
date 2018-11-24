@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
-import io.odysz.semantics.x.StException;
+import io.odysz.transact.x.StException;
 import io.odysz.transact.sql.DataSource;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.parts.Sql;

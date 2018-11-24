@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
-import io.odysz.semantics.x.StException;
+import io.odysz.transact.x.StException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.select.ConstList;
