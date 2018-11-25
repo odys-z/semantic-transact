@@ -1,18 +1,16 @@
 package io.odysz.transact.sql;
 
-import io.odysz.semantics.DataSource;
-
 /**Transaction / Batching context
  * @author ody
  */
 public class Transcxt {
 
 	// FIXME should be <interface>DA ?
-	private DataSource ds;
+	// private DataSource ds;
 
-	protected Transcxt(DataSource ds) {
-		this.ds = ds;
-	}
+//	protected Transcxt(DataSource ds) {
+//		this.ds = ds;
+//	}
 
 	public Query select(String tabl, String ... alias) {
 		return new Query(this, tabl, alias);

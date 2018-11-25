@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
-import io.odysz.semantics.DataSource;
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.Logic.op;
@@ -24,7 +23,7 @@ public class TestTransc {
 
 		user = new User("admin", "123456");
 
-		DataSource ds0 = new DataSource("stub");
+//		DataSource ds0 = new DataSource("stub");
 //		ds0.addTabl("a_funcs");
 //		ds0.addColumn("a_funcs", "funcName", "varchar", 50);
 //		ds0.addColumn("a_funcs", "funcId", "varchar", 50);
@@ -38,8 +37,8 @@ public class TestTransc {
 //		ds0.addColumn("a_log", "stamp", "datetime", 50);
 //		ds0.addColumn("a_log", "userId", "varchar", 50);
 //		ds0.addColumn("a_log", "txt", "text", 0);
-		
-		st = new Transcxt(ds0);
+//		st = new Transcxt(ds0);
+		st = new Transcxt();
 	}
 
 	@Test

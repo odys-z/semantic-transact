@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="semantic.DA/lib/semantrans-0.8.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/semantic.transact/export.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="/ifire/ir-serv-desc-0.6.0" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/semantic.transact/pom.xml"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;gen.antlr.sql.select"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql.parts"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql.parts.insert"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql.parts.antlr"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.semantics.meta"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql.parts.condition"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.common"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.semantics.x"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.sql.parts.select"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;gen.antlr.sql.exprs"/>
+        <javaElement handleIdentifier="=semantic.transact/src\/main\/java&lt;io.odysz.transact.x"/>
+    </selectedElements>
+</jardesc>
