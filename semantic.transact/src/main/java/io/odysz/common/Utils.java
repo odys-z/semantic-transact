@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Utils {
 	/**Used for print out all caller.
@@ -72,6 +73,19 @@ public class Utils {
 		}
 	}
 
+	public static void logkeys(Map<String, ?> map) {
+		try {
+			if (map != null)
+				for (String mk : map.keySet())
+					System.out.print(mk + ", ");
+			System.out.println();
+		} catch (Exception ex) {
+			StackTraceElement[] x = ex.getStackTrace();
+			System.err.println(String.format("logkeys(): Can't print. Error: %s. called by %s.%s()",
+					ex.getMessage(), x[0].getClassName(), x[0].getMethodName()));
+		}
+	}
+
 	public static void warn(String format, Object... args) {
 		try {
 			if (printCaller) {
@@ -119,5 +133,6 @@ public class Utils {
 			ex.printStackTrace();
 		}
 	}
+
 
 }
