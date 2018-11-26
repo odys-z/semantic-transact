@@ -5,7 +5,8 @@ import java.util.ArrayList;
 
 import io.odysz.common.AESHelper;
 
-/**Data structure semantics description and supporter.<br>
+/**@deprecated not used in Transact.
+ * Data structure semantics description and supporter.<br>
  * Currently only semantics of fullpath of depth-first tree traveling is supported.
  * @author ody
  */
@@ -72,10 +73,12 @@ public class Semantics {
 	private String opTimeField;
 	
 	// check referee count
+	@SuppressWarnings("unused")
 	private String checkCountErrFormat_Del;
 	private String checkCountSql_Del;
 	private String checkCountPkCol_Del;
 
+	@SuppressWarnings("unused")
 	private String checkCountErrFormat_Ins;
 	private String checkCountSql_Ins;
 	private String checkCountValueCol_Ins;
@@ -530,6 +533,7 @@ public class Semantics {
 	
 	//////////////////// stamp up-stamp 1 more than down-stamp ///////////////////
 	private String upStamp;
+	@SuppressWarnings("unused")
 	private boolean supportUpStampOnUpdate;
 	private String downStamp;
 	private String defltRefeeVal;

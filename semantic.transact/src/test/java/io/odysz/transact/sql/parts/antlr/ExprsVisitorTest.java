@@ -1,11 +1,5 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import io.odysz.transact.sql.parts.condition.Condit;
-
 public class ExprsVisitorTest {
 
 //	@Test

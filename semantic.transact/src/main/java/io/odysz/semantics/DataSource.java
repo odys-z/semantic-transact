@@ -6,7 +6,8 @@ import io.odysz.semantics.meta.ColumnMeta;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 
-/**Database meta data, not data source in DA.<br>
+/**@deprecated not used in Transact.
+ * Database meta data, not data source in DA.<br>
  * The caller of Semantic Transaction should prepare this before call it. 
  * @author ody
  */
