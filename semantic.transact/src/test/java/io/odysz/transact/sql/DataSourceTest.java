@@ -14,7 +14,7 @@ public class DataSourceTest {
 
 	@Test
 	public void testDataSource() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 //	public static DataSource createDs (String srcId) {

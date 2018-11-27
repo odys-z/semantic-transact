@@ -75,6 +75,11 @@ public abstract class Statement extends AbsPart {
 		return this;
 	}
 	
+	public Statement commit(ArrayList<String> sqls) throws TransException {
+		sqls.add(sql());
+		return this;
+	}
+
 //	protected static Condition formatCond(String maintbl, String oper,
 //			String ltabl, String lcol, String lconst,
 //			String rtabl, String rcol, String rconst) {
@@ -147,10 +152,5 @@ public abstract class Statement extends AbsPart {
 //	private static Condition formatRLikeCondition(Object lop, String rconst) {
 //		return BinaryCondition.like(lop, String.format("%s%%", rconst));
 //	}
-
-	public Statement commit(ArrayList<String> sqls) throws TransException {
-		sqls.add(sql());
-		return this;
-	}
 
 }
