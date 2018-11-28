@@ -112,6 +112,11 @@ public class Utils {
 		}
 	}
 
+	public static void warn(String title, ArrayList<String> list, Object... args) {
+		System.err.println(title);
+		warn(list, args);
+	}
+
 	public static void warn(ArrayList<String> list, Object... args) {
 		try {
 			if (printCaller) {
