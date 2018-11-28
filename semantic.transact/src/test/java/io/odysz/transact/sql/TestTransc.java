@@ -23,21 +23,6 @@ public class TestTransc {
 
 		user = new User("admin", "123456");
 
-//		DataSource ds0 = new DataSource("stub");
-//		ds0.addTabl("a_funcs");
-//		ds0.addColumn("a_funcs", "funcName", "varchar", 50);
-//		ds0.addColumn("a_funcs", "funcId", "varchar", 50);
-//		ds0.addColumn("a_funcs", "isUsed", "varchar", 2);
-//
-//		ds0.addTabl("a_rolefunc");
-//		ds0.addColumn("a_rolefunc", "funcId", "varchar", 50);
-//		ds0.addColumn("a_rolefunc", "roleId", "varchar", 50);
-//
-//		ds0.addTabl("a_log");
-//		ds0.addColumn("a_log", "stamp", "datetime", 50);
-//		ds0.addColumn("a_log", "userId", "varchar", 50);
-//		ds0.addColumn("a_log", "txt", "text", 0);
-//		st = new Transcxt(ds0);
 		st = new Transcxt();
 	}
 
@@ -57,16 +42,20 @@ public class TestTransc {
 			.col("lg.txt", "log")
 			.where(">=", "lg.stamp", "'1776-07-04'")
 			.where(Sql.condt("userId IN (%s)", Sql.str(users())))
+			.groupby("lg.stamp")
+			.groupby("log")
 			.commit(sqls);
 		
 		st.select("a_log", "lg")
 			.col("count(*)", "cnt")
-			 .col("count", "cnt")
+			.col("count", "cnt")
 			.where("=", "userId", "funders")
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
 			.where(Sql.condt("userId = '%s'", "George").or("userId = '%s'", "Washinton"),
 					Sql.condt("<=", "stamp", "'1911-10-10'"),
 					Sql.condt(op.eq, "userId", "'Sun Yat-sen'"))
+			.orderby("cnt", "desc")
+			.orderby("stamp")
 			.commit(sqls);
 
 		Utils.logi(sqls);

@@ -1,6 +1,6 @@
 package io.odysz.transact.sql.parts.select;
 
-import io.odysz.transact.sql.parts.condition.AbsPart;
+import io.odysz.transact.sql.parts.AbsPart;
 
 /**Select_list_elem:<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4

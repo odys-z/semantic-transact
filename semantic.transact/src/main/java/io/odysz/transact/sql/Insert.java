@@ -19,7 +19,7 @@ import io.odysz.transact.sql.parts.select.ConstList;
  * @author ody
  *
  */
-public class Insert extends Statement {
+public class Insert extends Statement<Insert> {
 
 	private Map<String,Integer> insertCols;
 	private String pk;
@@ -31,7 +31,7 @@ public class Insert extends Statement {
 		super(transc, tabl, null);
 	}
 
-	public Statement nv(String n, Object v) {
+	public Insert nv(String n, Object v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
 		currentRowNv.add(new Object[] {n, v});

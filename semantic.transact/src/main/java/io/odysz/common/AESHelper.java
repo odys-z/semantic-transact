@@ -201,7 +201,7 @@ public class AESHelper {
 	 * @param cipher
 	 * @param k
 	 * @param iv
-	 * @return
+	 * @return true: yes the same
 	 * @throws Exception
 	 */
 	public static boolean isSame(String cipher, String plain, String k, String iv) throws Exception {

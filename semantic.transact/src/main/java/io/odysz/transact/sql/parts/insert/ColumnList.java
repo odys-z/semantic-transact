@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.odysz.transact.sql.parts.condition.AbsPart;
+import io.odysz.transact.sql.parts.AbsPart;
 
 public class ColumnList extends AbsPart {
 	String[] cols;

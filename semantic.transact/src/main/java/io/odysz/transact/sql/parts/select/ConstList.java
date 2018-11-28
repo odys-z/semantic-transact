@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import io.odysz.transact.x.TransException;
-import io.odysz.transact.sql.parts.condition.AbsPart;
+import io.odysz.transact.sql.parts.AbsPart;
 
 public class ConstList extends AbsPart {
 	protected ArrayList<String> valst;

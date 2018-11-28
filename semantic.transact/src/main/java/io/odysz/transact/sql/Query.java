@@ -14,7 +14,10 @@ import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.select.JoinTabl;
+import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
+import io.odysz.transact.sql.parts.select.SelectList;
+import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.JoinTabl.join;
 
 /**
@@ -87,9 +90,11 @@ column_elem
  * @author ody
  *
  */
-public class Query extends Statement {
+public class Query extends Statement<Query> {
 	private List<SelectElem> selectList;
 	private List<JoinTabl> joins;
+	private ArrayList<String[]> orderList;
+	private ArrayList<String> groupList;
 
 	/**
 	private SelectQry q;
@@ -105,53 +110,7 @@ public class Query extends Statement {
 		q.addFromTable(tbl);
 		allColumn = true;
 	}
-
-	/**
-	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
-	 * @param alias
-	 * @return
-	 * /
-	public Query col(String col, String... alias) {
-		allColumn = false;
-		if (alias == null || alias.length <= 0 || alias[0] == null)
-			// q.addCustomColumns(col);
-			addCol(q, col);
-		else {
-			// TODO test expression as col
-			DbColumn dcol = transc.getColumn(mt, col);
-			if (dcol != null)
-				// TODO
-				// "stamp", "st" -> "t2.stamp AS st" (malias == null)
-				// "stamp", "st" -> "lg.stamp AS st" (malias != null)
-				q.addAliasedColumn(dcol, alias[0]);
-			else
-				// "l.stamp", "st" -> "l.stamp AS st"
-				q.addAliasedColumn(new CustomSql(col), alias[0]);
-		}
-		return this;
-	}
-
-	/**Try figure out is the col is an expression (a.col1, f(a.col), ...), then add the col to qry.
-	 * @param qry
-	 * @param col
-	 * /
-	private void addCol(SelectQry qry, String col) {
-		// TODO
-		// parse col
-		String[] colss = col.split(".");
-		String colAlias = colss[0];
-		String colExpr = colss[1];
-
-		if (colAlias == null) {
-			DbColumn dbcol = transc.getColumn(mt, colExpr);
-			if (dbcol != null) {
-				qry.addColumns(dbcol);
-				return;
-			}
-		}
-
-		qry.addCustomColumns(col);
-	}*/
+	*/
 
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
@@ -165,7 +124,7 @@ public class Query extends Statement {
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
 	 * @param alias
-	 * @return
+	 * @return current query object
 	 */
 	public Query col(String col, String... alias) {
 		// parser...
@@ -182,8 +141,8 @@ public class Query extends Statement {
 
 	/**Inner Join
 	 * @param withTabl
-	 * @param onCondtion e.g "t.f1='a' t.f2='b'", 2 AND conditions
-	 * @return
+	 * @param onCondit e.g "t.f1='a' t.f2='b'", 2 AND conditions
+	 * @return current query object
 	 */
 	public Query j(String withTabl, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
@@ -210,9 +169,23 @@ public class Query extends Statement {
 	public Query j(String withTabl, String alias, String on, Object...args) {
 		return j(withTabl, alias, Sql.condt(on, args));
 	}
+	
+	public Query groupby(String expr) {
+		if (groupList == null)
+			groupList = new ArrayList<String>();
+		groupList.add(expr);
+		return this;
+	}
+	
+	public Query orderby(String col, String... desc) {
+		if (orderList == null)
+			orderList = new ArrayList<String[]>();
+		orderList.add(new String[] {col, desc == null || desc.length <= 0 ? null : desc[0]});
+		return this;
+	}
 
 	@Override
-	public Statement commit(ArrayList<String> sqls) {
+	public Query commit(ArrayList<String> sqls) {
 		sqls.add(sql());
 		return this;
 	}
@@ -225,7 +198,8 @@ public class Query extends Statement {
 				// select ... from ... join ...
 				Stream.concat(
 						// select ...
-						Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
+						// Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
+						Stream.concat(Stream.of(new ExprPart("select")), Stream.of(new SelectList(selectList))),
 						// from ... join ...
 						Stream.concat(
 								Stream.of(new JoinTabl(join.main, mainTabl, mainAlias)),
@@ -233,19 +207,16 @@ public class Query extends Statement {
 								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
 				), Stream.concat(
 						// where ... group by ... order by ...
-						Stream.of(new ExprPart("where")).filter(w -> where != null),
-						Stream.of(where).filter(w -> where != null))
+//						Stream.of(new ExprPart("where")).filter(w -> where != null),
+//						Stream.of(where).filter(w -> where != null))
+						Stream.of(new ExprPart("where"), where).filter(w -> where != null),
+						Stream.concat(
+								// group by
+								Stream.of(new GroupbyList(groupList)).filter(o -> groupList != null),
+								// order by
+								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
 			).map(m -> m.sql());
 
 		return s.collect(Collectors.joining(" "));
-
-		// FIXME append to buffer?
-//		return String.format("select %s from %s",
-//				selectList
-//					.stream()
-//					.map(ele -> ele.sql())
-//					.collect(Collectors.joining(", ")),
-//				"joinings..."
-//				);
 	}
 }

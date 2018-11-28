@@ -1,5 +1,6 @@
 package io.odysz.transact.sql.parts.condition;
 
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic.op;
 
 public class ExprPart extends AbsPart {
@@ -19,9 +20,12 @@ public class ExprPart extends AbsPart {
 	}
 
 	public String sql() {
+		// FIXME what about unary operand?
 		if (logic == null)
 			return lexp == null ? "" : lexp;
-		else return String.format("%s %s %s", lexp, logic.sql(logic, rexp == null ? "" : rexp));
+		else return String.format("%s %s %s",
+				lexp == null ? "" : lexp,
+				logic.sql(logic, rexp == null ? "" : rexp));
 	}
 
 }

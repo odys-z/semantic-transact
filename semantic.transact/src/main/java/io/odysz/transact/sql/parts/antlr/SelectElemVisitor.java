@@ -55,7 +55,7 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 
 	/**Parse column expression (select_list_elem without alias).
 	 * @param colExpr
-	 * @return
+	 * @return AST node
 	 */
 	public static SelectElem parse(String colExpr) {
 		ANTLRInputStream inputStream = new ANTLRInputStream(colExpr);

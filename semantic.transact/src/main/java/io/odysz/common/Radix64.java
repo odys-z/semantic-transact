@@ -17,7 +17,7 @@ public class Radix64 {
 	/**
 	 * convert v to Radix64 integer. Chars are same to Base64 except '/', which is replaced by '-'
 	 * @param v fix 6 bytes Base64 chars.
-	 * @return
+	 * @return String representation in radix 64.
 	 */
 	public static String toString(int v) {
 		char[] buf = new char[6];

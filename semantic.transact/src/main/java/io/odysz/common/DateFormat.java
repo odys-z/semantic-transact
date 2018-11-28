@@ -17,13 +17,13 @@ public class DateFormat {
 	public static SimpleDateFormat sdflong_mysql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	/**yyyy-MM-dd
 	 * @param d
-	 * @return
+	 * @return formatted string
 	 */
 	static public String format(Date d) { return d == null ? " - - " : sdf.format(d); }
 
 	/**yyyy-MM-dd
 	 * @param text
-	 * @return
+	 * @return formatted string
 	 * @throws ParseException
 	 */
 	public static Date parse(String text) throws ParseException { return sdf.parse(text); }
@@ -37,12 +37,9 @@ public class DateFormat {
 		return sdflong_mysql.format(d0);
 	}
 
-	/**yyyy年MM月dd日 */ 
-//	public static final SimpleDateFormat sdfZh = new SimpleDateFormat("yyyy年MM月dd日");
-
 	/**https://stackoverflow.com/questions/9474121/i-want-to-get-year-month-day-etc-from-java-date-to-compare-with-gregorian-cal
 	 * @param date
-	 * @return
+	 * @return formatted string
 	 */
 	public static String GetZhCnYMD(Date date) {
 		if (date == null)

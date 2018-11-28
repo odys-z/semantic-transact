@@ -33,8 +33,8 @@ public class Sql {
 	}
 	
 
-	/**
-	 * @param users
+	/**TODO Deprecated?
+	 * @param ele the elements
 	 * @return "'ele1','ele2','ele3',..."
 	 */
 	public static String str(String[] ele) {

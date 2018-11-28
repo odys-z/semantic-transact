@@ -1,4 +1,4 @@
-package io.odysz.transact.sql.parts.condition;
+package io.odysz.transact.sql.parts;
 
 /**<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
