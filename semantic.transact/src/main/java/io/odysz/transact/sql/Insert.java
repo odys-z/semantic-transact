@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
@@ -90,11 +91,10 @@ public class Insert extends Statement<Insert> {
 	}
 
 	/**sql: insert into tabl(...) values(...) / select ...
-	 * @throws TransException 
-	 * @see io.odysz.transact.sql.Statement#sql()
+	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.Semantext)
 	 */
 	@Override
-	public String sql() {
+	public String sql(Semantext scxt) {
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			if (valuesNv == null) {
 				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
@@ -103,7 +103,7 @@ public class Insert extends Statement<Insert> {
 		}
 
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
-
+		
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
 				// insert into tabl(...)
@@ -125,7 +125,7 @@ public class Insert extends Statement<Insert> {
 						).filter(w -> hasValuesNv),
 						// select ...
 						Stream.of(selectValues).filter(w -> selectValues != null))
-			).map(m -> m.sql());
+			).map(m -> m.sql(scxt));
 
 		return s.collect(Collectors.joining(" "));
 	}

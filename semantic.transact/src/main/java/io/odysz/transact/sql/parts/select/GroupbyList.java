@@ -3,6 +3,7 @@ package io.odysz.transact.sql.parts.select;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.AbsPart;
 
 /**Order by list. A short cut for:<pre>
@@ -36,7 +37,7 @@ public class GroupbyList extends AbsPart {
 	}
 
 	@Override
-	public String sql() {
+	public String sql(Semantext sctx) {
 		return groups.stream().collect(Collectors.joining(", ", "group by ", ""));
 	}
 

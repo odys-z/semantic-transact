@@ -1,5 +1,6 @@
 package io.odysz.transact.sql.parts.select;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
@@ -28,14 +29,15 @@ public class JoinTabl extends Condit {
 		this.jtablias = alias;
 	}
 
-	public String sql() {
+	@Override
+	public String sql(Semantext sctx) {
 		if (jtype == join.main)
 			return String.format("from %s %s", jtabl, jtablias == null ? "" : jtablias);
 
-		String condt = super.sql();
+		String condt = super.sql(sctx);
 		if (condt != null && condt.length() > 0)
 			return String.format("%s %s %s on %s", sql(jtype), jtabl,
-				jtablias == null ? "" : jtablias, super.sql());
+				jtablias == null ? "" : jtablias, super.sql(sctx));
 		else
 			return String.format("%s %s %s", sql(jtype), jtabl,
 				jtablias == null ? "" : jtablias);

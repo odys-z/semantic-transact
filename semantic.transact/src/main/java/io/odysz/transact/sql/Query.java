@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -114,11 +115,6 @@ public class Query extends Statement<Query> {
 
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
-
-//		Table tbl = transc.getTable(tabl);
-//		if (alias != null && alias[0] != null)
-//			tbl = new RejoinTable(tbl, alias[0]);
-
 	}
 
 	/**
@@ -139,10 +135,22 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	public Query cols(String... colAliases) {
+		if (colAliases != null)
+			for (String colAlias : colAliases) {
+				String[] cass = colAlias.split(" ([Aa][Ss] )?");
+				if (cass != null && cass.length > 1)
+					col(cass[0], cass[1]);
+				else if (cass != null)
+					col(cass[0]);
+			}
+		return this;
+	}
+
 	/**Inner Join
 	 * @param withTabl
 	 * @param onCondit e.g "t.f1='a' t.f2='b'", 2 AND conditions
-	 * @return current query object
+	 * @return current select statement
 	 */
 	public Query j(String withTabl, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
@@ -152,6 +160,12 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	/**Inner join
+	 * @param withTabl
+	 * @param alias
+	 * @param onCondit
+	 * @return current select statement
+	 */
 	public Query j(String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, alias, onCondit);
 		if (joins == null)
@@ -160,12 +174,24 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	/**Inner join
+	 * @param withTabl
+	 * @param onCondit
+	 * @return current select statement
+	 */
 	public Query j(String withTabl, String onCondit) {
 		Condit condit = ConditVisitor.parse(onCondit);
 		j(withTabl, condit);
 		return this;
 	}
 
+	/**Inner join
+	 * @param withTabl
+	 * @param alias
+	 * @param on
+	 * @param args
+	 * @return current select statement
+	 */
 	public Query j(String withTabl, String alias, String on, Object...args) {
 		return j(withTabl, alias, Sql.condt(on, args));
 	}
@@ -185,13 +211,7 @@ public class Query extends Statement<Query> {
 	}
 
 	@Override
-	public Query commit(ArrayList<String> sqls) {
-		sqls.add(sql());
-		return this;
-	}
-
-	@Override
-	public String sql() {
+	public String sql(Semantext sctx) {
 		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
 
 		Stream<String> s = Stream.concat(
@@ -207,15 +227,13 @@ public class Query extends Statement<Query> {
 								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
 				), Stream.concat(
 						// where ... group by ... order by ...
-//						Stream.of(new ExprPart("where")).filter(w -> where != null),
-//						Stream.of(where).filter(w -> where != null))
 						Stream.of(new ExprPart("where"), where).filter(w -> where != null),
 						Stream.concat(
 								// group by
 								Stream.of(new GroupbyList(groupList)).filter(o -> groupList != null),
 								// order by
 								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
-			).map(m -> m.sql());
+			).map(m -> m.sql(sctx));
 
 		return s.collect(Collectors.joining(" "));
 	}

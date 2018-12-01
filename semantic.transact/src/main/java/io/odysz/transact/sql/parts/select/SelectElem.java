@@ -1,5 +1,6 @@
 package io.odysz.transact.sql.parts.select;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.AbsPart;
 
 /**Select_list_elem:<pre>
@@ -54,7 +55,7 @@ public class SelectElem extends AbsPart {
 	}
 
 	@Override
-	public String sql() {
+	public String sql(Semantext sctx) {
 		if (elemtype == ElemType.asterisk)
 			return col;
 		String sql;

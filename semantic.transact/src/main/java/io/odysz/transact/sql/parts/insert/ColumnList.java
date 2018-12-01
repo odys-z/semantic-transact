@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.AbsPart;
 
 public class ColumnList extends AbsPart {
@@ -23,11 +24,12 @@ public class ColumnList extends AbsPart {
 	}
 
 	@Override
-	public String sql() {
+	public String sql(Semantext context) {
 		if (cols == null)
 			return "";
 		else
 			return "(" + Arrays.stream(cols).collect(Collectors.joining(", ")) + ")";
 	}
+
 
 }

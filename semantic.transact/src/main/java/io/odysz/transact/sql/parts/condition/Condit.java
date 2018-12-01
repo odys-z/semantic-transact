@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Logic.type;
@@ -76,16 +77,17 @@ search_condition_not
 		return this;
 	}
 
-	public String sql() {
+	@Override
+	public String sql(Semantext sctx) {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
 		if (predict != null)
-			return predict.sql();
+			return predict.sql(sctx);
 		// 2. search_condition_and
 		else if (logitype == type.and) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
-					.map(cdt -> cdt.sql())
+					.map(cdt -> cdt.sql(sctx))
 					.collect(Collectors.joining(" AND "));
 				return sql;
 			}
@@ -94,7 +96,7 @@ search_condition_not
 		else if (logitype == type.or) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
-					.map(cdt -> cdt.sql())
+					.map(cdt -> cdt.sql(sctx))
 					.collect(Collectors.joining(" OR "));
 				return sql;
 			}
@@ -102,7 +104,7 @@ search_condition_not
 //		else if (predict == null && condts == null)
 //			return "";
 		// 4. search_condition - CAN'T reach here, it's Predicat's business.
-		return super.sql();
+		return super.sql(sctx);
 	}
 
 }

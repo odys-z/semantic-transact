@@ -1,5 +1,7 @@
 package io.odysz.transact.sql.parts;
 
+import io.odysz.semantics.Semantext;
+
 /**<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
 search_condition     : search_condition_and (OR search_condition_and)* ;
@@ -15,5 +17,11 @@ expression           : expression op expression
  */
 abstract public class AbsPart {
 
-	public abstract String sql();
+	/**Generating SQL after all elements in AST are ready.
+	 * A context is a semantics context for resolving value references, etc.
+	 * This method shouldn't been called. Use #{@link Query#commit(ArrayList<String>)} to generate SQLs.
+	 * @param context
+	 * @return
+	 */
+	public abstract String sql(Semantext context);
 }

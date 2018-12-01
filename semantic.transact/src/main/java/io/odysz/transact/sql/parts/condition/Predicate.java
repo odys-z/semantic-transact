@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 
@@ -37,7 +38,7 @@ public class Predicate extends AbsPart {
 		op = inlike;
 		l = expression;
 		String rstr = inlikes.stream()
-			.map(var -> var.sql()) // variable resolving goes here 
+			.map(var -> var.sql(null)) // variable resolving goes here 
 			.collect(Collectors.joining(", "));
 		r = new ExprPart(rstr);
 	}
@@ -60,11 +61,13 @@ public class Predicate extends AbsPart {
 		negative = not != null && not.getText() != null && not.getText().length() > 0;
 	}
 
-	public String sql() {
+	@Override
+	public String sql(Semantext sctx) {
 		if (brace && search_condit != null)
-			return String.format("(%s)", search_condit.sql());
+			return String.format("(%s)", search_condit.sql(sctx));
 		else {
-			return String.format("%s %s", l.sql(), op.sql(op, r.sql(), negative));
+			return String.format("%s %s", l.sql(sctx), op.sql(op, r.sql(sctx), negative));
 		}
 	}
+
 }

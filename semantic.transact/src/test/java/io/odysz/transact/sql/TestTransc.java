@@ -23,7 +23,11 @@ public class TestTransc {
 
 		user = new User("admin", "123456");
 
-		st = new Transcxt();
+		st = new Transcxt(null);
+	}
+
+	private String[] users() {
+		return new String[] {"usr1", "user2"};
 	}
 
 	@Test
@@ -51,7 +55,7 @@ public class TestTransc {
 			.col("count", "cnt")
 			.where("=", "userId", "funders")
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
-			.where(Sql.condt("userId = '%s'", "George").or("userId = '%s'", "Washinton"),
+			.where(Sql.condt("userId = '%s'", "George").or("userId = '%s'", "Washington"),
 					Sql.condt("<=", "stamp", "'1911-10-10'"),
 					Sql.condt(op.eq, "userId", "'Sun Yat-sen'"))
 			.orderby("cnt", "desc")
@@ -83,28 +87,44 @@ public class TestTransc {
 			.commit(sqls);
 		assertEquals(sqls.get(1),
 				"insert into a_log  (logId, stamp, txt) values ( 'b01', null, 'log .... 01' )");
-		
-		st.insert("a_rolefunc")
-			.select(st.select("a_functions", "f")
-						.col("f.funcId").col("'admin'")
-						.j("a_roles", "r", "r.roleId='%s'", "admin"))
-			.commit(sqls);
-
 		Utils.logi(sqls);
 	}
-	
+
 	@Test
-	public void testUpdate() {
+	public void testUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.update("a_users")
 			.nv("userName", "'abc-x01'")
-			.where("=", "userId", "admin");
+			.where("=", "userId", "'admin'")
+			.commit(sqls);
 
+		// update a_users  set userName='abc-x01' where userId = 'admin'
 		Utils.logi(sqls);
 	}
 
-	private String[] users() {
-		return new String[] {"usr1", "user2"};
+	@Test
+	public void testInsertSelectPostUpdate() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_rolefunc")
+			.select(st.select("a_functions", "f")
+						// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
+						.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
+						.j("a_roles", "r", "r.roleId='%s'", "admin"))
+			.post(st.update("a_roles")
+					.nv("funcount", st.select("a_rolefunc")
+										.col("count(funcId)")
+										.where("=", "roleId", "'admin'"))
+					.nv("roleName", "roleName || 'abc'")
+					.where("=", "roleId", "'admin'"))
+			.commit(sqls);
+
+		// insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'
+		// update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'
+		assertEquals(sqls.get(0),
+				"insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'");
+		assertEquals(sqls.get(1),
+				"update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'");
+		Utils.logi(sqls);
 	}
 
 }

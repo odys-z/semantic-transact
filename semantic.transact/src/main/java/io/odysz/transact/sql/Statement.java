@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.semantics.Semantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
 
@@ -27,6 +28,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected Condit where;
 
 	protected Transcxt transc;
+
+	private ArrayList<Statement<?>> postate;
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
@@ -53,8 +56,23 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
+	public <U extends Statement<U>> T post(U postatement) {
+		if (postate == null)
+			postate = new ArrayList<Statement<?>>();
+		this.postate.add(postatement); 
+		return (T) this;
+	}
+	
 	public T commit(ArrayList<String> sqls) throws TransException {
-		sqls.add(sql());
+		Semantext context = transc.inert(mainTabl);
+		return commit(context, sqls);
+	}
+	
+	protected T commit(Semantext cxt, ArrayList<String> sqls) throws TransException {
+		sqls.add(sql(cxt));
+		if (postate != null)
+			for (Statement<?> pst : postate)
+				pst.commit(cxt, sqls);
 		return (T) this;
 	}
 	
