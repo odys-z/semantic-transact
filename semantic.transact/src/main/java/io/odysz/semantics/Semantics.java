@@ -72,7 +72,6 @@ public class Semantics implements ISemantics {
 		dencrypt,
 		opTime,
 		checkSqlCountOnDel,
-		/**@deprecated*/
 		checkSqlCountOnInsert,
 		checkDsCountOnDel,
 		composingCol,

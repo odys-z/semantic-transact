@@ -29,16 +29,15 @@ public class Update extends Statement<Update> {
 
 	@Override
 	public String sql(Semantext sctx) {
+		sctx.onUpdate(nvs);
+		
 		// update tabl t set col = 'val' where t.col = 'val'
-		Stream<String> s =
-			Stream.concat(
-				Stream.of(
-				new ExprPart("update"),
-				new ExprPart(mainTabl), new ExprPart(mainAlias),
-				new ExprPart("set"),
-				new SetList(nvs)), 
-				Stream.of(new ExprPart("where"), where).filter(w -> where != null)
-				).map(m -> m == null ? "" : m.sql(sctx));
+		Stream<String> s = Stream.concat(
+					Stream.of(new ExprPart("update"),
+						new ExprPart(mainTabl), new ExprPart(mainAlias),
+						new ExprPart("set"), new SetList(nvs)), 
+					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
+				  .map(m -> m == null ? "" : m.sql(sctx));
 //		// insert into tabl(...) values(...) / select ...
 //		Stream<String> s2 = Stream.concat(
 //				// insert into tabl(...)

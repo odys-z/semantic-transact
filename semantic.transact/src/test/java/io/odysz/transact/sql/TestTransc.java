@@ -127,4 +127,32 @@ public class TestTransc {
 		Utils.logi(sqls);
 	}
 
+	
+	@Test
+	public void testInsertAutoUpdate() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_roles")
+			.nv("roleId", "AUTO")
+			.nv("roleName", "role-2")
+			.nv("funcount", "0")
+			.post(st.update("a_rolefunc")
+					.nv("funcId", "'f-01'")
+					.nv("roleId", "AUTO"))
+			.commit(sqls);
+	
+		st.insert("a_roles")
+			.nv("roleId", "AUTO")
+			.nv("roleName", "role-2")
+			.nv("funcount", "0")
+			.post(st.insert("a_rolefunc")
+					.nv("funcId", "'f-01'")
+					.nv("roleId", "AUTO"))
+			.commit(sqls);
+
+		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 01:35:59', 'role-2', '0' )
+		// update a_rolefunc  set funcId='f-01', roleId='AUTO #2018-12-02 01:35:59'
+		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 01:35:59', 'role-2', '0' )
+		// insert into a_rolefunc  (funcId, roleId) values ( ''f-01'', 'AUTO #2018-12-02 01:35:59' )
+		Utils.logi(sqls);
+	}
 }

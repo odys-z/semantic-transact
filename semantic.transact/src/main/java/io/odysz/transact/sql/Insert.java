@@ -22,8 +22,13 @@ import io.odysz.transact.sql.parts.select.ConstList;
  */
 public class Insert extends Statement<Insert> {
 
+	/**[col-name, col-index] */
 	private Map<String,Integer> insertCols;
+	
+	/**@deprecated Insert know nothing about semantics. It's handled by Semantics and Semantext*/
+	@SuppressWarnings("unused")
 	private String pk;
+
 	private Query selectValues;
 	private List<ArrayList<Object[]>> valuesNv;
 	private ArrayList<Object[]> currentRowNv;
@@ -51,8 +56,9 @@ public class Insert extends Statement<Insert> {
 			
 		if (insertCols == null)
 			insertCols = new HashMap<String, Integer>();
-		if (pk == null)
-			this.pk = col0;
+
+//		if (pk == null)
+//			this.pk = col0;
 		
 		// initial columns size
 		int size0 = insertCols.size();
@@ -94,7 +100,7 @@ public class Insert extends Statement<Insert> {
 	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.Semantext)
 	 */
 	@Override
-	public String sql(Semantext scxt) {
+	public String sql(Semantext sctx) {
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			if (valuesNv == null) {
 				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
@@ -103,6 +109,9 @@ public class Insert extends Statement<Insert> {
 		}
 
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
+		
+		if (hasValuesNv)
+			sctx.onInsert(valuesNv);
 		
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
@@ -125,7 +134,7 @@ public class Insert extends Statement<Insert> {
 						).filter(w -> hasValuesNv),
 						// select ...
 						Stream.of(selectValues).filter(w -> selectValues != null))
-			).map(m -> m.sql(scxt));
+			).map(m -> m.sql(sctx));
 
 		return s.collect(Collectors.joining(" "));
 	}
