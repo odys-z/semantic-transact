@@ -1,14 +1,16 @@
 package io.odysz.transact.sql;
 
-import io.odysz.semantics.ISemantics;
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 
 /**Transaction / Batching SQL builder creator.
  * @author ody
  */
 public class Transcxt {
 
-	public Transcxt(ISemantics semantics) {
+	ISemantext semantext;
+
+	public Transcxt(ISemantext semantext) {
+		this.semantext = semantext;
 	}
 
 	public Query select(String tabl, String ... alias) {
@@ -16,17 +18,19 @@ public class Transcxt {
 	}
 	
 	public Insert insert(String tabl) {
-		
 		return new Insert(this, tabl);
 	}
 	
 	public Update update(String tabl) {
-		
 		return new Update(this, tabl);
 	}
 
-	public Semantext inert(String tabl) {
-		return new Semantext(tabl);
-	}
+//	public <T extends Statement<T>> ISemantext insertCtx(Insert statement,
+//			String tabl, List<ArrayList<Object[]>> valuesNv) {
+//		return semantext.onInsert(statement, tabl, valuesNv);
+//	}
 
+	public <T extends Statement<T>> ISemantext insertCtx(T insert, String tabl) {
+		return semantext == null ? null : semantext.insert((Insert) insert, tabl);
+	}
 }

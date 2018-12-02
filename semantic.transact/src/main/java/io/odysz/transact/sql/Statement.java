@@ -1,12 +1,11 @@
 package io.odysz.transact.sql;
 
-
 import java.util.ArrayList;
 
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
 
@@ -64,11 +63,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 	
 	public T commit(ArrayList<String> sqls) throws TransException {
-		Semantext context = transc.inert(mainTabl);
+		ISemantext context = transc.insertCtx((T) this, mainTabl);
 		return commit(context, sqls);
 	}
 	
-	protected T commit(Semantext cxt, ArrayList<String> sqls) throws TransException {
+	protected T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		sqls.add(sql(cxt));
 		if (postate != null)
 			for (Statement<?> pst : postate)

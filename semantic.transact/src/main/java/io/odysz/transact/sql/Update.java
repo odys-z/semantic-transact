@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 
@@ -28,8 +28,9 @@ public class Update extends Statement<Update> {
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
-		sctx.onUpdate(nvs);
+	public String sql(ISemantext sctx) {
+		if (sctx != null)
+			sctx.onUpdate(this, mainTabl, nvs);
 		
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s = Stream.concat(

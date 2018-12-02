@@ -10,6 +10,7 @@ import org.junit.Test;
 import io.odysz.common.Utils;
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.Logic.op;
 
 public class TestTransc {
@@ -114,17 +115,17 @@ public class TestTransc {
 					.nv("funcount", st.select("a_rolefunc")
 										.col("count(funcId)")
 										.where("=", "roleId", "'admin'"))
-					.nv("roleName", "roleName || 'abc'")
+					.nv("roleName", new ExprPart("roleName || 'abc'"))
 					.where("=", "roleId", "'admin'"))
 			.commit(sqls);
 
 		// insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'
 		// update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'
+		Utils.logi(sqls);
 		assertEquals(sqls.get(0),
 				"insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'");
 		assertEquals(sqls.get(1),
 				"update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'");
-		Utils.logi(sqls);
 	}
 
 	
@@ -136,7 +137,7 @@ public class TestTransc {
 			.nv("roleName", "role-2")
 			.nv("funcount", "0")
 			.post(st.update("a_rolefunc")
-					.nv("funcId", "'f-01'")
+					.nv("funcId", "f-01")
 					.nv("roleId", "AUTO"))
 			.commit(sqls);
 	
@@ -145,14 +146,18 @@ public class TestTransc {
 			.nv("roleName", "role-2")
 			.nv("funcount", "0")
 			.post(st.insert("a_rolefunc")
-					.nv("funcId", "'f-01'")
+					.nv("funcId", "f-01")
 					.nv("roleId", "AUTO"))
 			.commit(sqls);
 
-		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 01:35:59', 'role-2', '0' )
-		// update a_rolefunc  set funcId='f-01', roleId='AUTO #2018-12-02 01:35:59'
-		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 01:35:59', 'role-2', '0' )
-		// insert into a_rolefunc  (funcId, roleId) values ( ''f-01'', 'AUTO #2018-12-02 01:35:59' )
+		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 10:02:23', 'role-2', '0' )
+		// update a_rolefunc  set funcId='f-01', roleId='AUTO #2018-12-02 10:02:23'
+		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 10:02:30', 'role-2', '0' )
+		// insert into a_rolefunc  (funcId, roleId) values ( 'f-01', 'AUTO #2018-12-02 10:02:30' )
 		Utils.logi(sqls);
+		assertTrue(sqls.get(0).startsWith("insert into a_roles"));
+		assertTrue(sqls.get(1).startsWith("update a_rolefunc"));
+		assertTrue(sqls.get(2).startsWith("insert into a_roles"));
+		assertTrue(sqls.get(3).startsWith("insert into a_rolefunc"));
 	}
 }

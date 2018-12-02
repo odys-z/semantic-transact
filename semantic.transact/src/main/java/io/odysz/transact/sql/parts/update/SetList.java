@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
@@ -16,7 +16,7 @@ public class SetList extends AbsPart {
 	}
 
 	@Override
-	public String sql(Semantext context) {
+	public String sql(ISemantext context) {
 		if (nvs == null)
 			return "";
 		else return nvs.stream()

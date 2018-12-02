@@ -3,7 +3,7 @@ package io.odysz.transact.sql.parts.select;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 
 
@@ -15,7 +15,7 @@ public class OrderyList extends AbsPart {
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		return orders.stream().map(e -> parse(e))
 				.filter(e -> e != null)
 				.collect(Collectors.joining(", ", "order by ", ""));

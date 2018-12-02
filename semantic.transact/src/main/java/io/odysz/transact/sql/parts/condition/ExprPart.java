@@ -1,6 +1,6 @@
 package io.odysz.transact.sql.parts.condition;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic.op;
 
@@ -21,7 +21,7 @@ public class ExprPart extends AbsPart {
 	}
 
 	@Override
-	public String sql(Semantext context) {
+	public String sql(ISemantext context) {
 		// FIXME what about unary operand?
 		if (logic == null)
 			return lexp == null ? "" : lexp;

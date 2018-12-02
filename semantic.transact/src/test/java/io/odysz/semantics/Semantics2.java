@@ -2,11 +2,21 @@ package io.odysz.semantics;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xml.sax.SAXException;
 
 import io.odysz.common.AESHelper;
+import io.odysz.module.xtable.IXMLStruct;
+import io.odysz.module.xtable.Log4jWrapper;
+import io.odysz.module.xtable.XMLDataFactory;
+import io.odysz.module.xtable.XMLTable;
+import io.odysz.semantics.x.SemanticException;
 
 /**Default data structure semantics description and supporter.<br>
- * <h3>What's Semantics for?</h3>
+ * The basic {@link Semantext2} use this to manage semantics configuration for resolving data semantics.
+ * <h3>What's Semantics2 for?</h3>
  * <p>Well, the word semantics is a computer science term. The author don't want to redefine this word,
  * but here is some explanation what <i>semantic-transact</i> is trying to support.</p>
  * <p>In a typical relational database based application, the main operation of data is CRUD.
@@ -14,16 +24,16 @@ import io.odysz.common.AESHelper;
  * and they are always organized as a database transaction/batch operation described in SQL.</p>
  * <p>Take "book-author" relation for example, the author's ID is also the parent referenced by
  * book's author FK. If trying to delete an author in DB, there are 2 typical policies can be applied
- * to the application. The first is delete all books by the author accordingly; the second is warn and
+ * by the application. The first is delete all books by the author accordingly; the second is warn and
  * deny the operation if some books are referencing the author. Both of this must been organized into
- * a transact/batch operation.</p>
+ * a transact/batch operation, with the second transact as check-then-delete.</p>
  * <p>In this case, you will find the FK relationship can be handled in a generalized operation, through
  * parameterizing some variables like table name, child referencing column name and parent ID.</p>
- * <p>Take the {@link Semantics.smtype#parentChildrenOnDel} for example, it's automatically support
- * "deleting all children when deleting parent" semantics. What the user (application developer) needto
+ * <p>Take the {@link Semantics2.smtype#parentChildrenOnDel} for example, it's automatically support
+ * "deleting all children when deleting parent" semantics. What the user (application developer) need to
  * do is configure a semantics item then delete the parent directly.</p>
  * <p>Now you (a developer) will definitely understand what's the "parentChildrenOnDel" for. Semantic-transact
- * abstract and hide these pattern, wrapped them automatically into a transaction. That's what semantic-
+ * abstract and hide these patterns, wrapped them automatically into a transaction. That's what semantic-
  * transact want to do.</p>
  * <h3>How to Use</h3>
  * <p>To use this function:</p>
@@ -31,53 +41,118 @@ import io.odysz.common.AESHelper;
  * 2. Set the configured semantics as context of {@link io.odysz.transact.sql.Statement}. See example in
  * {@link io.odysz.transact.SemanticsTest}. Then use Statement's subclass's commit() method to generate SQLs</p>
  * <h3>Is this Enough?</h3>
- * <p>The 9 to 10 types of semantics defined in {@link Semantics.smtype} is enough for some enterprise projects.
+ * <p>The 9 to 10 types of semantics defined in {@link Semantics2.smtype} is enough for some enterprise projects.
  * It depends on how abstract the semantics we want to support.</p>
  * </p>Another consideration is that semantic-transact never take supporting all semantics logic as it's goal.
  * It only trying to release burden of daily repeated tasks. Fortunately, such tasks' logic is simple, and the
  * burden is heavy. Let semantic-transact handle these simple logic, that's semantic-transact designed for. If
  * the semantics is complex, use anything you are familiar with.</p>
- * <p>But the semantics-cheapflow workflow engine is based on semantics-transact, and can handle typical, not 
- * very cheap if by our define, logics all necessary for enterprise applications. It's a good example illustrating
- * that if the semantics is designed carefully, those semantics supported by this class is enough. </p>
+ * <p>Before doing that, check the semantics-cheapflow workflow engine first, which is based on semantics-transact,
+ * and can handle typical - not very cheap if by our define - logics all necessary for enterprise applications.
+ * It's a good example illustrating that if the semantics is designed carefully, those semantics supported by
+ * this class is enough. </p>
  * <p>But it do need the application developers follow some design conventions. If you need you own semantics
- * implemantation, implement the interface {@link ISemantics}, or simply initialize {@link io.odysz.transact.sql.Transcxt}
- * with null semantics. 
+ * implementation, implement the interface {@link ISemantext}, or simply initialize {@link io.odysz.transact.sql.Transcxt}
+ * with null semantics, which will disable semantic supporting. 
  * @author ody
  */
-public class Semantics implements ISemantics {
-	/**Response error code*/
+class Semantics2 {
+	/**error code key word*/
 	public static final String ERR_CHK = "err_smtcs";;
 
-	/**<b>1. {@link #fullpath}</b><br>
-	 * <b>2. parentChildren</b>: delete children before delete parent;<br>
-	 * <b>3. dencrypt</b>: decrypt then encrypt (target col cannot be pk or anything other semantics will updated,<br>
-	 * TODO not supported in multiUpdate yet);<br>
-	 * <b>4. opTime</b>: oper and operTime that must auto updated when a user updating a record;<br>
-	 * <b>5. checkSqlCountOnDel</b>: check is this record a referee of children records - results from sql.select(count, description-args ...). The record(s) can't been deleted if referenced;<br>
-	 * <b>6. checkSqlCountOnInsert</b>: check is this record count when inserting - results from sql.select(count, description-args ...). The record(s) can't been inserted if count > 0;<br>
-	 * <b>7. checkDsCountOnDel</b>: check is this record a referee of children records - results from detaset.select(count, description-args ...). This is the oracle adaptive version of checkSqlCountOnDel;<br>
-	 * <b>8. composingCol</b>: compose a column from other columns;<br>
-	 * <b>9. stampUp1ThanDown</b> add 1 more second to down-stamp column and save to up-stamp.<br>
+	/**<b>0. {@link #autoPk} </b> key-word: "auto" | "pk" | "a-k"<br>
+	 * <b>1. {@link #fullpath} </b> key-word: "fullpath" | "fp" | "f-p"<br>
+	 * <b>2. {@link #parentChildren} </b> key-word: "pc-del-all" | "parent-child-del-all"<br>
+	 * <b>3. {@link #dencrypt} </b> key-word: "d-e" | "de-encrypt" <br>
+	 * <b>4. {@link #opTime}</b> key-word: "o-t" | "oper-time"<br>
+	 * <b>5. {@link #checkSqlCountOnDel} </b> key-word: "ck-cnt-del" | "check-count-del" <br>
+	 * <b>6. {@link #checkSqlCountOnInsert} </b> key-word: "ck-cnt-ins" | "check-count-insert" <br>
+	 * <b>7. {@link #checkDsCountOnDel} </b> key-word: "ds-cnt-ins" | "ds-count-insert" <br>
+	 * <b>8. {@link #composingCol} </b> key-word: "cmp-col" | "compose-col" | "compose-column" <br>
+	 * <b>9. {@link #stampUp1ThanDown} </b> key-word: "stamp-up1" <br>
+	 * <b>10.{@link #orclob} </b> key-word: "clob"<br>
 	 * UpdateBatch supporting:<br>
 	 * on inserting, up-stamp is the value of increased down stamp, or current time if it's not usable;<br>
 	 * on updating, up-stamp is set as down stamp increased if down stamp value not presented in sql, or,
 	 * up stamp will be ignored if down stamp presented. (use case of down stamp updating by synchronizer).<br>
-	 * <b>x. orclClob</b>: the field must saved as clob when driver type is orcl;
+	 * <b>x. orclob</b>: the field must saved as clob when driver type is orcl;
 	 */
 	public enum smtype {
-		/**when updating, auto update fullpath field according to parent-id and current record id */
+		/**"auto" | "pk" | "a-k": Generate auto pk for the field when inserting */
+		autoPk,
+		/** "f-p" | "fp" | "fullpath": when updating, auto update fullpath field according to parent-id and current record id */
 		fullpath,
+		/** "p-c-del-all" | "parent-child-del-all": delete children before delete parent */
 		parentChildrenOnDel,
+		/** "d-e" | "de-encrypt": decrypt then encrypt (target col cannot be pk or anything other semantics will updated */
 		dencrypt,
+		/** "o-t" | "oper-time": oper and operTime that must auto updated when a user updating a record*/
 		opTime,
+		/** "ck-cnt-del" | "check-count-del": check is this record a referee of children records - results from sql.select(count, description-args ...). The record(s) can't been deleted if referenced;*/
 		checkSqlCountOnDel,
+		/** "ck-cnt-ins" | "ck-cnt-insert": check is this record count when inserting - results from sql.select(count, description-args ...). The record(s) can't been inserted if count > 0;*/
 		checkSqlCountOnInsert,
-		checkDsCountOnDel,
+		/** "ds-cnt-del" | "ds-count-del": check is this record a referee of children records - results from detaset.select(count, description-args ...). This is the oracle adaptive version of checkSqlCountOnDel; */
+		// checkDsCountOnDel,
+		/** "cmp-col" | "compose-col" | "compse-column": compose a column from other columns;*/
 		composingCol,
+		/** "s-up1" | "stamp-up1": add 1 more second to down-stamp column and save to up-stamp*/
 		stamp1MoreThanRefee,
-		orclClob
+		/** "clob" | "orclob": the column is a CLOB field, semantic-transact will read/write separately in stream and get final results.*/
+		orclob;
+
+		public static smtype parse(String type) throws SemanticException {
+			if (type == null) throw new SemanticException("semantics is null");
+			type = type.toLowerCase().trim();
+			if ("auto".equals(type) || "pk".equals(type) || "a-k".equals(type) || "autopk".equals(type))
+				return autoPk;
+			else if ("fullpath".equals(type) || "f-p".equals(type))
+				return fullpath;
+			else if ("pc-del-all".equals(type) || "parent-child-del-all".equals(type) || "parentchildondel".equals(type))
+				return parentChildrenOnDel;
+			else if ("d-e".equals(type) || "de-encrypt".equals(type) || "dencrypt".equals(type))
+				return dencrypt;
+			else if ("o-t".equals(type) || "oper-time".equals(type) || "optime".equals(type))
+				return opTime;
+			else if ("ck-cnt-del".equals(type) || "check-count-del".equals(type) || "checksqlcountondel".equals(type))
+				return checkSqlCountOnDel;
+			else if ("ck-cnt-del".equals(type) || "check-count-del".equals(type) || "checksqlcountoninsert".equals(type))
+				return checkSqlCountOnInsert;
+//			else if ("ds-cnt-del".equals(type) || "ds-count-del".equals(type) || "checkdscountondel".equals(type))
+//				return checkDsCountOnDel;
+			else if ("cmp-col".equals(type) || "compose-col".equals(type) || "compse-column".equals(type) || "composingcol".equals(type))
+				return composingCol;
+			else if ("s-up1".equals(type) || type.startsWith("stamp1"))
+				return stamp1MoreThanRefee;
+			else if ("clob".equals(type) || "orclob".equals(type))
+				return orclob;
+			else throw new SemanticException("semantics not known: " + type);
 		}
+	}
+	
+	public static HashMap<String, Semantics2> init(String path) throws SAXException, SemanticException {
+		HashMap<String, Semantics2> ss = new HashMap<String, Semantics2>();
+
+		XMLTable conn = XMLDataFactory.getTable(new Log4jWrapper("") , "semantics", path,
+						new IXMLStruct() {
+							@Override public String rootTag() { return "semantics"; }
+							@Override public String tableTag() { return "t"; }
+							@Override public String recordTag() { return "s"; }});
+
+		conn.beforeFirst();	
+		while (conn.next()) {
+			String tabl = conn.getString("tabl");
+			Semantics2 s = ss.get(tabl);
+			if (s == null)
+				s = new Semantics2(conn.getString("smtc"), tabl,
+					conn.getString("pk"), conn.getString("args"));
+			else s.addSemantics(conn.getString("smtc"), tabl,
+					conn.getString("pk"), conn.getString("args"));
+			ss.put(tabl, s);
+		}
+		return ss;
+	}
+	
 	private String target;
 
 	// fullpath
@@ -90,8 +165,7 @@ public class Semantics implements ISemantics {
 	 * String[][] of {String[]{[0] child-table, [1] child-fk}, String[]{...}, ...}
 	 */
 	private ArrayList<String[]> childConstraints;
-	// private String childTab;
-	// private String childFK;
+
 	/** Readable description */
 	private String descPC;
 	private String idField;
@@ -120,96 +194,121 @@ public class Semantics implements ISemantics {
 	private String checkCountValueCol_Ins;
 	private String deschkIns;
 
-	/**semantic = fullpath, args["tabl", "rec-id", "parentId-field", "suffix-field", "fullpath-field"]<br>
-	 * semantic = parentChildrenOnDel, args["parent-table", "parent-id-field", "child-table", "child-fk-field"]<br>
-	 * semantic = dencrypt, args["tabl", "cipher-col", "iv-col", "decrypt-key", "encrypt-key"]<br>
-	 * semantic = opTime, args["tabl", "rec-id", "oper-col", "operTime-col"]<br>
-	 * semantic = checkCountOnDel(sql), args["tabl", "rec-id", "desc-template", "select count-arg0, recName-arg1, ...", "deleting-pk-col"]<br>
-	 * semantic = checkCountOnInsert(sql), args["tabl", "rec-id", "desc-template", "select count-arg0, recName-arg1, ...", "deleting-pk-col"]<br>
-	 * semantic = composed-col = concat(composing-cols), args["tabl", "rec-id", "composed-col", "composing-col1", "'const'", ...]<br>
-	 * semantic = stampUp1ThanDown, args["tabl", "id-field", "up-stamp", "down-stamp"]<br>
-	 * semantic = clob, args["bump-case-tabl", "id-field", "lob-field"]
+	private String autoPk;
+	public String autoPk() { return autoPk; }
+
+	/**semantic = fullpath, args["parentId-field", "suffix-field", "fullpath-field"]<br>
+	 * semantic = parentChildrenOnDel, args["child-table", "child-fk-field"]<br>
+	 * semantic = dencrypt, args["iv-col", "decrypt-key", "encrypt-key"]<br>
+	 * semantic = opTime, args["oper-col", "operTime-col"]<br>
+	 * semantic = checkCountOnDel(sql), args["desc-template", "select count-arg0, recName-arg1, ...", "deleting-pk-col"]<br>
+	 * semantic = checkCountOnInsert(sql), args["desc-template", "select count-arg0, recName-arg1, ...", "deleting-pk-col"]<br>
+	 * semantic = composed-col = concat(composing-cols), args["composed-col", "composing-col1", "'const'", ...]<br>
+	 * semantic = stampUp1ThanDown, args["up-stamp", "down-stamp"]<br>
+	 * semantic = clob, args["lob-field"]
 	 * @param semantic
+	 * @param tabl
+	 * @param recId
 	 * @param args
+	 * @throws SemanticException 
 	 */
-	public Semantics(smtype semantic, String[] args) {
-		try { addSemantics(semantic, args);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public Semantics2(smtype semantic, String tabl, String recId, String args) throws SemanticException {
+		addSemantics(semantic, tabl, recId, args);
+	}
+	public Semantics2(String semantic, String tabl, String recId, String args) throws SemanticException {
+		addSemantics(smtype.parse(semantic), tabl, recId, args);
 	}
 	
-	/**@see {@link Semantics#Semantics(smtype, String[])}
+	/**@see {@link Semantics2#Semantics(smtype, String[])}
 	 * @param semantic
+	 * @param tabl
 	 * @param args
 	 * @throws SQLException
 	 */
-	public void addSemantics(smtype semantic, String[] args) throws SQLException {
-		if (target != null && !target.equals(args[0]))
-			throw new SQLException(String.format("Adding semetics to different target: ", target, args[0]));
+	public void addSemantics(smtype semantic, String tabl, String recId, String args) throws SemanticException {
+		checkParas(tabl, recId, args);
+		String[] argss = args.split(",");
+		if (smtype.autoPk == semantic)
+			addAutoPk(tabl, recId, argss);
 		if (smtype.fullpath == semantic)
-			addFullpath(args);
+			addFullpath(tabl, recId, argss);
 		else if (smtype.parentChildrenOnDel == semantic)
-			addParentChildren(args);
+			addParentChildren(tabl, recId, argss);
 		else if (smtype.dencrypt == semantic)
-			addDencrypt(args);
-		else if (smtype.orclClob == semantic)
-			addClob(args);
+			addDencrypt(tabl, recId, argss);
+		else if (smtype.orclob == semantic)
+			addClob(tabl, recId, argss);
 		else if (smtype.opTime == semantic)
-			addOperTime(args);
+			addOperTime(tabl, recId, argss);
 		else if (smtype.checkSqlCountOnDel == semantic)
-			addCheckSqlCountOnDel(args);
+			addCheckSqlCountOnDel(tabl, recId, argss);
 		else if (smtype.checkSqlCountOnInsert == semantic)
-			addCheckSqlCountOnInsert(args);
+			addCheckSqlCountOnInsert(tabl, recId, argss);
 		else if (smtype.composingCol == semantic)
-			addComposings(args);
+			addComposings(tabl, recId, argss);
 		else if (smtype.stamp1MoreThanRefee == semantic)
-			addUpDownStamp(args);
-		else throw new SQLException("Unsuppported semantics: " + semantic);
+			addUpDownStamp(tabl, recId, argss);
+		else throw new SemanticException("Unsuppported semantics: " + semantic);
+	}
+
+	private void addAutoPk(String tabl, String recId, String[] argss) {
+		autoPk = recId;
+	}
+	private void addSemantics(String type, String tabl, String recId, String args) throws SemanticException {
+		smtype st = smtype.parse(type);
+		addSemantics(st, tabl, recId, args);
 	}
 
 	/**Throw exception if args is null or target (table) not correct.
+	 * @param tabl
+	 * @param recId
 	 * @param args
-	 * @throws SQLException
+	 * @throws SemanticException sementic configuration not matching the target or lack of args.
 	 */
-	private void checkParas(String[] args) throws SQLException {
-		if (args == null || args[0] == null || args[1] == null || args[2] == null)
-			throw new SQLException(String.format("adding semantics with empty args? %s %s %s", (Object[])args));
+	private void checkParas(String tabl, String recId, String args) throws SemanticException {
+		if (tabl == null || recId == null || args == null)
+			throw new SemanticException(String.format(
+					"adding semantics with empty targets? %s %s %s",
+					tabl, recId, args));
 
-		if (target != null && !target.equals(args[0]))
-			throw new SQLException(String.format("adding semantics for different target? %s vs. %s", target, args[0]));
-		if (idField != null && !idField.equals(args[1]))
-			throw new SQLException(String.format("adding semantics for target of diferent id field? %s vs. %s", idField, args[1]));
+		if (target != null && !target.equals(tabl))
+			throw new SemanticException(String.format("adding semantics for different target? %s vs. %s", target, tabl));
+		if (idField != null && !idField.equals(recId))
+			throw new SemanticException(String.format("adding semantics for target of diferent id field? %s vs. %s", idField, recId));
 	}
 	
-	private void addClob(String[] args) throws SQLException {
-		checkParas(args);
-
-		target = args[0];
-		idField = args[1];
+	/**
+	 * @param tabl
+	 * @param pk
+	 * @param args 0: CLOB field
+	 */
+	private void addClob(String tabl, String pk, String[] args) {
+		target = tabl;
+		idField = pk;
 		if (lobFields == null)
 			lobFields = new ArrayList<String>(1);
-		lobFields.add(args[2]);
+		lobFields.add(args[0]);
 	}
 
 	/**semantic = checkCountOnDel(sql), args["tabl", "rec-id", "desc-template", "select count-arg0, recName-arg1, ...", "deleting-pk-col"]
-	 * 
-	 * @param args
-	 * @throws SQLException
+	 * @param tabl
+	 * @param pk
+	 * @param args 0: error-message-format, 1: checking-sql, 2: count-col
 	 */
-	private void addCheckSqlCountOnDel(String[] args) throws SQLException {
-		checkParas(args);
-
-		target = args[0];
-		idField = args[1];
-		checkCountErrFormat_Del = args[2];
-		checkCountSql_Del = args[3];
-		checkCountPkCol_Del = args[4];
+	private void addCheckSqlCountOnDel(String tabl, String pk, String[] args) {
+		target = tabl;
+		idField = pk;
+		checkCountErrFormat_Del = args[0];
+		checkCountSql_Del = args[1];
+		checkCountPkCol_Del = args[2];
 	}
 
-	private void addCheckSqlCountOnInsert(String[] args) throws SQLException {
-		checkParas(args);
-
+	/**
+	 * @param tabl
+	 * @param pk
+	 * @param args 0: error-message-format, 1: checking-sql, 2: count-col in checking-sql
+	 */
+	private void addCheckSqlCountOnInsert(String tabl, String pk, String[] args) {
 		target = args[0];
 		idField = args[1];
 		checkCountErrFormat_Ins = args[2];
@@ -219,35 +318,43 @@ public class Semantics implements ISemantics {
 		deschkIns = String.format("Check sql results on table %s, value-col %s", target, checkCountValueCol_Ins);
 	}
 
-	private void addOperTime(String[] args) throws SQLException {
-		checkParas(args);
-
-		target = args[0];
-		idField = args[1];
-		operField = args[2];
-		opTimeField = args[3];
+	/**
+	 * @param tabl
+	 * @param pk
+	 * @param args 0: oper-field, 1: oper-time-field;
+	 */
+	private void addOperTime(String tabl, String pk, String[] args) {
+		target = tabl;
+		idField = pk;
+		operField = args[0];
+		opTimeField = args[1];
 	}
 
-	private void addDencrypt(String[] args) {
-		target = args[0];
-		cipherCol = args[1];
-		ivCol = args[2];
-		decryptK = args[3];
-		encryptK = args[4];
+	/**
+	 * @param tabl
+	 * @param pk
+	 * @param args 0: iv-col, 1: decrypt-key, 2: encrypt-key
+	 */
+	private void addDencrypt(String tabl, String pk, String[] args) {
+		target = tabl;
+		cipherCol = pk;
+		ivCol = args[0];
+		decryptK = args[1];
+		encryptK = args[2];
 	}
 
-	private void addParentChildren(String[] args) {
-		if (pathSufix != null) {
-			if (!target.equals(args[0]) || !idField.equals(args[1]))
-				System.err.println(String.format(
-					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
-					args[0], args[1], target, pathSufix));
-		}
-		target = args[0];
-		idField = args[1];
+	private void addParentChildren(String tabl, String pk, String[] args) {
+//		if (pathSufix != null) {
+//			if (!target.equals(args[0]) || !idField.equals(args[1]))
+//				System.err.println(String.format(
+//					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
+//					args[0], args[1], target, pathSufix));
+//		}
+		target = tabl;
+		idField = pk;
 		if (childConstraints == null)
 			childConstraints = new ArrayList<String[]> ();
-		childConstraints.add(new String[] {args[2], args[3]});
+		childConstraints.add(new String[] {args[0], args[1]});
 		//String.format("parent-child rule (%s.%s <-FK- '%s.%s')", target, id, childTab, childFK);
 		descPC = formatPcDesc();
 	}
@@ -259,22 +366,42 @@ public class Semantics implements ISemantics {
 		return s;
 	}
 
-	/**
-	 * @param args 0: tabl, 1: recId, 2: parent-field, 3: path-suffix (sibling field?), 4: fullpath-field
+	/**add fullpath semantics.
+	 * @param tabl
+	 * @param pk 
+	 * @param args 0: parent-field, 1: path-suffix (sibling field?), 2: fullpath-field
 	 */
-	private void addFullpath(String[] args) {
-		if (pathSufix != null) {
-			if (!target.equals(args[0]) || !pathSufix.equals(args[1]))
-				System.err.println(String.format(
-					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
-					args[0], args[1], target, pathSufix));
-		}
-		target = args[0];
-		idField = args[1];
-		parentField =  args[2];
-		pathSufix = args[3];
-		fullPath = args[4];
+	private void addFullpath(String tabl, String pk, String[] args) {
+//		if (pathSufix != null) {
+//			if (!target.equals(args[0]) || !pathSufix.equals(args[1]))
+//				System.err.println(String.format(
+//					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
+//					args[0], args[1], target, pathSufix));
+//		}
+		target = tabl;
+		idField = pk;
+		parentField =  args[0];
+		pathSufix = args[1];
+		fullPath = args[2];
 		descFullpath = String.format("fullpath rule (%s = 'parent-%s.%s')", fullPath, fullPath, pathSufix);
+	}
+
+	public String genFullpath(ArrayList<Object[]> value, Map<String, Integer>colIx) {
+		// can't compose fullpath as there is no parent's fullpath
+		String parentId = null;
+		String sibling = null;
+		String recId = null;
+
+		if (colIx.containsKey(parentField))
+			parentId = (String) value.get(colIx.get(parentField))[1];
+
+		if (colIx.containsKey(pathSufix))
+			sibling = (String) value.get(colIx.get(parentField))[1];
+		else sibling = pathSufix;
+
+		recId = (String) value.get(colIx.get(idField))[1];
+
+		return String.format("fullpath %s.%s %s", parentId, sibling, recId);
 	}
 
 //	public String genFullpath2(String conn, Object parentId, Object recId, Object siblingOrder) throws SQLException {
@@ -432,18 +559,28 @@ public class Semantics implements ISemantics {
 
 	public boolean is(smtype type) {
 		switch (type) {
+		case autoPk:
+			return autoPk != null;
 		case fullpath:
 			return fullPath != null;
-		case parentChildrenOnDel :
+		case parentChildrenOnDel:
 			return childConstraints != null && childConstraints.size() > 0;
-		case checkSqlCountOnInsert :
+		case checkSqlCountOnInsert:
 			return checkCountSql_Ins != null && checkCountValueCol_Ins != null;
+		case checkSqlCountOnDel:
+			return checkCountSql_Del != null;
+//		case checkDsCountOnDel:
+//			return :
 		case dencrypt:
 			return cipherCol != null && decryptK.length() > 0 && encryptK.length() > 0;
+		case opTime:
+			return operField != null || opTimeField != null;
 		case composingCol:
 			return composedCol != null && composingCols != null && composingCols.length > 0;
 		case stamp1MoreThanRefee:
 			return upStamp != null && downStamp != null;
+		case orclob:
+			return lobFields != null && lobFields.size() > 0;
 		default:
 			return false;
 		}
@@ -517,9 +654,7 @@ public class Semantics implements ISemantics {
 
 	private String[] composingCols;
 
-	private void addComposings(String[] args) throws SQLException {
-		checkParas(args);
-		
+	private void addComposings(String tabl, String pk, String[] args) {
 		target = args[0];
 		idField = args[1];
 		composedCol = args[2];
@@ -578,17 +713,17 @@ public class Semantics implements ISemantics {
 	private String defltRefeeVal;
 
 	/**
-	 * @param args [0] table, [1] id-field, [2] up-stamp, [3] down-stamp, [4] default down stamp, [5] generate up-stamp
-	 * @throws SQLException
+	 * @param tabl
+	 * @param pk
+	 * @param args [0] up-stamp, [1] down-stamp, [2] default down stamp, [3] generate up-stamp
 	 */
-	private void addUpDownStamp(String[] args) throws SQLException {
-		checkParas(args);
-		target = args[0];
-		idField = args[1];
-		upStamp = args[2];
-		downStamp = args[3];
-		defltRefeeVal = args.length > 4 ? args[4] : "0";
-		supportUpStampOnUpdate = args.length > 5 ? Boolean.valueOf(args[5]) : false;
+	private void addUpDownStamp(String tabl, String pk, String[] args) {
+		target = tabl;
+		idField = pk;
+		upStamp = args[0];
+		downStamp = args[1];
+		defltRefeeVal = args.length > 2 ? args[2] : "0";
+		supportUpStampOnUpdate = args.length > 3 ? Boolean.valueOf(args[3]) : false;
 	}
 
 	public String upstamp() {

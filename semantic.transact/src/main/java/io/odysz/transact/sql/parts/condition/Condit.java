@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Logic.type;
@@ -78,7 +78,7 @@ search_condition_not
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
 		if (predict != null)

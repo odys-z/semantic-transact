@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 
@@ -62,7 +62,7 @@ public class Predicate extends AbsPart {
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));
 		else {

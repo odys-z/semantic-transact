@@ -1,6 +1,6 @@
 package io.odysz.transact.sql.parts.select;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
@@ -30,7 +30,7 @@ public class JoinTabl extends Condit {
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		if (jtype == join.main)
 			return String.format("from %s %s", jtabl, jtablias == null ? "" : jtablias);
 

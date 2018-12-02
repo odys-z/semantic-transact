@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -211,7 +211,7 @@ public class Query extends Statement<Query> {
 	}
 
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
 
 		Stream<String> s = Stream.concat(

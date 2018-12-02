@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
@@ -25,11 +25,12 @@ public class Insert extends Statement<Insert> {
 	/**[col-name, col-index] */
 	private Map<String,Integer> insertCols;
 	
-	/**@deprecated Insert know nothing about semantics. It's handled by Semantics and Semantext*/
+	/**@deprecated Insert know nothing about semantics. It's handled by Semantics2 and Semantext2*/
 	@SuppressWarnings("unused")
 	private String pk;
 
 	private Query selectValues;
+	/**[ list[Object[n, v], ... ], ... ] */
 	private List<ArrayList<Object[]>> valuesNv;
 	private ArrayList<Object[]> currentRowNv;
 
@@ -97,10 +98,10 @@ public class Insert extends Statement<Insert> {
 	}
 
 	/**sql: insert into tabl(...) values(...) / select ...
-	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.Semantext)
+	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.Semantext2)
 	 */
 	@Override
-	public String sql(Semantext sctx) {
+	public String sql(ISemantext sctx) {
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			if (valuesNv == null) {
 				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
@@ -110,8 +111,8 @@ public class Insert extends Statement<Insert> {
 
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
 		
-		if (hasValuesNv)
-			sctx.onInsert(valuesNv);
+		if (sctx != null)
+			sctx.onInsert(this, mainTabl, valuesNv);
 		
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
@@ -169,6 +170,10 @@ public class Insert extends Statement<Insert> {
 		}
 
 		return vs;
+	}
+
+	public Map<String, Integer> getColumns() {
+		return insertCols;
 	}
 
 }

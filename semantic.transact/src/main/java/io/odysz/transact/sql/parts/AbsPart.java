@@ -1,6 +1,6 @@
 package io.odysz.transact.sql.parts;
 
-import io.odysz.semantics.Semantext;
+import io.odysz.semantics.ISemantext;
 
 /**<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
@@ -23,5 +23,5 @@ abstract public class AbsPart {
 	 * @param context
 	 * @return
 	 */
-	public abstract String sql(Semantext context);
+	public abstract String sql(ISemantext context);
 }
