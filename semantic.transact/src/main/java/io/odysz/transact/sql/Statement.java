@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.transact.x.TransException;
@@ -11,6 +12,11 @@ import io.odysz.transact.sql.parts.condition.Condit;
 
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
+	public interface IPostOperat {
+		// TODO return SemanticObject?
+		Object op (String sql) throws TransException, SQLException;
+	}
+
 	public enum Type { select, insert, update, delete }
 
 	protected static boolean verbose = true;
@@ -29,6 +35,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected Transcxt transc;
 
 	private ArrayList<Statement<?>> postate;
+
+	protected IPostOperat postOp;
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
@@ -73,6 +81,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			for (Statement<?> pst : postate)
 				pst.commit(cxt, sqls);
 		return (T) this;
+	}
+	
+	public void postOp(IPostOperat operat) {
+		postOp = operat;
 	}
 	
 }

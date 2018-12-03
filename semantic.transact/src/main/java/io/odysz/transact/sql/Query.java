@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ import io.odysz.transact.sql.parts.select.JoinTabl;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.JoinTabl.join;
 
@@ -209,6 +211,13 @@ public class Query extends Statement<Query> {
 		orderList.add(new String[] {col, desc == null || desc.length <= 0 ? null : desc[0]});
 		return this;
 	}
+
+	public Object rs(ISemantext sctx) throws TransException, SQLException {
+		if (postOp != null)
+			return postOp.op(sql(sctx));
+		return null;
+	}
+
 
 	@Override
 	public String sql(ISemantext sctx) {
