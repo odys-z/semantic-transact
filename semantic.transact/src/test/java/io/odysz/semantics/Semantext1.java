@@ -14,7 +14,7 @@ import io.odysz.transact.sql.Update;
  * @author ody
  *
  */
-public class Semantext1 implements ISemantext {
+class Semantext1 implements ISemantext {
 
 	private String tabl;
 	private HashMap<Object, Object> autoVals;
@@ -67,5 +67,11 @@ public class Semantext1 implements ISemantext {
 	@Override
 	public ISemantext insert(Insert insert, String tabl) {
 		return new Semantext1(tabl, semantics);
+	}
+
+	@Override
+	public ISemantext update(Update update, String mainTabl) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -8,10 +8,6 @@ import java.util.Map;
 import org.xml.sax.SAXException;
 
 import io.odysz.common.AESHelper;
-import io.odysz.module.xtable.IXMLStruct;
-import io.odysz.module.xtable.Log4jWrapper;
-import io.odysz.module.xtable.XMLDataFactory;
-import io.odysz.module.xtable.XMLTable;
 import io.odysz.semantics.x.SemanticException;
 
 /**Default data structure semantics description and supporter.<br>
@@ -133,23 +129,35 @@ class Semantics2 {
 	public static HashMap<String, Semantics2> init(String path) throws SAXException, SemanticException {
 		HashMap<String, Semantics2> ss = new HashMap<String, Semantics2>();
 
-		XMLTable conn = XMLDataFactory.getTable(new Log4jWrapper("") , "semantics", path,
-						new IXMLStruct() {
-							@Override public String rootTag() { return "semantics"; }
-							@Override public String tableTag() { return "t"; }
-							@Override public String recordTag() { return "s"; }});
+//		XMLTable conn = XMLDataFactory.getTable(new Log4jWrapper("") , "semantics", path,
+//						new IXMLStruct() {
+//							@Override public String rootTag() { return "semantics"; }
+//							@Override public String tableTag() { return "t"; }
+//							@Override public String recordTag() { return "s"; }});
+//
+//		conn.beforeFirst();	
+//		while (conn.next()) {
+//			String tabl = conn.getString("tabl");
+//			Semantics2 s = ss.get(tabl);
+//			if (s == null)
+//				s = new Semantics2(conn.getString("smtc"), tabl,
+//					conn.getString("pk"), conn.getString("args"));
+//			else s.addSemantics(conn.getString("smtc"), tabl,
+//					conn.getString("pk"), conn.getString("args"));
+//			ss.put(tabl, s);
+//		}
 
-		conn.beforeFirst();	
-		while (conn.next()) {
-			String tabl = conn.getString("tabl");
-			Semantics2 s = ss.get(tabl);
-			if (s == null)
-				s = new Semantics2(conn.getString("smtc"), tabl,
-					conn.getString("pk"), conn.getString("args"));
-			else s.addSemantics(conn.getString("smtc"), tabl,
-					conn.getString("pk"), conn.getString("args"));
-			ss.put(tabl, s);
-		}
+		String tabl = "a_functions";
+		Semantics2 s = new Semantics2("fullpath", tabl, "funcId",
+				"parentId,sibling,fullpath");
+		s.addSemantics("pc-del-all", tabl, "funcId", "a_rolefunc,funcId");
+		ss.put(tabl, s);
+
+		tabl = "a_roles";
+		s = new Semantics2("ck-cnt-del", tabl, "roleId",
+				"a_rolefunc, select count(*) cnt from a_rolefunc where roleId = '%s',cnt");
+		ss.put(tabl, s);
+
 		return ss;
 	}
 	
