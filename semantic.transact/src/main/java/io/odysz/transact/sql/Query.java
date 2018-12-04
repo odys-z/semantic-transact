@@ -15,13 +15,13 @@ import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.JoinTabl;
+import io.odysz.transact.sql.parts.select.JoinTabl.join;
+import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
-import io.odysz.transact.x.TransException;
-import io.odysz.transact.sql.parts.select.GroupbyList;
-import io.odysz.transact.sql.parts.select.JoinTabl.join;
 
 /**
  * <pre>
@@ -212,11 +212,6 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Object rs(ISemantext sctx) throws TransException, SQLException {
-		if (postOp != null)
-			return postOp.op(sql(sctx));
-		return null;
-	}
 
 
 	@Override
@@ -245,5 +240,45 @@ public class Query extends Statement<Query> {
 			).map(m -> m.sql(sctx));
 
 		return s.collect(Collectors.joining(" "));
+	}
+	
+	/**<p>Use this method to do post operation, a. k. a. for {@link Select} get selected results -
+	 * commit select statement, for {@link Insert} to get inserted new Ids.</p>
+	 * <p>This method must called after the post operation (lambda expression) been initialized.</p>
+	 * <h3>Why rs() must been used after setting lambda expression?</h3>
+	 * <p>As Query generated sql, it should be used to get result set - execute the SQL
+	 * select statement.</p>
+	 * <p>But semantic-transact is designed not to depend on any database accessing layer,
+	 * so Query shouldn't access database, although in many case it's very convenient to
+	 * get result set directly.</p>
+	 * <p>This requirements is handled in JDK1.8 lambda expression style:<br>
+	 * User override method {@link Transcxt#select(String, String...)}, which add a lambda
+	 * expression as the post operation for handling execution of the generated SQL statement,
+	 * rs() will call the lambda and return the result set returned by this operation.</p>
+	 * <h3>Where is the sample code?</h3>
+	 * <p>To see how to extend {@link Transcxt}, see DATranscxt in project semantic-DA.<br>
+	 * To see how to use this method, see io.odysz.semantic.DASemantextTest in project sematic-DA.</p>
+	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList)}
+	 * because the inserting values will be handled / smirred in both methods.</p>
+	 * <p>If you can make sure the ISemantext instance provided to Transcxt is clean of data
+	 * invention, you can safely use both of these methods. But it's not guaranteed in the
+	 * future version.</p>
+	 * Also it's not recommended for the performance reason. The sql string is already generated
+	 * by {@link #commit(ArrayList)}, don't generate it and travels AST again in this method, 
+	 * use it directly.
+	 * @param sctx
+	 * @return
+	 * @throws TransException
+	 * @throws SQLException
+	 */
+	public Object rs() throws TransException, SQLException {
+//		ISemantext context = transc.insertCtx((T) this, mainTabl);
+		if (postOp != null) {
+			ArrayList<String> sqls = new ArrayList<String>(); 
+			commit(sqls);
+			return postOp.op(sqls);
+//			return results;
+		}
+		return null;
 	}
 }

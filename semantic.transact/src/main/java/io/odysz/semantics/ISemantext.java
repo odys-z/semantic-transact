@@ -1,6 +1,7 @@
 package io.odysz.semantics;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.odysz.transact.sql.Insert;
@@ -22,20 +23,24 @@ import io.odysz.transact.sql.Update;
  */
 public interface ISemantext {
 	/**Called when starting a insert transaction sql composing.<br>
-	 * Create a context for the insert-sql composing process.
+	 * Create a context for the insert-sql composing process.<br>
+	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
 	 * @param insert
 	 * @param mainTabl
+	 * @param usr user information used for modify sql AST
 	 * @return the new ISemantext context instance for resolving semantics.
 	 */
-	public ISemantext insert(Insert insert, String mainTabl);
+	public ISemantext insert(Insert insert, String mainTabl, IUser... usr);
 
 	/**Called when starting an update transaction sql composing.<br>
-	 * Create a context for the update-sql composing process.
+	 * Create a context for the update-sql composing process.<br>
+	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
 	 * @param update
 	 * @param mainTabl
+	 * @param usr user information used for modify sql AST
 	 * @return
 	 */
-	public ISemantext update(Update update, String mainTabl);
+	public ISemantext update(Update update, String mainTabl, IUser... usr);
 
 	/**Called each time an <@link Insert} statement found itself will composing a insert-sql.<br>
 	 * Resolving inserting values, e.g an AUTO key is generated here.
@@ -55,9 +60,9 @@ public interface ISemantext {
 	 */
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs);
 
-
-
-
-
-
+	/**Get results from handling semantics. typically new inserting records' auto Id,
+	 * which should usually let the caller / client know about it.
+	 * @return
+	 */
+	public HashMap<String, SemanticObject> results();
 }

@@ -65,13 +65,18 @@ class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public ISemantext insert(Insert insert, String tabl) {
+	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
 		return new Semantext1(tabl, semantics);
 	}
 
 	@Override
-	public ISemantext update(Update update, String mainTabl) {
+	public ISemantext update(Update update, String mainTabl, IUser... usr) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HashMap<String, SemanticObject> results() {
 		return null;
 	}
 }

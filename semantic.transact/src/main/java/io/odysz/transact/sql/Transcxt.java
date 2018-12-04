@@ -1,6 +1,7 @@
 package io.odysz.transact.sql;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.IUser;
 
 /**Transaction / Batching SQL builder creator.
  * @author ody
@@ -30,7 +31,7 @@ public class Transcxt {
 //		return semantext.onInsert(statement, tabl, valuesNv);
 //	}
 
-	public <T extends Statement<T>> ISemantext insertCtx(T insert, String tabl) {
-		return semantext == null ? null : semantext.insert((Insert) insert, tabl);
+	public <T extends Statement<T>> ISemantext insertCtx(T insert, String tabl, IUser... usr) {
+		return semantext == null ? null : semantext.insert((Insert) insert, tabl, usr);
 	}
 }

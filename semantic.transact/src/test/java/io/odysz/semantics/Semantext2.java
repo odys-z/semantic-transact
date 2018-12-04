@@ -22,6 +22,7 @@ class Semantext2 implements ISemantext {
 	private HashMap<Object, Object> autoVals;
 	private HashMap<String, Semantics2> semantics;
 	private Statement<?> callerStatement;
+	private HashMap<String, SemanticObject> resolvedIds;
 
 	public Semantext2(String tabl, HashMap<String,Semantics2> semantics) {
 		this.tabl = tabl;
@@ -78,14 +79,22 @@ class Semantext2 implements ISemantext {
 
 
 	@Override
-	public ISemantext insert(Insert insert, String tabl) {
+	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
 		return new Semantext2(tabl, semantics);
 	}
 
 	@Override
-	public ISemantext update(Update update, String mainTabl) {
+	public ISemantext update(Update update, String mainTabl, IUser... usr) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**get resolved / generated Ids (only for insert)
+	 * @see io.odysz.semantics.ISemantext#results()
+	 */
+	@Override
+	public HashMap<String, SemanticObject> results() {
+		return resolvedIds;
 	}
 
 }
