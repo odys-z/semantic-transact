@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.select.ConstList;
+import io.odysz.transact.sql.parts.select.ValueList;
 import io.odysz.transact.x.TransException;
 
 public class SetValue extends ExprPart {
@@ -34,7 +34,7 @@ public class SetValue extends ExprPart {
 		else if (expr != null)
 			return expr.sql(sctx);
 		else if (constValue != null) {
-			ConstList constList = new ConstList(1);
+			ValueList constList = new ValueList(1);
 			try { constList.constv(0, constValue); }
 			catch (TransException e) {
 				e.printStackTrace();

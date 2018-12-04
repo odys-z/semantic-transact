@@ -13,9 +13,10 @@ import java.util.stream.Stream;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
-import io.odysz.transact.sql.parts.select.ConstList;
+import io.odysz.transact.sql.parts.select.ValueList;
 import io.odysz.transact.x.TransException;
 
 /**sql: insert into tabl(...) values(...) / select ...
@@ -142,16 +143,16 @@ public class Insert extends Statement<Insert> {
 		return s.collect(Collectors.joining(" "));
 	}
 
-	/**Create ConstList from row. 
+	/**Create ValueList from row. 
 	 * @param row
 	 * @param colIdx
 	 * @return
 	 */
-	private ConstList getRow(ArrayList<Object[]> row, Map<String, Integer> colIdx) {
+	private ValueList getRow(ArrayList<Object[]> row, Map<String, Integer> colIdx) {
 		if (row == null)
 			return null;
 
-		ConstList vs = new ConstList(row.size());
+		ValueList vs = new ValueList(row.size());
 		int idx = -1;
 		for (Object[] nv : row) {
 			if (nv == null) continue;
@@ -165,7 +166,10 @@ public class Insert extends Statement<Insert> {
 				continue;
 			}
 			try {
-				vs.constv(idx, (String) nv[1]);
+				if (nv[1] instanceof String)
+					vs.constv(idx, (String) nv[1]);
+				else
+					vs.v(idx, (AbsPart) nv[1]);
 			} catch (TransException e) {
 				e.printStackTrace();
 			}
