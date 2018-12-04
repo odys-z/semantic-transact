@@ -1,4 +1,4 @@
-package io.odysz.transact.sql.parts.select;
+package io.odysz.transact.sql.parts.insert;
 
 import java.util.ArrayList;
 import java.util.Arrays;

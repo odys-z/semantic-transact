@@ -19,13 +19,12 @@ public class SetList extends AbsPart {
 	public String sql(ISemantext context) {
 		if (nvs == null)
 			return "";
-		else return nvs.stream()
-				.map(nv -> {
-					String s = Stream.of(new ExprPart((String)nv[0]), new ExprPart("="), new SetValue(nv[1]))
-							.map(m -> m.sql(context))
-							.collect(Collectors.joining(""));
-					return s; })
-				.collect(Collectors.joining(", "));
+		else
+			return nvs.stream().map(nv -> {
+				String s = Stream.of(new ExprPart((String) nv[0]), new ExprPart("="), new SetValue(nv[1]))
+						.map(m -> m.sql(context)).collect(Collectors.joining(""));
+				return s;
+			}).collect(Collectors.joining(", "));
 	}
 
 }

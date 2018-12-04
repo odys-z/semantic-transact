@@ -16,7 +16,7 @@ import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
-import io.odysz.transact.sql.parts.select.ValueList;
+import io.odysz.transact.sql.parts.insert.ValueList;
 import io.odysz.transact.x.TransException;
 
 /**sql: insert into tabl(...) values(...) / select ...
@@ -129,11 +129,12 @@ public class Insert extends Statement<Insert> {
 				Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias), new ColumnList(insertCols)
 				// values(...) / select ...
 				), Stream.concat(
+						// FIXME how to join multiple values? (...), (...), ...
 						// values (...)
 						Stream.concat(Stream.of(new ExprPart("values (")), // 'values()' appears or not being the same as value nvs
 									  // 'v1', 'v2', ...)
 									  Stream.concat(Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-											  		  		.stream().map(row -> getRow(row, insertCols)),
+											  		  		.stream().map(row -> getValue(row, insertCols)),
 									  				Stream.of(new ExprPart(")")))
 						).filter(w -> hasValuesNv),
 						// select ...
@@ -148,7 +149,7 @@ public class Insert extends Statement<Insert> {
 	 * @param colIdx
 	 * @return
 	 */
-	private ValueList getRow(ArrayList<Object[]> row, Map<String, Integer> colIdx) {
+	private ValueList getValue(ArrayList<Object[]> row, Map<String, Integer> colIdx) {
 		if (row == null)
 			return null;
 
