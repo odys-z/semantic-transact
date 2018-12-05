@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.odysz.common.dbtype;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Update;
 
@@ -65,4 +66,6 @@ public interface ISemantext {
 	 * @return
 	 */
 	public HashMap<String, SemanticObject> results();
+
+	public dbtype dbtype();
 }

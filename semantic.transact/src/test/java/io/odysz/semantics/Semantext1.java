@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.odysz.common.DateFormat;
-import io.odysz.common.JDBCType;
+import io.odysz.common.dbtype;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
@@ -43,7 +43,7 @@ class Semantext1 implements ISemantext {
 						if (autoVals.containsKey(nv[0]))
 							nv[1] = autoVals.get(nv[0]);
 						else {
-							nv[1] = nv[1] + " #" + DateFormat.getTimeStampYMDHms(JDBCType.mysql);
+							nv[1] = nv[1] + " #" + DateFormat.getTimeStampYMDHms(dbtype.mysql);
 							autoVals.put(nv[0], nv[1]);
 						}
 					}
@@ -78,5 +78,10 @@ class Semantext1 implements ISemantext {
 	@Override
 	public HashMap<String, SemanticObject> results() {
 		return null;
+	}
+
+	@Override
+	public dbtype dbtype() {
+		return dbtype.sqlite;
 	}
 }

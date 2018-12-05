@@ -28,11 +28,11 @@ public class DateFormat {
 	 */
 	public static Date parse(String text) throws ParseException { return sdf.parse(text); }
 
-	public static String incSeconds(JDBCType drvType, String date0, int snds) throws ParseException {
+	public static String incSeconds(dbtype drvType, String date0, int snds) throws ParseException {
 		Date d0 = parse(date0);
 		d0.setTime(d0.getTime() + snds);
 		// return format(d0);
-		if (drvType == JDBCType.sqlite)
+		if (drvType == dbtype.sqlite)
 			return sdflong_sqlite.format(d0);
 		return sdflong_mysql.format(d0);
 	}
@@ -65,9 +65,9 @@ public class DateFormat {
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 
-	public static String getTimeStampYMDHms(JDBCType drvType) {
+	public static String getTimeStampYMDHms(dbtype drvType) {
 		Date now = new Date();
-		if (drvType == JDBCType.sqlite)
+		if (drvType == dbtype.sqlite)
 			return sdflong_sqlite.format(now);
 		return sdflong_mysql.format(now);
 	}

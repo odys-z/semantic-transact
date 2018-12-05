@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.odysz.common.DateFormat;
+import io.odysz.common.dbtype;
 import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
@@ -95,6 +96,11 @@ class Semantext2 implements ISemantext {
 	@Override
 	public HashMap<String, SemanticObject> results() {
 		return resolvedIds;
+	}
+
+	@Override
+	public dbtype dbtype() {
+		return dbtype.sqlite;
 	}
 
 }
