@@ -51,7 +51,7 @@ public class Utils {
 		}
 	}
 
-	public static void logi(ArrayList<String> list, Object... args) {
+	public static <T> void logi(ArrayList<T> list, Object... args) {
 		try {
 			if (printCaller) {
 				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
@@ -61,11 +61,11 @@ public class Utils {
 			}
 
 			if (list != null)
-				for (String it : list)
+				for (T it : list)
 					if (args != null && args.length > 0)
-						System.out.println(String.format(it, args));
+						System.out.println(String.format(it.toString(), args));
 					else
-						System.out.println(it);
+						System.out.println(it.toString());
 
 		} catch (Exception ex) {
 			System.err.println("logi(): Can't print. Error:");
