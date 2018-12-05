@@ -266,8 +266,7 @@ public class Query extends Statement<Query> {
 	 * Also it's not recommended for the performance reason. The sql string is already generated
 	 * by {@link #commit(ArrayList)}, don't generate it and travels AST again in this method, 
 	 * use it directly.
-	 * @param sctx
-	 * @return
+	 * @return the result set
 	 * @throws TransException
 	 * @throws SQLException
 	 */

@@ -68,7 +68,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	
 	/**Add post semantics after the parent statement, like add children after insert new parent.
 	 * @param postatement
-	 * @return
+	 * @return the calling statement
 	 */
 	public <U extends Statement<U>> T post(U postatement) {
 		if (postate == null)

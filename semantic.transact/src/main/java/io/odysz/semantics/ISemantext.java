@@ -39,7 +39,7 @@ public interface ISemantext {
 	 * @param update
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
-	 * @return
+	 * @return new ISemantext for update statement
 	 */
 	public ISemantext update(Update update, String mainTabl, IUser... usr);
 
@@ -57,15 +57,18 @@ public interface ISemantext {
 	 * @param update
 	 * @param tabl
 	 * @param nvs
-	 * @return
+	 * @return the update context
 	 */
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs);
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
-	 * @return
+	 * @return the result set (newIds, resolved values, ...)
 	 */
 	public HashMap<String, SemanticObject> results();
 
+	/**Get the dbtype handled by the context
+	 * @return db type
+	 */
 	public dbtype dbtype();
 }

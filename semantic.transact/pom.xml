@@ -1,14 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <name>semantic sql builder</name>
-  <description>semantic sql builder semantic sql builder</description>
+  <description>semantic sql builder</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<maven.compiler.source>1.8</maven.compiler.source>
+	<maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -17,13 +20,6 @@
     	<artifactId>commons-crypto</artifactId>
     	<version>1.0.0</version>
 	</dependency>
-
-	<!-- https://mvnrepository.com/artifact/com.healthmarketscience.sqlbuilder/sqlbuilder
-  	<dependency>
-  		<groupId>com.healthmarketscience.sqlbuilder</groupId>
-  		<artifactId>sqlbuilder</artifactId>
-  		<version>2.1.7</version>
-  	</dependency> -->
 
     <dependency>
     	<groupId>org.antlr</groupId>

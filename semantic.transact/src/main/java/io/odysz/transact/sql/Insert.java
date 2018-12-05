@@ -101,7 +101,7 @@ public class Insert extends Statement<Insert> {
 	}
 	
 	/**sql: insert into tabl(...) values(...) / select ...
-	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.Semantext2)
+	 * @see io.odysz.transact.sql.parts.AbsPart#sql(ISemantext)
 	 */
 	@Override
 	public String sql(ISemantext sctx) {
@@ -183,7 +183,7 @@ public class Insert extends Statement<Insert> {
 		return insertCols;
 	}
 
-	/**<p>Use this method to do post operation, a. k. a. for {@link Select} get selected results -
+	/**<p>Use this method to do post operation, a. k. a. for {@link Query} get selected results -
 	 * commit select statement, for {@link Insert} to get inserted new Ids.</p>
 	 * <p>This method must called after the post operation (lambda expression) been initialized.</p>
 	 * <h3>Why rs() must been used after setting lambda expression?</h3>
@@ -207,8 +207,7 @@ public class Insert extends Statement<Insert> {
 	 * Also it's not recommended for the performance reason. The sql string is already generated
 	 * by {@link #commit(ArrayList)}, don't generate it and travels AST again in this method, 
 	 * use it directly.
-	 * @param sctx
-	 * @return
+	 * @return results by resolving FK, etc.
 	 * @throws TransException
 	 * @throws SQLException
 	 */
