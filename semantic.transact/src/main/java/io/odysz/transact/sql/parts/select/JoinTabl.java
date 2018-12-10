@@ -3,6 +3,7 @@ package io.odysz.transact.sql.parts.select;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.sql.parts.select.JoinTabl.join;
 
 
 /**For grammar definition, see {@link ConditVisitor} 
@@ -10,7 +11,11 @@ import io.odysz.transact.sql.parts.condition.Condit;
  *
  */
 public class JoinTabl extends Condit {
-	public enum join { main, j, r, l };
+	public enum join { main, j, r, l;
+
+	public static join parse(String name) {
+		return join.j;
+	} };
 
 	protected join jtype;
 	protected String jtablias;
