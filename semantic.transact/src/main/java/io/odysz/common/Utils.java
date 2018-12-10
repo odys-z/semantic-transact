@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Utils {
@@ -51,7 +52,7 @@ public class Utils {
 		}
 	}
 
-	public static <T> void logi(ArrayList<T> list, Object... args) {
+	public static <T> void logi(List<T> list, Object... args) {
 		try {
 			if (printCaller) {
 				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
