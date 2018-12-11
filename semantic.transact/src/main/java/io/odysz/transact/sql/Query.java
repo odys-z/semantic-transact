@@ -149,17 +149,46 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	/**Inner or outer join
+	 * @param jt
+	 * @param withTabl
+	 * @param alias
+	 * @param onCondit
+	 * @return current select statement
+	 */
+	public Query j(join jt, String withTabl, String alias, Condit onCondit) {
+		JoinTabl joining = new JoinTabl(jt, withTabl, alias, onCondit);
+		if (joins == null)
+			joins = new ArrayList<JoinTabl>();
+		joins.add(joining);
+		return this;
+	
+	}
+
+	/**Inner or outer join
+	 * @param jt
+	 * @param withTabl
+	 * @param onCondit
+	 * @return current select statement
+	 */
+	public Query j(join jt, String withTabl, String alias, String onCondit) {
+		Condit condit = ConditVisitor.parse(onCondit);
+		j(jt, withTabl, alias, condit);
+		return this;
+	}
+
 	/**Inner Join
 	 * @param withTabl
 	 * @param onCondit e.g "t.f1='a' t.f2='b'", 2 AND conditions
 	 * @return current select statement
 	 */
 	public Query j(String withTabl, Condit onCondit) {
-		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
-		if (joins == null)
-			joins = new ArrayList<JoinTabl>();
-		joins.add(joining);
-		return this;
+//		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
+//		if (joins == null)
+//			joins = new ArrayList<JoinTabl>();
+//		joins.add(joining);
+//		return this;
+		return j(join.j, withTabl, null, onCondit);
 	}
 
 	/**Inner join

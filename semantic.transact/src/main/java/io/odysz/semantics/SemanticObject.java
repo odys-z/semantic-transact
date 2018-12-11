@@ -6,7 +6,11 @@ import java.util.List;
 
 import io.odysz.transact.x.TransException;
 
-/**The equivalent of JsonObject in previous projects
+/**<p>The equivalent of JsonObject in previous projects.
+ * Is this class the duplication of JMessage?</p>
+ * <p>If an json request object is handled by a port, a.k.a SQuery,
+ * is their any property name not known by the port?</p>
+ * <p>If no such properties, then there shouldn't be pub() and get().</p>
  * @author ody
  *
  */

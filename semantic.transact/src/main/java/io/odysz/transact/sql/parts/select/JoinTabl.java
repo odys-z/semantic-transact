@@ -10,7 +10,20 @@ import io.odysz.transact.sql.parts.condition.Condit;
  *
  */
 public class JoinTabl extends Condit {
-	public enum join { main, j, r, l };
+	public enum join { main, j, r, l;
+
+	public static join parse(String name) {
+		if (name == null || name.trim().length() == 0)
+			return join.j;
+		name = name.toLowerCase();
+		if (j.name().equals(name))
+			return join.j;
+		else if (r.name().equals(name))
+			return join.r;
+		else if (l.name().equals(name))
+			return join.l;
+		else return join.main;
+	} };
 
 	protected join jtype;
 	protected String jtablias;
