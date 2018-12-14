@@ -3,6 +3,7 @@ package io.odysz.semantics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.odysz.transact.x.TransException;
 
@@ -26,16 +27,25 @@ public class SemanticObject extends Object {
 		return props == null ? null : (String) props.get(prop);
 	}
 
-	public void put(String prop, String v) {
+	public SemanticObject put(String prop, String v) {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		props.put(prop, v);
+		return this;
 	}
 
-	public void put(String prop, SemanticObject obj) {
+	public SemanticObject put(String prop, Map obj) {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		props.put(prop, obj);
+		return this;
+	}
+
+	public SemanticObject put(String prop, SemanticObject obj) {
+		if (props == null)
+			props = new HashMap<String, Object>();
+		props.put(prop, obj);
+		return this;
 	}
 
 	/**Add element 'elem' to array 'prop'.
@@ -53,4 +63,6 @@ public class SemanticObject extends Object {
 			((ArrayList<Object>) props.get(prop)).add(elem);
 		else throw new TransException("%s seams is not an array. elem %s can't been added", prop, elem);
 	}
+
+//	public void html(PrintWriter writer) { }
 }
