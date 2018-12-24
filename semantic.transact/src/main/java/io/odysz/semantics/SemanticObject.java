@@ -7,11 +7,11 @@ import java.util.Map;
 
 import io.odysz.transact.x.TransException;
 
-/**<p>The equivalent of JsonObject in previous projects.
- * Is this class the duplication of JMessage?</p>
- * <p>If an json request object is handled by a port, a.k.a SQuery,
+/**<p>The semantics data used internally by semantic-DA to handle semantics configuration.</p>
+ * <p><b>Note:</b> The equivalent of JsonObject in previous projects is JMessage.
+ * <p>If a json request object is handled by a port, e.g. SQuery,
  * is their any property name not known by the port?</p>
- * <p>If no such properties, then there shouldn't be pub() and get().</p>
+ * <p>If no such properties, then there shouldn't be put() and get().</p>
  * @author ody
  *
  */
@@ -34,7 +34,7 @@ public class SemanticObject extends Object {
 		return this;
 	}
 
-	public SemanticObject put(String prop, Map obj) {
+	public SemanticObject put(String prop, Map<String, Object> obj) {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		props.put(prop, obj);
