@@ -2,16 +2,15 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import io.odysz.transact.x.TransException;
-import io.odysz.transact.sql.parts.Logic;
-import io.odysz.transact.sql.parts.Sql;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Logic;
+import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.x.TransException;
 
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
@@ -77,7 +76,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
-	public HashMap<String, SemanticObject> commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
+	public SemanticObject commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
 		ISemantext context = transc.insertCtx((T) this, mainTabl, usrInfo);
 		commit(context, sqls);
 		return context == null ? null : context.results();

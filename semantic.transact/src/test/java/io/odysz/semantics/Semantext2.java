@@ -17,15 +17,16 @@ import io.odysz.transact.sql.Update;
  * @author ody
  *
  */
+@SuppressWarnings("unused")
 class Semantext2 implements ISemantext {
 
 	private String tabl;
 	private HashMap<Object, Object> autoVals;
 	private HashMap<String, Semantics2> semantics;
 	private Statement<?> callerStatement;
-	private HashMap<String, SemanticObject> resolvedIds;
+	private SemanticObject resolvedIds;
 
-	public Semantext2(String tabl, HashMap<String,Semantics2> semantics) {
+	public Semantext2(String tabl, HashMap<String, Semantics2> semantics) {
 		this.tabl = tabl;
 		this.semantics = semantics;
 	}
@@ -94,7 +95,7 @@ class Semantext2 implements ISemantext {
 	 * @see io.odysz.semantics.ISemantext#results()
 	 */
 	@Override
-	public HashMap<String, SemanticObject> results() {
+	public SemanticObject results() {
 		return resolvedIds;
 	}
 

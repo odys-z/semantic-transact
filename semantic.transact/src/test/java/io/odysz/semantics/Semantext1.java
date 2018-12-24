@@ -14,6 +14,7 @@ import io.odysz.transact.sql.Update;
  * @author ody
  *
  */
+@SuppressWarnings("unused")
 class Semantext1 implements ISemantext {
 
 	private String tabl;
@@ -76,7 +77,7 @@ class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public HashMap<String, SemanticObject> results() {
+	public SemanticObject results() {
 		return null;
 	}
 

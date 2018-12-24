@@ -211,10 +211,10 @@ public class Insert extends Statement<Insert> {
 	 * @throws TransException
 	 * @throws SQLException
 	 */
-	public Object ins() throws TransException, SQLException {
+	public SemanticObject ins() throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
-			HashMap<String, SemanticObject> results = commit(sqls);
+			SemanticObject results = commit(sqls);
 			postOp.op(sqls);
 			return results;
 		}

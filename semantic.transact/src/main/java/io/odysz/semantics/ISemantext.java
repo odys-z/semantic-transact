@@ -1,7 +1,6 @@
 package io.odysz.semantics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.odysz.common.dbtype;
@@ -63,9 +62,9 @@ public interface ISemantext {
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
-	 * @return the result set (newIds, resolved values, ...)
+	 * @return the result set map[tabl, (newIds, resolved values, ...)]
 	 */
-	public HashMap<String, SemanticObject> results();
+	public SemanticObject results();
 
 	/**Get the dbtype handled by the context
 	 * @return db type
