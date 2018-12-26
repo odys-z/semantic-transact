@@ -1,5 +1,6 @@
 package io.odysz.semantics;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,4 +66,6 @@ public class SemanticObject extends Object {
 	}
 
 //	public void html(PrintWriter writer) { }
+	public void json(OutputStream os) {
+	}
 }
