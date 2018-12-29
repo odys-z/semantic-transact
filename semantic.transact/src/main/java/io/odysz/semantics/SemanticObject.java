@@ -20,6 +20,12 @@ public class SemanticObject extends Object {
 
 	private HashMap<String, Object> props;
 
+	public Class<?> getType (String prop) {
+		return props == null ? null
+				: props.containsKey(prop) ? props.get(prop).getClass()
+				: null;
+	}
+
 	public Object get(String prop) {
 		return props == null ? null : props.get(prop);
 	}
