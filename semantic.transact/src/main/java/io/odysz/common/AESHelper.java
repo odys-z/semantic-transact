@@ -2,7 +2,7 @@ package io.odysz.common;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
@@ -68,7 +68,7 @@ public class AESHelper {
 	    try (CryptoRandom random = CryptoRandomFactory.getCryptoRandom(randomProperties)) {
 	        random.nextBytes(iv);
 	        return iv;
-	    }catch(Exception ex) {
+	    }catch(IOException | GeneralSecurityException ex) {
 	    	ex.printStackTrace();
 	    	return null;
 	    }
@@ -80,10 +80,12 @@ public class AESHelper {
 	 * @param decryptIv Base64
 	 * @param encryptK plain key string
 	 * @return [cipher-base64, new-iv-base64]
-	 * @throws Exception
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 * @return
 	 */
 	public static String[] dencrypt(String cypher, String decryptK, String decryptIv,
-			String encryptK) throws Exception {
+			String encryptK) throws GeneralSecurityException, IOException {
 		byte[] iv = AESHelper.decode64(decryptIv);
 		byte[] input = AESHelper.decode64(cypher);
 		byte[] dkb = getUTF8Bytes(pad16_32(decryptK));
@@ -96,7 +98,7 @@ public class AESHelper {
 	}
 
 	public static String encrypt(String plain, String key, byte[] iv)
-			throws Exception {
+			throws GeneralSecurityException, IOException {
 		key = pad16_32(key);
 		plain = pad16_32(plain);
 		byte[] input = getUTF8Bytes(plain);
@@ -106,14 +108,15 @@ public class AESHelper {
         return b64;
 	}
 	
-	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws Exception {
+	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 		//System.out.println("txt: " + plain);
 		//System.out.println("key: " + key);
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         //Initializes the cipher with ENCRYPT_MODE, key and iv.
-        encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
+        try {
+			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
         byte[] output = new byte[((input.length)/16 + 2) * 16]; // + 1 will throw exception
 
@@ -129,6 +132,9 @@ public class AESHelper {
         output = Arrays.copyOf(output, updateBytes + finalBytes);
         encipher.close();
         return output;
+		} catch (GeneralSecurityException e) {
+			throw new GeneralSecurityException(e.getMessage());
+		}
 	}
 	
 	public static String decrypt(String cypher, String key, byte[] iv)
@@ -141,7 +147,7 @@ public class AESHelper {
         return p.replace("-", "");
 	}
 	
-	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws Exception {
+	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 		//key = pad16_32(key);
 		//cypher = pad16_32(cypher);
 		//byte[] input = Base64.getDecoder().decode(cypher);
@@ -160,14 +166,14 @@ public class AESHelper {
         //return setUTF8Bytes(Arrays.copyOf(output, finalBytes));
 	}
 	
-	private static String pad16_32(String s) throws SQLException {
+	private static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
 			return String.format("%1$16s", s).replace(' ', '-');
 		else if (l <= 32)
 			return String.format("%1$32s", s).replace(' ', '-');
 		else
-			throw new SQLException("Not supported block length(16B/32B): " + s);
+			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
 	
     /**
