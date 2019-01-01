@@ -5,8 +5,8 @@ public class Logic {
 
 	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
-		public String sql(op op, String rop, boolean... not) {
-			switch(op) {
+		public String sql(op oper, String rop, boolean... not) {
+			switch(oper) {
 			case eq:
 				return "= " + rop;
 			case ne:

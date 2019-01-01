@@ -1,5 +1,7 @@
 package io.odysz.semantics;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +26,13 @@ public class SemanticObject extends Object {
 	 * @return null if the property doesn't exists
 	 */
 	public Class<?> getType (String prop) {
-		return props == null ? null
-				: props.containsKey(prop) ? props.get(prop).getClass()
-				: null;
+		if (prop == null || props == null || !props.containsKey(prop))
+			return null;
+
+		Object p = props.get(prop);
+		return p == null
+				? Object.class // has key, no value
+				: p.getClass();
 	}
 
 	public Object get(String prop) {
@@ -37,13 +43,14 @@ public class SemanticObject extends Object {
 		return props == null ? null : (String) props.get(prop);
 	}
 
-	public SemanticObject put(String prop, String v) {
+	public SemanticObject put(String prop, Object v) {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		props.put(prop, v);
 		return this;
 	}
 
+	/*
 	public SemanticObject put(String prop, Map<String, Object> obj) {
 		if (props == null)
 			props = new HashMap<String, Object>();
@@ -51,12 +58,15 @@ public class SemanticObject extends Object {
 		return this;
 	}
 
+	public void put(String prop, SResultset rs) {
+	}
+
 	public SemanticObject put(String prop, SemanticObject obj) {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		props.put(prop, obj);
 		return this;
-	}
+	}*/
 
 	/**Add element 'elem' to array 'prop'.
 	 * @param prop
@@ -74,7 +84,66 @@ public class SemanticObject extends Object {
 		else throw new TransException("%s seams is not an array. elem %s can't been added", prop, elem);
 	}
 
-//	public void html(PrintWriter writer) { }
-	public void json(OutputStream os) {
+	/**Serialize without dependency of Gson
+	 * @param os
+	 * @throws IOException
+	 */
+	public void json(OutputStream os) throws IOException {
+		os.write('{');
+		boolean comma = false;
+		if (props != null)
+			for (String k : props.keySet()) {
+				if (comma) os.write(',');
+				os.write(k.getBytes());
+				os.write(':');
+				Object obj = props.get(k);
+				writeValue(os, obj);
+				// os.write(props.get(k).toString().getBytes());
+				comma = true;
+			}
+		os.write('}');
+	}
+
+	public String json() throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		json(os);
+		return os.toString();
+	}
+
+	private void writeValue(OutputStream os, Object obj) throws IOException {
+		if (obj instanceof SemanticObject)
+			((SemanticObject)obj).json(os);
+		if (obj instanceof List)
+			writeList(os, (List<?>)obj);
+		if (obj instanceof Map)
+			writeMap(os, (Map<?, ?>)obj);
+		else 
+			os.write(obj == null ? "null".getBytes() : obj.toString().getBytes());
+	}
+
+	private void writeMap(OutputStream os, Map<?, ?> map) throws IOException {
+		os.write('[');
+		boolean comma = false;
+		if (map != null)
+			for (Object k : map.keySet()) {
+				if (comma) os.write(',');
+				os.write(k.toString().getBytes());
+				os.write(':');
+				writeValue(os, map.get(k));
+				comma = true;
+			}
+		os.write(']');
+	}
+
+	private void writeList(OutputStream os, List<?> lst) throws IOException {
+		os.write('[');
+		boolean comma = false;
+		if (lst != null)
+			for (Object k : lst) {
+				if (comma) os.write(',');
+				os.write(k.toString().getBytes());
+				comma = true;
+			}
+		os.write(']');
 	}
 }
