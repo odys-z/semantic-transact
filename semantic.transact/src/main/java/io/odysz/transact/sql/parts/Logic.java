@@ -6,6 +6,7 @@ public class Logic {
 	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
 		public String sql(op oper, String rop, boolean... not) {
+			/*
 			switch(oper) {
 			case eq:
 				return "= " + rop;
@@ -49,6 +50,48 @@ public class Logic {
 			default:
 				return " TODO ";
 			}
+			*/
+			if (oper == op.eq)
+				return "= " + rop;
+			else if (oper == op.ne)
+				return "<> " + rop;
+			else if (oper == op.lt)
+				return "< " + rop;
+			else if (oper == op. le)
+				return "<= " + rop;
+			else if (oper == op.gt)
+				return "> " + rop;
+			else if (oper == op.ge)
+				return ">= " + rop;
+			else if (oper == op.like)
+				if (not != null && not.length > 0 && not[0])
+					return "not like " + likeOp(rop);
+				else
+					return "like " + likeOp(rop);
+			else if (oper == op.rlike)
+				if (not != null && not.length > 0 && not[0])
+					return "not like " + rlikeOp(rop);
+				else
+					return "like " + rlikeOp(rop);
+			else if (oper == op.llike)
+				if (not != null && not.length > 0 && not[0])
+					return "not like " + llikeOp(rop);
+				else
+					return "like " + llikeOp(rop);
+			else if (oper == op.in)
+				if (not != null && not.length > 0 && not[0])
+					return "not in (" + rop + ")";
+				else
+					return "in (" + rop + ")";
+			else if (oper == op.isnull)
+				if (not != null && not.length > 0 && not[0])
+					return "is not null";
+				else
+					return "is null";
+			else if (oper == op.isNotnull)
+				return "is not null";
+			else
+				return " TODO ";
 		}
 	
 		private String llikeOp(String op) {

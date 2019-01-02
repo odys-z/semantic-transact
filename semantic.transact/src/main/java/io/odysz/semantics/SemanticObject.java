@@ -1,18 +1,16 @@
 package io.odysz.semantics;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.odysz.transact.x.TransException;
 
 /**<p>The semantics data used internally by semantic-DA to handle semantics configuration.</p>
- * <p><b>Note:</b> The equivalent of JsonObject in previous projects is JMessage.
- * <p>If a json request object is handled by a port, e.g. SQuery,
+ * <p>SemanticObject implement methods to write itself as a json value with a writer provided by the caller.
+ * This can be used to write the object into other structured object.</p>
+ * <p><b>Note:</b> The equivalent of JsonObject in a request is JMessage.
+ * <p>Question: If a json request object is handled by a port, e.g. SQuery,
  * is their any property name not known by the port?</p>
  * <p>If no such properties, then there shouldn't be put() and get().</p>
  * @author ody
@@ -21,6 +19,7 @@ import io.odysz.transact.x.TransException;
 public class SemanticObject extends Object {
 
 	private HashMap<String, Object> props;
+	public HashMap<String, Object> props() { return props; }
 
 	/**@param prop
 	 * @return null if the property doesn't exists
@@ -84,66 +83,66 @@ public class SemanticObject extends Object {
 		else throw new TransException("%s seams is not an array. elem %s can't been added", prop, elem);
 	}
 
-	/**Serialize without dependency of Gson
-	 * @param os
-	 * @throws IOException
-	 */
-	public void json(OutputStream os) throws IOException {
-		os.write('{');
-		boolean comma = false;
-		if (props != null)
-			for (String k : props.keySet()) {
-				if (comma) os.write(',');
-				os.write(k.getBytes());
-				os.write(':');
-				Object obj = props.get(k);
-				writeValue(os, obj);
-				// os.write(props.get(k).toString().getBytes());
-				comma = true;
-			}
-		os.write('}');
-	}
-
-	public String json() throws IOException {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		json(os);
-		return os.toString();
-	}
-
-	private void writeValue(OutputStream os, Object obj) throws IOException {
-		if (obj instanceof SemanticObject)
-			((SemanticObject)obj).json(os);
-		if (obj instanceof List)
-			writeList(os, (List<?>)obj);
-		if (obj instanceof Map)
-			writeMap(os, (Map<?, ?>)obj);
-		else 
-			os.write(obj == null ? "null".getBytes() : obj.toString().getBytes());
-	}
-
-	private void writeMap(OutputStream os, Map<?, ?> map) throws IOException {
-		os.write('[');
-		boolean comma = false;
-		if (map != null)
-			for (Object k : map.keySet()) {
-				if (comma) os.write(',');
-				os.write(k.toString().getBytes());
-				os.write(':');
-				writeValue(os, map.get(k));
-				comma = true;
-			}
-		os.write(']');
-	}
-
-	private void writeList(OutputStream os, List<?> lst) throws IOException {
-		os.write('[');
-		boolean comma = false;
-		if (lst != null)
-			for (Object k : lst) {
-				if (comma) os.write(',');
-				os.write(k.toString().getBytes());
-				comma = true;
-			}
-		os.write(']');
-	}
+//	/**Serialize without dependency of Gson
+//	 * @param os
+//	 * @throws IOException
+//	 */
+//	public void json(OutputStream os) throws IOException {
+//		os.write('{');
+//		boolean comma = false;
+//		if (props != null)
+//			for (String k : props.keySet()) {
+//				if (comma) os.write(',');
+//				os.write(k.getBytes());
+//				os.write(':');
+//				Object obj = props.get(k);
+//				writeValue(os, obj);
+//				// os.write(props.get(k).toString().getBytes());
+//				comma = true;
+//			}
+//		os.write('}');
+//	}
+//
+//	public String json() throws IOException {
+//		ByteArrayOutputStream os = new ByteArrayOutputStream();
+//		json(os);
+//		return os.toString();
+//	}
+//
+//	private void writeValue(OutputStream os, Object obj) throws IOException {
+//		if (obj instanceof SemanticObject)
+//			((SemanticObject)obj).json(os);
+//		if (obj instanceof List)
+//			writeList(os, (List<?>)obj);
+//		if (obj instanceof Map)
+//			writeMap(os, (Map<?, ?>)obj);
+//		else 
+//			os.write(obj == null ? "null".getBytes() : obj.toString().getBytes());
+//	}
+//
+//	private void writeMap(OutputStream os, Map<?, ?> map) throws IOException {
+//		os.write('[');
+//		boolean comma = false;
+//		if (map != null)
+//			for (Object k : map.keySet()) {
+//				if (comma) os.write(',');
+//				os.write(k.toString().getBytes());
+//				os.write(':');
+//				writeValue(os, map.get(k));
+//				comma = true;
+//			}
+//		os.write(']');
+//	}
+//
+//	private void writeList(OutputStream os, List<?> lst) throws IOException {
+//		os.write('[');
+//		boolean comma = false;
+//		if (lst != null)
+//			for (Object k : lst) {
+//				if (comma) os.write(',');
+//				os.write(k.toString().getBytes());
+//				comma = true;
+//			}
+//		os.write(']');
+//	}
 }

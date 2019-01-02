@@ -1,5 +1,6 @@
 package io.odysz.semantics;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.transact.x.TransException;
@@ -21,10 +22,11 @@ public interface IUser {
 	ArrayList<String> dbLog(ArrayList<String> sqls);
 
 	/**Check user log in (already has pswd, iv and user Id from db)
+	 * @param request request object. In sematic.jserv, it's SessionReq object.
 	 * @return
 	 * @throws TransException Checking login information failed
 	 */
-	boolean login() throws TransException;
+	boolean login(Object request) throws TransException;
 
 	String sessionId();
 
@@ -36,5 +38,6 @@ public interface IUser {
 
 	SemanticObject logout();
 
+	void writeJsonRespValue(Object writer) throws IOException;
 
 }
