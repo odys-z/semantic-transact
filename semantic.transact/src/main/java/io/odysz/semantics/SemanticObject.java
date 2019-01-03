@@ -57,9 +57,6 @@ public class SemanticObject extends Object {
 		return this;
 	}
 
-	public void put(String prop, SResultset rs) {
-	}
-
 	public SemanticObject put(String prop, SemanticObject obj) {
 		if (props == null)
 			props = new HashMap<String, Object>();

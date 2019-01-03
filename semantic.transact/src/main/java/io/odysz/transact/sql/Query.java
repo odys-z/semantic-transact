@@ -94,6 +94,26 @@ column_elem
  *
  */
 public class Query extends Statement<Query> {
+	/**String Array Index definition. Not using java field for compliance with JS (without GWT).
+	 * @author ody
+	 */
+	public static class Ix {
+		public static final int JoinSize = 4;
+		/**String[0] = join.j | join.l | join.r */
+		public static final int JoinType = 0;
+		/**String[1] = join-with-tabl */
+		public static final int JoinTabl = 1;
+		/**String[2] = alias */
+		public static final int JoinAlias = 2;
+		/**String[3] = on-condition-string */
+		public static final int JoinOnCond = 3;
+		
+		public static final int ExprSize = 3;
+		public static final int ExprExpr = 0;
+		public static final int ExprAlais = 1;
+		public static final int ExprTabl = 2;
+	}
+
 	private List<SelectElem> selectList;
 	private List<JoinTabl> joins;
 	private ArrayList<String[]> orderList;
@@ -158,9 +178,10 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(join jt, String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(jt, withTabl, alias, onCondit);
-		if (joins == null)
-			joins = new ArrayList<JoinTabl>();
-		joins.add(joining);
+//		if (joins == null)
+//			joins = new ArrayList<JoinTabl>();
+//		joins.add(joining);
+		j(joining);
 		return this;
 	
 	}
@@ -199,10 +220,17 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, alias, onCondit);
+//		if (joins == null)
+//			joins = new ArrayList<JoinTabl>();
+//		joins.add(joining);
+		j(joining);
+		return this;
+	}
+
+	public void j(JoinTabl joining) {
 		if (joins == null)
 			joins = new ArrayList<JoinTabl>();
 		joins.add(joining);
-		return this;
 	}
 
 	/**Inner join

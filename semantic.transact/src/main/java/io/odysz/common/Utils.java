@@ -30,7 +30,7 @@ public class Utils {
 		try {
 			if (printCaller) {
 				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-				System.out.println(String.format("log by        %s.%s(%s:%s)", 
+				System.out.println(String.format("\nlog by        %s.%s(%s:%s)", 
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
 				if (stElements.length > 3)
@@ -51,6 +51,8 @@ public class Utils {
 					ex.getMessage(), x[0].getClassName(), x[0].getMethodName()));
 		}
 	}
+
+
 
 	public static <T> void logi(List<T> list, Object... args) {
 		try {
@@ -91,7 +93,7 @@ public class Utils {
 		try {
 			if (printCaller) {
 				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-				System.out.println(String.format("log by        %s.%s(%s:%s)", 
+				System.out.println(String.format("\nlog by        %s.%s(%s:%s)", 
 								stElements[2].getClassName(), stElements[2].getMethodName(),
 								stElements[2].getFileName(), stElements[2].getLineNumber()));
 				if (stElements.length > 3)
