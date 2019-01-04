@@ -98,20 +98,25 @@ public class Query extends Statement<Query> {
 	 * @author ody
 	 */
 	public static class Ix {
-		public static final int JoinSize = 4;
 		/**String[0] = join.j | join.l | join.r */
-		public static final int JoinType = 0;
+		public static final int joinType = 0;
 		/**String[1] = join-with-tabl */
-		public static final int JoinTabl = 1;
+		public static final int joinTabl = 1;
 		/**String[2] = alias */
-		public static final int JoinAlias = 2;
+		public static final int joinAlias = 2;
 		/**String[3] = on-condition-string */
-		public static final int JoinOnCond = 3;
+		public static final int joinOnCond = 3;
+		public static final int joinSize = 4;
 		
-		public static final int ExprSize = 3;
-		public static final int ExprExpr = 0;
-		public static final int ExprAlais = 1;
-		public static final int ExprTabl = 2;
+		public static final int exprExpr = 0;
+		public static final int exprAlais = 1;
+		public static final int exprTabl = 2;
+		public static final int exprSize = 3;
+		
+		public static final int predicateOper = 0;
+		public static final int predicateL = 1;
+		public static final int predicateR = 2;
+		public static final int predicateSize = 3;
 	}
 
 	private List<SelectElem> selectList;
