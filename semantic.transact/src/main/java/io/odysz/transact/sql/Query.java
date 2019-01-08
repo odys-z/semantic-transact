@@ -183,9 +183,6 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(join jt, String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(jt, withTabl, alias, onCondit);
-//		if (joins == null)
-//			joins = new ArrayList<JoinTabl>();
-//		joins.add(joining);
 		j(joining);
 		return this;
 	
@@ -209,11 +206,6 @@ public class Query extends Statement<Query> {
 	 * @return current select statement
 	 */
 	public Query j(String withTabl, Condit onCondit) {
-//		JoinTabl joining = new JoinTabl(join.j, withTabl, onCondit);
-//		if (joins == null)
-//			joins = new ArrayList<JoinTabl>();
-//		joins.add(joining);
-//		return this;
 		return j(join.j, withTabl, null, onCondit);
 	}
 
@@ -225,9 +217,6 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, alias, onCondit);
-//		if (joins == null)
-//			joins = new ArrayList<JoinTabl>();
-//		joins.add(joining);
 		j(joining);
 		return this;
 	}
@@ -333,12 +322,10 @@ public class Query extends Statement<Query> {
 	 * @throws SQLException
 	 */
 	public Object rs() throws TransException, SQLException {
-//		ISemantext context = transc.insertCtx((T) this, mainTabl);
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(sqls);
 			return postOp.op(sqls);
-//			return results;
 		}
 		return null;
 	}
