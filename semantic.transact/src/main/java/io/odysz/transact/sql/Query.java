@@ -123,6 +123,8 @@ public class Query extends Statement<Query> {
 	private List<JoinTabl> joins;
 	private ArrayList<String[]> orderList;
 	private ArrayList<String> groupList;
+	private int pg;
+	private int pgSize;
 
 	/**
 	private SelectQry q;
@@ -159,6 +161,14 @@ public class Query extends Statement<Query> {
 			selectList = new ArrayList<SelectElem>();
 
 		selectList.add(colElem);
+		return this;
+	}
+
+	public Query page(int page, int pgSize) {
+		// paging
+		this.pg = page;
+		this.pgSize = pgSize;
+
 		return this;
 	}
 
@@ -263,8 +273,6 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-
-
 	@Override
 	public String sql(ISemantext sctx) {
 		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
@@ -289,6 +297,15 @@ public class Query extends Statement<Query> {
 								// order by
 								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
 			).map(m -> m.sql(sctx));
+		
+		if (pg >= 0 && pgSize > 0) {
+			if (sctx != null)
+				try {
+					s = sctx.pagingStream(s, pg, pgSize);
+				} catch (TransException e1) {
+					e1.printStackTrace();
+				}
+		}
 
 		return s.collect(Collectors.joining(" "));
 	}

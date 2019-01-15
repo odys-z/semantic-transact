@@ -3,12 +3,14 @@ package io.odysz.semantics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving "AUTO" when generating sql.
  * @author ody
@@ -84,5 +86,10 @@ class Semantext1 implements ISemantext {
 	@Override
 	public dbtype dbtype() {
 		return dbtype.sqlite;
+	}
+
+	@Override
+	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
+		return s;
 	}
 }

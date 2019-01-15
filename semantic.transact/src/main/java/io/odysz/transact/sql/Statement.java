@@ -77,7 +77,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 	
 	public SemanticObject commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
-		ISemantext context = transc.insertCtx((T) this, mainTabl, usrInfo);
+		ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
 		commit(context, sqls);
 		return context == null ? null : context.results();
 	}

@@ -52,6 +52,7 @@ public class TestTransc {
 			.commit(sqls);
 		
 		st.select("a_log", "lg")
+			.page(0, 20)
 			.col("count(*)", "cnt")
 			.col("count", "cnt")
 			.where("=", "userId", "funders")

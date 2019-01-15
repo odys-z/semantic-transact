@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.x.TransException;
 
 /**<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4

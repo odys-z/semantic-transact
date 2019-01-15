@@ -31,7 +31,8 @@ public class Transcxt {
 //		return semantext.onInsert(statement, tabl, valuesNv);
 //	}
 
-	public <T extends Statement<T>> ISemantext insertCtx(T insert, String tabl, IUser... usr) {
-		return semantext == null ? null : semantext.insert((Insert) insert, tabl, usr);
+	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
+//		return semantext == null ? null : semantext.insert((Insert) insert, tabl, usr);
+		return semantext;
 	}
 }

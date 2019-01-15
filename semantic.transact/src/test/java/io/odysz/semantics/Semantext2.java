@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
@@ -12,6 +13,7 @@ import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving semantics when generating sql.
  * @author ody
@@ -104,4 +106,8 @@ class Semantext2 implements ISemantext {
 		return dbtype.sqlite;
 	}
 
+	@Override
+	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
+		return s;
+	}
 }
