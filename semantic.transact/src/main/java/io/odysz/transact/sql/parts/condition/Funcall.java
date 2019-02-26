@@ -19,6 +19,7 @@ public class Funcall extends ExprPart {
 	}
 
 	private Func func;
+	@SuppressWarnings("unused")
 	private String[] args;;
 
 	public Funcall(Func func) {
