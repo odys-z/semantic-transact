@@ -80,6 +80,12 @@ public class SemanticObject extends Object {
 		else throw new TransException("%s seams is not an array. elem %s can't been added", prop, elem);
 	}
 
+	public Object remove(String prop) {
+		if (props == null && props.containsKey(prop))
+			return props.remove(prop);
+		else return null;
+	}
+
 //	/**Serialize without dependency of Gson
 //	 * @param os
 //	 * @throws IOException
