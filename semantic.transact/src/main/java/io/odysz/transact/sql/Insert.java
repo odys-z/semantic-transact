@@ -183,8 +183,7 @@ public class Insert extends Statement<Insert> {
 		return insertCols;
 	}
 
-	/**<p>Use this method to do post operation, a. k. a. for {@link Query} get selected results -
-	 * commit select statement, for {@link Insert} to get inserted new Ids.</p>
+	/**<p>Use this method to do post operation, a. k. a. for {@link Insert} to get inserted new Ids.</p>
 	 * <p>This method must called after the post operation (lambda expression) been initialized.</p>
 	 * <h3>Why rs() must been used after setting lambda expression?</h3>
 	 * <p>As Query generated sql, it should be used to get result set - execute the SQL

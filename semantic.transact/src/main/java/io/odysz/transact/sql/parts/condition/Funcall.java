@@ -32,7 +32,7 @@ public class Funcall extends ExprPart {
 	}
 	
 	public static Funcall max(String... args) {
-		Funcall f = new Funcall(Func.now);
+		Funcall f = new Funcall(Func.max);
 		f.args = args;
 		return f;
 	}
@@ -41,7 +41,7 @@ public class Funcall extends ExprPart {
 	public String sql(ISemantext context) {
 		if (func == Func.now)
 			return sqlNow(context);
-		else return "TODO";
+		else return "TODO (Funcall)";
 	}
 
 	private String sqlNow(ISemantext context) {

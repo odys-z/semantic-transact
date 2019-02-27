@@ -3,7 +3,9 @@ package io.odysz.transact.sql;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 
-/**Transaction / Batching SQL builder creator.
+/**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
+ * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
+ * <p>When building sql, events liek on inserting, etc. are fired to ISemantext.
  * @author ody
  */
 public class Transcxt {

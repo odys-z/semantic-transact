@@ -15,7 +15,8 @@ import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
 
-/**Basic semantic context (semantics instance) for resolving semantics when generating sql.
+/**<p>Basic semantic context (semantics instance) for resolving semantics when generating sql.</p>
+ * <p>This testing implementation handling autoPk, fullpath, and may be more.</p>
  * @author ody
  *
  */
