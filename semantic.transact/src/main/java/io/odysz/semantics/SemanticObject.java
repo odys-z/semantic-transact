@@ -1,8 +1,12 @@
 package io.odysz.semantics;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import io.odysz.transact.x.TransException;
 
@@ -84,6 +88,36 @@ public class SemanticObject extends Object {
 		if (props == null && props.containsKey(prop))
 			return props.remove(prop);
 		else return null;
+	}
+
+	public void print(PrintStream out) {
+		if (props != null)
+			for (String k : props.keySet()) {
+				out.print(k);
+				out.print(" : ");
+				Class<?> c = getType(k);
+				if (c == null)
+					continue;
+				else if (c.isAssignableFrom(SemanticObject.class)
+					|| SemanticObject.class.isAssignableFrom(c))
+					((SemanticObject)get(k)).print(out);
+				else if (Collection.class.isAssignableFrom(c) || Map.class.isAssignableFrom(c)) {
+					Iterator<?> i = ((Collection<?>) get(k)).iterator(); 
+					out.println("[" + ((Collection<?>) get(k)).size() + "]");
+					while (i.hasNext()) {
+						Object ele = i.next();
+						c = ele.getClass();
+						if (c.isAssignableFrom(SemanticObject.class)
+								|| SemanticObject.class.isAssignableFrom(c))
+							((SemanticObject)ele).print(out);
+						else
+							out.print(get(k));
+					}
+				}
+				else out.print(get(k));
+				out.print(",\t");
+			}
+		out.println("");
 	}
 
 //	/**Serialize without dependency of Gson
