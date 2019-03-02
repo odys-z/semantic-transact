@@ -35,6 +35,12 @@ public interface IUser {
 
 	/**user id */
 	String uid();
+	
+	/**Get any property other than uid.
+	 * @param prop
+	 * @return porperty
+	 */
+	String get(String prop);
 
 	SemanticObject logout();
 
