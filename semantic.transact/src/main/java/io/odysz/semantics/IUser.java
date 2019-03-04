@@ -42,6 +42,8 @@ public interface IUser {
 	 */
 	String get(String prop);
 
+	IUser set(String prop, Object value);
+
 	SemanticObject logout();
 
 	void writeJsonRespValue(Object writer) throws IOException;
