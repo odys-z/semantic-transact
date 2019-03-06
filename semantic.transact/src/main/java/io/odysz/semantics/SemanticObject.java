@@ -46,6 +46,38 @@ public class SemanticObject extends Object {
 		return props == null ? null : (String) props.get(prop);
 	}
 
+	public SemanticObject data() {
+		return (SemanticObject) get("data");
+	}
+
+	public SemanticObject data(SemanticObject data) {
+		return put("data", data);
+	}
+	
+	public String port() {
+		return (String) get("port");
+	}
+	
+	public SemanticObject port(String port) {
+		return put("port", port);
+	}
+
+	public String msg() {
+		return (String) get("msg");
+	}
+	
+	public SemanticObject msg(String msg) {
+		return put("msg", msg);
+	}
+	
+	public String error() {
+		return (String) get("error");
+	}
+	
+	public SemanticObject error(String error) {
+		return put("error", error);
+	}
+	
 	public SemanticObject put(String prop, Object v) {
 		if (props == null)
 			props = new HashMap<String, Object>();
@@ -53,28 +85,13 @@ public class SemanticObject extends Object {
 		return this;
 	}
 
-	/*
-	public SemanticObject put(String prop, Map<String, Object> obj) {
-		if (props == null)
-			props = new HashMap<String, Object>();
-		props.put(prop, obj);
-		return this;
-	}
-
-	public SemanticObject put(String prop, SemanticObject obj) {
-		if (props == null)
-			props = new HashMap<String, Object>();
-		props.put(prop, obj);
-		return this;
-	}*/
-
 	/**Add element 'elem' to array 'prop'.
 	 * @param prop
 	 * @param elem
 	 * @throws TransException 
 	 */
 	@SuppressWarnings("unchecked")
-	public void add(String prop, Object elem) throws TransException {
+	public SemanticObject add(String prop, Object elem) throws TransException {
 		if (props == null)
 			props = new HashMap<String, Object>();
 		if (!props.containsKey(prop))
@@ -82,6 +99,7 @@ public class SemanticObject extends Object {
 		if (props.get(prop) instanceof List)
 			((ArrayList<Object>) props.get(prop)).add(elem);
 		else throw new TransException("%s seams is not an array. elem %s can't been added", prop, elem);
+		return this;
 	}
 
 	public Object remove(String prop) {
