@@ -1,5 +1,6 @@
 package io.odysz.transact.sql.parts.condition;
 
+import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 
 /**
@@ -45,15 +46,14 @@ public class Funcall extends ExprPart {
 	}
 
 	private String sqlNow(ISemantext context) {
-		switch (context.dbtype()) {
-		case sqlite:
+		dbtype dt = context.dbtype();
+		if (dbtype.sqlite == dt)
 			return "datetime('now')"; 
-		case oracle:
+		else if (dbtype.oracle == dt)
 			return "sysdate";
-		case mysql:
-		default:
+		else
+			// else if (mysql:
 			return "now()";
-		}
 	}
 
 }

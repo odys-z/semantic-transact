@@ -117,6 +117,9 @@ public class Query extends Statement<Query> {
 		public static final int predicateL = 1;
 		public static final int predicateR = 2;
 		public static final int predicateSize = 3;
+		
+		public static final int orderExpr = 0;
+		public static final int orderAsc = 1;
 	}
 
 	private List<SelectElem> selectList;

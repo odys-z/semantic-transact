@@ -57,13 +57,11 @@ public class JoinTabl extends Condit {
 	}
 
 	private String sql(join jt) {
-		switch (jt) {
-		case main: return "from";
-		case j: return "join";
-		case r: return "right outer join";
-		case l: return "left outer join";
-		default: return "";
-		}
+		if (jt == join.main) return "from";
+		else if (jt == join.j) return "join";
+		else if (jt == join.r) return "right outer join";
+		else if (jt == join.l) return "left outer join";
+		else return "";
 	}
 
 }
