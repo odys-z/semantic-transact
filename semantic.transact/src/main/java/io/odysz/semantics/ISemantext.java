@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import io.odysz.common.dbtype;
+import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
@@ -63,6 +64,7 @@ public interface ISemantext {
 	 */
 	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> valuesNv);
 
+	public SemanticObject resolvedNewIds();
 
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
@@ -98,5 +100,7 @@ public interface ISemantext {
 	 * @throws TransException 
 	 */
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
+
+	void addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
 	
 }

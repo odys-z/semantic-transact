@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
+import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
  * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
@@ -36,5 +37,9 @@ public class Transcxt {
 	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
 //		return semantext == null ? null : semantext.insert((Insert) insert, tabl, usr);
 		return semantext;
+	}
+
+	public void addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
+		semantext.addSemantics(tabl, pk, smtcs, args);
 	}
 }
