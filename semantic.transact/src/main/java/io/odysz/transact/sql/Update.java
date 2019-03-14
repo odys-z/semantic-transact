@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.SemanticObject;
+import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 
@@ -63,6 +65,15 @@ public class Update extends Statement<Update> {
 //			).map(m -> m.sql(scxt));
 
 		return s.collect(Collectors.joining(" "));
+	}
+
+	/**Add multi del insert update for children table
+	 * - a special frequently used case of CRUD, should be abstracted into a more general way.
+	 * @param multireq
+	 * @throws SemanticException 
+	 */
+	public void postChildren(SemanticObject multireq) throws SemanticException {
+		throw new SemanticException("TODO...");
 	}
 
 }

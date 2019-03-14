@@ -57,6 +57,14 @@ public class SemanticObject extends Object {
 	public String port() {
 		return (String) get("port");
 	}
+
+	public SemanticObject code(String c) {
+		return put("code", c);
+	}
+	
+	public String code() {
+		return (String) get("code");
+	}
 	
 	public SemanticObject port(String port) {
 		return put("port", port);
@@ -66,16 +74,22 @@ public class SemanticObject extends Object {
 		return (String) get("msg");
 	}
 	
-	public SemanticObject msg(String msg) {
-		return put("msg", msg);
+	public SemanticObject msg(String msg, Object... args) {
+		if (args == null || args.length == 0)
+			return put("msg", msg);
+		else
+			return put("msg", String.format(msg, args));
 	}
 	
 	public String error() {
 		return (String) get("error");
 	}
 	
-	public SemanticObject error(String error) {
-		return put("error", error);
+	public SemanticObject error(String error, Object... args) {
+		if (args == null || args.length == 0)
+			return put("error", error);
+		else
+			return put("error", String.format(error, args));
 	}
 	
 	public SemanticObject put(String prop, Object v) {
@@ -137,6 +151,7 @@ public class SemanticObject extends Object {
 			}
 		out.println("");
 	}
+
 
 //	/**Serialize without dependency of Gson
 //	 * @param os
