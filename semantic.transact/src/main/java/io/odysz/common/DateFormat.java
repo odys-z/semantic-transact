@@ -21,6 +21,8 @@ public class DateFormat {
 	 */
 	static public String format(Date d) { return d == null ? " - - " : sdf.format(d); }
 
+	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
+
 	/**yyyy-MM-dd
 	 * @param text
 	 * @return formatted string

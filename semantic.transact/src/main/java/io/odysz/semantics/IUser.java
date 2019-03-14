@@ -2,6 +2,7 @@ package io.odysz.semantics;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.odysz.transact.x.TransException;
 
@@ -13,6 +14,8 @@ import io.odysz.transact.x.TransException;
  *
  */
 public interface IUser {
+
+	HashMap<String, Object> props = new HashMap<String, Object>();
 
 	/**The sqls is committed to database, do something for logging. 
 	 * If there are some operation needing to update db, return those sql statements.
@@ -38,11 +41,14 @@ public interface IUser {
 	
 	/**Get any property other than uid.
 	 * @param prop
-	 * @return porperty
+	 * @return property value
 	 */
-	String get(String prop);
+	default String get(String prop) { return prop; };
 
-	IUser set(String prop, Object value);
+	default IUser set(String prop, Object v) {
+		props.put(prop, v);
+		return this;
+	};
 
 	SemanticObject logout();
 
