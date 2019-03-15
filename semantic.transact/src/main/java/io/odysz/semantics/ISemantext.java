@@ -34,7 +34,7 @@ import io.odysz.transact.x.TransException;
  *
  */
 public interface ISemantext {
-	/**Called when starting a insert transaction sql composing.<br>
+	/**Called when starting a insert transaction's sql composing.<br>
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
 	 * @param insert
@@ -54,7 +54,7 @@ public interface ISemantext {
 	 */
 	public ISemantext update(Update update, String mainTabl, IUser... usr);
 
-	/**Called each time an <@link Insert} statement found itself will composing a insert-sql.<br>
+	/**Called each time an <@link Insert} statement found itself will composing a insert-sql ({@link Insert#sql(ISemantext)})<br>
 	 * Resolving inserting values, e.g an AUTO key is generated here.
 	 * @param insert
 	 * @param tabl 
@@ -62,8 +62,6 @@ public interface ISemantext {
 	 * @return the ISemantext context, a thread safe context for resolving semantics like FK value resolving.<br>
 	 */
 	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> valuesNv);
-
-	public SemanticObject resolvedNewIds();
 
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
@@ -75,7 +73,7 @@ public interface ISemantext {
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
-	 * @return the result set map[tabl, (newIds, resolved values, ...)]
+	 * @return the result set map[tabl, {newIds, resolved values}], ...
 	 */
 	public SemanticObject results();
 

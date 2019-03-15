@@ -11,7 +11,6 @@ import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.transact.sql.Insert;
-import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
 
@@ -20,13 +19,13 @@ import io.odysz.transact.x.TransException;
  * @author ody
  *
  */
-@SuppressWarnings("unused")
 class Semantext2 implements ISemantext {
 
+	@SuppressWarnings("unused")
 	private String tabl;
-	private HashMap<Object, Object> autoVals;
+//	private HashMap<Object, Object> autoVals;
 	private HashMap<String, Semantics2> semantics;
-	private Statement<?> callerStatement;
+//	private Statement<?> callerStatement;
 	private SemanticObject resolvedIds;
 
 	public Semantext2(String tabl, HashMap<String, Semantics2> semantics) {
@@ -68,17 +67,16 @@ class Semantext2 implements ISemantext {
 					}
 				}
 			}
-		callerStatement = insert;
+//		callerStatement = insert;
 		return this;
 	}
 
 	@Override
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
-		// TODO we need semantics here
 		if (nvs != null)
 			for (Object[] nv : nvs)
 				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))
-					nv[1] = autoVals == null ? nv[1] : autoVals.get(nv[0]);
+					nv[1] = resolvedIds == null ? nv[1] : resolvedIds.get((String) nv[0]);
 		return this;
 	}
 
@@ -97,23 +95,14 @@ class Semantext2 implements ISemantext {
 	 * @see io.odysz.semantics.ISemantext#results()
 	 */
 	@Override
-	public SemanticObject results() {
-		return resolvedIds;
-	}
+	public SemanticObject results() { return resolvedIds; }
 
 	@Override
-	public dbtype dbtype() {
-		return dbtype.sqlite;
-	}
+	public dbtype dbtype() { return dbtype.sqlite; }
 
 	@Override
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
 		return s;
-	}
-
-	@Override
-	public SemanticObject resolvedNewIds() {
-		return null;
 	}
 
 	@Override

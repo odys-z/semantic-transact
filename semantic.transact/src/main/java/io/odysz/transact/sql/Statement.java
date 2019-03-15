@@ -26,12 +26,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected String mainTabl;
 	protected String mainAlias;
 	
-	/**Conditions of where clause * */
-	// protected ArrayList<Condt> wheres;
-
-	/**Conditions of where condtions
-	 * 
-	 */
+	/**Conditions of where conditions */
 	protected Condit where;
 
 	protected Transcxt transc;
@@ -76,6 +71,12 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
+	/**Generat all sqls, put int list.
+	 * @param sqls
+	 * @param usrInfo
+	 * @return sqls
+	 * @throws TransException
+	 */
 	public SemanticObject commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
 		ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
 		commit(context, sqls);

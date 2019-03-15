@@ -54,6 +54,13 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
+	/**Instead of using {@link #nv(String, Object)} to setup columns, sometimes we use insert tabl(col) select ...<br>
+	 * This method is used to setup cols in the latter case.
+	 * @param col0
+	 * @param cols
+	 * @return this
+	 * @throws TransException
+	 */
 	public Insert cols(String col0, String... cols) throws TransException {
 		if (valuesNv != null && valuesNv.size() > 0)
 			throw new TransException("cols() must been called before any rows' value been added (calling values())");
@@ -93,6 +100,11 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
+	/**select clause in sql: insert into tabl() <b>select ...</b>
+	 * @param values
+	 * @return this
+	 * @throws TransException
+	 */
 	public Insert select(Query values) throws TransException {
 		if (valuesNv != null && valuesNv.size() > 0)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
@@ -120,18 +132,12 @@ public class Insert extends Statement<Insert> {
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
 				// insert into tabl(...)
-				/*
-				Stream.concat(
-						// insert into tabl(...)
-						Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias)),
-						Optional.ofNullable(insertCols).orElse((Map<String, Integer>)Collections.<String, Integer>emptyMap())
-											.keySet().stream().map(m -> new ExprPart(m)).filter(m -> hasValuesNv) */
 				Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias), new ColumnList(insertCols)
 				// values(...) / select ...
 				), Stream.concat(
 						// FIXME how to join multiple values? (...), (...), ...
 						// values (...)
-						Stream.concat(Stream.of(new ExprPart("values (")), // 'values()' appears or not being the same as value nvs
+						Stream.concat(Stream.of(new ExprPart("values (")), // whether 'values()' appears or not is the same as value nvs
 									  // 'v1', 'v2', ...)
 									  Stream.concat(Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
 											  		  		.stream().map(row -> getValue(row, insertCols)),

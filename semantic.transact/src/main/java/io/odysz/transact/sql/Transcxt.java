@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
@@ -29,17 +30,30 @@ public class Transcxt {
 		return new Update(this, tabl);
 	}
 
-//	public <T extends Statement<T>> ISemantext insertCtx(Insert statement,
-//			String tabl, List<ArrayList<Object[]>> valuesNv) {
-//		return semantext.onInsert(statement, tabl, valuesNv);
-//	}
-
+	/**
+	 * @param insert
+	 * @param tabl
+	 * @param usr
+	 * @return {@link #semantext}
+	 */
 	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
-//		return semantext == null ? null : semantext.insert((Insert) insert, tabl, usr);
 		return semantext;
 	}
 
-	public void addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
+	/**Add Semantics to {@link #semantext}
+	 * @param tabl
+	 * @param pk
+	 * @param smtcs
+	 * @param args
+	 * @throws TransException
+	 */
+	public Transcxt addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
 		semantext.addSemantics(tabl, pk, smtcs, args);
+		return this;
+	}
+
+	public Object resolvedVal(String tabl, String col) {
+		return semantext.results().has(tabl) ?
+				((SemanticObject)semantext.results().get(tabl)).get(col) : null;
 	}
 }

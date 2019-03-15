@@ -37,6 +37,10 @@ public class SemanticObject extends Object {
 				: p.getClass();
 	}
 
+	public boolean has(String tabl) {
+		return props != null && props.containsKey(tabl) && props.get(tabl) != null;
+	}
+
 	public Object get(String prop) {
 		return props == null ? null : props.get(prop);
 	}

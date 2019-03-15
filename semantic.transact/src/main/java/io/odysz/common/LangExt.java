@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LangExt {
@@ -36,6 +37,13 @@ public class LangExt {
 		return Arrays.stream(ss)
 				.filter(s -> s != null)
 				.map(e -> toString(e))
+				.collect(Collectors.joining(",", "[", "]"));
+	}
+
+	public static String toString(Map<String, Integer> cols) {
+		if (cols == null) return null;
+		else return cols.entrySet().stream()
+				.map(e -> "{" + e.getKey() + ": " + e.getValue() + "}")
 				.collect(Collectors.joining(",", "[", "]"));
 	}
 }
