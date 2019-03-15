@@ -13,8 +13,7 @@ import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving "AUTO" when generating sql.
- * @author ody
- *
+ * @author odys-z@github.com
  */
 @SuppressWarnings("unused")
 class Semantext1 implements ISemantext {
@@ -30,7 +29,6 @@ class Semantext1 implements ISemantext {
 	}
 
 	/**When inserting, replace inserting values in 'AUTO' columns, e.g. generate auto PK for rec-id.<br>
-	 * TODO we need semantics here
 	 * @param valuesNv
 	 */
 	@Override
