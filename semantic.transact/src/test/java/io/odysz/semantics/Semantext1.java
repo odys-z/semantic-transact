@@ -75,14 +75,10 @@ class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public SemanticObject results() {
-		return null;
-	}
+	public SemanticObject results() { return null; }
 
 	@Override
-	public dbtype dbtype() {
-		return dbtype.sqlite;
-	}
+	public dbtype dbtype() { return dbtype.sqlite; }
 
 	@Override
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
@@ -90,12 +86,11 @@ class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public SemanticObject resolvedNewIds() {
-		return null;
-	}
+	public SemanticObject resolvedNewIds() { return null; }
 
 	@Override
-	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
+	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args)
+			throws TransException {
 		return this;
 	}
 }

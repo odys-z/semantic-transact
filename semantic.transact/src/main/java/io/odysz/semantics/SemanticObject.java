@@ -17,8 +17,7 @@ import io.odysz.transact.x.TransException;
  * <p>Question: If a json request object is handled by a port, e.g. SQuery,
  * is their any property name not known by the port?</p>
  * <p>If no such properties, then there shouldn't be put() and get().</p>
- * @author ody
- *
+ * @author odys-z@github.com
  */
 public class SemanticObject extends Object {
 
