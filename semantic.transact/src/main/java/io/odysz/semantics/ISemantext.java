@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import io.odysz.common.dbtype;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
@@ -101,6 +100,6 @@ public interface ISemantext {
 	 */
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
 
-	void addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
+	ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
 	
 }

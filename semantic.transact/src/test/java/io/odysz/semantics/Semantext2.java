@@ -90,7 +90,6 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public ISemantext update(Update update, String mainTabl, IUser... usr) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -110,5 +109,15 @@ class Semantext2 implements ISemantext {
 	@Override
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
 		return s;
+	}
+
+	@Override
+	public SemanticObject resolvedNewIds() {
+		return null;
+	}
+
+	@Override
+	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
+		return this;
 	}
 }
