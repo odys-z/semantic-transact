@@ -1,21 +1,22 @@
 package io.odysz.transact.sql;
 
 import io.odysz.semantics.ISemantext;
-import io.odysz.semantics.IUser;
-import io.odysz.semantics.SemanticObject;
-import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
  * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
- * <p>When building sql, events liek on inserting, etc. are fired to ISemantext.
- * @author ody
+ * <p>When building sql, events like onInserting, etc. are fired to ISemantext.
+ * @author odys-z@github.com
  */
 public class Transcxt {
 
-	ISemantext semantext;
+	protected static ISemantext statiCtx;
+	public ISemantext staticContext() { return statiCtx; }
 
-	public Transcxt(ISemantext semantext) {
-		this.semantext = semantext;
+	/**Create a statements manager.
+	 * @param staticSemantext A static semantic providing basic DB access, used to generate autoID etc.
+	 */
+	public Transcxt(ISemantext staticSemantext) {
+		statiCtx = staticSemantext;
 	}
 
 	public Query select(String tabl, String ... alias) {
@@ -35,10 +36,10 @@ public class Transcxt {
 	 * @param tabl
 	 * @param usr
 	 * @return {@link #semantext}
-	 */
 	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
 		return semantext;
 	}
+	 */
 
 	/**Add Semantics to {@link #semantext}
 	 * @param tabl
@@ -46,7 +47,6 @@ public class Transcxt {
 	 * @param smtcs
 	 * @param args
 	 * @throws TransException
-	 */
 	public Transcxt addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
 		semantext.addSemantics(tabl, pk, smtcs, args);
 		return this;
@@ -56,4 +56,5 @@ public class Transcxt {
 		return semantext.results().has(tabl) ?
 				((SemanticObject)semantext.results().get(tabl)).get(col) : null;
 	}
+	 */
 }

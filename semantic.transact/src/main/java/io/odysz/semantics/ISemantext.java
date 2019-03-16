@@ -1,5 +1,6 @@
 package io.odysz.semantics;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -73,9 +74,12 @@ public interface ISemantext {
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
-	 * @return the result set map[tabl, {newIds, resolved values}], ...
+	 * @param table
+	 * @param col
+	 * @return RESULt resoLVED VALue in tabl.col
 	 */
-	public SemanticObject results();
+	Object resulvedVal(String table, String col);
+	// public SemanticObject results();
 
 	/**Get the dbtype handled by the context
 	 * @return db type
@@ -98,6 +102,16 @@ public interface ISemantext {
 	 */
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
 
-	ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
-	
+//	ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
+
+	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
+	 * The new generated value is managed in this implementation class (for future resolving).
+	 * @param tabl
+	 * @param col
+	 * @return new auto key.
+	 * @throws SQLException
+	 * @throws TransException
+	 */
+	String genId(String tabl, String col) throws SQLException, TransException;
+
 }

@@ -20,7 +20,7 @@ public class TestTransc {
 
 	@Before
 	public void setUp() throws Exception {
-		Utils.printCaller(true);
+		Utils.printCaller(false);
 
 		user = new User("admin", "123456");
 
@@ -40,7 +40,7 @@ public class TestTransc {
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
-			.commit(sqls);
+			.commit(st.staticContext(), sqls);
 
 		st.select("a_log", "lg")
 			.col("lg.stamp", "logtime")

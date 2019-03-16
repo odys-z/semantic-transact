@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
@@ -169,7 +168,7 @@ public class Insert extends Statement<Insert> {
 			else if (colIdx.containsKey(nv[0]))
 					idx = colIdx.get(nv[0]);
 			else {
-				Utils.warn("Can't find column index for cole %s %s", nv[0], nv[1]);
+				Utils.warn("Can't find column index for col %s %s", nv[0], nv[1]);
 				continue;
 			}
 			try {
@@ -216,12 +215,11 @@ public class Insert extends Statement<Insert> {
 	 * @throws TransException
 	 * @throws SQLException
 	 */
-	public SemanticObject ins() throws TransException, SQLException {
+	public Object ins(ISemantext ctx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
-			SemanticObject results = commit(sqls);
-			postOp.op(sqls);
-			return results;
+			commit(ctx, sqls);
+			return postOp.op(sqls);
 		}
 		return null;
 	}

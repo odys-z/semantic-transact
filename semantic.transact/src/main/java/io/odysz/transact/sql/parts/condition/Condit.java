@@ -11,7 +11,8 @@ import io.odysz.transact.sql.parts.Logic.type;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 
 
-/**For grammar definition, see {@link ConditVisitor} 
+/**Logical Conditioning, a {@link Predicate} tree.
+ * For grammar definition, see {@link ConditVisitor}. 
  * @author ody
  *
  */
@@ -24,11 +25,12 @@ public class Condit extends Predicate {
 search_condition_not
     : NOT? predicate
     ;</pre>
-	 */
 	protected Predicate predict;
+	 */
 
 	public Condit(op op, String lop, String rop) {
 		super(op, lop, rop);
+		this.logitype = Logic.type.empty;
 	}
 
 	public Condit(Logic.type type, List<Condit> condts) {
@@ -38,33 +40,46 @@ search_condition_not
 	}
 
 	public Condit(Predicate predicate) {
-		this.predict = predicate;
-		// condts = new ArrayList<Condit>();
+		// this.predict = predicate;
+		super(predicate);
+		this.logitype = Logic.type.empty;
 	}
 
 	public Condit and(Condit and) {
-		if (condts == null || condts.size() == 0) {
-			logitype = type.and;
-			if (condts == null)
-				condts = new ArrayList<Condit>();
-			condts.add(and);
-		}
-		else {	
-			if (logitype == type.or)
+//		if (condts == null || condts.size() == 0) {
+//			if (condts == null) {
+//				condts = new ArrayList<Condit>();
+//			}
+//			condts.add(this);
+//			condts.add(and);
+//			return new Condit(type.and, condts);
+//		}
+//		else {	
+			if (logitype == type.or) {
 				// and is prior to the other ors
 				condts.get(condts.size() - 1).and(and);
-			else if (logitype == type.and)
+				return this;
+			}
+			else if (logitype == type.and) {
 				condts.add(and);
-			else if (logitype == type.not) {
+				return this;
+			}else if (logitype == type.not) {
 				Condit left = new Condit(type.not, condts);
 				condts = new ArrayList<Condit>();
 				condts.add(left);
 				logitype = type.and;
 				condts.add(and);
+				return this;
 			}
-		}
+			else { // empty logic, and to it
+				ArrayList<Condit> ands = new ArrayList<Condit>();
+				ands.add(this);
+				ands.add(and);
+				return new Condit(Logic.type.and, ands);
+			}
+
+//		}
 			
-		return this;
 	}
 
 	public Condit or(String logic, String from, String... to) {
@@ -81,9 +96,13 @@ search_condition_not
 	public String sql(ISemantext sctx) {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
-		if (predict != null)
-			return predict.sql(sctx);
+//		if (predict != null)
+//			return predict.sql(sctx); // TODO debug: no "not"?
+
 		// 2. search_condition_and
+		if (logitype == type.empty) {
+			return super.sql(sctx);
+		}
 		else if (logitype == type.and) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
@@ -104,7 +123,9 @@ search_condition_not
 //		else if (predict == null && condts == null)
 //			return "";
 		// 4. search_condition - CAN'T reach here, it's Predicat's business.
-		return super.sql(sctx);
+		// return super.sql(sctx);
+
+		return null;
 	}
 
 }

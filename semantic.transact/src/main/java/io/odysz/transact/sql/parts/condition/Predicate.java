@@ -9,8 +9,12 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 
+/**Basically a logic expression. For predicate definition, see {@link io.odysz.transact.sql.parts.antlr.PredicatVisitor}.
+ * @author odys-z@github.com
+ */
 public class Predicate extends AbsPart {
 
+	private boolean empty = false;
 	private boolean negative = false;
 	private Logic.op op;
 	private ExprPart l;
@@ -25,6 +29,19 @@ public class Predicate extends AbsPart {
 	}
 
 	public Predicate() {
+	}
+
+	public Predicate(Predicate cpy) {
+		if (cpy == null)
+			empty = true;
+		else {
+			empty = false;
+			this.op = cpy.op;
+			this.l = cpy.l;
+			this.r = cpy.r;
+			this.brace = cpy.brace;
+			this.search_condit = cpy.search_condit;
+		}
 	}
 
 	public Predicate(Logic.op op, ExprPart lexpr, ExprPart rexpr) {
@@ -63,6 +80,8 @@ public class Predicate extends AbsPart {
 
 	@Override
 	public String sql(ISemantext sctx) {
+		if (empty) return "";
+
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));
 		else {

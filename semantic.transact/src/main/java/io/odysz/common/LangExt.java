@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,8 +26,10 @@ public class LangExt {
 		}
 	}
 	
-	public static String toString(String[] ss) {
-		return ss == null ? null : Arrays.stream(ss).collect(Collectors.joining(",", "[", "]"));
+	public static String toString(Object[] ss) {
+		return ss == null ? null : Arrays.stream(ss)
+				.filter(e -> e != null)
+				.map(e -> e.toString()).collect(Collectors.joining(",", "[", "]"));
 	}
 	
 	/**Convert 2D array to string: "[{ss[0][1]: ss[0][1]}, {ss[1][0]: ss[1][1]}, ...]"
@@ -44,6 +47,13 @@ public class LangExt {
 		if (cols == null) return null;
 		else return cols.entrySet().stream()
 				.map(e -> "{" + e.getKey() + ": " + e.getValue() + "}")
+				.collect(Collectors.joining(",", "[", "]"));
+	}
+
+	public static String toString(List<Object[]> lst) {
+		if (lst == null) return null;
+		else return lst.stream()
+				.map(e -> toString(e))
 				.collect(Collectors.joining(",", "[", "]"));
 	}
 }

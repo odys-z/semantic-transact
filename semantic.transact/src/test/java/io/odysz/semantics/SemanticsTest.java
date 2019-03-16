@@ -31,7 +31,7 @@ public class SemanticsTest {
 			.nv("funcName", "Test 001")
 			.nv("sibling", "10")
 			.nv("parentId", "0")
-			.commit(sqls);
+			.commit(st.staticContext(), sqls);
 		
 		Utils.logi(sqls);
 		assertEquals(

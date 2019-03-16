@@ -1,5 +1,6 @@
 package io.odysz.semantics;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,10 @@ class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public SemanticObject results() { return new SemanticObject().put("all", autoVals); }
+	public Object resulvedVal(String tabl, String col) {
+		return autoVals == null ? null
+				: ((SemanticObject)autoVals.get(tabl)).get(col);
+	}
 
 	@Override
 	public dbtype dbtype() { return dbtype.sqlite; }
@@ -85,11 +89,14 @@ class Semantext1 implements ISemantext {
 		return s;
 	}
 
-//	@Override public SemanticObject resolvedNewIds() { return null; }
+//	@Override
+//	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args)
+//			throws TransException {
+//		return this;
+//	}
 
 	@Override
-	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args)
-			throws TransException {
-		return this;
+	public String genId(String tabl, String col) throws SQLException, TransException {
+		return "";
 	}
 }

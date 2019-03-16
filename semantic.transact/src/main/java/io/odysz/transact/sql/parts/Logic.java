@@ -1,7 +1,9 @@
 package io.odysz.transact.sql.parts;
 
 public class Logic {
-	public enum type { and, or, not };
+	/** empty type is used to subclass {@link io.odysz.transact.sql.parts.condition.Predicate}
+	 * as {@link io.odysz.transact.sql.parts.condition.Condit}*/
+	public enum type { and, or, not, empty };
 
 	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
