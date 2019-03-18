@@ -9,16 +9,20 @@ import io.odysz.semantics.ISemantext;
  */
 public class Transcxt {
 
-	protected static ISemantext statiCtx;
-	public ISemantext staticContext() { return statiCtx; }
+	protected static ISemantext basictx;
+	/**Get a basic Semantext that typicall don't handle many semantics, can only used for basic sql generation,
+	 * except the transact builder is constructed with a very strong Semantext, like that in cheap engine.
+	 * @return
+	 */
+	public ISemantext basiContext() { return basictx; }
 
 	/**Create a statements manager.
 	 * @param staticSemantext A static semantic providing basic DB access, used to generate autoID etc.
 	 */
 	public Transcxt(ISemantext staticSemantext) {
-		statiCtx = staticSemantext;
+		basictx = staticSemantext;
 	}
-
+	
 	public Query select(String tabl, String ... alias) {
 		return new Query(this, tabl, alias);
 	}

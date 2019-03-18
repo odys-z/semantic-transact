@@ -40,7 +40,7 @@ public class TestTransc {
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
-			.commit(st.staticContext(), sqls);
+			.commit(st.basiContext(), sqls);
 
 		st.select("a_log", "lg")
 			.col("lg.stamp", "logtime")
