@@ -30,6 +30,10 @@ public class Transcxt {
 	public Update update(String tabl) {
 		return new Update(this, tabl);
 	}
+	
+	public Delete delete(String tabl) {
+		return new Delete(this, tabl);
+	}
 
 	/**
 	 * @param insert

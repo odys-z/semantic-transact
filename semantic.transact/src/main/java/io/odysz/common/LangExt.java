@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,4 +57,27 @@ public class LangExt {
 				.map(e -> toString(e))
 				.collect(Collectors.joining(",", "[", "]"));
 	}
+	
+	/**Parse formatted string into hash map.
+	 * @param str "k1:v1,k2:v2,..."
+	 * @return hash map
+	 */
+	public static HashMap<String, String> parseMap(String str) {
+		if (str != null && str.trim().length() > 0) {
+			String[] entryss = str.trim().split(",");
+			HashMap<String, String> refMap = new HashMap<String, String>(entryss.length);
+			for (String entry : entryss) {
+				try {
+					String[] e = entry.split(":");
+					refMap.put(e[0].trim(), e[1].trim());
+				}
+				catch (Exception ex) {
+					Utils.warn("WARN: - can't parse: " + entry);
+					continue;
+				}
+			}
+			return refMap;
+		}
+		return null;
+	}	
 }
