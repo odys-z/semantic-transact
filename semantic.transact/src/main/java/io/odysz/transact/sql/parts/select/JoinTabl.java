@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts.select;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
@@ -9,7 +10,7 @@ import io.odysz.transact.sql.parts.condition.Condit;
  * @author ody
  *
  */
-public class JoinTabl extends Condit {
+public class JoinTabl extends AbsPart {
 	public enum join { main, j, r, l;
 
 	public static join parse(String name) {
@@ -28,15 +29,17 @@ public class JoinTabl extends Condit {
 	protected join jtype;
 	protected String jtablias;
 	protected String jtabl;
+	private Condit on;
 
 	public JoinTabl(join joinType, String tabl, Condit on) {
-		super(on);
+		this.on = on;
 		this.jtabl = tabl;
 		this.jtype = joinType;
 	}
 
 	public JoinTabl(join joinType, String tabl, String alias, Condit... on) {
-		super(on == null || on.length == 0 ? null : on[0]);
+		// super(on == null || on.length == 0 ? null : on[0]);
+		this.on = on == null || on.length == 0 ? null : on[0];
 		this.jtype = joinType;
 		this.jtabl = tabl;
 		this.jtablias = alias;
@@ -47,10 +50,12 @@ public class JoinTabl extends Condit {
 		if (jtype == join.main)
 			return String.format("from %s %s", jtabl, jtablias == null ? "" : jtablias);
 
-		String condt = super.sql(sctx);
-		if (condt != null && condt.length() > 0)
-			return String.format("%s %s %s on %s", sql(jtype), jtabl,
-				jtablias == null ? "" : jtablias, super.sql(sctx));
+		// String condt = super.sql(sctx);
+		if (on != null)
+			return String.format("%s %s %s on %s", sql(jtype),
+					// jtablias == null ? "" : jtablias, super.sql(sctx));
+					jtabl, jtablias == null ? "" : jtablias,
+					on.sql(sctx));
 		else
 			return String.format("%s %s %s", sql(jtype), jtabl,
 				jtablias == null ? "" : jtablias);

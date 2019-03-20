@@ -96,7 +96,7 @@ public class TestTransc {
 	public void testUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.update("a_users")
-			.nv("userName", "'abc-x01'")
+			.nv("userName", "abc-x01")
 			.where("=", "userId", "'admin'")
 			.commit(sqls);
 
@@ -109,9 +109,9 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_rolefunc")
 			.select(st.select("a_functions", "f")
-						// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
-						.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
-						.j("a_roles", "r", "r.roleId='%s'", "admin"))
+					// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
+					.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
+					.j("a_roles", "r", "r.roleId='%s'", "admin"))
 			.post(st.update("a_roles")
 					.nv("funcount", st.select("a_rolefunc")
 										.col("count(funcId)")
