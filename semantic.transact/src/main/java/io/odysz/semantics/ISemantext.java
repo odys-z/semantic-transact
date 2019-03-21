@@ -35,6 +35,9 @@ import io.odysz.transact.x.TransException;
  *
  */
 public interface ISemantext {
+	/**Match referencing string like "RESULVE tabl.col" */
+	String refPattern = "^\\s*RESULVE\\s*(\\w)\\s*\\.\\s*(\\w)";
+
 	/**Called when starting a insert transaction's sql composing.<br>
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
@@ -81,6 +84,23 @@ public interface ISemantext {
 	Object resulvedVal(String table, String col);
 	// public SemanticObject results();
 
+	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
+	 * Find and return referee.
+	 * @param constValue
+	 * @return
+	 */
+	public Object resulvedVal(String ref);
+	
+	/**Format special escaping string that will be resolve value later.
+	 * @see #refPattern
+	 * @param tabl
+	 * @param pk
+	 * @return resolving string: "RESULVE tabl.pk"
+	 */
+	public default String formatResulv(String tabl, String pk) {
+		return String.format("RESULVE %s.%s", tabl, pk);
+	}
+
 	/**Get the dbtype handled by the context
 	 * @return db type
 	 */
@@ -113,5 +133,4 @@ public interface ISemantext {
 	 * @throws TransException
 	 */
 	String genId(String tabl, String col) throws SQLException, TransException;
-
 }

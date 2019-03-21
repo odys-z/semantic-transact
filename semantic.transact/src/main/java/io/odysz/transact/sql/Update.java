@@ -41,39 +41,31 @@ public class Update extends Statement<Update> {
 						new ExprPart("set"), new SetList(nvs)), 
 					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
 				  .map(m -> m == null ? "" : m.sql(sctx));
-//		// insert into tabl(...) values(...) / select ...
-//		Stream<String> s2 = Stream.concat(
-//				// insert into tabl(...)
-//				/*
-//				Stream.concat(
-//						// insert into tabl(...)
-//						Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias)),
-//						Optional.ofNullable(insertCols).orElse((Map<String, Integer>)Collections.<String, Integer>emptyMap())
-//											.keySet().stream().map(m -> new ExprPart(m)).filter(m -> hasValuesNv) */
-//				Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias), new ColumnList(insertCols)
-//				// values(...) / select ...
-//				), Stream.concat(
-//						// values (...)
-//						Stream.concat(Stream.of(new ExprPart("values (")), // 'values()' appears or not being the same as value nvs
-//									  // 'v1', 'v2', ...)
-//									  Stream.concat(Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-//											  		  		.stream().map(row -> getRow(row, insertCols)),
-//									  				Stream.of(new ExprPart(")")))
-//						).filter(w -> hasValuesNv),
-//						// select ...
-//						Stream.of(selectValues).filter(w -> selectValues != null))
-//			).map(m -> m.sql(scxt));
 
 		return s.collect(Collectors.joining(" "));
 	}
 
-	/**Add multi del insert update for children table
-	 * - a special frequently used case of CRUD, should be abstracted into a more general way.
-	 * @param multireq
+	/**FIXME merge this to some where parsing JMessage<br>
+	 * Add multi del insert update for children table<br>
+	 * - a special frequently used case of CRUD, provided as a shortcut of API.
+	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
+	 * @param stcx 
 	 * @throws SemanticException 
 	 */
-	public void postChildren(SemanticObject multireq) throws SemanticException {
-		throw new SemanticException("TODO...");
-	}
+	public void postChildren(SemanticObject multireq, Transcxt stcx) throws SemanticException {
+		// throw new SemanticException("TODO...");
+		Delete del = (Delete) multireq.get("dels");
+		if (del != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			postate.add(del);
+		}
 
+		Insert ins = (Insert) multireq.get("insert");
+		if (ins != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			postate.add(ins);
+		}
+	}
 }

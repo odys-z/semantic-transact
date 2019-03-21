@@ -26,9 +26,7 @@ public class ExprPart extends AbsPart {
 		if (logic == null)
 			return lexp == null ? "" : lexp;
 		else return String.format("%s %s %s",
-				lexp == null ? "" : lexp,
-				logic.sql(logic, rexp == null ? "" : rexp));
+				lexp == null ? "" : context.resulvedVal(lexp),
+				logic.sql(logic, rexp == null ? "" : (String) context.resulvedVal(rexp)));
 	}
-
-
 }

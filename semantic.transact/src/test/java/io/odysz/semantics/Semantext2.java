@@ -103,13 +103,11 @@ class Semantext2 implements ISemantext {
 		return s;
 	}
 
-//	@Override
-//	public ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
-//		return this;
-//	}
-
 	@Override
 	public String genId(String tabl, String col) throws SQLException, TransException {
 		return "";
 	}
+
+	@Override
+	public String resulvedVal(String ref) { return "FAKE RESULVED"; }
 }

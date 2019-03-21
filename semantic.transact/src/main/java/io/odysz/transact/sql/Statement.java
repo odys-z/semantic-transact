@@ -48,7 +48,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 	 */
 
-	private ArrayList<Statement<?>> postate;
+	protected ArrayList<Statement<?>> postate;
 
 	protected IPostOperat postOp;
 

@@ -41,8 +41,10 @@ public class SetValue extends ExprPart {
 					.collect(Collectors.joining(""));
 		else if (expr != null)
 			return expr.sql(sctx);
-		else if (constValue != null)
-			return "'" + constValue + "'";
+		else if (constValue != null) {
+			String v = (String) sctx.resulvedVal(constValue);
+			return "'" + v + "'";
+		}
 		else
 			return super.sql(sctx);
 	}
