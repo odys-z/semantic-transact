@@ -92,9 +92,11 @@ public class Insert extends Statement<Insert> {
 		if (valuesNv == null)
 			valuesNv = new ArrayList<ArrayList<Object[]>>(rowFields.size());
 		
-		if (currentRowNv != null && currentRowNv.size() > 0)
+		if (currentRowNv != null && currentRowNv.size() > 0) {
 			// append current row, then append new vals 
 			valuesNv.add(currentRowNv);
+			currentRowNv = null;
+		}
 		valuesNv.add(rowFields);
 		return this;
 	}
@@ -116,17 +118,17 @@ public class Insert extends Statement<Insert> {
 	 */
 	@Override
 	public String sql(ISemantext sctx) {
-		if (currentRowNv != null && currentRowNv.size() > 0) {
-			if (valuesNv == null) {
-				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
-			}
-			valuesNv.add(currentRowNv);
-		}
+//		if (currentRowNv != null && currentRowNv.size() > 0) {
+//			if (valuesNv == null) {
+//				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
+//			}
+//			valuesNv.add(currentRowNv);
+//		}
 
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
-		
-		if (sctx != null)
-			sctx.onInsert(this, mainTabl, valuesNv);
+
+//		if (sctx != null)
+//			sctx.onInsert(this, mainTabl, valuesNv);
 		
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
@@ -184,9 +186,7 @@ public class Insert extends Statement<Insert> {
 		return vs;
 	}
 
-	public Map<String, Integer> getColumns() {
-		return insertCols;
-	}
+	public Map<String, Integer> getColumns() { return insertCols; }
 
 	/**<p>Use this method to do post operation, a. k. a. for {@link Insert} to get inserted new Ids.</p>
 	 * <p>This method must called after the post operation (lambda expression) been initialized.</p>
@@ -216,12 +216,35 @@ public class Insert extends Statement<Insert> {
 	 * @throws SQLException
 	 */
 	public Object ins(ISemantext ctx) throws TransException, SQLException {
+		// check referee
+		beginSql(ctx);
+
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
 			return postOp.op(sqls);
 		}
 		return null;
+	}
+
+	void beginSql(ISemantext ctx) {
+		if (currentRowNv != null && currentRowNv.size() > 0) {
+			if (valuesNv == null) {
+				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
+			}
+			valuesNv.add(currentRowNv);
+			currentRowNv = null;
+		}
+
+//		@SuppressWarnings("unused")
+//		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
+		
+		if (ctx != null)
+			ctx.onInsert(this, mainTabl, valuesNv);
+		
+		if (postate != null)
+			for (Statement<?> pst : postate)
+				pst.beginSql(ctx);
 	}
 	
 }

@@ -96,4 +96,9 @@ class Semantext1 implements ISemantext {
 
 	@Override
 	public String resulvedVal(String ref) { return "FAKE RESULVED"; }
+
+	@Override
+	public ISemantext clone(IUser usr) {
+		return new Semantext1(tabl, semantics);
+	}
 }

@@ -133,4 +133,10 @@ public interface ISemantext {
 	 * @throws TransException
 	 */
 	String genId(String tabl, String col) throws SQLException, TransException;
+
+	/**Create a new instance for a semantics processing.
+	 * @param usr 
+	 * @return new semantext instance
+	 */
+	public ISemantext clone(IUser usr);
 }

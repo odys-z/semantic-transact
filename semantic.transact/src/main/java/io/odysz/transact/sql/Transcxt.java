@@ -1,6 +1,7 @@
 package io.odysz.transact.sql;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.IUser;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
  * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
@@ -15,6 +16,10 @@ public class Transcxt {
 	 * @return
 	 */
 	public ISemantext basiContext() { return basictx; }
+
+	public ISemantext instancontxt(IUser usr) {
+		return basictx.clone(usr);
+	}
 
 	/**Create a statements manager.
 	 * @param staticSemantext A static semantic providing basic DB access, used to generate autoID etc.

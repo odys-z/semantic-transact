@@ -106,6 +106,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 	
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		beginSql(cxt);
+
 		sqls.add(sql(cxt));
 		if (postate != null)
 			for (Statement<?> pst : postate)
@@ -120,6 +122,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public void doneOp(IPostOperat operat) {
 		postOp = operat;
 	}
+
+	/**Called when starting preparing sql, works like preparing auto generated key etc. should go here.
+	 * @param ctx
+	 */
+	void beginSql(ISemantext ctx) { }
 
 
 }

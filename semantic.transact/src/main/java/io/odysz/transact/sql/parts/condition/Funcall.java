@@ -1,5 +1,9 @@
 package io.odysz.transact.sql.parts.condition;
 
+import java.util.Date;
+
+import io.odysz.common.DateFormat;
+import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 
@@ -13,6 +17,9 @@ function_call
  *
  */
 public class Funcall extends ExprPart {
+	public static boolean sqliteUseLocaltime = false;
+	public static boolean ms2kUseUTCtime = false;
+
 	public enum Func { now("now()"), max("max(%s)");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
@@ -28,7 +35,7 @@ public class Funcall extends ExprPart {
 		this.func = func;
 	}
 
-	public static Funcall now () {
+	public static Funcall now (dbtype dtype) {
 		return new Funcall(Func.now);
 	}
 	
@@ -47,13 +54,20 @@ public class Funcall extends ExprPart {
 
 	private String sqlNow(ISemantext context) {
 		dbtype dt = context.dbtype();
-		if (dbtype.sqlite == dt)
-			return "datetime('now')"; 
-		else if (dbtype.oracle == dt)
-			return "sysdate";
-		else
-			// else if (mysql:
+		// return new Funcall(Func.now);
+		if (dt == dbtype.mysql)
 			return "now()";
+		else  if (dt == dbtype.sqlite)
+			return sqliteUseLocaltime ? "datetime('now', 'localtime')" : "datetime('now')";
+		else if (dt == dbtype.ms2k)
+			return ms2kUseUTCtime ? "getutcdate()" : "getdate()";
+		else if (dt == dbtype.oracle)
+			return "SYSDATE()";
+		else {
+			String s = DateFormat.formatime(new Date());
+			Utils.warn("Formating now() for unknown db type: %s as %s", dt.name(), s);
+			return s;
+		}
 	}
 
 }
