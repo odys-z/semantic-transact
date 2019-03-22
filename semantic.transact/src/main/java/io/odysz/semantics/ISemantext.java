@@ -67,6 +67,8 @@ public interface ISemantext {
 	 */
 	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> valuesNv);
 
+	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row);
+
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
 	 * @param tabl
@@ -139,4 +141,5 @@ public interface ISemantext {
 	 * @return new semantext instance
 	 */
 	public ISemantext clone(IUser usr);
+
 }

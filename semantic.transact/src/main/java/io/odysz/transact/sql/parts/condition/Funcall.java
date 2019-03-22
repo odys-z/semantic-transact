@@ -17,7 +17,9 @@ function_call
  *
  */
 public class Funcall extends ExprPart {
+	/**Use sqlite localtime or not */
 	public static boolean sqliteUseLocaltime = false;
+	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
 	public enum Func { now("now()"), max("max(%s)");
@@ -66,7 +68,7 @@ public class Funcall extends ExprPart {
 		else {
 			String s = DateFormat.formatime(new Date());
 			Utils.warn("Formating now() for unknown db type: %s as %s", dt.name(), s);
-			return s;
+			return "'" + s + "'";
 		}
 	}
 

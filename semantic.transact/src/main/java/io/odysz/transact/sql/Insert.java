@@ -216,8 +216,12 @@ public class Insert extends Statement<Insert> {
 	 * @throws SQLException
 	 */
 	public Object ins(ISemantext ctx) throws TransException, SQLException {
-		// check referee
-		beginSql(ctx);
+		// prepare
+		prepare(ctx);
+
+		// on insert
+		if (ctx != null)
+			ctx.onInsert(this, mainTabl, valuesNv);
 
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
@@ -226,8 +230,22 @@ public class Insert extends Statement<Insert> {
 		}
 		return null;
 	}
+	
+	@Override
+	public Insert commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		prepare(cxt);
 
-	void beginSql(ISemantext ctx) {
+		if (cxt != null) cxt.onInsert(this, mainTabl, valuesNv);
+
+		sqls.add(sql(cxt));
+		if (postate != null)
+			for (Statement<?> pst : postate)
+				pst.commit(cxt, sqls);
+		return this;
+	}		
+
+
+	void prepare(ISemantext ctx) {
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			if (valuesNv == null) {
 				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
@@ -238,13 +256,12 @@ public class Insert extends Statement<Insert> {
 
 //		@SuppressWarnings("unused")
 //		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
-		
 		if (ctx != null)
-			ctx.onInsert(this, mainTabl, valuesNv);
+			ctx.onPrepare(this, mainTabl, valuesNv);
 		
 		if (postate != null)
 			for (Statement<?> pst : postate)
-				pst.beginSql(ctx);
+				pst.prepare(ctx);
 	}
 	
 }

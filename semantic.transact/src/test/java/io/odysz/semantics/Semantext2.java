@@ -115,4 +115,7 @@ class Semantext2 implements ISemantext {
 	public ISemantext clone(IUser usr) {
 		return new Semantext2(tabl, semantics);
 	}
+
+	@Override
+	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
 }
