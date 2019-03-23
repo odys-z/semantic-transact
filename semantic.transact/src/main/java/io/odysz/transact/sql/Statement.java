@@ -99,7 +99,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
 		// ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
-		ISemantext context = transc.basiContext();
+		ISemantext context = transc.basictx();
 		Utils.warn("WARNING: your are using a static semantic context for generating sql, it should only been used for testing.");
 		return commit(context, sqls);
 		// return context == null ? null : context.results();

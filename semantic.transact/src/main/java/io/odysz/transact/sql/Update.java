@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
-import io.odysz.semantics.SemanticObject;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 
@@ -45,27 +43,4 @@ public class Update extends Statement<Update> {
 		return s.collect(Collectors.joining(" "));
 	}
 
-	/**FIXME merge this to some where parsing JMessage<br>
-	 * Add multi del insert update for children table<br>
-	 * - a special frequently used case of CRUD, provided as a shortcut of API.
-	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
-	 * @param stcx 
-	 * @throws SemanticException 
-	 */
-	public void postChildren(SemanticObject multireq, Transcxt stcx) throws SemanticException {
-		// throw new SemanticException("TODO...");
-		Delete del = (Delete) multireq.get("dels");
-		if (del != null) {
-			if (postate == null)
-				postate = new ArrayList<Statement<?>>();
-			postate.add(del);
-		}
-
-		Insert ins = (Insert) multireq.get("insert");
-		if (ins != null) {
-			if (postate == null)
-				postate = new ArrayList<Statement<?>>();
-			postate.add(ins);
-		}
-	}
 }

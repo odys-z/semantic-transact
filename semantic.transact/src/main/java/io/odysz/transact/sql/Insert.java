@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
@@ -125,6 +126,10 @@ public class Insert extends Statement<Insert> {
 //			valuesNv.add(currentRowNv);
 //		}
 
+
+		if (sctx != null)
+			sctx.onInsert(this, mainTabl, valuesNv);
+
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
 
 //		if (sctx != null)
@@ -217,11 +222,11 @@ public class Insert extends Statement<Insert> {
 	 */
 	public Object ins(ISemantext ctx) throws TransException, SQLException {
 		// prepare
-		prepare(ctx);
+//		prepare(ctx);
 
 		// on insert
-		if (ctx != null)
-			ctx.onInsert(this, mainTabl, valuesNv);
+//		if (ctx != null)
+//			ctx.onInsert(this, mainTabl, valuesNv);
 
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
@@ -235,12 +240,18 @@ public class Insert extends Statement<Insert> {
 	public Insert commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		prepare(cxt);
 
-		if (cxt != null) cxt.onInsert(this, mainTabl, valuesNv);
+		if (cxt != null) {
+			cxt.onInsert(this, mainTabl, valuesNv);
+			if (postate != null)
+				for (Statement<?> pst : postate)
+					cxt.onInsert(cxt);
+		}
 
 		sqls.add(sql(cxt));
 		if (postate != null)
 			for (Statement<?> pst : postate)
-				pst.commit(cxt, sqls);
+				// pst.commit(cxt, sqls);
+				sqls.add(pst.sql(cxt));
 		return this;
 	}		
 
@@ -254,14 +265,34 @@ public class Insert extends Statement<Insert> {
 			currentRowNv = null;
 		}
 
-//		@SuppressWarnings("unused")
-//		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
-		if (ctx != null)
-			ctx.onPrepare(this, mainTabl, valuesNv);
+//		if (ctx != null)
+//			ctx.onPrepare(this, mainTabl, valuesNv);
 		
 		if (postate != null)
 			for (Statement<?> pst : postate)
 				pst.prepare(ctx);
 	}
-	
+
+	/**FIXME merge this to some where parsing JMessage<br>
+	 * Add multi del insert update for children table<br>
+	 * - a special frequently used case of CRUD, provided as a shortcut of API.
+	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
+	 * @param stcx 
+	 * @throws SemanticException 
+	 */
+	public void postChildren(SemanticObject multireq, Transcxt stcx) throws TransException {
+		Delete del = (Delete) multireq.get("dels");
+		if (del != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			postate.add(del);
+		}
+
+		Insert ins = (Insert) multireq.get("insert");
+		if (ins != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			postate.add(ins);
+		}
+	}
 }

@@ -15,7 +15,7 @@ public class Transcxt {
 	 * except the transact builder is constructed with a very strong Semantext, like that in cheap engine.
 	 * @return
 	 */
-	public ISemantext basiContext() { return basictx; }
+	public ISemantext basictx() { return basictx; }
 
 	public ISemantext instancontxt(IUser usr) {
 		return basictx.clone(usr);
