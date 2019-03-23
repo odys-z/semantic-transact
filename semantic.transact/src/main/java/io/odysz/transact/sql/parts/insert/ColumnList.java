@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 
@@ -19,6 +20,9 @@ public class ColumnList extends AbsPart {
 			Integer ix = colIdx.get(n);
 			if (ix == null)
 				continue;
+			if (ix >= cols.length)
+				Utils.warn("Column ignored, possibly results from duplicate name (%s) in column list.", n);
+			else
 			cols[ix] = n;
 		}
 	}

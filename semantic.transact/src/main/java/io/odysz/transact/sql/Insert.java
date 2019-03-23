@@ -51,6 +51,8 @@ public class Insert extends Statement<Insert> {
 			insertCols = new HashMap<String, Integer>();
 		if (!insertCols.containsKey(n))
 			insertCols.put(n, insertCols.size());
+		else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
+				n, v);
 		return this;
 	}
 
@@ -125,10 +127,6 @@ public class Insert extends Statement<Insert> {
 //			}
 //			valuesNv.add(currentRowNv);
 //		}
-
-
-		if (sctx != null)
-			sctx.onInsert(this, mainTabl, valuesNv);
 
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
 
@@ -238,13 +236,17 @@ public class Insert extends Statement<Insert> {
 	
 	@Override
 	public Insert commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		// prepare semantics like auto-pk
 		prepare(cxt);
 
+		// resolve semantics like fk-ins referring to auto-pk
+		// FIXME should move ISemantext.onInsert() to Statement.resolveSemantics()?
 		if (cxt != null) {
 			cxt.onInsert(this, mainTabl, valuesNv);
 			if (postate != null)
 				for (Statement<?> pst : postate)
-					cxt.onInsert(cxt);
+					if (pst instanceof Insert)
+						cxt.onInsert((Insert)pst, pst.mainTabl, ((Insert)pst).valuesNv);
 		}
 
 		sqls.add(sql(cxt));
@@ -265,8 +267,8 @@ public class Insert extends Statement<Insert> {
 			currentRowNv = null;
 		}
 
-//		if (ctx != null)
-//			ctx.onPrepare(this, mainTabl, valuesNv);
+		if (ctx != null)
+			ctx.onPrepare(this, mainTabl, valuesNv);
 		
 		if (postate != null)
 			for (Statement<?> pst : postate)
@@ -288,11 +290,13 @@ public class Insert extends Statement<Insert> {
 			postate.add(del);
 		}
 
-		Insert ins = (Insert) multireq.get("insert");
+		@SuppressWarnings("unchecked")
+		ArrayList<Insert> ins = (ArrayList<Insert>) multireq.get("insert");
 		if (ins != null) {
 			if (postate == null)
 				postate = new ArrayList<Statement<?>>();
-			postate.add(ins);
+			for (Insert i : ins)
+				postate.add(i);
 		}
 	}
 }
