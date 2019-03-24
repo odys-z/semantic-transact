@@ -76,6 +76,28 @@ public class Utils {
 		}
 	}
 
+	public static void logArr(List<String[]> list, Object... args) {
+		try {
+			if (printCaller) {
+				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+				System.out.println(String.format("logger:        %s.%s(%s:%s)", 
+								stElements[2].getClassName(), stElements[2].getMethodName(),
+								stElements[2].getFileName(), stElements[2].getLineNumber()));
+			}
+
+			if (list != null)
+				for (String[] it : list)
+					if (args != null && args.length > 0)
+						System.out.println(String.format(LangExt.toString(it), args));
+					else
+						System.out.println(LangExt.toString(it));
+
+		} catch (Exception ex) {
+			System.err.println("logi(): Can't print. Error:");
+			ex.printStackTrace();
+		}
+	}
+	
 	public static void logkeys(Map<String, ?> map) {
 		try {
 			if (map != null)

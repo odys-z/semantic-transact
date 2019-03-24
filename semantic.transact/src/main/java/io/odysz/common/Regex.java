@@ -42,11 +42,14 @@ public class Regex {
 
 	public ArrayList<String> findGroups(String v) {
 		Matcher matcher = regInst.matcher(v);
-		ArrayList<String> vss = new ArrayList<String>(2) ;
-        while (matcher.find()) {
-        	vss.add(matcher.group());
+        if (matcher.find()) {
+        	ArrayList<String> vss = new ArrayList<String>(matcher.groupCount()) ;
+        	// group(0) is the hole string itself
+        	for (int i = 1; i <= matcher.groupCount(); i++)
+        		vss.add(matcher.group(i));
+        	return vss;
         }
-        return vss;
+        else return null;
 	}
 	
 	public ArrayList<String[]> findGroupsRecur(String v) {

@@ -144,7 +144,7 @@ public class Insert extends Statement<Insert> {
 						Stream.concat(Stream.of(new ExprPart("values (")), // whether 'values()' appears or not is the same as value nvs
 									  // 'v1', 'v2', ...)
 									  Stream.concat(Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-											  		  		.stream().map(row -> getValue(row, insertCols)),
+											  		  		.stream().map(row -> getValue(sctx, row, insertCols)),
 									  				Stream.of(new ExprPart(")")))
 						).filter(w -> hasValuesNv),
 						// select ...
@@ -159,7 +159,7 @@ public class Insert extends Statement<Insert> {
 	 * @param colIdx
 	 * @return
 	 */
-	private ValueList getValue(ArrayList<Object[]> row, Map<String, Integer> colIdx) {
+	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
 		if (row == null)
 			return null;
 
@@ -178,7 +178,9 @@ public class Insert extends Statement<Insert> {
 			}
 			try {
 				if (nv[1] instanceof String)
-					vs.constv(idx, (String) nv[1]);
+					// vs.constv(idx, (String) nv[1]);
+					vs.constv(idx, sctx == null ? (String)nv[1]
+												: (String) sctx.resulvedVal((String)nv[1]));
 				else
 					vs.v(idx, (AbsPart) nv[1]);
 			} catch (TransException e) {

@@ -35,8 +35,12 @@ import io.odysz.transact.x.TransException;
  *
  */
 public interface ISemantext {
-	/**Match referencing string like "RESULVE tabl.col" */
-	String refPattern = "^\\s*RESULVE\\s*(\\w)\\s*\\.\\s*(\\w)";
+	/**Match referencing string like "RESULVE tabl.col".<br>
+	 * Regex.findGroups():<br>
+	 * [0] RESULVE<br>
+	 * [1] task_nodes<br>
+	 * [2] taskId*/
+	String refPattern = "^\\s*(RESULVE)\\s*(\\w+)\\s*\\.\\s*(\\w+)\\s*$";
 
 	/**Called when starting a insert transaction's sql composing.<br>
 	 * Create a context for the insert-sql composing process.<br>
@@ -62,12 +66,12 @@ public interface ISemantext {
 	 * Resolving inserting values, e.g an AUTO key is generated here.
 	 * @param insert
 	 * @param tabl 
-	 * @param valuesNv [ list[Object[n, v], ... ], ... ]
+	 * @param rows [ list[Object[n, v], ... ], ... ]
 	 * @return the ISemantext context, a thread safe context for resolving semantics like FK value resolving.<br>
 	 */
-	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> valuesNv);
+	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
 
-	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row);
+	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
 
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
@@ -127,7 +131,8 @@ public interface ISemantext {
 //	ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
 
 	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
-	 * The new generated value is managed in this implementation class (for future resolving).
+	 * The new generated value is managed in this implementation class (for future resolving).<br>
+	 * <b>side effect</b>: generated auto key already been put into autoVals, can be referenced later. 
 	 * @param tabl
 	 * @param col
 	 * @return new auto key.
