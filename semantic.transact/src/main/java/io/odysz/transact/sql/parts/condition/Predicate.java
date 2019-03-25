@@ -14,6 +14,10 @@ import io.odysz.transact.sql.parts.Logic;
  */
 public class Predicate extends AbsPart {
 
+//	public static Predicate IsNull() {
+//		return new Predicate(Logic.op.isnull, "", "");
+//	}
+
 	private boolean empty = false;
 	private boolean negative = false;
 	private Logic.op op;

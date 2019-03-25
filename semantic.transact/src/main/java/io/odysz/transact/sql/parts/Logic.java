@@ -42,7 +42,7 @@ public class Logic {
 					return "in (" + rop + ")";
 			else if (oper == op.isnull)
 				if (not != null && not.length > 0 && not[0])
-					return "is not null";
+					return "is null";
 				else
 					return "is null";
 			else if (oper == op.isNotnull)
