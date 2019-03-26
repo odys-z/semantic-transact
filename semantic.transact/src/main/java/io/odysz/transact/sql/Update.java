@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -7,6 +8,7 @@ import java.util.stream.Stream;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
+import io.odysz.transact.x.TransException;
 
 public class Update extends Statement<Update> {
 	private ArrayList<Object[]> nvs;
@@ -27,6 +29,15 @@ public class Update extends Statement<Update> {
 		return this;
 	}
 	
+	public Object u(ISemantext stx) throws TransException, SQLException {
+		if (postOp != null) {
+			ArrayList<String> sqls = new ArrayList<String>(); 
+			commit(stx, sqls);
+			return postOp.op(sqls);
+		}
+		return null;
+	}
+
 	@Override
 	public String sql(ISemantext sctx) {
 		if (sctx != null)
