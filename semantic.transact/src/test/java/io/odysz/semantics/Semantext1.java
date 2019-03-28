@@ -85,6 +85,9 @@ class Semantext1 implements ISemantext {
 	public dbtype dbtype() { return dbtype.sqlite; }
 
 	@Override
+	public String connId() { return null; }
+
+	@Override
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
 		return s;
 	}

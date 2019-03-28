@@ -10,15 +10,17 @@ import io.odysz.semantics.IUser;
  */
 public class Transcxt {
 
-	protected static ISemantext basictx;
+	protected ISemantext basictx;
+
+
 	/**Get a basic Semantext that typicall don't handle many semantics, can only used for basic sql generation,
 	 * except the transact builder is constructed with a very strong Semantext, like that in cheap engine.
 	 * @return
-	 */
 	public ISemantext basictx() { return basictx; }
+	 */
 
 	public ISemantext instancontxt(IUser usr) {
-		return basictx.clone(usr);
+		return basictx == null ? null : basictx.clone(usr);
 	}
 
 	/**Create a statements manager.
@@ -51,23 +53,6 @@ public class Transcxt {
 	 * @return {@link #semantext}
 	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
 		return semantext;
-	}
-	 */
-
-	/**Add Semantics to {@link #semantext}
-	 * @param tabl
-	 * @param pk
-	 * @param smtcs
-	 * @param args
-	 * @throws TransException
-	public Transcxt addSemantics(String tabl, String pk, String smtcs, String args) throws TransException {
-		semantext.addSemantics(tabl, pk, smtcs, args);
-		return this;
-	}
-
-	public Object resolvedVal(String tabl, String col) {
-		return semantext.results().has(tabl) ?
-				((SemanticObject)semantext.results().get(tabl)).get(col) : null;
 	}
 	 */
 }

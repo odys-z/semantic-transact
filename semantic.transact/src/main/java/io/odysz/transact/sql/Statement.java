@@ -22,8 +22,7 @@ import io.odysz.transact.x.TransException;
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public interface IPostOperat {
-		// TODO return SemanticObject?
-		Object op (ArrayList<String> sqls) throws TransException, SQLException;
+		Object op (String connId, ArrayList<String> sqls) throws TransException, SQLException;
 	}
 
 	public enum Type { select, insert, update, delete }
@@ -99,10 +98,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
 		// ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
-		ISemantext context = transc.basictx();
-		Utils.warn("WARNING: your are using a static semantic context for generating sql, it should only been used for testing.");
+		ISemantext context = transc.instancontxt(usrInfo == null || usrInfo.length == 0 ? null : usrInfo[0]);
+		
+		if (context == null)
+			Utils.warn("WARNING: your are building sql with null context, it should only happen for testing.");
 		return commit(context, sqls);
-		// return context == null ? null : context.results();
 	}
 	
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {

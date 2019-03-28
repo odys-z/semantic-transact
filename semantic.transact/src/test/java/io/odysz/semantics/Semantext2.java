@@ -73,6 +73,9 @@ class Semantext2 implements ISemantext {
 	}
 
 	@Override
+	public String connId() { return null; }
+
+	@Override
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
 		if (nvs != null)
 			for (Object[] nv : nvs)

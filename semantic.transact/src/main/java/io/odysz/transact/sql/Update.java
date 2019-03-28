@@ -33,7 +33,7 @@ public class Update extends Statement<Update> {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(stx, sqls);
-			return postOp.op(sqls);
+			return postOp.op(stx.connId(), sqls);
 		}
 		return null;
 	}

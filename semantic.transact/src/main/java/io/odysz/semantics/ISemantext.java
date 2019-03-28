@@ -42,6 +42,8 @@ public interface ISemantext {
 	 * [2] taskId*/
 	String refPattern = "^\\s*(RESULVE)\\s*(\\w+)\\s*\\.\\s*(\\w+)\\s*$";
 
+	public String connId();
+	
 	/**Called when starting a insert transaction's sql composing.<br>
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
@@ -88,7 +90,6 @@ public interface ISemantext {
 	 * @return RESULt resoLVED VALue in tabl.col
 	 */
 	Object resulvedVal(String table, String col);
-	// public SemanticObject results();
 
 	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
 	 * Find and return referee.
@@ -128,8 +129,6 @@ public interface ISemantext {
 	 */
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
 
-//	ISemantext addSemantics(String tabl, String pk, String smtcs, String args) throws TransException;
-
 	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
 	 * The new generated value is managed in this implementation class (for future resolving).<br>
 	 * <b>side effect</b>: generated auto key already been put into autoVals, can be referenced later. 
@@ -146,6 +145,4 @@ public interface ISemantext {
 	 * @return new semantext instance
 	 */
 	public ISemantext clone(IUser usr);
-
-
 }
