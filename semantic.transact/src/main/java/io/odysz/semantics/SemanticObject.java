@@ -120,7 +120,7 @@ public class SemanticObject extends Object {
 	}
 
 	public Object remove(String prop) {
-		if (props == null && props.containsKey(prop))
+		if (props != null && props.containsKey(prop))
 			return props.remove(prop);
 		else return null;
 	}

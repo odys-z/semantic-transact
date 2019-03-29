@@ -19,6 +19,7 @@ public interface IUser {
 
 	/**The sqls is committed to database, do something for logging. 
 	 * If there are some operation needing to update db, return those sql statements.
+	 * Make sure the committed sqls is not returned, only logging sqls are needed.
 	 * @param sqls
 	 * @return SQLs for logging
 	 */
@@ -49,6 +50,8 @@ public interface IUser {
 		props.put(prop, v);
 		return this;
 	};
+	
+	IUser logAct(String funcName, String funcId);
 
 	SemanticObject logout();
 

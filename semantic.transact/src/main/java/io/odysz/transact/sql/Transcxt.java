@@ -11,7 +11,9 @@ import io.odysz.semantics.IUser;
 public class Transcxt {
 
 	protected ISemantext basictx;
+	public ISemantext basictx() { return basictx; }
 
+//	protected static HashMap<String, HashMap<String, ISemantext>> smtCfgs;
 
 	/**Get a basic Semantext that typicall don't handle many semantics, can only used for basic sql generation,
 	 * except the transact builder is constructed with a very strong Semantext, like that in cheap engine.
