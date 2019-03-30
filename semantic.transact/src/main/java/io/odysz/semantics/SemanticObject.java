@@ -21,7 +21,7 @@ import io.odysz.transact.x.TransException;
  */
 public class SemanticObject extends Object {
 
-	private HashMap<String, Object> props;
+	protected HashMap<String, Object> props;
 	public HashMap<String, Object> props() { return props; }
 
 	/**@param prop

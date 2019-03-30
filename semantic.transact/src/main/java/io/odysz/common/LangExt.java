@@ -27,12 +27,24 @@ public class LangExt {
 		}
 	}
 	
+	/** Get a string that can be parsed by {@link #toArray(String)}.
+	 * @param ss
+	 * @return [e0, e1, ...]
+	 */
 	public static String toString(Object[] ss) {
 		return ss == null ? null : Arrays.stream(ss)
 				.filter(e -> e != null)
 				.map(e -> e.toString()).collect(Collectors.joining(",", "[", "]"));
 	}
 	
+	/**Get a string array that composed into string by {@link #toString(Object[])}.
+	 * @param str
+	 * @return string[]
+	 */
+	public static String[] toArray(String str) {
+		return str.replaceAll("^\\[", "").replaceAll("\\]$", "").split(",");
+	}	
+
 	/**Convert 2D array to string: "[{ss[0][1]: ss[0][1]}, {ss[1][0]: ss[1][1]}, ...]"
 	 * @param ss
 	 * @return
@@ -44,9 +56,9 @@ public class LangExt {
 				.collect(Collectors.joining(",", "[", "]"));
 	}
 
-	public static String toString(Map<String, Integer> cols) {
-		if (cols == null) return null;
-		else return cols.entrySet().stream()
+	public static String toString(Map<String, ?> map) {
+		if (map == null) return null;
+		else return map.entrySet().stream()
 				.map(e -> "{" + e.getKey() + ": " + e.getValue() + "}")
 				.collect(Collectors.joining(",", "[", "]"));
 	}
@@ -79,5 +91,5 @@ public class LangExt {
 			return refMap;
 		}
 		return null;
-	}	
+	}
 }
