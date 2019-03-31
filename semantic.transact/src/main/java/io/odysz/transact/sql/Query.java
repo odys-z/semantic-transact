@@ -186,6 +186,14 @@ public class Query extends Statement<Query> {
 			}
 		return this;
 	}
+	
+	public Query l(String withTabl, String alias, String onCondit) {
+		return j(join.l, withTabl, alias, onCondit);
+	}
+	
+	public Query r(String withTabl, String alias, String onCondit) {
+		return j(join.r, withTabl, alias, onCondit);
+	}
 
 	/**Inner or outer join
 	 * @param jt

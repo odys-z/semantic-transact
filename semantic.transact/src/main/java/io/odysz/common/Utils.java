@@ -52,7 +52,23 @@ public class Utils {
 		}
 	}
 
+	public static void logi(String[] row) {
+		try {
+			if (printCaller) {
+				StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+				System.out.println(String.format("logger:        %s.%s(%s:%s)", 
+								stElements[2].getClassName(), stElements[2].getMethodName(),
+								stElements[2].getFileName(), stElements[2].getLineNumber()));
+			}
 
+			if (row != null)
+				System.out.println(LangExt.toString(row));
+		} catch (Exception ex) {
+			System.err.println("logi(): Can't print. Error:");
+			ex.printStackTrace();
+		}
+
+	}
 
 	public static <T> void logi(List<T> list, Object... args) {
 		try {
