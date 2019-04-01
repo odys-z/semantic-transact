@@ -83,6 +83,16 @@ public class SemanticObject extends Object {
 		else
 			return put("msg", String.format(msg, args));
 	}
+
+	/**Put resultset (SResultset) into "rs".
+	 * Useing this should be careful as the rs is a 3d array.
+	 * @param lst
+	 * @return
+	 * @throws TransException
+	 */
+	public SemanticObject rs(Object resultset) throws TransException {
+		return add("rs", resultset);
+	}
 	
 	public String error() {
 		return (String) get("error");
@@ -154,68 +164,4 @@ public class SemanticObject extends Object {
 			}
 		out.println("");
 	}
-
-
-//	/**Serialize without dependency of Gson
-//	 * @param os
-//	 * @throws IOException
-//	 */
-//	public void json(OutputStream os) throws IOException {
-//		os.write('{');
-//		boolean comma = false;
-//		if (props != null)
-//			for (String k : props.keySet()) {
-//				if (comma) os.write(',');
-//				os.write(k.getBytes());
-//				os.write(':');
-//				Object obj = props.get(k);
-//				writeValue(os, obj);
-//				// os.write(props.get(k).toString().getBytes());
-//				comma = true;
-//			}
-//		os.write('}');
-//	}
-//
-//	public String json() throws IOException {
-//		ByteArrayOutputStream os = new ByteArrayOutputStream();
-//		json(os);
-//		return os.toString();
-//	}
-//
-//	private void writeValue(OutputStream os, Object obj) throws IOException {
-//		if (obj instanceof SemanticObject)
-//			((SemanticObject)obj).json(os);
-//		if (obj instanceof List)
-//			writeList(os, (List<?>)obj);
-//		if (obj instanceof Map)
-//			writeMap(os, (Map<?, ?>)obj);
-//		else 
-//			os.write(obj == null ? "null".getBytes() : obj.toString().getBytes());
-//	}
-//
-//	private void writeMap(OutputStream os, Map<?, ?> map) throws IOException {
-//		os.write('[');
-//		boolean comma = false;
-//		if (map != null)
-//			for (Object k : map.keySet()) {
-//				if (comma) os.write(',');
-//				os.write(k.toString().getBytes());
-//				os.write(':');
-//				writeValue(os, map.get(k));
-//				comma = true;
-//			}
-//		os.write(']');
-//	}
-//
-//	private void writeList(OutputStream os, List<?> lst) throws IOException {
-//		os.write('[');
-//		boolean comma = false;
-//		if (lst != null)
-//			for (Object k : lst) {
-//				if (comma) os.write(',');
-//				os.write(k.toString().getBytes());
-//				comma = true;
-//			}
-//		os.write(']');
-//	}
 }
