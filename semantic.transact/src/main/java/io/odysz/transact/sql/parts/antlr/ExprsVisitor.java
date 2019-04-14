@@ -109,9 +109,7 @@ expression
 	 */
 	@Override
 	public ExprPart visitExpression(ExpressionContext ctx) {
-		// return super.visitExpression(ctx);
 		if (ctx.op != null)
-			// TODO
 			return new ExprPart(Logic.op.eq, "A", "B");
 		else {
 			Primitive_expressionContext pe = ctx.primitive_expression();
