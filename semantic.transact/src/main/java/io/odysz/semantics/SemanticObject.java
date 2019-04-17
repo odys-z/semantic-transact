@@ -86,11 +86,13 @@ public class SemanticObject extends Object {
 
 	/**Put resultset (SResultset) into "rs".
 	 * Useing this should be careful as the rs is a 3d array.
+	 * @param total 
 	 * @param lst
 	 * @return
 	 * @throws TransException
 	 */
-	public SemanticObject rs(Object resultset) throws TransException {
+	public SemanticObject rs(Object resultset, int total) throws TransException {
+		add("total", total);
 		return add("rs", resultset);
 	}
 	

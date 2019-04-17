@@ -1,8 +1,7 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -70,7 +69,7 @@ public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
         */
 		List<Condit> condts = ctx.search_condition_and()
 				.stream().map(condAnd -> condAnd.accept(this))
-				.collect(toList());
+				.collect(Collectors.toList());
 		return new Condit(type.or, condts);
 	}
 
@@ -79,7 +78,7 @@ public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
 		// return super.visitSearch_condition_and(ctx);
 		List<Condit> condts = ctx.search_condition_not()
 				.stream().map(condNot -> condNot.accept(this))
-				.collect(toList());
+				.collect(Collectors.toList());
 		return new Condit(type.and, condts);
 	}
 

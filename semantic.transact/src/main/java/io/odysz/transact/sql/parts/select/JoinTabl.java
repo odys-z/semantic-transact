@@ -6,7 +6,8 @@ import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
 
-/**For grammar definition, see {@link ConditVisitor} 
+/**Select query's join clause.<br>
+ * For grammar definition, see {@link ConditVisitor} 
  * @author ody
  *
  */

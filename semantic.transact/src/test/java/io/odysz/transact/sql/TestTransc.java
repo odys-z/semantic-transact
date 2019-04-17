@@ -23,7 +23,6 @@ public class TestTransc {
 		Utils.printCaller(false);
 
 		user = new User("admin", "123456");
-
 		st = new Transcxt(null);
 	}
 
@@ -63,11 +62,31 @@ public class TestTransc {
 			.orderby("cnt", "desc")
 			.orderby("stamp")
 			.commit(sqls);
+		// TODO assert OR
+
+		/* Added case: ignored table / alias from client
+select userId userId, userName userName, mobile mobile, dept.orgId orgId, a_reg_org.orgName orgName, 
+dept.departName departName, dept.departId departId, r.roleId roleId, r.roleName roleName, notes notes 
+from a_user  
+join a_reg_org  on orgId = orgId 
+left outer join a_org_depart dept on departId = dept.departId 
+left outer join a_roles r on roleId = roleId 
+		st.select("a_user")
+			.col("userId", "userId").col("userName").col("dept.orgId", "orgId").col("a_org_depart.orgName")
+			.j("a_reg_org", "orgId =orgId ")
+			.l("a_org_depart", "dept", "departId = dept.departId")
+			.l("a_roles", "r", "roleId=roleId")
+			.where("like", "a_user.userName", "''")
+			.where("=", "a_user.orgId", "''")
+			.commit(sqls);
 
 		Utils.logi(sqls);
-		
-		// .. .. ..
-		// nothing 
+
+		String last = sqls.get(sqls.size() - 1);
+		int lastlen = last.length();
+		assertEquals("a_user.roleId = r.roleId where a_user.userName like '' AND a_user.orgId = ''",
+				last.substring(lastlen - 75, lastlen));
+		 */
 	}
 	
 	@Test
@@ -129,7 +148,6 @@ public class TestTransc {
 				"update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'");
 	}
 
-	
 	@Test
 	public void testInsertAutoUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();

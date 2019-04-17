@@ -92,6 +92,28 @@ search_condition_not
 		return this;
 	}
 
+	/** Additional information of left alias for generating sql. */
+	String lAlias;
+	/** Additional information of right alias for generating sql. */
+	String rAlias;
+	/**<p>Sometimes conditions's table name or alias are ignored by client.
+	 * This method can be called by {@link io.odysz.transact.sql.parts.select.JoinTabl}
+	 * to supply additional information when generating sql.<p>
+	 * <p><b>TODO DESIGN MEMO</b><br>
+	 * {@link Condit}s are parsed from sometimes from where clause, sometimes from join-on clause,
+	 * so it's not have enough information to parse ignored alias.<br>
+	 * Should we implement this fault tolerance?
+	 * </p> @Deprecated
+	 * @param l left operand's alias (table name)
+	 * @param r right operand's alias (table name)
+	 * @return this
+	 */
+	public Condit sqlTbl(String lt, String rt) {
+		this.lAlias = lt;
+		this.rAlias = lt;
+		return this;
+	}
+
 	@Override
 	public String sql(ISemantext sctx) {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not

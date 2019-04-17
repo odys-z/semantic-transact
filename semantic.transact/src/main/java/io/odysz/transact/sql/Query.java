@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
@@ -320,6 +321,7 @@ public class Query extends Statement<Query> {
 				} catch (TransException e1) {
 					e1.printStackTrace();
 				}
+			else Utils.warn("The query transaction needing a sql paging implementation, but the semantext instance is null. See semantic.DA/io.odysz.semantic.DASemantext#pagingStream() for example.");
 		}
 
 		return s.collect(Collectors.joining(" "));
