@@ -153,10 +153,14 @@ public class Query extends Statement<Query> {
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
 	 * @param alias
 	 * @return current query object
+	 * @throws TransException 
 	 */
-	public Query col(String col, String... alias) {
-		// parser...
+	public Query col(String col, String... alias) throws TransException {
+		if (col == null)
+			throw new TransException("col is null");
 		SelectElem colElem = SelectElemVisitor.parse(col) ;
+		if (colElem == null)
+			throw new TransException("column %s can't been parsed.", col);
 
 		if (alias != null && alias.length > 0 && alias[0] != null)
 			colElem.as(alias[0]);
@@ -175,7 +179,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query cols(String... colAliases) {
+	public Query cols(String... colAliases) throws TransException {
 		if (colAliases != null)
 			for (String colAlias : colAliases) {
 				String[] cass = colAlias.split(" ([Aa][Ss] )?");
