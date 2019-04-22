@@ -221,13 +221,6 @@ public class Insert extends Statement<Insert> {
 	 * @throws SQLException
 	 */
 	public Object ins(ISemantext ctx) throws TransException, SQLException {
-		// prepare
-//		prepare(ctx);
-
-		// on insert
-//		if (ctx != null)
-//			ctx.onInsert(this, mainTabl, valuesNv);
-
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
