@@ -82,7 +82,7 @@ public class AESHelper {
 	 * @return [cipher-base64, new-iv-base64]
 	 * @throws GeneralSecurityException
 	 * @throws IOException
-	 * @return
+	 * @return string[b64(cipher), b64(iv)]
 	 */
 	public static String[] dencrypt(String cypher, String decryptK, String decryptIv,
 			String encryptK) throws GeneralSecurityException, IOException {

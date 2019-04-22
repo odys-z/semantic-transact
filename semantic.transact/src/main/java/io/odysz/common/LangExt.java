@@ -15,7 +15,7 @@ public class LangExt {
 	 * @param s
 	 * @param regex
 	 * @param noTrim
-	 * @return
+	 * @return String[]
 	 */
 	public static String[] split(String s, String regex, boolean... noTrim) {
 		if (s == null)
@@ -47,7 +47,7 @@ public class LangExt {
 
 	/**Convert 2D array to string: "[{ss[0][1]: ss[0][1]}, {ss[1][0]: ss[1][1]}, ...]"
 	 * @param ss
-	 * @return
+	 * @return converted String
 	 */
 	public static String toString(String[][] ss) {
 		return Arrays.stream(ss)

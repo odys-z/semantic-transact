@@ -27,7 +27,7 @@ public interface IUser {
 
 	/**Check user log in (already has pswd, iv and user Id from db)
 	 * @param request request object. In sematic.jserv, it's SessionReq object.
-	 * @return
+	 * @return true: ok; false: failed
 	 * @throws TransException Checking login information failed
 	 */
 	boolean login(Object request) throws TransException;

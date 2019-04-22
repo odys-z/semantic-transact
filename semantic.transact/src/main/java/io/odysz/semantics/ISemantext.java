@@ -94,7 +94,7 @@ public interface ISemantext {
 	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
 	 * Find and return referee.
 	 * @param constValue
-	 * @return
+	 * @return resolved value from restult
 	 */
 	public Object resulvedVal(String ref);
 	

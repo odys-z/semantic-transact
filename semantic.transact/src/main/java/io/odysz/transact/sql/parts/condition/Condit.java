@@ -104,8 +104,8 @@ search_condition_not
 	 * so it's not have enough information to parse ignored alias.<br>
 	 * Should we implement this fault tolerance?
 	 * </p> @Deprecated
-	 * @param l left operand's alias (table name)
-	 * @param r right operand's alias (table name)
+	 * @param lt left operand's alias (table name)
+	 * @param rt right operand's alias (table name)
 	 * @return this
 	 */
 	public Condit sqlTbl(String lt, String rt) {
