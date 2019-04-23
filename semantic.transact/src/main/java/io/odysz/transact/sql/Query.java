@@ -117,6 +117,9 @@ public class Query extends Statement<Query> {
 		public static final int nvn = 0;
 		public static final int nvv = 1;
 		
+		public static final int nvn = 0;
+		public static final int nvv = 1;
+
 		public static final int predicateOper = 0;
 		public static final int predicateL = 1;
 		public static final int predicateR = 2;

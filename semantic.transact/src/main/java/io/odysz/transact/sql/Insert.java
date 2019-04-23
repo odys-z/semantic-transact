@@ -214,20 +214,13 @@ public class Insert extends Statement<Insert> {
 	 * invention, you can safely use both of these methods. But it's not guaranteed in the
 	 * future version.</p>
 	 * Also it's not recommended for the performance reason. The sql string is already generated
-	 * by {@link #commit(ArrayList)}, don't generate it and travels AST again in this method, 
+	 * by {@link #commit(ArrayList, int...)} , don't generate it and travels AST again in this method, 
 	 * use it directly.
 	 * @return results by resolving FK, etc.
 	 * @throws TransException
 	 * @throws SQLException
 	 */
 	public Object ins(ISemantext ctx) throws TransException, SQLException {
-		// prepare
-//		prepare(ctx);
-
-		// on insert
-//		if (ctx != null)
-//			ctx.onInsert(this, mainTabl, valuesNv);
-
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);

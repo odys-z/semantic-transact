@@ -36,17 +36,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected Condit where;
 
 	protected Transcxt transc;
-	/**Use this to make post updates etc have the same context with the main statement.<br>
-	protected Statement<? extends Statement<?>> semantext(ISemantext semantext) {
-	 * @see #post(Statement)
-	 * @param semantext 
-	 * @return this
-	protected Statement<? extends Statement<?>> semantext() {
-//		transc.semantext = semantext;
-		return this;
-	}
+	/**Use this to make post updates etc have the same context with the main statement.
 	 */
-
 	protected ArrayList<Statement<?>> postate;
 
 	protected IPostOperat postOp;
@@ -116,7 +107,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 	
 	/**Set done operation - typically a database statement committing.<br>
-	 * See {@link Query#rs()}
+	 * See {@link Query#rs(ISemantext)}
 	 * @param operat
 	 */
 	public void doneOp(IPostOperat operat) {

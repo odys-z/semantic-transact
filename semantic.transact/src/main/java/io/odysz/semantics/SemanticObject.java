@@ -17,6 +17,7 @@ import io.odysz.transact.x.TransException;
  * <p>Question: If a json request object is handled by a port, e.g. SQuery,
  * is their any property name not known by the port?</p>
  * <p>If no such properties, then there shouldn't be put() and get().</p>
+ * 
  * @author odys-z@github.com
  */
 public class SemanticObject extends Object {
@@ -88,7 +89,7 @@ public class SemanticObject extends Object {
 	 * Useing this should be careful as the rs is a 3d array.
 	 * @param total 
 	 * @param lst
-	 * @return
+	 * @return this
 	 * @throws TransException
 	 */
 	public SemanticObject rs(Object resultset, int total) throws TransException {
@@ -117,6 +118,7 @@ public class SemanticObject extends Object {
 	/**Add element 'elem' to array 'prop'.
 	 * @param prop
 	 * @param elem
+	 * @return this
 	 * @throws TransException 
 	 */
 	@SuppressWarnings("unchecked")

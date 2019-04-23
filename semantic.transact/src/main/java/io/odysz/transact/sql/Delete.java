@@ -17,18 +17,6 @@ public class Delete extends Update {
 		super(transc, tabl);
 	}
 
-	/**set n = v, where if v is constant, 'val', must have a '' pair.
-	 * @param n
-	 * @param v
-	 * @return Update statement
-	public Delete nv(String n, Object v) {
-		if (nvs == null)
-			nvs = new ArrayList<Object[]>();
-		nvs.add(new Object[] {n, v});
-		return this;
-	}
-	 */
-
 	@Override
 	public String sql(ISemantext sctx) {
 		if (sctx != null)
