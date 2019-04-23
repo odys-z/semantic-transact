@@ -216,6 +216,7 @@ public class Insert extends Statement<Insert> {
 	 * Also it's not recommended for the performance reason. The sql string is already generated
 	 * by {@link #commit(ArrayList, int...)} , don't generate it and travels AST again in this method, 
 	 * use it directly.
+	 * @param ctx
 	 * @return results by resolving FK, etc.
 	 * @throws TransException
 	 * @throws SQLException

@@ -3,9 +3,12 @@ package io.odysz.transact.sql;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
+import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
@@ -51,6 +54,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public T where(String logic, String loperand, String roperand) {
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
+	
+	public T where(ArrayList<String[]> conds) throws SemanticException {
+		if (conds != null && conds.size() > 0)
+			for (String[] cond : conds) 
+				if (cond.length != Ix.predicateSize)
+					throw new SemanticException("SQL predicate size is invalid: %s",
+								LangExt.toString(cond));
+				else
+					where(cond[Ix.predicateOper], cond[Ix.predicateL], cond[Ix.predicateR]);
+		
+		return (T) this;
+	}
 
 	/**
 	 * @param condt
@@ -78,6 +93,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		if (postate == null)
 			postate = new ArrayList<Statement<?>>();
 		this.postate.add(postatement);
+		return (T) this;
+	}
+
+	public <U extends Statement<U>> T post(ArrayList<U> posts) {
+		if (posts != null && posts.size() > 0)
+			for (U u : posts)
+				post(u);
 		return (T) this;
 	}
 	

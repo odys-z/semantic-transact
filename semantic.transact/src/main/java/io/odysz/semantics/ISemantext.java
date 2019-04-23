@@ -93,10 +93,14 @@ public interface ISemantext {
 
 	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
 	 * Find and return referee.
-	 * @param constValue
+	 * @param ref
 	 * @return resolved value from restult
 	 */
 	public Object resulvedVal(String ref);
+
+	/**Get all the resolved results,
+	 * a.k.a return value of {@link Update#doneOp(io.odysz.transact.sql.Statement.IPostOperat)}.*/
+	public SemanticObject resulves();
 	
 	/**Format special escaping string that will be resolve value later.
 	 * @see #refPattern

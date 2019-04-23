@@ -87,8 +87,8 @@ public class SemanticObject extends Object {
 
 	/**Put resultset (SResultset) into "rs".
 	 * Useing this should be careful as the rs is a 3d array.
+	 * @param resultset
 	 * @param total 
-	 * @param lst
 	 * @return this
 	 * @throws TransException
 	 */

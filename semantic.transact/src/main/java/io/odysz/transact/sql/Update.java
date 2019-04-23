@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.SemanticObject;
+import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 import io.odysz.transact.x.TransException;
@@ -17,10 +20,10 @@ public class Update extends Statement<Update> {
 		super(transc, tabl, null);
 	}
 
-	/**set n = v, where if v is constant, 'val', must have a '' pair.
+	/**set n = v, where if v is constant, e.g. 'val', must have a '' pair.
 	 * @param n
 	 * @param v
-	 * @return Update statement
+	 * @return this Update statement
 	 */
 	public Update nv(String n, Object v) {
 		if (nvs == null)
@@ -28,12 +31,31 @@ public class Update extends Statement<Update> {
 		nvs.add(new Object[] {n, v});
 		return this;
 	}
+
+	/**set array of [n, v], where if v is constant, e.g. 'val', must have a '' pair.
+	 * @param nvs the n-v array
+	 * @return this Update statement
+	 */
+	public Update nvs(ArrayList<String[]> nvs) {
+		if (nvs != null)
+			for (String[] nv : nvs)
+				nv(nv[Ix.nvn], nv[Ix.nvv]);
+		return this;
+	}
 	
 	public Object u(ISemantext stx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(stx, sqls);
-			return postOp.op(stx.connId(), sqls);
+			// return postOp.op(stx.connId(), sqls);
+			Object res = postOp.op(stx.connId(), sqls);
+			
+			if (res instanceof int[]) // Connects.commit() usually return this for update
+				res = LangExt.toString((int[])res);
+			// update results: cond = where, post autovals.
+			return new SemanticObject()
+					.put("updated", res)
+					.put("autoVals", stx.resulves());
 		}
 		return null;
 	}

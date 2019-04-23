@@ -37,6 +37,11 @@ public class LangExt {
 				.map(e -> e.toString()).collect(Collectors.joining(",", "[", "]"));
 	}
 	
+	public static String toString(int[] ss) {
+		return ss == null ? null : Arrays.stream(ss)
+				.mapToObj(e -> String.valueOf(e)).collect(Collectors.joining(",", "[", "]"));
+	}
+
 	/**Get a string array that composed into string by {@link #toString(Object[])}.
 	 * @param str
 	 * @return string[]

@@ -121,4 +121,9 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
+
+	@Override
+	public SemanticObject resulves() {
+		return null;
+	}
 }
