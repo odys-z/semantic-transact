@@ -14,9 +14,12 @@ import io.odysz.transact.sql.parts.insert.ValueList;
  * subquery,<br>
  * expression,<br>
  * function_call: method_name '(' expression_list ')'
- * where {@link Funcall} can handle 'now' for different db, like datetime('now'), strftime('%Y-%m-%d %H-%M-%f','now')
+ * where {@link Funcall} can handle 'now' for different db, like
+ * <pre>datetime('now'), strftime('%Y-%m-%d %H-%M-%f','now')</pre>
  * @see {@link ValueList}
- * @author ody */
+ * 
+ * @author odys-z@github.com
+ * */
 public class SetValue extends ExprPart {
 
 	private Query selectValue;

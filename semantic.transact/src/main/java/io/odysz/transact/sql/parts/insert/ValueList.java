@@ -72,8 +72,8 @@ update_elem
     //| full_column_name '.' WRITE (expression, )
 ;
 </pre>
- * @author ody
  *
+ * @author odys-z@github.com
  */
 public class ValueList extends AbsPart {
 	protected ArrayList<AbsPart> valst;

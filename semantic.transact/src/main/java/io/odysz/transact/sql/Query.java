@@ -330,8 +330,8 @@ public class Query extends Statement<Query> {
 		return s.collect(Collectors.joining(" "));
 	}
 	
-	/**<p>Use this method to do post operation, a. k. a. for {@link Select} get selected results -
-	 * commit select statement, for {@link Insert} to get inserted new Ids.</p>
+	/**<p>Use this method to do post operation, a. k. a. for {@link Query} getting selected results -
+	 * committing select statement; or for {@link Insert} getting inserted new ids.</p>
 	 * <p>This method must called after the post operation (lambda expression) been initialized.</p>
 	 * <h3>Why rs() must been used after setting lambda expression?</h3>
 	 * <p>As Query generated sql, it should be used to get result set - execute the SQL
