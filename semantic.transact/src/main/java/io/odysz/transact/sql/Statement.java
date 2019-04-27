@@ -89,16 +89,16 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @param postatement
 	 * @return the calling statement
 	 */
-	public <U extends Statement<U>> T post(U postatement) {
+	public T post(Statement<?> postatement) {
 		if (postate == null)
 			postate = new ArrayList<Statement<?>>();
 		this.postate.add(postatement);
 		return (T) this;
 	}
 
-	public <U extends Statement<U>> T post(ArrayList<U> posts) {
+	public T post(ArrayList<Statement<?>> posts) {
 		if (posts != null && posts.size() > 0)
-			for (U u : posts)
+			for (Statement<?> u : posts)
 				post(u);
 		return (T) this;
 	}

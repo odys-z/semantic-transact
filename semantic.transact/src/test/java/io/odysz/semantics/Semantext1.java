@@ -57,7 +57,7 @@ class Semantext1 implements ISemantext {
 	 * @see io.odysz.semantics.ISemantext#onUpdate(java.util.ArrayList)
 	 */
 	@Override
-	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
+	public ISemantext onUpdate(Statement<?> update, String tabl, ArrayList<Object[]> nvs) {
 		if (autoVals != null && nvs != null)
 			for (Object[] nv : nvs)
 				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))

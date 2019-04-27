@@ -44,7 +44,7 @@ public class Transcxt {
 		return new Update(this, tabl);
 	}
 	
-	public Delete delete(String tabl) {
+	public Delete delete(String tabl, IUser usr) {
 		return new Delete(this, tabl);
 	}
 

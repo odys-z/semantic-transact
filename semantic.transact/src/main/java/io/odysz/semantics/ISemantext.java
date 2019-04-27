@@ -82,7 +82,7 @@ public interface ISemantext {
 	 * @param nvs
 	 * @return the update context
 	 */
-	public ISemantext onUpdate(Statement<?> update, String tabl, ArrayList<Object[]> nvs);
+	public ISemantext onUpdate(Statement<? extends Statement<?>> update, String tabl, ArrayList<Object[]> nvs);
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.

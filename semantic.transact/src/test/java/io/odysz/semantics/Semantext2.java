@@ -12,6 +12,7 @@ import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.transact.sql.Insert;
+import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.x.TransException;
 
@@ -76,7 +77,7 @@ class Semantext2 implements ISemantext {
 	public String connId() { return null; }
 
 	@Override
-	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
+	public ISemantext onUpdate(Statement<?> update, String tabl, ArrayList<Object[]> nvs) {
 		if (nvs != null)
 			for (Object[] nv : nvs)
 				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))

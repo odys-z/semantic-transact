@@ -10,11 +10,11 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 
-public class Delete extends Update {
+public class Delete extends Statement<Delete>  {
 	private ArrayList<Object[]> nvs;
 
 	Delete(Transcxt transc, String tabl) {
-		super(transc, tabl);
+		super(transc, tabl, null);
 	}
 
 	@Override
@@ -63,5 +63,9 @@ public class Delete extends Update {
 	public void postChildren(SemanticObject multireq) throws SemanticException {
 		throw new SemanticException("TODO...");
 	}
-
+	
+	public Object del(ISemantext ctx) {
+		
+		return null;
+	}
 }
