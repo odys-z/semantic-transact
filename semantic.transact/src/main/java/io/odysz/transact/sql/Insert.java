@@ -28,10 +28,6 @@ public class Insert extends Statement<Insert> {
 	/**[col-name, col-index] */
 	private Map<String,Integer> insertCols;
 	
-	/**@deprecated Insert know nothing about semantics. It's handled by Semantics2 and Semantext2*/
-	@SuppressWarnings("unused")
-	private String pk;
-
 	private Query selectValues;
 	/**[ list[Object[n, v], ... ], ... ] */
 	private List<ArrayList<Object[]>> valuesNv;
@@ -70,9 +66,6 @@ public class Insert extends Statement<Insert> {
 		if (insertCols == null)
 			insertCols = new HashMap<String, Integer>();
 
-//		if (pk == null)
-//			this.pk = col0;
-		
 		// initial columns size
 		int size0 = insertCols.size();
 
