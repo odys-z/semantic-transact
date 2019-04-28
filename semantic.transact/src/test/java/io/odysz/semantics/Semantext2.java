@@ -113,7 +113,7 @@ class Semantext2 implements ISemantext {
 	}
 
 	@Override
-	public String resulvedVal(String ref) { return "FAKE RESULVED"; }
+	public String resulvedVal(String ref) { return ref; }
 
 	@Override
 	public ISemantext clone(IUser usr) {

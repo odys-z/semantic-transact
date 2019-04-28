@@ -33,10 +33,29 @@ public class SemanticsTest {
 			.nv("parentId", "0")
 			.commit(st.instancontxt(null), sqls);
 		
-		Utils.logi(sqls);
 		assertEquals(
-			"insert into a_functions",
-			sqls.get(0).substring(0, 23));
+			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', '10', '0', 'fullpath 0.0 AUTO')",
+			sqls.get(0));
+		
+		ArrayList<ArrayList<?>> vals = new ArrayList<ArrayList<?>>();
+		ArrayList<String[]> r1 = new ArrayList<String[]>();
+		r1.add(new String[] {"roleId", "r01"});
+		r1.add(new String[] {"funcId", "f01"});
+
+		ArrayList<String[]> r2 = new ArrayList<String[]>();
+		r2.add(new String[] {"roleId", "r02"});
+		r2.add(new String[] {"funcId", "f02"});
+
+		vals.add(r1);
+		vals.add(r2);
+		st.insert("a_role_funcs")
+			.cols(new String[] {"roleId", "funcId"})
+			.values(vals)
+			.commit(st.instancontxt(null), sqls);
+
+		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02')",
+				sqls.get(1));
+		Utils.logi(sqls);
 	}
 
 }

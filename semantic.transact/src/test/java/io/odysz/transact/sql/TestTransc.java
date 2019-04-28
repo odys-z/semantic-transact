@@ -95,7 +95,7 @@ left outer join a_roles r on roleId = roleId
 		st.insert("a_funcs")
 			.nv("funcId", "a01")
 			.commit(sqls);
-		assertEquals(sqls.get(0), "insert into a_funcs  (funcId) values ( 'a01' )");
+		assertEquals(sqls.get(0), "insert into a_funcs  (funcId) values ('a01')");
 		
 		ArrayList<Object[]> vals = new ArrayList<Object[]>(2);
 		vals.add(new String[]{ "logId", "b01"});
@@ -107,7 +107,7 @@ left outer join a_roles r on roleId = roleId
 			.value(vals)
 			.commit(sqls);
 		assertEquals(sqls.get(1),
-				"insert into a_log  (logId, stamp, txt) values ( 'b01', null, 'log .... 01' )");
+				"insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')");
 		// Utils.logi(sqls);
 	}
 
