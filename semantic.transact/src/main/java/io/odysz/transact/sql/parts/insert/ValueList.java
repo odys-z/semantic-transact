@@ -135,9 +135,23 @@ public class ValueList extends AbsPart {
 //		else
 //			return Arrays.stream(valsArr).map(v -> v == null ? "null" : "'" + v + "'").collect(Collectors.joining(", "));
 		else if (valst != null)
-			return valst.stream().map(v -> v == null ? "null" : v.sql(context)).collect(Collectors.joining(", "));
+			return valst.stream().map(v -> {
+				try {
+					return v == null ? "null" : v.sql(context);
+				} catch (TransException e) {
+					e.printStackTrace();
+					return "";
+				}
+			}).collect(Collectors.joining(", "));
 		else
-			return Arrays.stream(valsArr).map(v -> v == null ? "null" : v.sql(context)).collect(Collectors.joining(", "));
+			return Arrays.stream(valsArr).map(v -> {
+				try {
+					return v == null ? "null" : v.sql(context);
+				} catch (TransException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}).collect(Collectors.joining(", ", "(", ")"));
 	}
 
 

@@ -40,7 +40,7 @@ public class Insert extends Statement<Insert> {
 	public Insert nv(String n, Object v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
-		currentRowNv.add(new Object[] {n, v});
+		currentRowNv.add(new String[] {n, String.valueOf(v)});
 		
 		// column names
 		if (insertCols == null)
@@ -76,24 +76,45 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	public Insert values(ArrayList<Object[]> rowFields) throws TransException {
-		if (rowFields == null)
+	public Insert cols(String[] cols) throws TransException {
+		if (cols != null) {
+			for (String c : cols)
+				cols(c);
+		}
+		return this;
+	}
+
+	/**Append values after cols been set.
+	 * @param val
+	 * @return this
+	 * @throws TransException
+	 */
+	public Insert value(ArrayList<Object[]> val) throws TransException {
+		if (val == null)
 			return this;
-		if (insertCols.size() != rowFields.size())
+		if (insertCols.size() != val.size())
 			throw new TransException("columns' number didn't match rows field count.");
 
 		if (selectValues != null)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 
 		if (valuesNv == null)
-			valuesNv = new ArrayList<ArrayList<Object[]>>(rowFields.size());
+			valuesNv = new ArrayList<ArrayList<Object[]>>(val.size());
 		
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			// append current row, then append new vals 
 			valuesNv.add(currentRowNv);
 			currentRowNv = null;
 		}
-		valuesNv.add(rowFields);
+		valuesNv.add(val);
+		return this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Insert values(ArrayList<ArrayList<?>> arrayList) throws TransException {
+		if (arrayList != null)
+			for (ArrayList<?> val : arrayList)
+				value((ArrayList<Object[]>)val);
 		return this;
 	}
 
@@ -125,24 +146,37 @@ public class Insert extends Statement<Insert> {
 
 //		if (sctx != null)
 //			sctx.onInsert(this, mainTabl, valuesNv);
-		
+		// FIXME
+		// insert into a_role_funcs  (funcId, roleId) values ('1A', '0101') ('03', '0101') ('0301', '0101') ('0302', '0101') ('04', '0101') ('0401', '0101')... ('0909', '0101')
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
-				// insert into tabl(...)
-				Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias), new ColumnList(insertCols)
-				// values(...) / select ...
-				), Stream.concat(
-						// FIXME how to join multiple values? (...), (...), ...
-						// values (...)
-						Stream.concat(Stream.of(new ExprPart("values (")), // whether 'values()' appears or not is the same as value nvs
-									  // 'v1', 'v2', ...)
-									  Stream.concat(Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-											  		  		.stream().map(row -> getValue(sctx, row, insertCols)),
-									  				Stream.of(new ExprPart(")")))
-						).filter(w -> hasValuesNv),
-						// select ...
-						Stream.of(selectValues).filter(w -> selectValues != null))
-			).map(m -> m.sql(sctx));
+			// insert into tabl(...)
+			Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias),
+					// (...)
+					new ColumnList(insertCols)
+			   // values(...) / select ...
+			), Stream.concat(
+				// FIXME how to join multiple values? (...), (...), ...
+				// values (...)
+				// whether 'values()' appears or not is the same as value valuesNv
+				Stream.concat(Stream.of(new ExprPart("values")),
+						// 'v1', 'v2', ...)
+//						Stream.concat(
+								Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
+									.stream().map(row -> getValue(sctx, row, insertCols))
+//									, Stream.of(new ExprPart(")"))
+//						)
+				).filter(w -> hasValuesNv),
+				// select ...
+				Stream.of(selectValues).filter(w -> selectValues != null))
+			).map(m -> {
+				try {
+					return m.sql(sctx);
+				} catch (TransException e) {
+					e.printStackTrace();
+					return "";
+				}
+			});
 
 		return s.collect(Collectors.joining(" "));
 	}

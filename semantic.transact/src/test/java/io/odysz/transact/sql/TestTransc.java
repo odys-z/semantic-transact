@@ -104,11 +104,11 @@ left outer join a_roles r on roleId = roleId
 
 		st.insert("a_log")
 			.cols("logId", "stamp", "txt")
-			.values(vals)
+			.value(vals)
 			.commit(sqls);
 		assertEquals(sqls.get(1),
 				"insert into a_log  (logId, stamp, txt) values ( 'b01', null, 'log .... 01' )");
-		Utils.logi(sqls);
+		// Utils.logi(sqls);
 	}
 
 	@Test
@@ -120,7 +120,9 @@ left outer join a_roles r on roleId = roleId
 			.commit(sqls);
 
 		// update a_users  set userName='abc-x01' where userId = 'admin'
-		Utils.logi(sqls);
+		// Utils.logi(sqls);
+		assertEquals("update a_users  set userName='abc-x01' where userId = 'admin'",
+				sqls.get(0));
 	}
 
 	@Test
@@ -141,7 +143,7 @@ left outer join a_roles r on roleId = roleId
 
 		// insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'
 		// update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'
-		Utils.logi(sqls);
+		// Utils.logi(sqls);
 		assertEquals(sqls.get(0),
 				"insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'");
 		assertEquals(sqls.get(1),
@@ -173,7 +175,7 @@ left outer join a_roles r on roleId = roleId
 		// update a_rolefunc  set funcId='f-01', roleId='AUTO #2018-12-02 10:02:23'
 		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 10:02:30', 'role-2', '0' )
 		// insert into a_rolefunc  (funcId, roleId) values ( 'f-01', 'AUTO #2018-12-02 10:02:30' )
-		Utils.logi(sqls);
+		// Utils.logi(sqls);
 		assertTrue(sqls.get(0).startsWith("insert into a_roles"));
 		assertTrue(sqls.get(1).startsWith("update a_rolefunc"));
 		assertTrue(sqls.get(2).startsWith("insert into a_roles"));

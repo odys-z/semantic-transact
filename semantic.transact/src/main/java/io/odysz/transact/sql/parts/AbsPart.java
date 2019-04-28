@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.x.TransException;
 
 /**<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
@@ -22,6 +23,7 @@ abstract public class AbsPart {
 	 * This method shouldn't been called. Use Statement#commit() to generate SQLs.
 	 * @param context
 	 * @return sql
+	 * @throws TransException Something invalid while composing sql.
 	 */
-	public abstract String sql(ISemantext context);
+	public abstract String sql(ISemantext context) throws TransException;
 }

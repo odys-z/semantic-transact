@@ -36,10 +36,10 @@ public class Update extends Statement<Update> {
 	 * @param nvs the n-v array
 	 * @return this Update statement
 	 */
-	public Update nvs(ArrayList<String[]> nvs) {
+	public Update nvs(ArrayList<Object[]> nvs) {
 		if (nvs != null)
-			for (String[] nv : nvs)
-				nv(nv[Ix.nvn], nv[Ix.nvv]);
+			for (Object[] nv : nvs)
+				nv((String)nv[Ix.nvn], nv[Ix.nvv]);
 		return this;
 	}
 	
@@ -71,7 +71,14 @@ public class Update extends Statement<Update> {
 						new ExprPart(mainTabl), new ExprPart(mainAlias),
 						new ExprPart("set"), new SetList(nvs)), 
 					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
-				  .map(m -> m == null ? "" : m.sql(sctx));
+				  .map(m -> {
+					try {
+						return m == null ? "" : m.sql(sctx);
+					} catch (TransException e) {
+						e.printStackTrace();
+						return "";
+					}
+				});
 
 		return s.collect(Collectors.joining(" "));
 	}

@@ -315,7 +315,14 @@ public class Query extends Statement<Query> {
 								Stream.of(new GroupbyList(groupList)).filter(o -> groupList != null),
 								// order by
 								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
-			).map(m -> m.sql(sctx));
+			).map(m -> {
+				try {
+					return m.sql(sctx);
+				} catch (TransException e2) {
+					e2.printStackTrace();
+					return "";
+				}
+			});
 		
 		if (pg >= 0 && pgSize > 0) {
 			if (sctx != null)

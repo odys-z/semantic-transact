@@ -8,7 +8,7 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.update.SetList;
+import io.odysz.transact.x.TransException;
 
 public class Delete extends Statement<Delete>  {
 	private ArrayList<Object[]> nvs;
@@ -18,17 +18,26 @@ public class Delete extends Statement<Delete>  {
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		if (sctx != null)
 			sctx.onUpdate(this, mainTabl, nvs);
 		
+		if (where == null)
+			throw new TransException("semantic.transact doesn't allow any delete statement without conditions. table: %s", mainTabl);
+		
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s = Stream.concat(
-					Stream.of(new ExprPart("delete....."),
-						new ExprPart(mainTabl), new ExprPart(mainAlias),
-						new ExprPart("set"), new SetList(nvs)), 
+					Stream.of(  new ExprPart("delete from"),
+								new ExprPart(mainTabl)), 
 					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
-				  .map(m -> m == null ? "" : m.sql(sctx));
+				  .map(m -> {
+					try {
+						return m == null ? "" : m.sql(sctx);
+					} catch (TransException e) {
+						e.printStackTrace();
+						return "";
+					}
+				});
 //		// insert into tabl(...) values(...) / select ...
 //		Stream<String> s2 = Stream.concat(
 //				// insert into tabl(...)
