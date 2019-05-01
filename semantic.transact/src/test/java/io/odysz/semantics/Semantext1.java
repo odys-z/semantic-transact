@@ -88,11 +88,6 @@ class Semantext1 implements ISemantext {
 	public String connId() { return null; }
 
 	@Override
-	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
-		return s;
-	}
-
-	@Override
 	public String genId(String tabl, String col) throws SQLException, TransException {
 		return "";
 	}

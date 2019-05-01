@@ -3,7 +3,6 @@ package io.odysz.semantics;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import io.odysz.common.dbtype;
 import io.odysz.transact.sql.Insert;
@@ -22,11 +21,6 @@ import io.odysz.transact.x.TransException;
  * 
  * <p>Semantic-transact is designed only process SQL structure, not handling the data semantics,
  * so it only fire the event to the handler, the implementation of ISemantext. </p>
- * 
- * <p>{@link #pagingStream} is another semantics example that must handled by context. When composing SQL like select
- * statement, if the results needing to be paged at server side, the sql statement is different for different DB.
- * But semantic-transact don't care DB type or JDBC connection, so it's the context that will handling this.
- * See the {@link #pagingStream(Stream, int, int)}.</p>
  * 
  * <p>An ISemantext instance is used as an sql composing context
  * by semantic-transact when travel the AST and composing SQL(s). There must be an {@link #insert}

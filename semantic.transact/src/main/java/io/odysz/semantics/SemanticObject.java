@@ -96,6 +96,10 @@ public class SemanticObject extends Object {
 		add("total", total);
 		return add("rs", resultset);
 	}
+
+	public Object rs(int i) {
+		return ((ArrayList<?>)get("rs")).get(i);
+	}
 	
 	public String error() {
 		return (String) get("error");

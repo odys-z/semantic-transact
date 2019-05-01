@@ -48,7 +48,7 @@ public class Update extends Statement<Update> {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(stx, sqls);
 			// return postOp.op(stx.connId(), sqls);
-			Object res = postOp.op(stx.connId(), sqls);
+			Object res = postOp.op(stx, sqls);
 			
 			if (res instanceof int[]) // Connects.commit() usually return this for update
 				res = LangExt.toString((int[])res);

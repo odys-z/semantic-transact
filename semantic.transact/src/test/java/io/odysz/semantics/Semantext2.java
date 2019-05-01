@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
@@ -23,11 +22,8 @@ import io.odysz.transact.x.TransException;
  */
 class Semantext2 implements ISemantext {
 
-	@SuppressWarnings("unused")
 	private String tabl;
-//	private HashMap<Object, Object> autoVals;
 	private HashMap<String, Semantics2> semantics;
-//	private Statement<?> callerStatement;
 	private SemanticObject resolvedIds;
 
 	public Semantext2(String tabl, HashMap<String, Semantics2> semantics) {
@@ -101,11 +97,6 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public dbtype dbtype() { return dbtype.sqlite; }
-
-	@Override
-	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException {
-		return s;
-	}
 
 	@Override
 	public String genId(String tabl, String col) throws SQLException, TransException {
