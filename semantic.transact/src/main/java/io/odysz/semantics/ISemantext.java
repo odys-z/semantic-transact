@@ -131,8 +131,8 @@ public interface ISemantext {
 	 * @param pgSize page size
 	 * @return stream that will be used to join paging select statement
 	 * @throws TransException 
-	 */
 	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
+	 */
 
 	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
 	 * The new generated value is managed in this implementation class (for future resolving).<br>

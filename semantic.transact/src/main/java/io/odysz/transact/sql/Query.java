@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
@@ -131,7 +130,9 @@ public class Query extends Statement<Query> {
 	private ArrayList<String[]> orderList;
 	private ArrayList<String> groupList;
 	private int pg;
-	private int pgSize;
+	public int page() { return pg; }
+	int pgSize;
+	public int size() { return pgSize; }
 
 	/**
 	private SelectQry q;
@@ -324,15 +325,15 @@ public class Query extends Statement<Query> {
 				}
 			});
 		
-		if (pg >= 0 && pgSize > 0) {
-			if (sctx != null)
-				try {
-					s = sctx.pagingStream(s, pg, pgSize);
-				} catch (TransException e1) {
-					e1.printStackTrace();
-				}
-			else Utils.warn("The query transaction needing a sql paging implementation, but the semantext instance is null. See semantic.DA/io.odysz.semantic.DASemantext#pagingStream() for example.");
-		}
+//		if (pg >= 0 && pgSize > 0) {
+//			if (sctx != null)
+//				try {
+//					s = sctx.pagingStream(s, pg, pgSize);
+//				} catch (TransException e1) {
+//					e1.printStackTrace();
+//				}
+//			else Utils.warn("The query transaction needing a sql paging implementation, but the semantext instance is null. See semantic.DA/io.odysz.semantic.DASemantext#pagingStream() for example.");
+//		}
 
 		return s.collect(Collectors.joining(" "));
 	}
@@ -370,8 +371,11 @@ public class Query extends Statement<Query> {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
-			return postOp.op(ctx.connId(), sqls);
+			// return postOp.op(ctx.connId(), sqls);
+			return postOp.op(ctx, sqls);
 		}
 		return null;
 	}
+
+
 }
