@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.semantics.IResults;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
@@ -367,12 +368,12 @@ public class Query extends Statement<Query> {
 	 * @throws TransException
 	 * @throws SQLException
 	 */
-	public Object rs(ISemantext ctx) throws TransException, SQLException {
+	public IResults rs(ISemantext ctx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
 			// return postOp.op(ctx.connId(), sqls);
-			return postOp.op(ctx, sqls);
+			return (IResults) postOp.op(ctx, sqls);
 		}
 		return null;
 	}
