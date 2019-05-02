@@ -87,6 +87,7 @@ left outer join a_roles r on roleId = roleId
 		assertEquals("a_user.roleId = r.roleId where a_user.userName like '' AND a_user.orgId = ''",
 				last.substring(lastlen - 75, lastlen));
 		 */
+		fail("Function call as expression not tested!");
 	}
 	
 	@Test

@@ -51,6 +51,8 @@ public class Funcall extends ExprPart {
 	public String sql(ISemantext context) {
 		if (func == Func.now)
 			return sqlNow(context);
+		else if (func == Func.ifnull)
+			return sqlIfnull(context);
 		else return "TODO (Funcall)";
 	}
 
