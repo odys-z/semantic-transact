@@ -40,7 +40,7 @@ public class SelectElem extends AbsPart {
 
 	private ElemType elemtype;
 	private String tabl;
-	private String col; bug here, it shall be one of expression, funcall, col_name
+	private String col; bug here, it shall be one of expression, funcall or col_name
 	private String alias;
 
 	public SelectElem(ElemType elemType, String col) {

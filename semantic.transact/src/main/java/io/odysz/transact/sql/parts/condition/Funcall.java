@@ -22,7 +22,7 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func { now("now()"), max("max(%s)");
+	public enum Func { now("now()"), max("max(%s)"), ifnull("ifnull");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
