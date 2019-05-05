@@ -38,7 +38,8 @@ expression_list
     ;
 
 expression
-    : primitive_expression
+    // : primitive_expression    <- replaced by constant
+    : constant
     | function_call
     | full_column_name
     | bracket_expression
@@ -77,9 +78,10 @@ table_name
     ;
 
 
-primitive_expression
-    : DEFAULT | NULL | LOCAL_ID | constant
-    ;
+// By odys-z
+// primitive_expression
+//     : DEFAULT | NULL | LOCAL_ID | constant
+//     ;
 
 unary_operator_expression
     : '~' expression
@@ -105,8 +107,8 @@ constant_expression
 // Spaces are allowed for comparison operators.
 comparison_operator
     : '=' | '>' | '<' | '<' '=' | '>' '=' | '<' '>' | '!' '=' | '!' '>' | '!' '<' | '%' '~' | '%' | '~' '%' 
-    | '?' // isnull ... by odys-z
-    | '?' '!' | '!' '?' // is not null ... by odys-z
+    // | '?' // isnull ... by odys-z
+    // | '?' '!' | '!' '?' // is not null ... by odys-z
     ;
 
 assignment_operator

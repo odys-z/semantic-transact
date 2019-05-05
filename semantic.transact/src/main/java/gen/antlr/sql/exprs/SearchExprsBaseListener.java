@@ -148,18 +148,6 @@ public class SearchExprsBaseListener implements SearchExprsListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrimitive_expression(SearchExprs.Primitive_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPrimitive_expression(SearchExprs.Primitive_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterUnary_operator_expression(SearchExprs.Unary_operator_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}

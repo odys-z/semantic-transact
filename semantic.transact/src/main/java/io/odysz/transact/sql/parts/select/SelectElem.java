@@ -5,41 +5,17 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 
-/**Select_list_elem:<pre>
-https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
-
-// https://msdn.microsoft.com/en-us/library/ms176104.aspx
-select_list
-    : select_list_elem (',' select_list_elem)*
-	;
-select_list_elem
-    : asterisk
-    | column_elem
-    // TODO to be understood
-    // | udt_elem
-    
-    // Modified
-    // | expression_elem
-    | expression as_column_alias?
-	;
-
-as_column_alias
-    : AS? column_alias
-	;
-	
-column_elem
-    // : (table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) as_column_alias?
-    // changed:
-    : (table_name '.')? (column_name=id) as_column_alias?
-    ;
- * </pre>
- * @author ody
+/**Select_list_elem:
+ * For gramar, see {@link io.odysz.transact.sql.parts.antlr.SelectElemVisitor}.
+ * https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
+ * https://msdn.microsoft.com/en-us/library/ms176104.aspx
  *
+ * @author odys-z
  */
 public class SelectElem extends AbsPart {
 
-	/**Select element type, one of *, tabl.col, col, f(), expr */
-	public enum ElemType { asterisk, tableCol, col, func, expr }
+	/**Select element type, one of *, tabl.col, col, f(), expr, 'const' */
+	public enum ElemType { asterisk, tableCol, col, expr, constant }
 
 	private ElemType elemtype;
 	private String tabl;
@@ -76,8 +52,9 @@ public class SelectElem extends AbsPart {
 		String sql;
 		if (elemtype == ElemType.asterisk)
 			sql = col;
-		else if (elemtype == ElemType.func)
-			sql = new Funcall(col).sql(sctx) + " " + alias;
+//		else if (elemtype == ElemType.func)
+//			sql = new Funcall(col).sql(sctx) + " " + alias;
+		// expr also handling func?
 		else if (elemtype == ElemType.expr)
 			sql = expr.sql(sctx) + " " + alias;
 		else if (tabl == null)

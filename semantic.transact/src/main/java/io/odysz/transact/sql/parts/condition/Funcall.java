@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts.condition;
 
 import java.util.Date;
+import java.util.List;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
@@ -22,10 +23,18 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull");
+	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull"), dbSame("func");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
+
+		public static Func parse(String funcName) {
+			if (now.fid.equals(funcName))
+				return now;
+			if (isnull.fid.equals(funcName))
+				return isnull;
+			return dbSame; // max is db same
+		}
 	}
 
 	private Func func;
@@ -36,15 +45,26 @@ public class Funcall extends ExprPart {
 		this.func = func;
 	}
 	
-	public Funcall(String funcExpr) {
-		super(funcExpr);
-		Func f = parse(funcExpr);
-		this.func = f;
+	public Funcall(String funcName, List<ExprPart> funcArgs) {
+		// TODO Auto-generated constructor stub
+		super(funcName);
+		this.func = Func.parse(funcName);
 	}
 
-	private Func parse(String funcExpr) {
-		return null;
+	public Funcall args(String[] args) {
+		this.args = args;
+		return this;
 	}
+	
+//	public Funcall(String funcExpr) {
+//		super(funcExpr);
+//		Func f = parse(funcExpr);
+//		this.func = f;
+//	}
+//
+//	private Func parse(String funcExpr) {
+//		return null;
+//	}
 
 	/**@deprecated
 	 * @param dtype
@@ -70,7 +90,18 @@ public class Funcall extends ExprPart {
 			return sqlNow(context);
 		else if (func == Func.isnull)
 			return sqlIfnull(context);
-		else return "TODO (Funcall)";
+		// else return func.fid();
+		else return dbSame();
+	}
+
+	private String dbSame() {
+		String f = func.fid + "(" +
+				args != null && args.length > 0 && args[0] != null ? args[0] : "";
+
+		for (int i = 1; args != null && i < args.length; i++)
+			f += ", " + args[i];
+
+		return f + ")";
 	}
 
 	private String sqlIfnull(ISemantext context) {

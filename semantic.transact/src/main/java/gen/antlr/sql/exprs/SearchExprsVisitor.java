@@ -77,12 +77,6 @@ public interface SearchExprsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTable_name(SearchExprs.Table_nameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SearchExprs#primitive_expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrimitive_expression(SearchExprs.Primitive_expressionContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SearchExprs#unary_operator_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

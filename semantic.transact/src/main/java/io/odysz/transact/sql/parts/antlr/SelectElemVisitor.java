@@ -1,5 +1,8 @@
 package io.odysz.transact.sql.parts.antlr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -11,11 +14,13 @@ import gen.antlr.sql.select.SelectParts.As_column_aliasContext;
 import gen.antlr.sql.select.SelectParts.AsteriskContext;
 import gen.antlr.sql.select.SelectParts.Column_elemContext;
 import gen.antlr.sql.select.SelectParts.ExpressionContext;
+import gen.antlr.sql.select.SelectParts.Expression_listContext;
 import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
 import gen.antlr.sql.select.SelectParts.Table_nameContext;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectElem.ElemType;
 
@@ -49,8 +54,26 @@ asterisk
     : '*'
     | table_name '.' asterisk
     ;
+
+// currently only function_call, constant, expression op expression
+expression
+    : primitive_expression
+    | function_call
+    | full_column_name
+    | bracket_expression
+    | unary_operator_expression
+    | expression op=('*' | '/' | '%') expression
+    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
+    | expression comparison_operator expression
+    | expression assignment_operator expression
+    ;
+
+function_call
+    : aggregate_windowed_function
+    | func_proc_name '(' expression_list? ')'
+    ;
 </pre> 
- * @author ody
+ * @author odys-z@github.com
  *
  */
 @SuppressWarnings("deprecation")
@@ -114,31 +137,35 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			return ele;
 		}
 		*/
+		
+		// expression : function_call | constant | expr op expr;
 		String text = null;
-		Function_callContext f = ctx.function_call();
-		if (f != null)  {
-			text = f.getText();
-			if (text != null) {
-				ele = new SelectElem(ElemType.func, text);
-//				As_column_aliasContext alias = ctx.as_column_alias();
-//				if (alias != null && alias.column_alias() != null)
-//					ele.as(alias.column_alias().getText());
-//				return ele;
-			}
+
+		ExpressionContext exp = ctx.expression();
+		// constant expression
+		if (exp != null && exp.primitive_expression() != null
+				&& exp.primitive_expression().constant() != null) {
+			text = exp.primitive_expression().constant().getText();
+			ele = new SelectElem(ElemType.constant, text);
 		}
-		else {
-			ExpressionContext exp = ctx.expression();
-			if (exp != null) 
-				text = exp.getText();
-			if (text != null) {
+		else if (exp != null)  {
+			text = exp.getText();
+			// function
+			Function_callContext f = exp.function_call();
+			if (f != null)  {
+				text = f.getText();
+				Expression_listContext args = f.expression_list();
+				if (text != null) {
+					Funcall func = new Funcall(f.func_proc_name().getText(), funcArgs(args.expression()));
+					ele = new SelectElem(func);
+				}
+			}
+			// expression
+			else if (text != null) {
 				op logic = Logic.op(exp.op.getText());
 				ExprPart expr = new ExprPart(logic, exp.getChild(0).getText(),
-						exp.getChildCount() > 2 ? exp.getChild(2).getText() : "");
+					exp.getChildCount() > 2 ? exp.getChild(2).getText() : "");
 				ele = new SelectElem(expr);
-//				As_column_aliasContext alias = ctx.as_column_alias();
-//				if (alias != null && alias.column_alias() != null)
-//					ele.as(alias.column_alias().getText());
-//				return ele;
 			}
 		}
 		
@@ -152,4 +179,18 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 		return null;
 	}
 
+	private List<ExprPart> funcArgs(List<ExpressionContext> list) {
+		if (list != null) {
+			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
+			for (ExpressionContext exp : list) {
+				String op = exp.op.getText();
+				if (op != null)
+					// recursive visit?
+					lst.add(new ExprPart(exp.getText()));
+			}
+			return lst;
+		}
+		return null;
+	}
+	
 }

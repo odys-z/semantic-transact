@@ -230,7 +230,7 @@ public class SelectParts extends Parser {
 		"'HEALTHCHECKTIMEOUT'", "'IDENTITY'", "'IDENTITYCOL'", "'IDENTITY_INSERT'", 
 		"'IF'", null, "'INCLUDE'", "'INCREMENT'", "'INDEX'", "'INFINITE'", "'INIT'", 
 		"'INNER'", "'INSERT'", "'INSTEAD'", "'INTERSECT'", "'INTO'", null, null, 
-		"'IS'", "'ISNULL'", "'JOIN'", "'KERBEROS'", "'KEY'", "'KEY_PATH'", "'KEY_STORE_PROVIDER_NAME'", 
+		null, null, "'JOIN'", "'KERBEROS'", "'KEY'", "'KEY_PATH'", "'KEY_STORE_PROVIDER_NAME'", 
 		"'KILL'", "'LANGUAGE'", "'LEFT'", "'LIBRARY'", "'LIFETIME'", null, null, 
 		null, "'LINENO'", "'LINUX'", "'LISTENER_IP'", "'LISTENER_PORT'", "'LOAD'", 
 		"'LOCAL_SERVICE_NAME'", "'LOG'", "'MATCHED'", "'MASTER'", "'MAX_MEMORY'", 

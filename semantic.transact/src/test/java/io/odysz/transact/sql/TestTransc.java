@@ -98,8 +98,8 @@ left outer join a_roles r on roleId = roleId
 			.col("f.funcId", "fid")
 			.commit(st.instancontxt(null), sqls);
 
-		assertEquals(sqls.get(0).substring(0, 38),
-				"select f.funcName is not null checked");
+		assertEquals("select f.funcName is not null checked",
+				sqls.get(0).substring(0, 38));
 	}
 	
 	@Test

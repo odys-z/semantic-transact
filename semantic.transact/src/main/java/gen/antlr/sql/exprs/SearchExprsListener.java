@@ -118,16 +118,6 @@ public interface SearchExprsListener extends ParseTreeListener {
 	 */
 	void exitTable_name(SearchExprs.Table_nameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SearchExprs#primitive_expression}.
-	 * @param ctx the parse tree
-	 */
-	void enterPrimitive_expression(SearchExprs.Primitive_expressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SearchExprs#primitive_expression}.
-	 * @param ctx the parse tree
-	 */
-	void exitPrimitive_expression(SearchExprs.Primitive_expressionContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link SearchExprs#unary_operator_expression}.
 	 * @param ctx the parse tree
 	 */

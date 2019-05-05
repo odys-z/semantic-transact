@@ -94,13 +94,6 @@ public class SearchExprsBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPrimitive_expression(SearchExprs.Primitive_expressionContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitUnary_operator_expression(SearchExprs.Unary_operator_expressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
