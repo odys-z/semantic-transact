@@ -21,12 +21,16 @@ public class ExprPart extends AbsPart {
 	}
 
 	@Override
-	public String sql(ISemantext context) {
+	public String sql(ISemantext ctx) {
 		// FIXME what about unary operand?
 		if (logic == null)
 			return lexp == null ? "" : lexp;
-		else return String.format("%s %s %s",
-				lexp == null ? "" : context.resulvedVal(lexp),
-				logic.sql(logic, rexp == null ? "" : (String) context.resulvedVal(rexp)));
+		else {
+			Object lresulved = ctx == null ? lexp : ctx.resulvedVal(lexp);
+			Object rresulved = ctx == null ? rexp : ctx.resulvedVal(rexp);
+			return String.format("%s %s",
+				lexp == null ? "" : lresulved,
+				logic.sql(logic, rexp == null ? "" : (String) rresulved));
+		}
 	}
 }

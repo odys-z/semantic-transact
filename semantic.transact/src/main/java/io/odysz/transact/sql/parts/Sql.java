@@ -5,6 +5,7 @@ import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
+/**Logic expression etc's helper */
 public class Sql {
 	
 	public static Condit condt(String format, Object... args) {
@@ -36,9 +37,9 @@ public class Sql {
 	/**TODO Deprecated?
 	 * @param ele the elements
 	 * @return "'ele1','ele2','ele3',..."
-	 */
 	public static String str(String[] ele) {
 		return "'ele1','ele2','ele3'";
 	}
+	 */
 
 }

@@ -22,25 +22,42 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func { now("now()"), max("max(%s)"), ifnull("ifnull");
+	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
 	}
 
 	private Func func;
-	@SuppressWarnings("unused")
 	private String[] args;;
 
 	public Funcall(Func func) {
 		super(func.fid());
 		this.func = func;
 	}
+	
+	public Funcall(String funcExpr) {
+		super(funcExpr);
+		Func f = parse(funcExpr);
+		this.func = f;
+	}
 
+	private Func parse(String funcExpr) {
+		return null;
+	}
+
+	/**@deprecated
+	 * @param dtype
+	 * @return Funcall object
+	 */
 	public static Funcall now (dbtype dtype) {
 		return new Funcall(Func.now);
 	}
 	
+	/**@deprecated
+	 * @param dtype
+	 * @return Funcall object
+	 */
 	public static Funcall max(String... args) {
 		Funcall f = new Funcall(Func.max);
 		f.args = args;
@@ -51,9 +68,25 @@ public class Funcall extends ExprPart {
 	public String sql(ISemantext context) {
 		if (func == Func.now)
 			return sqlNow(context);
-		else if (func == Func.ifnull)
+		else if (func == Func.isnull)
 			return sqlIfnull(context);
 		else return "TODO (Funcall)";
+	}
+
+	private String sqlIfnull(ISemantext context) {
+		dbtype dt = context.dbtype();
+		if (dt == dbtype.mysql)
+			return String.format("ifnull(%s, %s)", args[0], args[1]);
+		else  if (dt == dbtype.sqlite)
+			return String.format("ifnull(%s, %s)", args[0], args[1]);
+		else if (dt == dbtype.ms2k)
+			return String.format("isnull(%s, %s)", args[0], args[1]);
+		else if (dt == dbtype.oracle)
+			return String.format("nvl(%s, %s)", args[0], args[1]);
+		else {
+			Utils.warn("Using isnull() for unknown db type: %s", dt.name());
+			return String.format("isnull(%s, %s)", args[0], args[1]);
+		}
 	}
 
 	private String sqlNow(ISemantext context) {

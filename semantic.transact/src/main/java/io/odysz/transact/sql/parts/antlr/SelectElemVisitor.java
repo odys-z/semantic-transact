@@ -13,6 +13,9 @@ import gen.antlr.sql.select.SelectParts.Column_elemContext;
 import gen.antlr.sql.select.SelectParts.ExpressionContext;
 import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
 import gen.antlr.sql.select.SelectParts.Table_nameContext;
+import io.odysz.transact.sql.parts.Logic;
+import io.odysz.transact.sql.parts.Logic.op;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectElem.ElemType;
 
@@ -71,14 +74,14 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 
 	@Override
 	public SelectElem visitSelect_list_elem(Select_list_elemContext ctx) {
-		// return super.visitSelect_list_elem(ctx);
 		AsteriskContext asterisk = ctx.asterisk();
+		// asterisk : '*' | table_name '.' asterisk;
 		if (asterisk != null) {
-			// Table_nameContext t = asterisk.table_name();
 			return new SelectElem(ElemType.asterisk, asterisk.getText());
 		}
 
-		SelectElem ele;
+		SelectElem ele = null;
+		// column_elem : (table_name '.')? (column_name=id) as_column_alias? ;
 		Column_elemContext colElem = ctx.column_elem();
 		if (colElem != null) {
 			Table_nameContext tabl = colElem.table_name();
@@ -92,6 +95,7 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			return ele;
 		}
 
+		/*
 		String text = null;
 		Function_callContext f = ctx.function_call();
 		if (f != null) 
@@ -104,6 +108,41 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 		
 		if (text != null) {
 			ele = new SelectElem(ElemType.func, text);
+			As_column_aliasContext alias = ctx.as_column_alias();
+			if (alias != null && alias.column_alias() != null)
+				ele.as(alias.column_alias().getText());
+			return ele;
+		}
+		*/
+		String text = null;
+		Function_callContext f = ctx.function_call();
+		if (f != null)  {
+			text = f.getText();
+			if (text != null) {
+				ele = new SelectElem(ElemType.func, text);
+//				As_column_aliasContext alias = ctx.as_column_alias();
+//				if (alias != null && alias.column_alias() != null)
+//					ele.as(alias.column_alias().getText());
+//				return ele;
+			}
+		}
+		else {
+			ExpressionContext exp = ctx.expression();
+			if (exp != null) 
+				text = exp.getText();
+			if (text != null) {
+				op logic = Logic.op(exp.op.getText());
+				ExprPart expr = new ExprPart(logic, exp.getChild(0).getText(),
+						exp.getChildCount() > 2 ? exp.getChild(2).getText() : "");
+				ele = new SelectElem(expr);
+//				As_column_aliasContext alias = ctx.as_column_alias();
+//				if (alias != null && alias.column_alias() != null)
+//					ele.as(alias.column_alias().getText());
+//				return ele;
+			}
+		}
+		
+		if (ele != null) {
 			As_column_aliasContext alias = ctx.as_column_alias();
 			if (alias != null && alias.column_alias() != null)
 				ele.as(alias.column_alias().getText());

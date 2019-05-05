@@ -26,9 +26,9 @@ public class TestTransc {
 		st = new Transcxt(null);
 	}
 
-	private String[] users() {
-		return new String[] {"usr1", "user2"};
-	}
+//	private String[] users() {
+//		return new String[] {"usr1", "user2"};
+//	}
 
 	@Test
 	public void testSelect() throws TransException {
@@ -45,7 +45,7 @@ public class TestTransc {
 			.col("lg.stamp", "logtime")
 			.col("lg.txt", "log")
 			.where(">=", "lg.stamp", "'1776-07-04'")
-			.where(Sql.condt("userId IN (%s)", Sql.str(users())))
+			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3"))
 			.groupby("lg.stamp")
 			.groupby("log")
 			.commit(sqls);
@@ -87,7 +87,19 @@ left outer join a_roles r on roleId = roleId
 		assertEquals("a_user.roleId = r.roleId where a_user.userName like '' AND a_user.orgId = ''",
 				last.substring(lastlen - 75, lastlen));
 		 */
-		fail("Function call as expression not tested!");
+	}
+
+	@Test
+	public void testFunc() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.select("a_funcs", "f")
+			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
+			.col("f.funcName IS null", "checked")
+			.col("f.funcId", "fid")
+			.commit(st.instancontxt(null), sqls);
+
+		assertEquals(sqls.get(0).substring(0, 38),
+				"select f.funcName is not null checked");
 	}
 	
 	@Test

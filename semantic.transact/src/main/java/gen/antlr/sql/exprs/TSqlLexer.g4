@@ -191,8 +191,10 @@ INTERSECT:                             'INTERSECT';
 INTO:                                  'INTO';
 IPV4_ADDR:                             [']? IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT [']?;
 IPV6_ADDR:                              [']?[0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[:][0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?[']?;
-IS:                                    'IS';
-ISNULL:                                'ISNULL';
+
+IS:                                    'IS' | 'is'; 
+ISNULL:                                'ISNULL' | 'isnull';
+
 JOIN:                                  'JOIN';
 KERBEROS:                              'KERBEROS';
 KEY:                                   'KEY';

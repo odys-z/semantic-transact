@@ -2,6 +2,8 @@ package io.odysz.transact.sql.parts.select;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 
 /**Select_list_elem:<pre>
 https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
@@ -36,12 +38,22 @@ column_elem
  */
 public class SelectElem extends AbsPart {
 
+	/**Select element type, one of *, tabl.col, col, f(), expr */
 	public enum ElemType { asterisk, tableCol, col, func, expr }
 
 	private ElemType elemtype;
 	private String tabl;
-	private String col; bug here, it shall be one of expression, funcall or col_name
+	/**in simple case, this is Column name,
+	 * for {@link #elemtype} = {@link ElemType#expr}, this is not used - using {@link #expr} instead.
+	 */
+	private String col;
+	/**in func case, this is the expression part.
+	 * for {@link #elemtype} = {@link ElemType#col}, using {@link #col} instead.
+	 */
+	private ExprPart expr;
+
 	private String alias;
+
 
 	public SelectElem(ElemType elemType, String col) {
 		this.elemtype = elemType;
@@ -53,16 +65,26 @@ public class SelectElem extends AbsPart {
 		this.tabl = tabl;
 		this.col = col;
 	}
+	
+	public SelectElem(ExprPart expr) {
+		this.elemtype = ElemType.expr;
+		this.expr = expr;
+	}
 
 	@Override
 	public String sql(ISemantext sctx) {
-		if (elemtype == ElemType.asterisk)
-			return col;
 		String sql;
-		if (tabl == null)
+		if (elemtype == ElemType.asterisk)
+			sql = col;
+		else if (elemtype == ElemType.func)
+			sql = new Funcall(col).sql(sctx) + " " + alias;
+		else if (elemtype == ElemType.expr)
+			sql = expr.sql(sctx) + " " + alias;
+		else if (tabl == null)
 			sql = col;
 		else 
 			sql = tabl + "." + col;
+
 		if (alias != null)
 			return sql += " " + alias;
 		return sql;
