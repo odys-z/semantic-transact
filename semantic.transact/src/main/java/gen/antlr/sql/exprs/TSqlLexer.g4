@@ -480,7 +480,9 @@ CONCAT_NULL_YIELDS_NULL:               'CONCAT_NULL_YIELDS_NULL';
 CONTENT:                               'CONTENT';
 CONTROL:                               'CONTROL';
 COOKIE:                                'COOKIE';
+
 COUNT:                                 'COUNT' | 'count' | 'Count';
+
 COUNT_BIG:                             'COUNT_BIG';
 COUNTER:                               'COUNTER';
 CPU:                                   'CPU';

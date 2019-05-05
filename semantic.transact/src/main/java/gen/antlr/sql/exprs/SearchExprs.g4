@@ -105,6 +105,8 @@ constant_expression
 // Spaces are allowed for comparison operators.
 comparison_operator
     : '=' | '>' | '<' | '<' '=' | '>' '=' | '<' '>' | '!' '=' | '!' '>' | '!' '<' | '%' '~' | '%' | '~' '%' 
+    | '?' // isnull ... by odys-z
+    | '?' '!' | '!' '?' // is not null ... by odys-z
     ;
 
 assignment_operator
