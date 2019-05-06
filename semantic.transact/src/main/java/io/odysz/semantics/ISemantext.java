@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.common.dbtype;
+import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
@@ -65,8 +66,9 @@ public interface ISemantext {
 	 * @param tabl 
 	 * @param rows [ list[Object[n, v], ... ], ... ]
 	 * @return the ISemantext context, a thread safe context for resolving semantics like FK value resolving.<br>
+	 * @throws SemanticException 
 	 */
-	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
+	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws SemanticException;
 
 	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
 
