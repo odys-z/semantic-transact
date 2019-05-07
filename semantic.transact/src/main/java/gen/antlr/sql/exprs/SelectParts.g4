@@ -1,7 +1,7 @@
 /* Select parts, such as select_list_elem.
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * compile:
- * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.exprs
+ * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.select
  */
 
 parser grammar SelectParts;
@@ -24,6 +24,7 @@ select_list_elem
     // Modified
     // | expression_elem
     | expression as_column_alias?
+    | expression IS null_notnull
 	;
 
 as_column_alias

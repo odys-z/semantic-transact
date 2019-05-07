@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.7.1
+// Generated from SelectParts.g4 by ANTLR 4.7.2
 package gen.antlr.sql.select;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -177,16 +177,6 @@ public interface SelectPartsListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTable_name(SelectParts.Table_nameContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SelectParts#primitive_expression}.
-	 * @param ctx the parse tree
-	 */
-	void enterPrimitive_expression(SelectParts.Primitive_expressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SelectParts#primitive_expression}.
-	 * @param ctx the parse tree
-	 */
-	void exitPrimitive_expression(SelectParts.Primitive_expressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SelectParts#unary_operator_expression}.
 	 * @param ctx the parse tree

@@ -38,7 +38,7 @@ expression_list
     ;
 
 expression
-    // : primitive_expression    <- replaced by constant
+    // : primitive_expression    <- ody: replaced by constant
     : constant
     | function_call
     | full_column_name

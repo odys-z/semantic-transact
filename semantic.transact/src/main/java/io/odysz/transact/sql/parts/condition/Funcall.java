@@ -1,7 +1,6 @@
 package io.odysz.transact.sql.parts.condition;
 
 import java.util.Date;
-import java.util.List;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
@@ -45,10 +44,16 @@ public class Funcall extends ExprPart {
 		this.func = func;
 	}
 	
-	public Funcall(String funcName, List<ExprPart> funcArgs) {
-		// TODO Auto-generated constructor stub
+	public Funcall(String funcName, String[] funcArgs) {
 		super(funcName);
 		this.func = Func.parse(funcName);
+		args = funcArgs;
+	}
+
+	public Funcall(String funcName, String colName) {
+		super(funcName);
+		args = new String[] {colName};
+		this.func = Func.dbSame;
 	}
 
 	public Funcall args(String[] args) {
@@ -56,17 +61,7 @@ public class Funcall extends ExprPart {
 		return this;
 	}
 	
-//	public Funcall(String funcExpr) {
-//		super(funcExpr);
-//		Func f = parse(funcExpr);
-//		this.func = f;
-//	}
-//
-//	private Func parse(String funcExpr) {
-//		return null;
-//	}
-
-	/**@deprecated
+	/**Create a now() sql function.
 	 * @param dtype
 	 * @return Funcall object
 	 */
@@ -91,12 +86,13 @@ public class Funcall extends ExprPart {
 		else if (func == Func.isnull)
 			return sqlIfnull(context);
 		// else return func.fid();
-		else return dbSame();
+		else return dbSame(context);
 	}
 
-	private String dbSame() {
-		String f = func.fid + "(" +
-				args != null && args.length > 0 && args[0] != null ? args[0] : "";
+	private String dbSame(ISemantext ctx) {
+		String f = super.sql(ctx) + "(";
+		if (args != null && args.length > 0 && args[0] != null)
+			f += args[0];
 
 		for (int i = 1; args != null && i < args.length; i++)
 			f += ", " + args[i];
@@ -122,7 +118,6 @@ public class Funcall extends ExprPart {
 
 	private String sqlNow(ISemantext context) {
 		dbtype dt = context.dbtype();
-		// return new Funcall(Func.now);
 		if (dt == dbtype.mysql)
 			return "now()";
 		else  if (dt == dbtype.sqlite)

@@ -3,7 +3,6 @@ package io.odysz.transact.sql.parts.select;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.condition.Funcall;
 
 /**Select_list_elem:
  * For gramar, see {@link io.odysz.transact.sql.parts.antlr.SelectElemVisitor}.
@@ -56,7 +55,7 @@ public class SelectElem extends AbsPart {
 //			sql = new Funcall(col).sql(sctx) + " " + alias;
 		// expr also handling func?
 		else if (elemtype == ElemType.expr)
-			sql = expr.sql(sctx) + " " + alias;
+			sql = expr.sql(sctx); // + " " + alias;
 		else if (tabl == null)
 			sql = col;
 		else 

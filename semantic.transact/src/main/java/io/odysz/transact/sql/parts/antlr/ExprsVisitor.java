@@ -1,11 +1,9 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import gen.antlr.sql.exprs.SearchExprs.ConstantContext;
 import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
-import gen.antlr.sql.exprs.SearchExprs.Expression_listContext;
 import gen.antlr.sql.exprs.SearchExprs.Full_column_nameContext;
 import gen.antlr.sql.exprs.SearchExprs.Function_callContext;
 import gen.antlr.sql.exprs.SearchExprs.Unary_operator_expressionContext;
@@ -127,7 +125,8 @@ expression
 			
 			Function_callContext fc = ctx.function_call();
 			if (fc != null)
-				return new Funcall(fc.func_proc_name().getText(), funcArgs(fc.expression_list()));
+				return new Funcall(fc.func_proc_name().getText(),
+						SelectElemVisitor.funcArgs((List<?>) fc.expression_list()));
 
 			Full_column_nameContext fn = ctx.full_column_name();
 			if (fn != null)
@@ -147,17 +146,17 @@ expression
 //		}
 	}
 
-	private List<ExprPart> funcArgs(Expression_listContext expression_list) {
-		if (expression_list != null) {
-			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
-			for (ExpressionContext exp : expression_list.expression()) {
-				String op = exp.op.getText();
-				if (op != null)
-					// recursive visit?
-					lst.add(new ExprPart(exp.getText()));
-			}
-		}
-		return null;
-	}
+//	private List<String> funcArgs(Expression_listContext expression_list) {
+//		if (expression_list != null) {
+//			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
+//			for (ExpressionContext exp : expression_list.expression()) {
+//				String op = exp.op.getText();
+//				if (op != null)
+//					// recursive visit?
+//					lst.add(new ExprPart(exp.getText()));
+//			}
+//		}
+//		return null;
+//	}
 	
 }

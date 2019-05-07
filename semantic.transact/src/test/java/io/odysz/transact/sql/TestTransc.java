@@ -79,14 +79,11 @@ left outer join a_roles r on roleId = roleId
 			.where("like", "a_user.userName", "''")
 			.where("=", "a_user.orgId", "''")
 			.commit(sqls);
-
-		Utils.logi(sqls);
-
-		String last = sqls.get(sqls.size() - 1);
-		int lastlen = last.length();
-		assertEquals("a_user.roleId = r.roleId where a_user.userName like '' AND a_user.orgId = ''",
-				last.substring(lastlen - 75, lastlen));
 		 */
+		String last = sqls.get(1);
+		int lastlen = last.length();
+		assertEquals("where lg.stamp >= '1776-07-04' AND userId in ('ele1', 'ele2', ele3) group by lg.stamp, log",
+				last.substring(lastlen - 90, lastlen));
 	}
 
 	@Test
@@ -94,12 +91,14 @@ left outer join a_roles r on roleId = roleId
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.select("a_funcs", "f")
 			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
-			.col("f.funcName IS null", "checked")
+			.col("f.funcName is not null", "checked")
 			.col("f.funcId", "fid")
+			.col("substring(notes, 1, 16)", "notes")
 			.commit(st.instancontxt(null), sqls);
 
-		assertEquals("select f.funcName is not null checked",
-				sqls.get(0).substring(0, 38));
+		assertEquals("select f.funcName is not null checked, f.funcId fid, substring(notes, 1, 16) notes " +
+				"from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId = '123456'",
+				sqls.get(0));
 	}
 	
 	@Test

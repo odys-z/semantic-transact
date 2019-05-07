@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import gen.antlr.sql.select.SelectParts.Function_callContext;
 import gen.antlr.sql.exprs.TSqlLexer;
@@ -143,9 +144,13 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 
 		ExpressionContext exp = ctx.expression();
 		// constant expression
-		if (exp != null && exp.primitive_expression() != null
-				&& exp.primitive_expression().constant() != null) {
-			text = exp.primitive_expression().constant().getText();
+//		if (exp != null && exp.primitive_expression() != null
+//				&& exp.primitive_expression().constant() != null) {
+//			text = exp.primitive_expression().constant().getText();
+//			ele = new SelectElem(ElemType.constant, text);
+//		}
+		if (exp != null && exp.constant() != null) {
+			text = exp.constant().getText();
 			ele = new SelectElem(ElemType.constant, text);
 		}
 		else if (exp != null)  {
@@ -153,12 +158,37 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			// function
 			Function_callContext f = exp.function_call();
 			if (f != null)  {
-				text = f.getText();
-				Expression_listContext args = f.expression_list();
-				if (text != null) {
-					Funcall func = new Funcall(f.func_proc_name().getText(), funcArgs(args.expression()));
-					ele = new SelectElem(func);
+				// text = f.getText();
+				// aggregation funcion
+				if (f.aggregate_windowed_function() != null) {
+					text = f.aggregate_windowed_function().getChild(0).getText();
+					// '(' ('*' | full_column_name) ')'
+					if (text != null) {
+						String coln = "*";
+						if (f.aggregate_windowed_function().full_column_name() != null)
+							coln = f.aggregate_windowed_function().full_column_name().getText();
+						Funcall func = new Funcall(text, coln);
+						ele = new SelectElem(func);
+					}
 				}
+				// funcion
+				else {
+					text = f.func_proc_name().getText();
+					if (text != null) {
+						Expression_listContext args = f.expression_list();
+						Funcall func = new Funcall(text, funcArgs(args.expression()));
+						ele = new SelectElem(func);
+					}
+				}
+
+			}
+			// expression IS null_notnull
+			else if (ctx.IS() != null) {
+				// simplified handling - all raw text as expression, bug here
+				op op = ctx.null_notnull().NOT() != null ?
+						Logic.op.isNotnull : Logic.op.isnull;
+				ExprPart expr = new ExprPart(op, ctx.expression().getText(), "");
+				ele = new SelectElem(expr);
 			}
 			// expression
 			else if (text != null) {
@@ -179,16 +209,17 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 		return null;
 	}
 
-	private List<ExprPart> funcArgs(List<ExpressionContext> list) {
+	public static String[] funcArgs(List<?> list) {
 		if (list != null) {
-			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
-			for (ExpressionContext exp : list) {
-				String op = exp.op.getText();
-				if (op != null)
-					// recursive visit?
-					lst.add(new ExprPart(exp.getText()));
+			ArrayList<String> lst = new ArrayList<String>();
+			for (Object exp : list) {
+				
+//				String op = exp.op.getText();
+//				if (op != null)
+					// FIXME no recursive expression visit here?
+					lst.add(((ParserRuleContext)exp).getText());
 			}
-			return lst;
+			return lst.toArray(new String[lst.size()]);
 		}
 		return null;
 	}

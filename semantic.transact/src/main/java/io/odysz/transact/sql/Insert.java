@@ -90,10 +90,11 @@ public class Insert extends Statement<Insert> {
 	public Insert value(ArrayList<Object[]> val) throws TransException {
 		if (val == null)
 			return this;
-		if (insertCols == null || selectValues != null)
+		if (insertCols != null && insertCols.size() > 0
+				&& selectValues != null && selectValues.size() > 0)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 
-		if (insertCols.size() != val.size())
+		if (insertCols != null && insertCols.size() != val.size())
 			throw new TransException("columns' number didn't match rows field count.");
 
 		if (valuesNv == null)

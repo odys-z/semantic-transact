@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.7.1
+// Generated from SelectParts.g4 by ANTLR 4.7.2
 package gen.antlr.sql.select;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -112,12 +112,6 @@ public interface SelectPartsVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTable_name(SelectParts.Table_nameContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SelectParts#primitive_expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrimitive_expression(SelectParts.Primitive_expressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SelectParts#unary_operator_expression}.
 	 * @param ctx the parse tree

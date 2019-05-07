@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.7.1
+// Generated from SelectParts.g4 by ANTLR 4.7.2
 package gen.antlr.sql.select;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -215,18 +215,6 @@ public class SelectPartsBaseListener implements SelectPartsListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTable_name(SelectParts.Table_nameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPrimitive_expression(SelectParts.Primitive_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPrimitive_expression(SelectParts.Primitive_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
