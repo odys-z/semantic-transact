@@ -7,7 +7,7 @@ import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
-import io.odysz.semantics.x.SemanticException;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
@@ -25,7 +25,7 @@ import io.odysz.transact.x.TransException;
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public interface IPostOperat {
-		Object op (ISemantext ctx, ArrayList<String> sqls) throws TransException, SQLException;
+		SemanticObject op (ISemantext ctx, ArrayList<String> sqls) throws TransException, SQLException;
 	}
 
 	public enum Type { select, insert, update, delete }
@@ -55,11 +55,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
 	
-	public T where(ArrayList<String[]> conds) throws SemanticException {
+	public T where(ArrayList<String[]> conds) throws TransException {
 		if (conds != null && conds.size() > 0)
 			for (String[] cond : conds) 
 				if (cond.length != Ix.predicateSize)
-					throw new SemanticException("SQL predicate size is invalid: %s",
+					throw new TransException("SQL predicate size is invalid: %s",
 								LangExt.toString(cond));
 				else
 					where(cond[Ix.predicateOper], cond[Ix.predicateL], cond[Ix.predicateR]);

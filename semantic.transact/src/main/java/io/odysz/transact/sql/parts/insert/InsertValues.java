@@ -43,7 +43,7 @@ public class InsertValues extends AbsPart {
 			else if (colIdx.containsKey(nv[0]))
 					idx = colIdx.get(nv[0]);
 			else {
-				Utils.warn("Can't find column index for col %s %s", nv[0], nv[1]);
+				Utils.warn("Can't find column index for col %s (value = %s)", nv[0], nv[1]);
 				continue;
 			}
 			try {

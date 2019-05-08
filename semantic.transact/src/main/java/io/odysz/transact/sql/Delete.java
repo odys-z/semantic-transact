@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
@@ -67,14 +66,13 @@ public class Delete extends Statement<Delete>  {
 	/**Add multi del insert update for children table
 	 * - a special frequently used case of CRUD, should be abstracted into a more general way.
 	 * @param multireq
-	 * @throws SemanticException 
+	 * @throws TransException 
 	 */
-	public void postChildren(SemanticObject multireq) throws SemanticException {
-		throw new SemanticException("TODO...");
+	public void postChildren(SemanticObject multireq) throws TransException {
+		throw new TransException("Not working yet ...");
 	}
 	
-	public Object del(ISemantext ctx) {
-		
-		return null;
+	public Object del(ISemantext ctx) throws TransException {
+		throw new TransException("Not working yet ...");
 	}
 }

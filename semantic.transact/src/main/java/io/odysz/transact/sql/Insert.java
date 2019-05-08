@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
@@ -38,7 +37,8 @@ public class Insert extends Statement<Insert> {
 	public Insert nv(String n, Object v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
-		currentRowNv.add(new String[] {n, String.valueOf(v)});
+		// currentRowNv.add(new String[] {n, String.valueOf(v)});
+		currentRowNv.add(new Object[] {n, v});
 		
 		// column names
 		if (insertCols == null)
@@ -219,42 +219,42 @@ public class Insert extends Statement<Insert> {
 		return s.collect(Collectors.joining(" "));
 	}
 
-	/**Create ValueList from row. 
-	 * @param row
-	 * @param colIdx
-	 * @return
-	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
-		if (row == null)
-			return null;
-
-		ValueList vs = new ValueList(row.size());
-		int idx = -1;
-		for (Object[] nv : row) {
-			if (nv == null) continue;
-
-			if (colIdx == null)
-				idx++;
-			else if (colIdx.containsKey(nv[0]))
-					idx = colIdx.get(nv[0]);
-			else {
-				Utils.warn("Can't find column index for col %s %s", nv[0], nv[1]);
-				continue;
-			}
-			try {
-				if (nv[1] instanceof String)
-					// vs.constv(idx, (String) nv[1]);
-					vs.constv(idx, sctx == null ? (String)nv[1]
-												: (String) sctx.resulvedVal((String)nv[1]));
-				else
-					vs.v(idx, (AbsPart) nv[1]);
-			} catch (TransException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return vs;
-	}
-	 */
+//	/**Create ValueList from row. 
+//	 * @param row
+//	 * @param colIdx
+//	 * @return
+//	 */
+//	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
+//		if (row == null)
+//			return null;
+//
+//		ValueList vs = new ValueList(row.size());
+//		int idx = -1;
+//		for (Object[] nv : row) {
+//			if (nv == null) continue;
+//
+//			if (colIdx == null)
+//				idx++;
+//			else if (colIdx.containsKey(nv[0]))
+//					idx = colIdx.get(nv[0]);
+//			else {
+//				Utils.warn("Can't find column index for col %s %s", nv[0], nv[1]);
+//				continue;
+//			}
+//			try {
+//				if (nv[1] instanceof String)
+//					// vs.constv(idx, (String) nv[1]);
+//					vs.constv(idx, sctx == null ? (String)nv[1]
+//												: (String) sctx.resulvedVal((String)nv[1]));
+//				else
+//					vs.v(idx, (AbsPart) nv[1]);
+//			} catch (TransException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		return vs;
+//	}
 
 	public Map<String, Integer> getColumns() { return insertCols; }
 

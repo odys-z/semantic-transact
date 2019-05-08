@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.semantics.IResults;
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -91,12 +91,12 @@ column_elem
     : (table_name '.')? (column_name=id) as_column_alias?
     ;
 	</pre>
- * @author ody
+ * @author odys-z@github.com
  *
  */
 public class Query extends Statement<Query> {
 	/**String Array Index definition. Not using java field for compliance with JS (without GWT).
-	 * @author ody
+	 * @author odys-z@github.com
 	 */
 	public static class Ix {
 		/**String[0] = join.j | join.l | join.r */
@@ -368,12 +368,12 @@ public class Query extends Statement<Query> {
 	 * @throws TransException
 	 * @throws SQLException
 	 */
-	public IResults rs(ISemantext ctx) throws TransException, SQLException {
+	public SemanticObject rs(ISemantext ctx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
 			// return postOp.op(ctx.connId(), sqls);
-			return (IResults) postOp.op(ctx, sqls);
+			return postOp.op(ctx, sqls);
 		}
 		return null;
 	}

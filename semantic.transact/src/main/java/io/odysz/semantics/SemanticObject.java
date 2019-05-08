@@ -137,6 +137,18 @@ public class SemanticObject extends Object {
 		return this;
 	}
 
+	/**Add int array.
+	 * @param prop
+	 * @param ints
+	 * @return this
+	 * @throws TransException
+	 */
+	public SemanticObject addInts(String prop, int[] ints) throws TransException {
+		for (int e : ints)
+			add(prop, e);
+		return this;
+	}
+
 	public Object remove(String prop) {
 		if (props != null && props.containsKey(prop))
 			return props.remove(prop);

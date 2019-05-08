@@ -8,7 +8,7 @@ import java.util.Map;
 import org.xml.sax.SAXException;
 
 import io.odysz.common.AESHelper;
-import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 
 /**Default data structure semantics description and supporter.<br>
  * The basic {@link Semantext2} use this to manage semantics configuration for resolving data semantics.
@@ -97,8 +97,8 @@ class Semantics2 {
 		/** "clob" | "orclob": the column is a CLOB field, semantic-transact will read/write separately in stream and get final results.*/
 		orclob;
 
-		public static smtype parse(String type) throws SemanticException {
-			if (type == null) throw new SemanticException("semantics is null");
+		public static smtype parse(String type) throws TransException {
+			if (type == null) throw new TransException("semantics is null");
 			type = type.toLowerCase().trim();
 			if ("auto".equals(type) || "pk".equals(type) || "a-k".equals(type) || "autopk".equals(type))
 				return autoPk;
@@ -122,11 +122,11 @@ class Semantics2 {
 				return stamp1MoreThanRefee;
 			else if ("clob".equals(type) || "orclob".equals(type))
 				return orclob;
-			else throw new SemanticException("semantics not known: " + type);
+			else throw new TransException("semantics not known: " + type);
 		}
 	}
 	
-	public static HashMap<String, Semantics2> init(String path) throws SAXException, SemanticException {
+	public static HashMap<String, Semantics2> init(String path) throws SAXException, TransException {
 		HashMap<String, Semantics2> ss = new HashMap<String, Semantics2>();
 
 //		XMLTable conn = XMLDataFactory.getTable(new Log4jWrapper("") , "semantics", path,
@@ -218,12 +218,12 @@ class Semantics2 {
 	 * @param tabl
 	 * @param recId
 	 * @param args
-	 * @throws SemanticException 
+	 * @throws TransException 
 	 */
-	public Semantics2(smtype semantic, String tabl, String recId, String args) throws SemanticException {
+	public Semantics2(smtype semantic, String tabl, String recId, String args) throws TransException {
 		addSemantics(semantic, tabl, recId, args);
 	}
-	public Semantics2(String semantic, String tabl, String recId, String args) throws SemanticException {
+	public Semantics2(String semantic, String tabl, String recId, String args) throws TransException {
 		addSemantics(smtype.parse(semantic), tabl, recId, args);
 	}
 	
@@ -233,7 +233,7 @@ class Semantics2 {
 	 * @param args
 	 * @throws SQLException
 	 */
-	public void addSemantics(smtype semantic, String tabl, String recId, String args) throws SemanticException {
+	public void addSemantics(smtype semantic, String tabl, String recId, String args) throws TransException {
 		checkParas(tabl, recId, args);
 		String[] argss = args.split(",");
 		if (smtype.autoPk == semantic)
@@ -256,13 +256,13 @@ class Semantics2 {
 			addComposings(tabl, recId, argss);
 		else if (smtype.stamp1MoreThanRefee == semantic)
 			addUpDownStamp(tabl, recId, argss);
-		else throw new SemanticException("Unsuppported semantics: " + semantic);
+		else throw new TransException("Unsuppported semantics: " + semantic);
 	}
 
 	private void addAutoPk(String tabl, String recId, String[] argss) {
 		autoPk = recId;
 	}
-	private void addSemantics(String type, String tabl, String recId, String args) throws SemanticException {
+	private void addSemantics(String type, String tabl, String recId, String args) throws TransException {
 		smtype st = smtype.parse(type);
 		addSemantics(st, tabl, recId, args);
 	}
@@ -271,18 +271,18 @@ class Semantics2 {
 	 * @param tabl
 	 * @param recId
 	 * @param args
-	 * @throws SemanticException sementic configuration not matching the target or lack of args.
+	 * @throws TransException sementic configuration not matching the target or lack of args.
 	 */
-	private void checkParas(String tabl, String recId, String args) throws SemanticException {
+	private void checkParas(String tabl, String recId, String args) throws TransException {
 		if (tabl == null || recId == null || args == null)
-			throw new SemanticException(String.format(
+			throw new TransException(String.format(
 					"adding semantics with empty targets? %s %s %s",
 					tabl, recId, args));
 
 		if (target != null && !target.equals(tabl))
-			throw new SemanticException(String.format("adding semantics for different target? %s vs. %s", target, tabl));
+			throw new TransException(String.format("adding semantics for different target? %s vs. %s", target, tabl));
 		if (idField != null && !idField.equals(recId))
-			throw new SemanticException(String.format("adding semantics for target of diferent id field? %s vs. %s", idField, recId));
+			throw new TransException(String.format("adding semantics for target of diferent id field? %s vs. %s", idField, recId));
 	}
 	
 	/**
