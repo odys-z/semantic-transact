@@ -9,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
+import io.odysz.semantics.meta.TableMeta;
+import io.odysz.semantics.meta.ColType.coltype;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.x.TransException;
 
@@ -20,7 +22,7 @@ public class SemanticsTest {
 	@Before
 	public void setUp() throws Exception {
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
-		st = new Transcxt(new Semantext2("root", semantics));
+		st = new Transcxt(new Semantext2("root", semantics, fakeMetas()));
 	}
 
 	@Test
@@ -34,7 +36,7 @@ public class SemanticsTest {
 			.commit(st.instancontxt(null), sqls);
 		
 		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', '10', '0', 'fullpath 0.0 AUTO')",
+			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
 			sqls.get(0));
 		
 		ArrayList<ArrayList<?>> vals = new ArrayList<ArrayList<?>>();
@@ -58,4 +60,18 @@ public class SemanticsTest {
 		Utils.logi(sqls);
 	}
 
+
+	@SuppressWarnings("serial")
+	static HashMap<String, TableMeta> fakeMetas() {
+		return new HashMap<String, TableMeta>() {
+			{put("a_functions", fackFuncs());}
+			{put("a_role_funcs", new TableMeta("a_role_funcs"));}
+		};
+	}
+
+	private static TableMeta fackFuncs() {
+		return new TableMeta("a_functions")
+				.col("sibling", coltype.number)
+				.col("parentId", coltype.text);
+	}
 }

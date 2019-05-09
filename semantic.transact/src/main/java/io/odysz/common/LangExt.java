@@ -97,4 +97,13 @@ public class LangExt {
 		}
 		return null;
 	}
+
+	/**Is s empty of only space - not logic meanings?
+	 * 
+	 * @param s
+	 * @return true: empty
+	 */
+	public static boolean isblank(String s) {
+		return s == null || s.trim().length() == 0;
+	}
 }

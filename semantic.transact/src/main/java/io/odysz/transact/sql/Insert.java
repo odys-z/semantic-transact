@@ -28,6 +28,9 @@ public class Insert extends Statement<Insert> {
 	private Query selectValues;
 	/**[ list[Object[n, v], ... ], ... ] */
 	private List<ArrayList<Object[]>> valuesNv;
+	
+	/**current row's nv.<br>
+	 * TODO let's depcate this - all new nv are appended to last of valuesNv */
 	private ArrayList<Object[]> currentRowNv;
 
 	Insert(Transcxt transc, String tabl) {
@@ -203,7 +206,7 @@ public class Insert extends Statement<Insert> {
 						// 'v1', 'v2', ...)
 //						Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
 //								.stream().map(row -> getValue(sctx, row, insertCols))
-					new InsertValues(insertCols, valuesNv)
+					new InsertValues(mainTabl, insertCols, valuesNv)
 				).filter(w -> hasValuesNv),
 				// select ...
 				Stream.of(selectValues).filter(w -> selectValues != null))

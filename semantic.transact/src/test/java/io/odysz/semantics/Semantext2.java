@@ -10,6 +10,7 @@ import java.util.Map;
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.Semantics2.smtype;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
@@ -25,10 +26,12 @@ class Semantext2 implements ISemantext {
 	private String tabl;
 	private HashMap<String, Semantics2> semantics;
 	private SemanticObject resolvedIds;
+	private HashMap<String, TableMeta> metas;
 
-	public Semantext2(String tabl, HashMap<String, Semantics2> semantics) {
+	public Semantext2(String tabl, HashMap<String, Semantics2> semantics, HashMap<String, TableMeta> metas) {
 		this.tabl = tabl;
 		this.semantics = semantics;
+		this.metas = metas;
 	}
 
 	/**When inserting, replace inserting values in 'AUTO' columns, e.g. generate auto PK for rec-id.
@@ -84,7 +87,7 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
-		return new Semantext2(tabl, semantics);
+		return new Semantext2(tabl, semantics, metas);
 	}
 
 	@Override
@@ -108,7 +111,7 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public ISemantext clone(IUser usr) {
-		return new Semantext2(tabl, semantics);
+		return new Semantext2(tabl, semantics, metas);
 	}
 
 	@Override
@@ -117,5 +120,10 @@ class Semantext2 implements ISemantext {
 	@Override
 	public SemanticObject resulves() {
 		return null;
+	}
+	
+	@Override
+	public TableMeta colType(String tabl) {
+		return metas.get(tabl);
 	}
 }

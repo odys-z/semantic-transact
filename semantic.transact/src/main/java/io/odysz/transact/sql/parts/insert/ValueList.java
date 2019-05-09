@@ -79,6 +79,7 @@ public class ValueList extends AbsPart {
 	protected ArrayList<AbsPart> valst;
 
 	protected AbsPart[] valsArr;
+	/** This is also the flag of multi-row values */
 	private boolean valsArrIsnull;
 	
 	public ValueList(int size) {
@@ -89,6 +90,13 @@ public class ValueList extends AbsPart {
 
 	public ValueList constv(int idx, String v) throws TransException {
 		return v(idx, new ExprPart("'" + v + "'"));
+//		ExprPart vpart;
+//		if (sctx.colType().isString())
+//			vpart = new ExprPart("'" + v + "'");
+//		else 
+//			vpart = new ExprPart(v);
+//
+//		return v(idx, vpart);
 	}
 
 	public ValueList v(int idx, AbsPart v) throws TransException {
@@ -105,16 +113,15 @@ public class ValueList extends AbsPart {
 	}
 
 	public ValueList constv(String v) throws TransException {
-//		if (valsArr != null)
-//			throw new TransException("Don't use both list and array mode in ValueList.");
-//
-//		if (valst == null)
-//			valst = new ArrayList<AbsPart>();
-//		valst.add(new ExprPart("'" + v + "'"));
-//		return this;
-		return v(new ExprPart("'" + v + "'"));
+		throw new TransException("yes it's realy used.");
+		// return v(new ExprPart("'" + v + "'"));
 	}
 	
+	/**Add value to the last column.
+	 * @param v
+	 * @return
+	 * @throws TransException
+	 */
 	public ValueList v(AbsPart v) throws TransException {
 		if (valsArr != null)
 			throw new TransException("Don't use both list and array mode in ValueList.");
@@ -123,7 +130,6 @@ public class ValueList extends AbsPart {
 			valst = new ArrayList<AbsPart>();
 		valst.add(v);
 		return this;
-
 	}
 
 	@Override

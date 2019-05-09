@@ -7,15 +7,19 @@ import java.util.stream.Collectors;
 
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 public class InsertValues extends AbsPart {
 
 	private List<ArrayList<Object[]>> values;
 	private Map<String, Integer> cols;
+	private String tabl;
 
-	public InsertValues(Map<String, Integer> cols, List<ArrayList<Object[]>> values) {
+	public InsertValues(String tabl, Map<String, Integer> cols, List<ArrayList<Object[]>> values) {
+		this.tabl = tabl;
 		this.cols = cols;
 		this.values = values;
 	}
@@ -29,6 +33,12 @@ public class InsertValues extends AbsPart {
 				.collect(Collectors.joining(", "));
 	}
 
+	/**Get row's value list used in sql values.
+	 * @param sctx
+	 * @param row
+	 * @param colIdx
+	 * @return value list
+	 */
 	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
 		if (row == null)
 			return null;
@@ -47,10 +57,16 @@ public class InsertValues extends AbsPart {
 				continue;
 			}
 			try {
-				if (nv[1] instanceof String)
-					// vs.constv(idx, (String) nv[1]);
-					vs.constv(idx, sctx == null ? (String)nv[1]
-												: (String) sctx.resulvedVal((String)nv[1]));
+				if (nv[1] instanceof String) {
+					// Only value through java api know what's the type, the json massage handler don't.
+					// So we figure it out throw db meta data.
+					String str = sctx == null ? (String)nv[1]
+							 : (String) sctx.resulvedVal((String)nv[1]);
+					TableMeta ct = sctx.colType(tabl);
+					if (ct != null && ct != null && ct.isText((String)nv[0]))
+						vs.constv(idx, str);
+					else vs.v(idx, new ExprPart(str));
+				}
 				else
 					vs.v(idx, (AbsPart) nv[1]);
 			} catch (TransException e) {

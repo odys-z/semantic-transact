@@ -13,14 +13,10 @@ public class Transcxt {
 	protected ISemantext basictx;
 	public ISemantext basictx() { return basictx; }
 
-//	protected static HashMap<String, HashMap<String, ISemantext>> smtCfgs;
-
-	/**Get a basic Semantext that typicall don't handle many semantics, can only used for basic sql generation,
-	 * except the transact builder is constructed with a very strong Semantext, like that in cheap engine.
-	 * @return
-	public ISemantext basictx() { return basictx; }
+	/**Get a {@link ISemantext} that typically handle configured semantics,
+	 * @param usr the session user
+	 * @return a new instance for building sql, resulving sql, etc.
 	 */
-
 	public ISemantext instancontxt(IUser usr) {
 		return basictx == null ? null : basictx.clone(usr);
 	}
@@ -44,17 +40,7 @@ public class Transcxt {
 		return new Update(this, tabl);
 	}
 	
-	public Delete delete(String tabl, IUser usr) {
+	public Delete delete(String tabl) {
 		return new Delete(this, tabl);
 	}
-
-	/**
-	 * @param insert
-	 * @param tabl
-	 * @param usr
-	 * @return {@link #semantext}
-	public <T extends Statement<T>> ISemantext ctx(T insert, String tabl, IUser... usr) {
-		return semantext;
-	}
-	 */
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.Query.Ix;
@@ -43,19 +42,25 @@ public class Update extends Statement<Update> {
 		return this;
 	}
 	
-	public Object u(ISemantext stx) throws TransException, SQLException {
+	/**Commit updating sql(s) to db.
+	 * @param stx semantext instance
+	 * @return semanticObject, return of postOp.
+	 * @throws TransException
+	 * @throws SQLException
+	 */
+	public SemanticObject u(ISemantext stx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(stx, sqls);
-			// return postOp.op(stx.connId(), sqls);
-			Object res = postOp.op(stx, sqls);
-			
-			if (res instanceof int[]) // Connects.commit() usually return this for update
-				res = LangExt.toString((int[])res);
-			// update results: cond = where, post autovals.
-			return new SemanticObject()
-					.put("updated", res)
-					.put("autoVals", stx.resulves());
+			// Connects.commit() usually return this for update
+
+			return postOp.op(stx, sqls);
+//			SemanticObject res = postOp.op(stx, sqls);
+//			if (res instanceof int[])
+//				res = LangExt.toString((int[])res);
+//			return new SemanticObject()
+//					.put("updated", res)
+//					.put("autoVals", stx.resulves());
 		}
 		return null;
 	}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.common.dbtype;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
@@ -145,4 +146,7 @@ public interface ISemantext {
 	 * @return new semantext instance
 	 */
 	public ISemantext clone(IUser usr);
+
+	public TableMeta colType(String tabl);
+
 }

@@ -1,11 +1,11 @@
 package io.odysz.transact.sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
@@ -14,6 +14,23 @@ public class Delete extends Statement<Delete>  {
 
 	Delete(Transcxt transc, String tabl) {
 		super(transc, tabl, null);
+	}
+
+	public Object d(ISemantext stx) throws TransException, SQLException {
+		if (postOp != null) {
+			ArrayList<String> sqls = new ArrayList<String>(); 
+			commit(stx, sqls);
+			return postOp.op(stx, sqls);
+			
+//			Object res = postOp.op(stx, sqls);
+//			
+//			if (res instanceof int[])
+//				res = LangExt.toString((int[])res);
+//			return new SemanticObject()
+//					.put("deleted", res)
+//					.put("autoVals", stx.resulves());
+		}
+		return null;
 	}
 
 	@Override
@@ -67,12 +84,9 @@ public class Delete extends Statement<Delete>  {
 	 * - a special frequently used case of CRUD, should be abstracted into a more general way.
 	 * @param multireq
 	 * @throws TransException 
-	 */
 	public void postChildren(SemanticObject multireq) throws TransException {
 		throw new TransException("Not working yet ...");
 	}
+	 */
 	
-	public Object del(ISemantext ctx) throws TransException {
-		throw new TransException("Not working yet ...");
-	}
 }
