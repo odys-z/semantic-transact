@@ -8,6 +8,12 @@ import io.odysz.transact.sql.parts.condition.Condit;
 /**Logic expression etc's helper */
 public class Sql {
 	
+	/**Create {@link Condit} from string.
+	 * '%' (like) in format must be '%%'.
+	 * @param format
+	 * @param args
+	 * @return
+	 */
 	public static Condit condt(String format, Object... args) {
 		// try format == op - user can be confused like condt("=", "f.c1", "v1");
 		op op = Logic.op(format);
@@ -33,13 +39,4 @@ public class Sql {
 		return new Condit(op, loperand, roperand);
 	}
 	
-
-	/**TODO Deprecated?
-	 * @param ele the elements
-	 * @return "'ele1','ele2','ele3',..."
-	public static String str(String[] ele) {
-		return "'ele1','ele2','ele3'";
-	}
-	 */
-
 }

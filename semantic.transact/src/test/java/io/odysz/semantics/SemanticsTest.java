@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import io.odysz.common.Utils;
 import io.odysz.semantics.meta.TableMeta;
-import io.odysz.semantics.meta.ColType.coltype;
+import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.x.TransException;
 

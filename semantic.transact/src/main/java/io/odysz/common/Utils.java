@@ -81,7 +81,9 @@ public class Utils {
 
 			if (list != null)
 				for (T it : list)
-					if (args != null && args.length > 0)
+					if (it == null)
+						System.out.println("null");
+					else if (args != null && args.length > 0)
 						System.out.println(String.format(it.toString(), args));
 					else
 						System.out.println(it.toString());

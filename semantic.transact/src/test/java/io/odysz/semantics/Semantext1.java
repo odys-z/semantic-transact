@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
-import io.odysz.semantics.meta.ColType;
+import io.odysz.semantics.meta.ColMeta;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;

@@ -13,22 +13,6 @@ import java.util.regex.Pattern;
  *
  */
 public class Regex {
-//	private static Pattern reg;
-//	static {
-//		try {
-//			String regex = Configs.getCfg("members.passport.regex");
-//			if (regex != null && regex.trim().length() > 0)
-//				reg = Pattern.compile(regex);
-//			else reg = null;
-//		}catch (Exception ex) { ex.printStackTrace(); }
-//	}
-//
-//	public static boolean staticMatch (String v) {
-//		if (reg == null) return false;
-//		Matcher matcher = reg.matcher(v);
-//		return matcher.find();
-//	}
-	
 	// also can be used in Instanced style
 	private final Pattern regInst;
 	public Regex(String pattern) {
@@ -57,15 +41,8 @@ public class Regex {
         ArrayList<String[]> res = new ArrayList<String[]>();
         int i = 0;
         while (matcher.find()) {
-//            System.out.println(" ---------------- ");
-//            System.out.println(v);
-//            System.out.print("Start index: " + matcher.start());
-//            System.out.print(" End index: " + matcher.end() + " ");
-//            System.out.println(matcher.group());
-
         	String[] grps = new String[matcher.groupCount()];
             for (int g = 0; g < matcher.groupCount(); g++) {
-//            	System.out.println("group " + g + "\t" + matcher.group(g));
             	grps[g] = matcher.group(g);
             }
             res.add(grps);

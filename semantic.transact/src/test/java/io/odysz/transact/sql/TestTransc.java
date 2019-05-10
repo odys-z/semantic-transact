@@ -26,29 +26,31 @@ public class TestTransc {
 		st = new Transcxt(null);
 	}
 
-//	private String[] users() {
-//		return new String[] {"usr1", "user2"};
-//	}
-
 	@Test
 	public void testSelect() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
-			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
+			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
+			.where("%~", "f.funcName", "'bourgeoisie'")
 			.commit(st.instancontxt(null), sqls);
+		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie'",
+				sqls.get(0));
 
 		st.select("a_log", "lg")
 			.col("lg.stamp", "logtime")
 			.col("lg.txt", "log")
 			.where(">=", "lg.stamp", "'1776-07-04'")
-			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3"))
+			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'"))
+			// .where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'"))
 			.groupby("lg.stamp")
 			.groupby("log")
 			.commit(sqls);
+		assertEquals("select lg.stamp logtime, lg.txt log from a_log lg where lg.stamp >= '1776-07-04' AND userId in ('ele1', 'ele2', 'ele3') group by lg.stamp, log",
+				sqls.get(1));
 		
 		st.select("a_log", "lg")
 			.page(0, 20)
@@ -62,28 +64,9 @@ public class TestTransc {
 			.orderby("cnt", "desc")
 			.orderby("stamp")
 			.commit(sqls);
-		// TODO assert OR
 
-		/* Added case: ignored table / alias from client
-select userId userId, userName userName, mobile mobile, dept.orgId orgId, a_reg_org.orgName orgName, 
-dept.departName departName, dept.departId departId, r.roleId roleId, r.roleName roleName, notes notes 
-from a_user  
-join a_reg_org  on orgId = orgId 
-left outer join a_org_depart dept on departId = dept.departId 
-left outer join a_roles r on roleId = roleId 
-		st.select("a_user")
-			.col("userId", "userId").col("userName").col("dept.orgId", "orgId").col("a_org_depart.orgName")
-			.j("a_reg_org", "orgId =orgId ")
-			.l("a_org_depart", "dept", "departId = dept.departId")
-			.l("a_roles", "r", "roleId=roleId")
-			.where("like", "a_user.userName", "''")
-			.where("=", "a_user.orgId", "''")
-			.commit(sqls);
-		 */
-		String last = sqls.get(1);
-		int lastlen = last.length();
-		assertEquals("where lg.stamp >= '1776-07-04' AND userId in ('ele1', 'ele2', ele3) group by lg.stamp, log",
-				last.substring(lastlen - 90, lastlen));
+		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND userId = 'George' AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
+				sqls.get(2));
 	}
 
 	@Test
@@ -120,7 +103,6 @@ left outer join a_roles r on roleId = roleId
 			.commit(sqls);
 		assertEquals(sqls.get(1),
 				"insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')");
-		// Utils.logi(sqls);
 	}
 
 	@Test

@@ -62,10 +62,15 @@ public class InsertValues extends AbsPart {
 					// So we figure it out throw db meta data.
 					String str = sctx == null ? (String)nv[1]
 							 : (String) sctx.resulvedVal((String)nv[1]);
-					TableMeta ct = sctx.colType(tabl);
-					if (ct != null && ct != null && ct.isText((String)nv[0]))
+					if (sctx == null)
+						// when testing
 						vs.constv(idx, str);
-					else vs.v(idx, new ExprPart(str));
+					else {
+						TableMeta cltyp = sctx.colType(tabl);
+						if (cltyp == null || cltyp.isText((String)nv[0]))
+							vs.constv(idx, str);
+						else vs.v(idx, new ExprPart(str));
+					}
 				}
 				else
 					vs.v(idx, (AbsPart) nv[1]);

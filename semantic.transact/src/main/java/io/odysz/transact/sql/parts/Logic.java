@@ -71,10 +71,11 @@ public class Logic {
 	
 	public static op op(String oper, boolean... withNot) {
 		oper = oper.toLowerCase();
+		// check SearchExprs.g4, ?0, !?0, etc. are not working
 		op jc = "=".equals(oper) || "eq".equals(oper) ? op.eq
 	   				 : "%".equals(oper) || "like".equals(oper) ? op.like
-	   				 : "~%".equals(oper) || "=%".equals(oper) || "rlike".equals(oper) ? op.rlike
-	   				 : "%~".equals(oper) || "%=".equals(oper) || "llike".equals(oper) ? op.llike
+	   				 : "~%".equals(oper) || "rlike".equals(oper) ? op.rlike // =% is not correct
+	   				 : "%~".equals(oper) || "llike".equals(oper) ? op.llike // %= is assignment operator
    					 : "<=".equals(oper) || "le".equals(oper) ? op.le
    					 : "<".equals(oper) || "lt".equals(oper) ? op.lt
    					 : ">=".equals(oper) || "ge".equals(oper) ? op.ge

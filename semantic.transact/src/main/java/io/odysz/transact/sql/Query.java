@@ -326,16 +326,6 @@ public class Query extends Statement<Query> {
 				}
 			});
 		
-//		if (pg >= 0 && pgSize > 0) {
-//			if (sctx != null)
-//				try {
-//					s = sctx.pagingStream(s, pg, pgSize);
-//				} catch (TransException e1) {
-//					e1.printStackTrace();
-//				}
-//			else Utils.warn("The query transaction needing a sql paging implementation, but the semantext instance is null. See semantic.DA/io.odysz.semantic.DASemantext#pagingStream() for example.");
-//		}
-
 		return s.collect(Collectors.joining(" "));
 	}
 	
