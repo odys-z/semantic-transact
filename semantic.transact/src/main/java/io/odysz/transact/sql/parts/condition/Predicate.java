@@ -2,29 +2,35 @@ package io.odysz.transact.sql.parts.condition;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
+import io.odysz.transact.x.TransException;
 
 /**Basically a logic expression. For predicate definition, see {@link io.odysz.transact.sql.parts.antlr.PredicatVisitor}.
  * @author odys-z@github.com
  */
 public class Predicate extends AbsPart {
 
-//	public static Predicate IsNull() {
-//		return new Predicate(Logic.op.isnull, "", "");
-//	}
-
 	private boolean empty = false;
+	
 	private boolean negative = false;
+	public boolean negative() { return negative; }
+
 	private Logic.op op;
+	public Logic.op logic() { return op; }
+
 	private ExprPart l;
 	private ExprPart r;
 	private boolean brace;
 	private Condit search_condit;
+
+	private Query inSelect;
 
 	public Predicate(Logic.op op, ExprPart lexpr, String rop) {
 		this.op = op;
@@ -78,6 +84,14 @@ public class Predicate extends AbsPart {
 		this.search_condit = search_condit;
 	}
 
+	public Predicate(Logic.op in, String col, Query s) throws TransException {
+		this.op = in;
+		if (in != Logic.op.in)
+			throw new TransException("Currently only 'in' operator is supported for select condition. select:\n %s", s.sql(null));
+		this.l = new ExprPart(col);
+		this.inSelect = s;
+	}
+
 	public void not(TerminalNode not) {
 		negative = not != null && not.getText() != null && not.getText().length() > 0;
 	}
@@ -85,6 +99,17 @@ public class Predicate extends AbsPart {
 	@Override
 	public String sql(ISemantext sctx) {
 		if (empty) return "";
+		else if (op == Logic.op.in && inSelect != null)
+			return Stream.of(l, new ExprPart("in ("), inSelect, new ExprPart(")"))
+					.map(e -> {
+						try {
+							return e == null ? "" : e.sql(sctx);
+						} catch (TransException e1) {
+							e1.printStackTrace();
+							return "";
+						}
+					})
+					.collect(Collectors.joining(" "));
 
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));

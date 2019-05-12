@@ -2,9 +2,12 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.Query.Ix;
@@ -13,6 +16,12 @@ import io.odysz.transact.sql.parts.update.SetList;
 import io.odysz.transact.x.TransException;
 
 public class Update extends Statement<Update> {
+
+	/**[col-name, col-index] */
+	private Map<String,Integer> updateCols;
+	public Map<String, Integer> getColumns() { return updateCols; }
+
+
 	private ArrayList<Object[]> nvs;
 
 	Update(Transcxt transc, String tabl) {
@@ -28,6 +37,15 @@ public class Update extends Statement<Update> {
 		if (nvs == null)
 			nvs = new ArrayList<Object[]>();
 		nvs.add(new Object[] {n, v});
+		
+		// column names
+		if (updateCols == null)
+			updateCols = new HashMap<String, Integer>();
+		if (!updateCols.containsKey(n))
+			updateCols.put(n, updateCols.size());
+		else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
+				n, v);
+		
 		return this;
 	}
 
@@ -42,6 +60,27 @@ public class Update extends Statement<Update> {
 		return this;
 	}
 	
+	@Override
+	public Update commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		// prepare semantics like auto-pk
+		prepare(cxt);
+
+		if (cxt != null) {
+			cxt.onUpdate(this, mainTabl, nvs);
+			if (postate != null)
+				for (Statement<?> pst : postate)
+					if (pst instanceof Update)
+						cxt.onUpdate((Update)pst, pst.mainTabl, ((Update)pst).nvs);
+					// FIXME what about it's insert, delete?
+		}
+
+		sqls.add(sql(cxt));
+		if (postate != null)
+			for (Statement<?> pst : postate)
+				sqls.add(pst.sql(cxt));
+		return this;
+	}
+
 	/**Commit updating sql(s) to db.
 	 * @param stx semantext instance
 	 * @return semanticObject, return of postOp.
@@ -66,7 +105,7 @@ public class Update extends Statement<Update> {
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		if (sctx != null)
 			sctx.onUpdate(this, mainTabl, nvs);
 		

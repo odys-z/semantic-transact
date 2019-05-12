@@ -96,6 +96,7 @@ search_condition_not
 	String lAlias;
 	/** Additional information of right alias for generating sql. */
 	String rAlias;
+
 	/**<p>Sometimes conditions's table name or alias are ignored by client.
 	 * This method can be called by {@link io.odysz.transact.sql.parts.select.JoinTabl}
 	 * to supply additional information when generating sql.<p>

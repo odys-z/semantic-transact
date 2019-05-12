@@ -6,9 +6,10 @@ import java.util.List;
 
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
-import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
 /**<p>Interface for semantic event handler.</p>
@@ -77,8 +78,11 @@ public interface ISemantext {
 	 * @param tabl
 	 * @param nvs
 	 * @return the update context
+	 * @throws SemanticException 
 	 */
-	public ISemantext onUpdate(Statement<? extends Statement<?>> update, String tabl, ArrayList<Object[]> nvs);
+	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) throws TransException;
+
+	public ISemantext onDelete(Delete delete, String tabl, Condit whereCondt) throws TransException;
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
@@ -113,22 +117,6 @@ public interface ISemantext {
 	 * @return db type
 	 */
 	public dbtype dbtype();
-
-	/**<p>The implementation of this return different stream to compose paging sql.</p>
-	 * Sql examples: </p>
-	 * mysql<br>
-	 * "select * from (select t.*, @ic_num := @ic_num + 1 as rnum from (%s) t, (select @ic_num := 0) ic_t) t1 where rnum > %s and rnum <= %s"<br><br>
-	 * oracle<br>
-	 * return String.format("select * from (select t.*, rownum r_n_ from (%s) t WHERE rownum <= %s  order by rownum) t where r_n_ > %s"<br><br>
-	 * ms sql sever 2000 - 2010<br>
-	 * return String.format("select * from (SELECT ROW_NUMBER() OVER(ORDER BY (select NULL as noorder)) AS RowNum, * from (%s) t) t where rownum >= %s and rownum <= %s <br><br>
-	 * @param s stream that will be collected into select statement
-	 * @param pageIx page index
-	 * @param pgSize page size
-	 * @return stream that will be used to join paging select statement
-	 * @throws TransException 
-	public Stream<String> pagingStream(Stream<String> s, int pageIx, int pgSize) throws TransException;
-	 */
 
 	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
 	 * The new generated value is managed in this implementation class (for future resolving).<br>

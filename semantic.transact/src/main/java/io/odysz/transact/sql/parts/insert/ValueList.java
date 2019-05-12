@@ -119,7 +119,7 @@ public class ValueList extends AbsPart {
 	
 	/**Add value to the last column.
 	 * @param v
-	 * @return
+	 * @return this
 	 * @throws TransException
 	 */
 	public ValueList v(AbsPart v) throws TransException {

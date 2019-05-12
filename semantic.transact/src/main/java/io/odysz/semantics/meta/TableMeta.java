@@ -35,7 +35,7 @@ public class TableMeta {
 	}
 
 	public coltype coltype(String col) {
-		return types == null && types.containsKey(col) ?
-				coltype.text : types.get(col).type();
+		return types != null && types.containsKey(col) ?
+				types.get(col).type() : coltype.text;
 	}
 }

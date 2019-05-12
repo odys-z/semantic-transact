@@ -10,9 +10,11 @@ import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving "AUTO" when generating sql.
@@ -61,14 +63,19 @@ class Semantext1 implements ISemantext {
 	 * @see io.odysz.semantics.ISemantext#onUpdate(java.util.ArrayList)
 	 */
 	@Override
-	public ISemantext onUpdate(Statement<?> update, String tabl, ArrayList<Object[]> nvs) {
-		if (autoVals != null && nvs != null)
-			for (Object[] nv : nvs)
-				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))
-					nv[1] = autoVals == null ? nv[1] : autoVals.get(nv[0]);
+	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
+//		if (autoVals != null && nvs != null)
+//			for (Object[] nv : nvs)
+//				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))
+//					nv[1] = autoVals == null ? nv[1] : autoVals.get(nv[0]);
 		return this;
 	}
 
+	@Override
+	public ISemantext onDelete(Delete delete, String tabl, Condit condt) {
+		return this;
+	}
+	
 	@Override
 	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
 		return new Semantext1(tabl, semantics, metas);

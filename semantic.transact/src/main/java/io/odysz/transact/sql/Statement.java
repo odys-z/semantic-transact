@@ -39,11 +39,15 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected Condit where;
 
 	protected Transcxt transc;
+	public Transcxt transc() { return transc; }
+	
 	/**Use this to make post updates etc have the same context with the main statement.
 	 */
 	protected ArrayList<Statement<?>> postate;
 
 	protected IPostOperat postOp;
+
+	private ArrayList<Statement<?>> before;
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
@@ -83,6 +87,22 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 				where = where.and(and);
 		return (T) this;
 	}
+
+	/**This is a wraper of {@link #where(String, String, String)} for convenient
+	 * - the third arg is taken as a string constant and added single quotes at begin and end.
+	 * @param op
+	 * @param lcol left column
+	 * @param rconst right constant will be adding single quotes "''"
+	 * @return 
+	 */
+	public T where_(String op, String lcol, String rconst) {
+		return where(op, lcol, "'" + rconst + "'");
+	}
+
+	public T where_(String op, String lcol, Object rconst) {
+		// TODO something to be done to handle constant value other than string.
+		return where_(op, lcol, (String)rconst);
+	}
 	
 	/**Add post semantics after the parent statement, like add children after insert new parent.<br>
 	 * <b>Side effect</b>: the added post statement's context is changed - to referencing the same instance for resolving, etc.
@@ -96,6 +116,22 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
+	/**Add setaments before this statement'sql been generated.<br>
+	 * @param postatement
+	 * @return the calling statement
+	 */
+	public T before(Statement<?> postatement) {
+		if (before == null)
+			before = new ArrayList<Statement<?>>();
+		this.before.add(postatement);
+		return (T) this;
+	}
+
+	/**Wrapper of {@link #post(Statement)}.
+	/**Wrapper of {@link #post(Statement)}.
+	 * @param posts
+	 * @return
+	 */
 	public T post(ArrayList<Statement<?>> posts) {
 		if (posts != null && posts.size() > 0)
 			for (Statement<?> u : posts)
@@ -103,7 +139,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
-	/**Generat all sqls, put int list.
+	/**Generate all sqls, put into list, with a semantext created from usrInfo.
+	 * This method is a wrapper of {@link #commit(ISemantext, ArrayList)}.
 	 * @param sqls
 	 * @param usrInfo
 	 * @return the result set map[tabl, {newIds, resolved values}], ...
@@ -118,10 +155,24 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return commit(context, sqls);
 	}
 	
+	/**Generating sqls with running context ctx.
+	 * @param cxt
+	 * @param sqls
+	 * @return the resulting statement.
+	 * @throws TransException
+	 */
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		prepare(cxt);
 
-		sqls.add(sql(cxt));
+		// sql() calling onDelete (generating before sentences), must called before "before"
+		String itself = sql(cxt);
+
+		if (before != null)
+			for (Statement<?> bf : before)
+				bf.commit(cxt, sqls);
+
+		sqls.add(itself);
+
 		if (postate != null)
 			for (Statement<?> pst : postate)
 				pst.commit(cxt, sqls);
@@ -130,10 +181,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	
 	/**Set done operation - typically a database statement committing.<br>
 	 * See {@link Query#rs(ISemantext)}
-	 * @param operat
+	 * @param operatn
 	 */
-	public void doneOp(IPostOperat operat) {
-		postOp = operat;
+	public void doneOp(IPostOperat operatn) {
+		postOp = operatn;
 	}
 
 	/**Called when starting preparing sql, works like preparing auto generated key etc. should go here.
@@ -141,5 +192,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	void prepare(ISemantext ctx) { }
 
+	@Override
+	public abstract String sql(ISemantext context) throws TransException;
 
 }

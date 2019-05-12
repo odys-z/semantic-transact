@@ -21,7 +21,7 @@ public class LangExt {
 		if (s == null)
 			return null;
 		else {
-			if (noTrim == null || noTrim.length > 0 && noTrim[0])
+			if (noTrim == null || noTrim.length == 0 || !noTrim[0])
 				regex = "\\s*" + regex + "\\s*";
 			return s.split(regex);
 		}

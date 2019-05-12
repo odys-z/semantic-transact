@@ -11,9 +11,10 @@ import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
-import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
 /**<p>Basic semantic context (semantics instance) for resolving semantics when generating sql.</p>
@@ -25,7 +26,7 @@ class Semantext2 implements ISemantext {
 
 	private String tabl;
 	private HashMap<String, Semantics2> semantics;
-	private SemanticObject resolvedIds;
+//	private SemanticObject resolvedIds;
 	private HashMap<String, TableMeta> metas;
 
 	public Semantext2(String tabl, HashMap<String, Semantics2> semantics, HashMap<String, TableMeta> metas) {
@@ -76,14 +77,14 @@ class Semantext2 implements ISemantext {
 	public String connId() { return null; }
 
 	@Override
-	public ISemantext onUpdate(Statement<?> update, String tabl, ArrayList<Object[]> nvs) {
-		if (nvs != null)
-			for (Object[] nv : nvs)
-				if (nv != null && nv.length > 0 && "AUTO".equals(nv[1]))
-					nv[1] = resolvedIds == null ? nv[1] : resolvedIds.get((String) nv[0]);
+	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {
 		return this;
 	}
 
+	@Override
+	public ISemantext onDelete(Delete delete, String tabl, Condit condt) {
+		return this;
+	}
 
 	@Override
 	public ISemantext insert(Insert insert, String tabl, IUser... usr) {

@@ -304,7 +304,6 @@ public class Insert extends Statement<Insert> {
 		prepare(cxt);
 
 		// resolve semantics like fk-ins referring to auto-pk
-		// FIXME should move ISemantext.onInsert() to Statement.resolveSemantics()?
 		if (cxt != null) {
 			cxt.onInsert(this, mainTabl, valuesNv);
 			if (postate != null)

@@ -155,6 +155,9 @@ public class SemanticObject extends Object {
 		else return null;
 	}
 
+	/**Print for reading - string can't been converted back to object
+	 * @param out
+	 */
 	public void print(PrintStream out) {
 		if (props != null)
 			for (String k : props.keySet()) {
