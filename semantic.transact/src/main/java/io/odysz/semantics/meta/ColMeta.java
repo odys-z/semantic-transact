@@ -42,7 +42,7 @@ public class ColMeta {
 		return coltype.text;
 	}
 
-	public ColMeta len(int len) {
+	public ColMeta tlen(int len) {
 		this.len = len;
 		return this;
 	}

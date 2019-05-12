@@ -26,7 +26,8 @@ public class TableMeta {
 	}
 
 	public TableMeta col(String col, String t, Integer len) {
-		types.put(col, new ColMeta(t).len(len));
+		ColMeta cm = new ColMeta(t);
+		types.put(col, cm.tlen(len));
 		return this;
 	}
 
