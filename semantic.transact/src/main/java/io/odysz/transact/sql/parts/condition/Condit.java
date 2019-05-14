@@ -44,6 +44,10 @@ search_condition_not
 		super(predicate);
 		this.logitype = Logic.type.empty;
 	}
+	
+	public boolean isEmpty() {
+		return (condts == null || condts.size() == 0) && super.empty;
+	}
 
 	public Condit and(Condit and) {
 //		if (condts == null || condts.size() == 0) {

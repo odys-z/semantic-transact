@@ -62,6 +62,9 @@ public class Update extends Statement<Update> {
 	
 	@Override
 	public Update commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		if (where == null || where.isEmpty())
+			throw new TransException("Empty conditions for updating. io.odysz.transact.sql.Update is enforcing updating with conditions.");
+
 		// prepare semantics like auto-pk
 		prepare(cxt);
 
@@ -77,7 +80,8 @@ public class Update extends Statement<Update> {
 		sqls.add(sql(cxt));
 		if (postate != null)
 			for (Statement<?> pst : postate)
-				sqls.add(pst.sql(cxt));
+				// sqls.add(pst.sql(cxt));
+				pst.commit(cxt, sqls);
 		return this;
 	}
 

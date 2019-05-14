@@ -26,29 +26,29 @@ public class ColTypeTest {
 			;
 		
 		assertEquals(coltype.text, t.coltype("c01"));
-		assertTrue(t.isText("c01"));
+		assertTrue(t.isQuoted("c01"));
 		assertEquals(coltype.text, t.coltype("c02"));
-		assertTrue(t.isText("c02"));
+		assertTrue(t.isQuoted("c02"));
 		assertEquals(coltype.text, t.coltype("c03"));
-		assertTrue(t.isText("c03"));
+		assertTrue(t.isQuoted("c03"));
 		assertEquals(coltype.datetime, t.coltype("c04"));
-		assertFalse(t.isText("c04"));
+		assertTrue(t.isQuoted("c04"));
 		assertEquals(coltype.datetime, t.coltype("c05"));
-		assertFalse(t.isText("c05"));
+		assertTrue(t.isQuoted("c05"));
 		assertEquals(coltype.datetime, t.coltype("c06"));
-		assertFalse(t.isText("c06"));
+		assertTrue(t.isQuoted("c06"));
 		assertEquals(coltype.number, t.coltype("c07"));
-		assertFalse(t.isText("c07"));
+		assertFalse(t.isQuoted("c07"));
 		assertEquals(coltype.number, t.coltype("c08"));
-		assertFalse(t.isText("c08"));
+		assertFalse(t.isQuoted("c08"));
 		assertEquals(coltype.text, t.coltype("c09"));
-		assertTrue(t.isText("c09"));
+		assertTrue(t.isQuoted("c09"));
 		assertEquals(coltype.clob, t.coltype("c0a"));
-		assertFalse(t.isText("c0a"));
+		assertFalse(t.isQuoted("c0a"));
 		assertEquals(coltype.bin, t.coltype("c0b"));
-		assertFalse(t.isText("c0b"));
+		assertFalse(t.isQuoted("c0b"));
 		assertEquals(coltype.bin, t.coltype("c0c"));
-		assertFalse(t.isText("c0c"));
+		assertFalse(t.isQuoted("c0c"));
 	}
 
 }

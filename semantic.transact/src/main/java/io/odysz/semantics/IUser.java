@@ -23,22 +23,22 @@ public interface IUser {
 	 * @param sqls
 	 * @return SQLs for logging
 	 */
-	ArrayList<String> dbLog(ArrayList<String> sqls);
+	default ArrayList<String> dbLog(ArrayList<String> sqls) { return null; }
 
 	/**Check user log in (already has pswd, iv and user Id from db)
 	 * @param request request object. In sematic.jserv, it's SessionReq object.
 	 * @return true: ok; false: failed
 	 * @throws TransException Checking login information failed
 	 */
-	boolean login(Object request) throws TransException;
+	default boolean login(Object request) throws TransException { return false; }
 
-	String sessionId();
+	default String sessionId() { return null; }
 
 	/**Update last touched time stamp.*/
-	void touch();
+	default void touch() {}
 
 	/**user id */
-	String uid();
+	String uid() ;
 	
 	/**Get any property other than uid.
 	 * @param prop
@@ -53,8 +53,8 @@ public interface IUser {
 	
 	IUser logAct(String funcName, String funcId);
 
-	SemanticObject logout();
+	default SemanticObject logout() { return null; }
 
-	void writeJsonRespValue(Object writer) throws IOException;
+	default void writeJsonRespValue(Object writer) throws IOException {}
 
 }

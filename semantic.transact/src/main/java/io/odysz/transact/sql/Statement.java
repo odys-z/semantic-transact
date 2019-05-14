@@ -47,7 +47,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	protected IPostOperat postOp;
 
-	private ArrayList<Statement<?>> before;
+	protected ArrayList<Statement<?>> before;
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
@@ -62,7 +62,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public T where(ArrayList<String[]> conds) throws TransException {
 		if (conds != null && conds.size() > 0)
 			for (String[] cond : conds) 
-				if (cond.length != Ix.predicateSize)
+				if (cond == null)
+					continue;
+				else if (cond.length != Ix.predicateSize)
 					throw new TransException("SQL predicate size is invalid: %s",
 								LangExt.toString(cond));
 				else

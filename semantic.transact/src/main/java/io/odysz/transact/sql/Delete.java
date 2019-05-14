@@ -11,7 +11,8 @@ import io.odysz.transact.sql.parts.condition.Predicate;
 import io.odysz.transact.x.TransException;
 
 public class Delete extends Statement<Delete>  {
-	/**In select condition*/
+	/**In select condition.
+	 * TODO should moved to super and support Update? */
 	private Predicate inSelectCond;
 
 //	private ArrayList<Object[]> nvs;
@@ -27,6 +28,13 @@ public class Delete extends Statement<Delete>  {
 			return postOp.op(stx, sqls);
 		}
 		return null;
+	}
+
+	public Delete commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+		if ((where == null || where.isEmpty())
+			&& (inSelectCond == null || inSelectCond.empty()))
+			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletiong with conditions.");
+		return super.commit(cxt, sqls);
 	}
 
 	@Override
@@ -55,9 +63,6 @@ public class Delete extends Statement<Delete>  {
 	}
 
 	public Delete whereIn(Predicate inCondt) throws TransException {
-//		ArrayList<String> sqls = new ArrayList<String>();
-//		s.commit(sqls, usr);
-//		inSelectCond = new Predicate(Logic.op.in, );
 		inSelectCond = inCondt;
 		return this;
 	}

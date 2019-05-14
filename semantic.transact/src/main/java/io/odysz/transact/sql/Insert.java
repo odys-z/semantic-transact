@@ -131,58 +131,7 @@ public class Insert extends Statement<Insert> {
 		selectValues = values;
 		return this;
 	}
-	
-//	/**sql: insert into tabl(...) values(...) / select ...
-//	 * @see io.odysz.transact.sql.parts.AbsPart#sql(ISemantext)
-//	 */
-//	@Override
-//	public String sql(ISemantext sctx) {
-////		if (currentRowNv != null && currentRowNv.size() > 0) {
-////			if (valuesNv == null) {
-////				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
-////			}
-////			valuesNv.add(currentRowNv);
-////		}
-//
-//		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
-//
-////		if (sctx != null)
-////			sctx.onInsert(this, mainTabl, valuesNv);
-//		// FIXME
-//		// insert into a_role_funcs  (funcId, roleId) values ('1A', '0101') ('03', '0101') ('0301', '0101') ('0302', '0101') ('04', '0101') ('0401', '0101')... ('0909', '0101')
-//		// insert into tabl(...) values(...) / select ...
-//		Stream<String> s = Stream.concat(
-//			// insert into tabl(...)
-//			Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias),
-//					// (...)
-//					new ColumnList(insertCols)
-//			   // values(...) / select ...
-//			), Stream.concat(
-//				// FIXME how to join multiple values? (...), (...), ...
-//				// values (...)
-//				// whether 'values()' appears or not is the same as value valuesNv
-//				Stream.concat(Stream.of(new ExprPart("values")),
-//						// 'v1', 'v2', ...)
-////						Stream.concat(
-//								Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-//									.stream().map(row -> getValue(sctx, row, insertCols))
-////									, Stream.of(new ExprPart(")"))
-////						)
-//				).filter(w -> hasValuesNv),
-//				// select ...
-//				Stream.of(selectValues).filter(w -> selectValues != null))
-//			).map(m -> {
-//				try {
-//					return m.sql(sctx);
-//				} catch (TransException e) {
-//					e.printStackTrace();
-//					return "";
-//				}
-//			});
-//
-//		return s.collect(Collectors.joining(" "));
-//	}
-	
+
 	/**sql: insert into tabl(...) values(...) / select ...
 	 * @see io.odysz.transact.sql.parts.AbsPart#sql(ISemantext)
 	 */
@@ -222,42 +171,6 @@ public class Insert extends Statement<Insert> {
 		return s.collect(Collectors.joining(" "));
 	}
 
-//	/**Create ValueList from row. 
-//	 * @param row
-//	 * @param colIdx
-//	 * @return
-//	 */
-//	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
-//		if (row == null)
-//			return null;
-//
-//		ValueList vs = new ValueList(row.size());
-//		int idx = -1;
-//		for (Object[] nv : row) {
-//			if (nv == null) continue;
-//
-//			if (colIdx == null)
-//				idx++;
-//			else if (colIdx.containsKey(nv[0]))
-//					idx = colIdx.get(nv[0]);
-//			else {
-//				Utils.warn("Can't find column index for col %s %s", nv[0], nv[1]);
-//				continue;
-//			}
-//			try {
-//				if (nv[1] instanceof String)
-//					// vs.constv(idx, (String) nv[1]);
-//					vs.constv(idx, sctx == null ? (String)nv[1]
-//												: (String) sctx.resulvedVal((String)nv[1]));
-//				else
-//					vs.v(idx, (AbsPart) nv[1]);
-//			} catch (TransException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		return vs;
-//	}
 
 	public Map<String, Integer> getColumns() { return insertCols; }
 
@@ -312,11 +225,21 @@ public class Insert extends Statement<Insert> {
 						cxt.onInsert((Insert)pst, pst.mainTabl, ((Insert)pst).valuesNv);
 		}
 
-		sqls.add(sql(cxt));
+		// sqls.add(sql(cxt));
+		// sql() calling onDelete (generating before sentences), must called before "before"
+		String itself = sql(cxt);
+
+		if (before != null)
+			for (Statement<?> bf : before)
+				bf.commit(cxt, sqls);
+
+		sqls.add(itself);
+
+
 		if (postate != null)
 			for (Statement<?> pst : postate)
-				// pst.commit(cxt, sqls);
-				sqls.add(pst.sql(cxt));
+				// sqls.add(pst.sql(cxt));
+				pst.commit(cxt, sqls);
 		return this;
 	}		
 

@@ -153,7 +153,8 @@ public class TestTransc {
 			.nv("funcount", "0")
 			.post(st.update("a_rolefunc")
 					.nv("funcId", "f-01")
-					.nv("roleId", "AUTO"))
+					.nv("roleId", "AUTO")
+					.where_("=", "roleId", "AUTO"))
 			.commit(sqls);
 	
 		st.insert("a_roles")
@@ -174,5 +175,23 @@ public class TestTransc {
 		assertTrue(sqls.get(1).startsWith("update a_rolefunc"));
 		assertTrue(sqls.get(2).startsWith("insert into a_roles"));
 		assertTrue(sqls.get(3).startsWith("insert into a_rolefunc"));
+	}
+	
+	@Test
+	public void testUpd_del_insts() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_roles")
+			.nv("roleName", "role-21")
+			.where_("=", "roleId", "role 01")
+			.post(st.delete("a_rolefunc")
+					.where_("=", "roleId", "role 01")
+					.post(st.insert("a_rolefunc")
+							.nv("funcId", "f 001")
+							.nv("roleId", "role 01")))
+			.commit(sqls);
+		// update a_roles  set roleName='role-21' where roleId = 'role 01'
+		// delete from a_rolefunc where roleId = 'role 01'
+		// insert into a_rolefunc  (funcId, roleId) values ('f 001', 'role 01')
+		assertEquals(3, sqls.size());
 	}
 }

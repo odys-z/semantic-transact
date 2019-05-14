@@ -49,8 +49,8 @@ public class ColMeta {
 	
 	public int len() { return len; }
 
-	public boolean isText() {
-		return this.t == coltype.text;
+	public boolean isQuoted() {
+		return this.t == null || this.t == coltype.text || this.t == coltype.datetime;
 	}
 
 	public coltype type() { return t; }

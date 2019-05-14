@@ -19,15 +19,20 @@ public class TableMeta {
 		return this;
 	}
 	
-	public boolean isText(String col) {
+	public boolean isQuoted(String col) {
 		return types.containsKey(col) ? 
-				types.get(col).isText()
+				types.get(col).isQuoted()
 				: true;
 	}
 
-	public TableMeta col(String col, String t, Integer len) {
+	public TableMeta col(String coln, String t, int len) {
 		ColMeta cm = new ColMeta(t);
-		types.put(col, cm.tlen(len));
+//		// weird maven behavior
+//		Utils.warn("weird weird weird  %s %s %s...............................", coln, t, len);
+//		if (types == null)
+//			// strange
+//			Utils.warn("That's so strange ...............................");
+		types.put(coln, cm.tlen(len));
 		return this;
 	}
 

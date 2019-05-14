@@ -88,7 +88,7 @@ public interface ISemantext {
 	 * which should usually let the caller / client know about it.
 	 * @param table
 	 * @param col
-	 * @return RESULt resoLVED VALue in tabl.col
+	 * @return RESULt resoLVED VALue in tabl.col, or null if not exists.
 	 */
 	Object resulvedVal(String table, String col);
 

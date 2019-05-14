@@ -17,7 +17,8 @@ import io.odysz.transact.x.TransException;
  */
 public class Predicate extends AbsPart {
 
-	private boolean empty = false;
+	protected boolean empty = false;
+	public boolean empty() { return empty; }
 	
 	private boolean negative = false;
 	public boolean negative() { return negative; }
