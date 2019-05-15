@@ -13,6 +13,7 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.sql.parts.condition.Predicate;
 import io.odysz.transact.x.TransException;
 
 /**Statement like inert, update - the structured API.<br>
@@ -72,6 +73,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		
 		return (T) this;
 	}
+	
+	public T where(Predicate pred) {
+		if (pred instanceof Condit)
+			return where((Condit)pred, new Condit[0]);
+		else
+			return where(new Condit(pred), new Condit[0]);
+	}
 
 	/**
 	 * @param condt
@@ -95,7 +103,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @param op
 	 * @param lcol left column
 	 * @param rconst right constant will be adding single quotes "''"
-	 * @return 
+	 * @return this
 	 */
 	public T where_(String op, String lcol, String rconst) {
 		return where(op, lcol, "'" + rconst + "'");

@@ -52,6 +52,7 @@ public class Predicate extends AbsPart {
 			this.r = cpy.r;
 			this.brace = cpy.brace;
 			this.search_condit = cpy.search_condit;
+			this.inSelect = cpy.inSelect;
 		}
 	}
 

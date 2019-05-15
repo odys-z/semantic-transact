@@ -2,15 +2,13 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -19,10 +17,10 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.JoinTabl;
 import io.odysz.transact.sql.parts.select.JoinTabl.join;
-import io.odysz.transact.x.TransException;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
+import io.odysz.transact.x.TransException;
 
 /**
  * <pre>
@@ -95,6 +93,24 @@ column_elem
  *
  */
 public class Query extends Statement<Query> {
+	/**Handling from t0 join t1 on ...
+	 * @author odys-z@github.com
+	 */
+	public class JoinList extends AbsPart {
+		private List<JoinTabl> lstJoins;
+
+		public JoinList(List<JoinTabl> joins) {
+			this.lstJoins = joins;
+		}
+
+		@Override
+		public String sql(ISemantext sctx) throws TransException {
+			return lstJoins == null ? "" :
+				lstJoins.stream().map(m -> m.sql(sctx)).collect(Collectors.joining(" "));
+		}
+
+	}
+
 	/**String Array Index definition. Not using java field for compliance with JS (without GWT).
 	 * @author odys-z@github.com
 	 */
@@ -294,32 +310,66 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	public Query orderbys(ArrayList<String[]> orders) {
+		if (orders != null && orders.size() > 0)
+			for (String[] order : orders)
+				orderby(order[0], order[1]);
+		return this;
+	}
+
+//	@Override
+//	public String sql(ISemantext sctx) {
+//		// Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
+//
+//		Stream<String> s = Stream.concat(
+//				// select ... from ... join ...
+//				Stream.concat(
+//						// select ...
+//						// Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
+//						Stream.concat(Stream.of(new ExprPart("select")), Stream.of(new SelectList(selectList))),
+//						// from ... join ...
+//						Stream.concat(
+//								Stream.of(new JoinTabl(join.main, mainTabl, mainAlias)),
+//								// join can be null
+//								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
+//				), Stream.concat(
+//						// where ... group by ... order by ...
+//						Stream.of(new ExprPart("where"), where).filter(w -> where != null),
+//						Stream.concat(
+//								// group by
+//								Stream.of(new GroupbyList(groupList)).filter(o -> groupList != null),
+//								// order by
+//								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
+//			).map(m -> {
+//				try {
+//					return m.sql(sctx);
+//				} catch (TransException e2) {
+//					e2.printStackTrace();
+//					return "";
+//				}
+//			});
+//		
+//		return s.collect(Collectors.joining(" "));
+//	}
 	@Override
 	public String sql(ISemantext sctx) {
-		Predicate<? super JoinTabl> hasJoin = e -> joins != null && joins.size() > 0;
-
-		Stream<String> s = Stream.concat(
-				// select ... from ... join ...
-				Stream.concat(
-						// select ...
-						// Stream.concat(Stream.of(new ExprPart("select")), selectList.stream()),
-						Stream.concat(Stream.of(new ExprPart("select")), Stream.of(new SelectList(selectList))),
-						// from ... join ...
-						Stream.concat(
-								Stream.of(new JoinTabl(join.main, mainTabl, mainAlias)),
-								// join can be null
-								Optional.ofNullable(joins).orElse(Collections.emptyList()).stream().filter(hasJoin))
-				), Stream.concat(
-						// where ... group by ... order by ...
-						Stream.of(new ExprPart("where"), where).filter(w -> where != null),
-						Stream.concat(
-								// group by
-								Stream.of(new GroupbyList(groupList)).filter(o -> groupList != null),
-								// order by
-								Stream.of(new OrderyList(orderList)).filter(o -> orderList != null)))
-			).map(m -> {
+		Stream<String> s = Stream.of(
+					// select ...
+					new ExprPart("select"), new SelectList(selectList),
+					// from ... join ...
+					new JoinTabl(join.main, mainTabl, mainAlias),
+					// join can be null
+					joins != null && joins.size() > 0 ? new JoinList(joins) : null,
+					// where ... group by ... order by ...
+					where == null ? null : new ExprPart("where"),
+					where,
+					// group by
+					groupList == null ? null : new GroupbyList(groupList),
+					// order by
+					orderList == null ? null : new OrderyList(orderList)
+			).filter(e -> e != null).map(m -> {
 				try {
-					return m.sql(sctx);
+					return m == null ? "" : m.sql(sctx);
 				} catch (TransException e2) {
 					e2.printStackTrace();
 					return "";
