@@ -302,6 +302,12 @@ public class Query extends Statement<Query> {
 		groupList.add(expr);
 		return this;
 	}
+
+	public void groupby(String[] groups) {
+		if (groups != null && groups.length > 0)
+			for (String g : groups)
+				groupby(g);
+	}
 	
 	public Query orderby(String col, String... desc) {
 		if (orderList == null)
@@ -310,7 +316,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query orderbys(ArrayList<String[]> orders) {
+	public Query orderby(ArrayList<String[]> orders) {
 		if (orders != null && orders.size() > 0)
 			for (String[] order : orders)
 				orderby(order[0], order[1]);
