@@ -139,8 +139,6 @@ public class Insert extends Statement<Insert> {
 	public String sql(ISemantext sctx) {
 		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
 
-		// FIXME
-		// insert into a_role_funcs  (funcId, roleId) values ('1A', '0101') ('03', '0101') ('0301', '0101') ('0302', '0101') ('04', '0101') ('0401', '0101')... ('0909', '0101')
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
 			// insert into tabl(...)
@@ -153,8 +151,6 @@ public class Insert extends Statement<Insert> {
 				// whether 'values()' appears or not is the same as value valuesNv
 				Stream.of(new ExprPart("values"),
 						// 'v1', 'v2', ...)
-//						Optional.ofNullable(valuesNv).orElse(Collections.emptyList())
-//								.stream().map(row -> getValue(sctx, row, insertCols))
 					new InsertValues(mainTabl, insertCols, valuesNv)
 				).filter(w -> hasValuesNv),
 				// select ...
@@ -211,40 +207,72 @@ public class Insert extends Statement<Insert> {
 		return null;
 	}
 	
+//	@Override
+//	public Insert commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+//		// prepare semantics like auto-pk
+//		prepare(cxt);
+//
+//		// resolve semantics like fk-ins referring to auto-pk
+//		if (cxt != null) {
+//			cxt.onInsert(this, mainTabl, valuesNv);
+//			if (postate != null)
+//				for (Statement<?> pst : postate)
+//					if (pst instanceof Insert)
+//						cxt.onInsert((Insert)pst, pst.mainTabl, ((Insert)pst).valuesNv);
+//		}
+//
+//		// sqls.add(sql(cxt));
+//		// sql() calling onDelete (generating before sentences), must called before "before"
+//		String itself = sql(cxt);
+//
+//		if (before != null)
+//			for (Statement<?> bf : before)
+//				bf.commit(cxt, sqls);
+//
+//		sqls.add(itself);
+//
+//
+//		if (postate != null)
+//			for (Statement<?> pst : postate)
+//				// sqls.add(pst.sql(cxt));
+//				pst.commit(cxt, sqls);
+//		return this;
+//	}		
+
+//	void prepare(ISemantext ctx) {
+//		if (currentRowNv != null && currentRowNv.size() > 0) {
+//			if (valuesNv == null) {
+//				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
+//			}
+//			valuesNv.add(currentRowNv);
+//			currentRowNv = null;
+//		}
+//
+//		if (ctx != null)
+//			ctx.onPrepare(this, mainTabl, valuesNv);
+//		
+//		if (postate != null)
+//			for (Statement<?> pst : postate)
+//				pst.prepare(ctx);
+//	}
+
 	@Override
 	public Insert commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-		// prepare semantics like auto-pk
-		prepare(cxt);
+		List<ArrayList<Object[]>> values = prepareNv(cxt);
 
-		// resolve semantics like fk-ins referring to auto-pk
-		if (cxt != null) {
-			cxt.onInsert(this, mainTabl, valuesNv);
-			if (postate != null)
-				for (Statement<?> pst : postate)
-					if (pst instanceof Insert)
-						cxt.onInsert((Insert)pst, pst.mainTabl, ((Insert)pst).valuesNv);
-		}
+		if (cxt != null)
+			cxt.onInsert(this, mainTabl, values);
 
-		// sqls.add(sql(cxt));
-		// sql() calling onDelete (generating before sentences), must called before "before"
-		String itself = sql(cxt);
+		Insert ins = super.commit(cxt, sqls);
+		
+		if (cxt != null && values != null)
+			for (ArrayList<Object[]> row : values)
+				cxt.onPost(this, mainTabl, row, sqls);
 
-		if (before != null)
-			for (Statement<?> bf : before)
-				bf.commit(cxt, sqls);
+		return ins;
+	}
 
-		sqls.add(itself);
-
-
-		if (postate != null)
-			for (Statement<?> pst : postate)
-				// sqls.add(pst.sql(cxt));
-				pst.commit(cxt, sqls);
-		return this;
-	}		
-
-
-	void prepare(ISemantext ctx) {
+	List<ArrayList<Object[]>> prepareNv(ISemantext ctx) {
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			if (valuesNv == null) {
 				valuesNv = new ArrayList<ArrayList<Object[]>>(1);
@@ -252,18 +280,19 @@ public class Insert extends Statement<Insert> {
 			valuesNv.add(currentRowNv);
 			currentRowNv = null;
 		}
+		return valuesNv;
 
-		if (ctx != null)
-			ctx.onPrepare(this, mainTabl, valuesNv);
-		
-		if (postate != null)
-			for (Statement<?> pst : postate)
-				pst.prepare(ctx);
+//		if (ctx != null)
+//			ctx.onPrepare(this, mainTabl, valuesNv);
+//		
+//		if (postate != null)
+//			for (Statement<?> pst : postate)
+//				pst.prepare(ctx);
 	}
 
-	/**FIXME merge this to some where parsing JMessage<br>
-	 * Add multi del insert update for children table<br>
+	/**Add multi del insert update for children table<br>
 	 * - a special frequently used case of CRUD, provided as a shortcut of API.
+	 * FIXME merge this to some where parsing JMessage<br>
 	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
 	 * @param stcx 
 	 * @throws SemanticException 

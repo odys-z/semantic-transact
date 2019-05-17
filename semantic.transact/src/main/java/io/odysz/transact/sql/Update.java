@@ -60,29 +60,44 @@ public class Update extends Statement<Update> {
 		return this;
 	}
 	
+//	@Override
+//	public Update commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+//		if (where == null || where.isEmpty())
+//			throw new TransException("Empty conditions for updating. io.odysz.transact.sql.Update is enforcing updating with conditions.");
+//
+//		// prepare semantics like auto-pk
+//		prepare(cxt);
+//
+//		if (cxt != null) {
+//			cxt.onUpdate(this, mainTabl, nvs);
+//			if (postate != null)
+//				for (Statement<?> pst : postate)
+//					if (pst instanceof Update)
+//						cxt.onUpdate((Update)pst, pst.mainTabl, ((Update)pst).nvs);
+//					// FIXME what about it's insert, delete?
+//		}
+//
+//		sqls.add(sql(cxt));
+//		if (postate != null)
+//			for (Statement<?> pst : postate)
+//				// sqls.add(pst.sql(cxt));
+//				pst.commit(cxt, sqls);
+//		return this;
+//	}
 	@Override
 	public Update commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		if (where == null || where.isEmpty())
 			throw new TransException("Empty conditions for updating. io.odysz.transact.sql.Update is enforcing updating with conditions.");
 
-		// prepare semantics like auto-pk
-		prepare(cxt);
-
-		if (cxt != null) {
+		if (cxt != null)
 			cxt.onUpdate(this, mainTabl, nvs);
-			if (postate != null)
-				for (Statement<?> pst : postate)
-					if (pst instanceof Update)
-						cxt.onUpdate((Update)pst, pst.mainTabl, ((Update)pst).nvs);
-					// FIXME what about it's insert, delete?
-		}
 
-		sqls.add(sql(cxt));
-		if (postate != null)
-			for (Statement<?> pst : postate)
-				// sqls.add(pst.sql(cxt));
-				pst.commit(cxt, sqls);
-		return this;
+		Update upd = super.commit(cxt, sqls);
+
+		if (cxt != null)
+			cxt.onPost(this, mainTabl, nvs, sqls);
+
+		return upd;
 	}
 
 	/**Commit updating sql(s) to db.

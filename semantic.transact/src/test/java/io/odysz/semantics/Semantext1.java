@@ -111,8 +111,8 @@ class Semantext1 implements ISemantext {
 		return new Semantext1(tabl, semantics, metas);
 	}
 
-	@Override
-	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
+//	@Override
+//	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
 
 	@Override
 	public SemanticObject resulves() {
@@ -123,4 +123,8 @@ class Semantext1 implements ISemantext {
 	public TableMeta colType(String tabl) {
 		return metas.get(tabl);
 	}
+
+	@Override
+	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls)
+			throws TransException { return null; }
 }

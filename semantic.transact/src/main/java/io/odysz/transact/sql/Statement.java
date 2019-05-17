@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -110,12 +111,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T where_(String op, String lcol, Object rconst) {
-		// TODO something to be done to handle constant value other than string.
+		// TODO something to be done to handle constant value other than type of string.
 		return where_(op, lcol, (String)rconst);
 	}
 	
-	/**Add post semantics after the parent statement, like add children after insert new parent.<br>
-	 * <b>Side effect</b>: the added post statement's context is changed - to referencing the same instance for resolving, etc.
+	/**Add post semantics after the parent statement,
+	 * like add children after insert new parent.<br>
+	 * <b>Side effect</b>: the added post statement's context is changed
+	 * - to referencing the same instance for resolving, etc.
 	 * @param postatement
 	 * @return the calling statement
 	 */
@@ -186,8 +189,27 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		if (postate != null)
 			for (Statement<?> pst : postate)
 				pst.commit(cxt, sqls);
+
 		return (T) this;
 	}
+	
+//	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
+//		prepare(cxt);
+//
+//		// sql() calling onDelete (generating before sentences), must called before "before"
+//		String itself = sql(cxt);
+//
+//		if (before != null)
+//			for (Statement<?> bf : before)
+//				bf.commit(cxt, sqls);
+//
+//		sqls.add(itself);
+//
+//		if (postate != null)
+//			for (Statement<?> pst : postate)
+//				pst.commit(cxt, sqls);
+//		return (T) this;
+//	}
 	
 	/**Set done operation - typically a database statement committing.<br>
 	 * See {@link Query#rs(ISemantext)}
@@ -204,5 +226,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	@Override
 	public abstract String sql(ISemantext context) throws TransException;
+
+	/** Get columns to be set / insert values.
+	 * <p>{@link Delete} an {@link Insert} should override this method.</p>
+	 * @return columns
+	 */
+	public Map<String, Integer> getColumns() { return null; }
 
 }

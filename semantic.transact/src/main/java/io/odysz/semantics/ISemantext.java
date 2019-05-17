@@ -8,6 +8,7 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
+import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -71,7 +72,7 @@ public interface ISemantext {
 	 */
 	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws TransException;
 
-	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
+//	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> rows);
 
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
@@ -83,6 +84,17 @@ public interface ISemantext {
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) throws TransException;
 
 	public ISemantext onDelete(Delete delete, String tabl, Condit whereCondt) throws TransException;
+
+	/**Handle wiring back resulved values, etc. 
+	 * Called when all children sql generated (posts' commit() called).
+	 * @param stmt
+	 * @param mainTabl
+	 * @param row
+	 * @param sqls
+	 * @return this
+	 * @throws TransException failed handling semantics
+	 */
+	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls) throws TransException;
 
 	/**Get results from handling semantics. typically new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
@@ -136,5 +148,6 @@ public interface ISemantext {
 	public ISemantext clone(IUser usr);
 
 	public TableMeta colType(String tabl);
+
 
 }

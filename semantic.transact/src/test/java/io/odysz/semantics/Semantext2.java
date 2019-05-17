@@ -13,6 +13,7 @@ import io.odysz.semantics.Semantics2.smtype;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
+import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -115,8 +116,8 @@ class Semantext2 implements ISemantext {
 		return new Semantext2(tabl, semantics, metas);
 	}
 
-	@Override
-	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
+//	@Override
+//	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
 
 	@Override
 	public SemanticObject resulves() {
@@ -127,4 +128,8 @@ class Semantext2 implements ISemantext {
 	public TableMeta colType(String tabl) {
 		return metas.get(tabl);
 	}
+
+	@Override
+	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls)
+			throws TransException { return null; }
 }
