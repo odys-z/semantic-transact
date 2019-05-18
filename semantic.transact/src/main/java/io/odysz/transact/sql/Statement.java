@@ -14,6 +14,7 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Predicate;
 import io.odysz.transact.x.TransException;
 
@@ -115,6 +116,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_(op, lcol, (String)rconst);
 	}
 	
+	public Statement<?> where(String logic, String loperand, ExprPart resulving) {
+		return where(Sql.condt(Logic.op(logic), loperand, resulving));
+	}
+
 	/**Add post semantics after the parent statement,
 	 * like add children after insert new parent.<br>
 	 * <b>Side effect</b>: the added post statement's context is changed

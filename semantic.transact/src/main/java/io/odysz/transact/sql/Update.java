@@ -43,7 +43,7 @@ public class Update extends Statement<Update> {
 			updateCols = new HashMap<String, Integer>();
 		if (!updateCols.containsKey(n))
 			updateCols.put(n, updateCols.size());
-		else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
+		else Utils.warn("Column's value already exists, old value replaced by new value (%s = %s)",
 				n, v);
 		
 		return this;

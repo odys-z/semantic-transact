@@ -48,7 +48,8 @@ public class Insert extends Statement<Insert> {
 			insertCols = new HashMap<String, Integer>();
 		if (!insertCols.containsKey(n))
 			insertCols.put(n, insertCols.size());
-		else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
+		// else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
+		else Utils.warn("Column's value already exists, old value replaced by new value (%s = %s)",
 				n, v);
 		return this;
 	}

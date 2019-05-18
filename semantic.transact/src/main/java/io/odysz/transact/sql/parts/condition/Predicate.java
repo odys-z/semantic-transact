@@ -72,10 +72,16 @@ public class Predicate extends AbsPart {
 		r = new ExprPart(rstr);
 	}
 
-	public Predicate(Logic.op op, String from, String nnn) {
+	public Predicate(Logic.op op, String from, String rp) {
 		this.op = op;
 		this.l = new ExprPart(from);
-		this.r = new ExprPart(nnn);
+		this.r = new ExprPart(rp);
+	}
+
+	public Predicate(Logic.op op, String from, ExprPart rp) {
+		this.op = op;
+		this.l = new ExprPart(from);
+		this.r = rp;
 	}
 
 	/**Use this to visit predicate : '(' search_condition ')';
