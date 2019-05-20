@@ -117,6 +117,16 @@ public class TestTransc {
 		// Utils.logi(sqls);
 		assertEquals("update a_users  set userName='abc-x01' where userId = 'admin'",
 				sqls.get(0));
+		
+		sqls.clear();
+		st.update("a_users")
+			.nv("userName", st.select("a_functions", "f")
+								.col("count(funcId)", "c")
+								.where_("=", "f.funcName", "admin"))
+			.where("=", "userId", "'admin'")
+			.commit(sqls);
+		assertEquals("update a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin'",
+				sqls.get(0));
 	}
 
 	@Test

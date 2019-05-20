@@ -189,7 +189,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			for (Statement<?> bf : before)
 				bf.commit(cxt, sqls);
 
-		sqls.add(itself);
+		if (!LangExt.isblank(itself))
+			sqls.add(itself);
 
 		if (postate != null)
 			for (Statement<?> pst : postate)

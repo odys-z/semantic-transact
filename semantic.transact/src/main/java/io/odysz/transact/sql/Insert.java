@@ -138,7 +138,11 @@ public class Insert extends Statement<Insert> {
 	 */
 	@Override
 	public String sql(ISemantext sctx) {
-		boolean hasValuesNv = valuesNv != null && valuesNv.size() > 0;
+		boolean hasVals = valuesNv != null 
+				&& valuesNv.size() > 0
+				&& valuesNv.get(0) != null
+				&& valuesNv.get(0).size() > 0;
+		if (!hasVals && selectValues == null) return "";
 
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
@@ -153,7 +157,7 @@ public class Insert extends Statement<Insert> {
 				Stream.of(new ExprPart("values"),
 						// 'v1', 'v2', ...)
 					new InsertValues(mainTabl, insertCols, valuesNv)
-				).filter(w -> hasValuesNv),
+				).filter(w -> hasVals),
 				// select ...
 				Stream.of(selectValues).filter(w -> selectValues != null))
 			).map(m -> {
