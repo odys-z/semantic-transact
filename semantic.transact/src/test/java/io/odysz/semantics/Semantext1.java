@@ -103,8 +103,8 @@ class Semantext1 implements ISemantext {
 		return "";
 	}
 
-	@Override
-	public String resulvedVal(String ref) { return ref; }
+//	@Override
+//	public String resulvedVal(String ref) { return ref; }
 
 	@Override
 	public ISemantext clone(IUser usr) {

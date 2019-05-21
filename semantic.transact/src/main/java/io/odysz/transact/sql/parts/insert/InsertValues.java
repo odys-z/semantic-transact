@@ -57,34 +57,16 @@ public class InsertValues extends AbsPart {
 				continue;
 			}
 			try {
-				/*
-				if (nv[1] instanceof String) {
-					// Only value through java api know what's the type, the json massage handler don't.
-					// So we figure it out throw db meta data.
-					String str = sctx == null ? (String)nv[1]
-							 : (String) sctx.resulvedVal((String)nv[1]);
-					if (sctx == null)
-						// when testing
-						vs.constv(idx, str);
-					else {
-						TableMeta cltyp = sctx.colType(tabl);
-						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
-							vs.constv(idx, str);
-						else vs.v(idx, new ExprPart(str));
-					}
-				}
-				else if (nv[1] instanceof AbsPart)
-					vs.v(idx, (AbsPart) nv[1]);
-				else 
-					vs.v(idx, new ExprPart(nv[1]));
-					*/
 				if (nv[1] instanceof AbsPart)
 					vs.v(idx, (AbsPart) nv[1]);
 				else {
 					// Only value through java api know what's the type, the json massage handler don't.
 					// So we figure it out throw db meta data.
-					String str = sctx == null ? (String)nv[1]
-							 : (String) sctx.resulvedVal(String.valueOf(nv[1]));
+					
+					// 2019.5.21 Resulving won't reach here
+//					String str = sctx == null ? (String)nv[1]
+//							 : (String) sctx.resulvedVal(String.valueOf(nv[1]));
+					String str = String.valueOf(nv[1]);
 					if (sctx == null)
 						// when testing
 						vs.constv(idx, str);

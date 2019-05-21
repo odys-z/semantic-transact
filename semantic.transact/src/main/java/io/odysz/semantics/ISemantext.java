@@ -106,8 +106,8 @@ public interface ISemantext {
 	 * Find and return referee.
 	 * @param ref
 	 * @return resolved value from restult
-	 */
 	public Object resulvedVal(String ref);
+	 */
 
 	/**Get all the resolved results,
 	 * a.k.a return value of {@link Update#doneOp(io.odysz.transact.sql.Statement.IPostOperat)}.*/
@@ -118,10 +118,10 @@ public interface ISemantext {
 	 * @param tabl
 	 * @param pk
 	 * @return resolving string: "RESULVE tabl.pk"
-	 */
 	public default String formatResulv(String tabl, String pk) {
 		return String.format("RESULVE %s.%s", tabl, pk);
 	}
+	 */
 
 	/**Get the dbtype handled by the context
 	 * @return db type

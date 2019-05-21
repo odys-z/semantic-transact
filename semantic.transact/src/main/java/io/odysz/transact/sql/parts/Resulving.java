@@ -34,4 +34,10 @@ public class Resulving extends ExprPart {
 		else return "'" + o.toString() + "'";
 	}
 
+	public String resulved(ISemantext smtx) {
+		if (smtx == null)
+			return "'" + tabl + "." + autok + "'";
+		return (String) smtx.resulvedVal(tabl, autok);
+	}
+
 }

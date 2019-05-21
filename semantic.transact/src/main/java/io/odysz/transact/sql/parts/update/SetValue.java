@@ -52,8 +52,9 @@ public class SetValue extends ExprPart {
 		else if (expr != null)
 			return expr.sql(sctx);
 		else if (constValue != null) {
-			String v = sctx == null ? constValue : (String) sctx.resulvedVal(constValue);
-			return "'" + v + "'";
+			// String v = sctx == null ? constValue : (String) sctx.resulvedVal(constValue);
+			// return "'" + v + "'";
+			return "'" + constValue + "'";
 		}
 		else
 			return super.sql(sctx);

@@ -26,11 +26,14 @@ public class ExprPart extends AbsPart {
 		if (logic == null)
 			return lexp == null ? "" : lexp;
 		else {
-			Object lresulved = ctx == null ? lexp : ctx.resulvedVal(lexp);
-			Object rresulved = ctx == null ? rexp : ctx.resulvedVal(rexp);
+//			Object lresulved = ctx == null ? lexp : ctx.resulvedVal(lexp);
+//			Object rresulved = ctx == null ? rexp : ctx.resulvedVal(rexp);
+//			return String.format("%s %s",
+//				lexp == null ? "" : lresulved,
+//				logic.sql(logic, rexp == null ? "" : (String) rresulved));
 			return String.format("%s %s",
-				lexp == null ? "" : lresulved,
-				logic.sql(logic, rexp == null ? "" : (String) rresulved));
+				lexp == null ? "" : lexp,
+				logic.sql(logic, rexp == null ? "" : rexp));
 		}
 	}
 }
