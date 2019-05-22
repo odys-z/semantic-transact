@@ -101,9 +101,19 @@ public class LangExt {
 	/**Is s empty of only space - not logic meanings?
 	 * 
 	 * @param s
+	 * @param takeAsNull regex take as null, e.g. "\\s*null\\s*" will take the string "null " as null.
 	 * @return true: empty
 	 */
-	public static boolean isblank(String s) {
-		return s == null || s.trim().length() == 0;
+	public static boolean isblank(String s, String... takeAsNull) {
+		if (s == null)
+			return true;
+		else if (takeAsNull == null || takeAsNull.length == 0)
+			return s.trim().length() == 0;
+		else {
+			for (String asNull : takeAsNull)
+				if (s.matches(asNull))
+					return true;
+			return false;
+		}
 	}
 }
