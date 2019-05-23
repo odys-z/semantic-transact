@@ -106,7 +106,13 @@ public class Query extends Statement<Query> {
 		@Override
 		public String sql(ISemantext sctx) throws TransException {
 			return lstJoins == null ? "" :
-				lstJoins.stream().map(m -> m.sql(sctx)).collect(Collectors.joining(" "));
+				lstJoins.stream().map(m -> {
+					try { return m.sql(sctx);
+					} catch (TransException e) {
+						e.printStackTrace();
+						return "";
+					}
+				}).collect(Collectors.joining(" "));
 		}
 
 	}
@@ -192,6 +198,15 @@ public class Query extends Statement<Query> {
 		selectList.add(colElem);
 		return this;
 	}
+	
+	public Query col(ExprPart expr) {
+		if (expr != null) {
+			if (selectList == null)
+				selectList = new ArrayList<SelectElem>();
+			selectList.add(new SelectElem(expr));
+		}
+		return this;
+	}
 
 	public Query page(int page, int pgSize) {
 		// paging
@@ -216,7 +231,11 @@ public class Query extends Statement<Query> {
 	public Query l(String withTabl, String alias, String onCondit) {
 		return j(join.l, withTabl, alias, onCondit);
 	}
-	
+
+	public Query l(Query select, String alias, String onCondit) {
+		return j(join.l, select, alias, onCondit);
+	}
+
 	public Query r(String withTabl, String alias, String onCondit) {
 		return j(join.r, withTabl, alias, onCondit);
 	}
@@ -264,6 +283,16 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(String withTabl, String alias, Condit onCondit) {
 		JoinTabl joining = new JoinTabl(join.j, withTabl, alias, onCondit);
+		j(joining);
+		return this;
+	}
+	
+	public Query j(Query select, String alias, String onCondit) {
+		return j(join.j, select, alias, onCondit);
+	}
+
+	private Query j(join l, Query select, String alias, String onCondit) {
+		JoinTabl joining = new JoinTabl(join.j, select, alias, onCondit);
 		j(joining);
 		return this;
 	}
@@ -423,6 +452,7 @@ public class Query extends Statement<Query> {
 		}
 		return null;
 	}
+
 
 
 }

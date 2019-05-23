@@ -22,7 +22,7 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull"), dbSame("func");
+	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull"), dbSame("func"), ifNullElse("ifNullElse");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
@@ -37,7 +37,7 @@ public class Funcall extends ExprPart {
 	}
 
 	private Func func;
-	private String[] args;;
+	private Object[] args;;
 
 	public Funcall(Func func) {
 		super(func.fid());
@@ -55,6 +55,11 @@ public class Funcall extends ExprPart {
 		args = new String[] {colName};
 		this.func = Func.dbSame;
 	}
+
+//	public Funcall(String fid, String col, Object ifTrue, Object orElse) {
+//		super(fid);
+//		args = new Object[] {col, ifTrue, orElse};
+//	}
 
 	public Funcall args(String[] args) {
 		this.args = args;
@@ -85,10 +90,16 @@ public class Funcall extends ExprPart {
 			return sqlNow(context);
 		else if (func == Func.isnull)
 			return sqlIfnull(context);
+		else if (func == Func.ifNullElse)
+			return sqlIfNullElse(context);
 		// else return func.fid();
 		else return dbSame(context);
 	}
 
+	/**return function string that database function used as the same style.
+	 * @param ctx
+	 * @return
+	 */
 	private String dbSame(ISemantext ctx) {
 		String f = super.sql(ctx) + "(";
 		if (args != null && args.length > 0 && args[0] != null)
@@ -98,6 +109,23 @@ public class Funcall extends ExprPart {
 			f += ", " + args[i];
 
 		return f + ")";
+	}
+
+	private String sqlIfNullElse(ISemantext context) {
+		dbtype dt = context.dbtype();
+		if (dt == dbtype.mysql)
+			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
+		else  if (dt == dbtype.sqlite)
+			return String.format("case %s when null then %s else %s end", args[0], args[1], args[2]);
+		else if (dt == dbtype.ms2k)
+			return String.format("case when %s is null then %s else %s end", args[0], args[1], args[2]);
+		else if (dt == dbtype.oracle)
+			return String.format("decode(%s, null, %s, %s)", args[0], args[1], args[2]);
+		else {
+			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s", dt.name());
+			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
+		}
+
 	}
 
 	private String sqlIfnull(ISemantext context) {
@@ -131,6 +159,12 @@ public class Funcall extends ExprPart {
 			Utils.warn("Formating now() for unknown db type: %s as %s", dt.name(), s);
 			return "'" + s + "'";
 		}
+	}
+
+	public static Funcall ifNullElse(String colElem, Object ifTrue, Object orElse) {
+		Funcall f = new Funcall(Func.ifNullElse);
+		f.args = new Object[] {colElem, ifTrue, orElse};
+		return f;
 	}
 
 }

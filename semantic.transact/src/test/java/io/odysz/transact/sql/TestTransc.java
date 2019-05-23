@@ -1,6 +1,7 @@
 package io.odysz.transact.sql;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
@@ -8,10 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
-import io.odysz.transact.x.TransException;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.Logic.op;
+import io.odysz.transact.x.TransException;
 
 public class TestTransc {
 
@@ -68,6 +69,8 @@ public class TestTransc {
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND userId = 'George' AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
 	}
+
+	
 
 	@Test
 	public void testFunc() throws TransException {

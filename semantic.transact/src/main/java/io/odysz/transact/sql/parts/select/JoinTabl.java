@@ -1,9 +1,17 @@
 package io.odysz.transact.sql.parts.select;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.x.TransException;
 
 
 /**Select query's join clause.<br>
@@ -29,37 +37,63 @@ public class JoinTabl extends AbsPart {
 
 	protected join jtype;
 	protected String jtablias;
-	protected String jtabl;
+	protected AbsPart jtabl;
 	private Condit on;
 
 	public JoinTabl(join joinType, String tabl, Condit on) {
 		this.on = on;
-		this.jtabl = tabl;
+		this.jtabl = new ExprPart(tabl);
 		this.jtype = joinType;
 	}
 
 	public JoinTabl(join joinType, String tabl, String alias, Condit... on) {
-		// super(on == null || on.length == 0 ? null : on[0]);
 		this.on = on == null || on.length == 0 ? null : on[0];
 		this.jtype = joinType;
-		this.jtabl = tabl;
+		this.jtabl = new ExprPart(tabl);
 		this.jtablias = alias;
+	}
+	
+	public JoinTabl(join jt, Query select, String alias, String onCondit) {
+		joinTabl(jt, select, alias, Sql.condt(onCondit));
+	}
+
+	public JoinTabl(join jt, Query select, String alias, Condit... on) {
+		joinTabl(jt, select, alias, on);
+	}
+
+	private void joinTabl(join jt, Query select, String alias, Condit... on) {
+		this.on = on == null || on.length == 0 ? null : on[0];
+		this.jtype = jt;
+		this.jtabl = select;
+		if (LangExt.isblank(alias))
+			this.jtablias = select.alias();
+		else 
+			this.jtablias = alias;
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		if (jtype == join.main)
-			return String.format("from %s %s", jtabl, jtablias == null ? "" : jtablias);
+			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias);
 
-		// String condt = super.sql(sctx);
-		if (on != null)
-			return String.format("%s %s %s on %s", sql(jtype),
-					// jtablias == null ? "" : jtablias, super.sql(sctx));
-					jtabl, jtablias == null ? "" : jtablias,
-					on.sql(sctx));
-		else
-			return String.format("%s %s %s", sql(jtype), jtabl,
-				jtablias == null ? "" : jtablias);
+		Stream<String> s = Stream.of(
+				sql(jtype),
+				jtabl instanceof Query ? "(" : null,
+					jtabl,
+				jtabl instanceof Query ? ")" : null,
+					jtablias,
+				on == null ? null : "on",
+				on)
+				.filter(p -> p != null)
+				.map(m -> {
+					try {
+						return m instanceof String ? (String)m : ((AbsPart)m).sql(sctx);
+					} catch (TransException e) {
+						e.printStackTrace();
+						return "";
+					}
+				}) ;
+		return s.collect(Collectors.joining(" "));
 	}
 
 	private String sql(join jt) {
@@ -69,5 +103,4 @@ public class JoinTabl extends AbsPart {
 		else if (jt == join.l) return "left outer join";
 		else return "";
 	}
-
 }

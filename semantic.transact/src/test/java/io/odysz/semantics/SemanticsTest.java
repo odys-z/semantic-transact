@@ -12,6 +12,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.sql.Transcxt;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
 public class SemanticsTest {
@@ -60,7 +61,28 @@ public class SemanticsTest {
 		Utils.logi(sqls);
 	}
 
+	/**Assert: 
+	 * select f.funcName func from a_functions f join 
+	 * ( select case rf.funcId when null then true else false from a_role_func rf ) tf 
+	 * on rf.funcId = f.funcId",
+	 * @throws TransException
+	 */
+	@Test
+	public void testSelectJoin() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
 
+		st.select("a_functions", "f")
+			// .j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
+			.l(st.select("a_role_func", "rf")
+					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
+					"tf", "tf.funcId = f.funcId")
+			.col("f.funcName", "func")
+			.commit(st.instancontxt(null), sqls);
+		assertEquals("select f.funcName func from a_functions f join ( select case rf.funcId when null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
+				sqls.get(0));
+
+	}
+	
 	@SuppressWarnings("serial")
 	static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {

@@ -1,7 +1,6 @@
 package io.odysz.transact.sql.parts.select;
 
 import io.odysz.semantics.ISemantext;
-import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
 /**Select_list_elem:
@@ -11,7 +10,7 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
  *
  * @author odys-z
  */
-public class SelectElem extends AbsPart {
+public class SelectElem extends ExprPart {
 
 	/**Select element type, one of *, tabl.col, col, f(), expr, 'const' */
 	public enum ElemType { asterisk, tableCol, col, expr, constant }
@@ -31,17 +30,20 @@ public class SelectElem extends AbsPart {
 
 
 	public SelectElem(ElemType elemType, String col) {
+		super(null);
 		this.elemtype = elemType;
 		this.col = col;
 	}
 
 	public SelectElem(ElemType type, String tabl, String col) {
+		super(null);
 		this.elemtype = type;
 		this.tabl = tabl;
 		this.col = col;
 	}
 	
 	public SelectElem(ExprPart expr) {
+		super(null);
 		this.elemtype = ElemType.expr;
 		this.expr = expr;
 	}

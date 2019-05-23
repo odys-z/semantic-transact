@@ -37,6 +37,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	protected String mainTabl;
 	protected String mainAlias;
+	public String alias() { return mainAlias; }
 	
 	/**Conditions of where conditions */
 	protected Condit where;
@@ -198,24 +199,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 		return (T) this;
 	}
-	
-//	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-//		prepare(cxt);
-//
-//		// sql() calling onDelete (generating before sentences), must called before "before"
-//		String itself = sql(cxt);
-//
-//		if (before != null)
-//			for (Statement<?> bf : before)
-//				bf.commit(cxt, sqls);
-//
-//		sqls.add(itself);
-//
-//		if (postate != null)
-//			for (Statement<?> pst : postate)
-//				pst.commit(cxt, sqls);
-//		return (T) this;
-//	}
 	
 	/**Set done operation - typically a database statement committing.<br>
 	 * See {@link Query#rs(ISemantext)}
