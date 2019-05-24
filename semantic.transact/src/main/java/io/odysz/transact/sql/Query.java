@@ -291,8 +291,8 @@ public class Query extends Statement<Query> {
 		return j(join.j, select, alias, onCondit);
 	}
 
-	private Query j(join l, Query select, String alias, String onCondit) {
-		JoinTabl joining = new JoinTabl(join.j, select, alias, onCondit);
+	public Query j(join jt, Query select, String alias, String onCondit) {
+		JoinTabl joining = new JoinTabl(jt, select, alias, onCondit);
 		j(joining);
 		return this;
 	}
