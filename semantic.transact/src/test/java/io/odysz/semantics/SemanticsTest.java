@@ -78,7 +78,7 @@ public class SemanticsTest {
 					"tf", "tf.funcId = f.funcId")
 			.col("f.funcName", "func")
 			.commit(st.instancontxt(null), sqls);
-		assertEquals("select f.funcName func from a_functions f join ( select case rf.funcId when null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
+		assertEquals("select f.funcName func from a_functions f left outer join ( select case rf.funcId when null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
 				sqls.get(0));
 
 	}
