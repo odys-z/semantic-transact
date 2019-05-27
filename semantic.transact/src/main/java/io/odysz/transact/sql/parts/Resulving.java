@@ -6,8 +6,14 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**Value to be resulved.
- * For what's resulved value, see <a href=''>RESolved resULt Value</a>
- * servral 
+ * For what's resulved value, see <a href=''>RESolved resULt Value</a>.
+ * <p>Note: This class can not been used to resolve post fk value.</p> 
+ * <p>Design Memo:<br>
+ * If leting Resulving can resolve post fk value, all statement tree nodes
+ * must traveled by a pre-inserting event handler, that's not possible to
+ * remember all generated key if there are to nodes inserting the same table.<br>
+ * So statement tree events do not travel across sub-trees is a rule of the design.
+ * Then it's impossible to post resolve children pk using Resulving.</p>
  * @author odys-z@github.com
  */
 public class Resulving extends ExprPart {

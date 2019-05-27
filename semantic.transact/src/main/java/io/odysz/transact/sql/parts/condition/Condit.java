@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Logic.type;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
+import io.odysz.transact.x.TransException;
 
 
 /**Logical Conditioning, a {@link Predicate} tree.
@@ -50,6 +52,11 @@ search_condition_not
 		this.logitype = Logic.type.empty;
 	}
 	
+	public Condit(op op, String lop, Query rop) throws TransException {
+		super(op, lop, rop);
+		this.logitype = Logic.type.empty;
+	}
+
 	public boolean isEmpty() {
 		return (condts == null || condts.size() == 0) && super.empty;
 	}

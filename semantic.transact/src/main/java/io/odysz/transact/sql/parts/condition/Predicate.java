@@ -94,8 +94,8 @@ public class Predicate extends AbsPart {
 
 	public Predicate(Logic.op in, String col, Query s) throws TransException {
 		this.op = in;
-		if (in != Logic.op.in)
-			throw new TransException("Currently only 'in' operator is supported for select condition. select:\n %s", s.sql(null));
+		if (in != Logic.op.in && in != Logic.op.notin)
+			throw new TransException("Currently only '(not) in' operator is supported for select condition. select:\n %s", s.sql(null));
 		this.l = new ExprPart(col);
 		this.inSelect = s;
 	}
@@ -107,8 +107,10 @@ public class Predicate extends AbsPart {
 	@Override
 	public String sql(ISemantext sctx) {
 		if (empty) return "";
-		else if (op == Logic.op.in && inSelect != null)
-			return Stream.of(l, new ExprPart("in ("), inSelect, new ExprPart(")"))
+		else if ((op == Logic.op.in || op == Logic.op.notin) && inSelect != null)
+			return Stream.of(l,
+					op == Logic.op.notin ? new ExprPart("not") : null,
+					new ExprPart("in ("), inSelect, new ExprPart(")"))
 					.map(e -> {
 						try {
 							return e == null ? "" : e.sql(sctx);
