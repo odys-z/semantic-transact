@@ -17,7 +17,6 @@ import io.odysz.transact.x.TransException;
 
 public class SemanticsTest {
 
-//	private Semantics2 semantics;
 	private Transcxt st;
 
 	@Before

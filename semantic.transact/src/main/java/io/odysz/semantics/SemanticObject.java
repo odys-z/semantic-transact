@@ -100,6 +100,19 @@ public class SemanticObject extends Object {
 	public Object rs(int i) {
 		return ((ArrayList<?>)get("rs")).get(i);
 	}
+
+	@SuppressWarnings("unchecked")
+	public int total(int i) {
+		if (get("total") == null)
+			return -1;
+		ArrayList<Object> lst = ((ArrayList<Object>)get("total"));
+		if (lst == null || lst.size() <= i)
+			return -1;
+		Object obj = lst.get(i);
+		if (obj == null)
+			return -1;
+		return (int)obj;
+	}
 	
 	public String error() {
 		return (String) get("error");

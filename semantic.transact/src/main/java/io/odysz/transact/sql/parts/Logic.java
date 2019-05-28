@@ -1,5 +1,9 @@
 package io.odysz.transact.sql.parts;
 
+import io.odysz.common.Utils;
+import io.odysz.common.dbtype;
+import io.odysz.semantics.ISemantext;
+
 public class Logic {
 	/** empty type is used to subclass {@link io.odysz.transact.sql.parts.condition.Predicate}
 	 * as {@link io.odysz.transact.sql.parts.condition.Condit}*/
@@ -7,7 +11,7 @@ public class Logic {
 
 	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
-		public String sql(op oper, String rop, boolean... not) {
+		public String sql(ISemantext sctx, op oper, String rop, boolean... negative) {
 			if (oper == op.eq)
 				return "= " + rop;
 			else if (oper == op.ne)
@@ -21,27 +25,27 @@ public class Logic {
 			else if (oper == op.ge)
 				return ">= " + rop;
 			else if (oper == op.like)
-				if (not != null && not.length > 0 && not[0])
-					return "not like " + likeOp(rop);
+				if (negative != null && negative.length > 0 && negative[0])
+					return "not like " + likeOp(sctx, rop);
 				else
-					return "like " + likeOp(rop);
+					return "like " + likeOp(sctx, rop);
 			else if (oper == op.rlike)
-				if (not != null && not.length > 0 && not[0])
-					return "not like " + rlikeOp(rop);
+				if (negative != null && negative.length > 0 && negative[0])
+					return "not like " + rlikeOp(sctx, rop);
 				else
-					return "like " + rlikeOp(rop);
+					return "like " + rlikeOp(sctx, rop);
 			else if (oper == op.llike)
-				if (not != null && not.length > 0 && not[0])
-					return "not like " + llikeOp(rop);
+				if (negative != null && negative.length > 0 && negative[0])
+					return "not like " + llikeOp(sctx, rop);
 				else
-					return "like " + llikeOp(rop);
+					return "like " + llikeOp(sctx, rop);
 			else if (oper == op.in)
-				if (not != null && not.length > 0 && not[0])
+				if (negative != null && negative.length > 0 && negative[0])
 					return "not in (" + rop + ")";
 				else
 					return "in (" + rop + ")";
 			else if (oper == op.isnull)
-				if (not != null && not.length > 0 && not[0])
+				if (negative != null && negative.length > 0 && negative[0])
 					return "is null";
 				else
 					return "is null";
@@ -51,21 +55,37 @@ public class Logic {
 				return " TODO ";
 		}
 	
-		private String llikeOp(String op) {
-			if (op != null && op.length() > 2 && op.startsWith("'") && !op.startsWith("'%"))
-				return op.replaceFirst("^'", "'%");
-			else return op;
+		private String llikeOp(ISemantext sctx, String op) {
+			if (op != null && op.length() > 2)
+				if (op.startsWith("'") && !op.startsWith("'%"))
+					return op.replaceFirst("^'", "'%");
+				else return concat(sctx, "'%'", op);
+			return op;
 		}
 	
-		private String rlikeOp(String op) {
-			if (op != null && op.length() > 2 && op.endsWith("'") && !op.endsWith("%'"))
-				return op.replaceFirst("'$", "%'");
-			else return op;
+		private String concat(ISemantext sctx, String op, String with) {
+			if (sctx == null) {
+				Utils.warn("generating db function concat(%s, %s), should only happen for testing, but semantext is null. This should only happen for testing.", op, with);
+				return String.format("concat(%s, %s)", op, with);
+			}
+			dbtype db = sctx.dbtype();
+
+			if (db != dbtype.mysql || db != dbtype.oracle || db != dbtype.sqlite)
+				Utils.warn("db function concat(%s, %s)", op, with);
+			return String.format("concat(%s, %s)", op, with);
+		}
+
+		private String rlikeOp(ISemantext sctx, String op) {
+			if (op != null && op.length() > 2)
+				if (op.endsWith("'") && !op.endsWith("%'"))
+					return op.replaceFirst("'$", "%'");
+				else return concat(sctx, op, "'%'");
+			return op;
 		}
 	
 	
-		private String likeOp(String op) {
-			return rlikeOp(llikeOp(op));
+		private String likeOp(ISemantext sctx, String op) {
+			return rlikeOp(sctx, llikeOp(sctx, op));
 		}
 	}
 	

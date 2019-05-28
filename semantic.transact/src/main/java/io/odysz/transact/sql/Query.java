@@ -199,11 +199,14 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 	
-	public Query col(ExprPart expr) {
+	public Query col(ExprPart expr, String... alias) {
 		if (expr != null) {
 			if (selectList == null)
 				selectList = new ArrayList<SelectElem>();
-			selectList.add(new SelectElem(expr));
+			SelectElem ele = new SelectElem(expr);
+			if (alias != null && alias.length > 0 && alias[0] != null)
+				ele.as(alias[0]);
+			selectList.add(ele);
 		}
 		return this;
 	}

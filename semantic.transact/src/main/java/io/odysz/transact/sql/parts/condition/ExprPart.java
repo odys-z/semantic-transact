@@ -33,7 +33,7 @@ public class ExprPart extends AbsPart {
 //				logic.sql(logic, rexp == null ? "" : (String) rresulved));
 			return String.format("%s %s",
 				lexp == null ? "" : lexp,
-				logic.sql(logic, rexp == null ? "" : rexp));
+				logic.sql(ctx, logic, rexp == null ? "" : rexp));
 		}
 	}
 }

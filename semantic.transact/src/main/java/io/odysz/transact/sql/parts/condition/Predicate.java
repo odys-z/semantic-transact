@@ -124,7 +124,7 @@ public class Predicate extends AbsPart {
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));
 		else {
-			return String.format("%s %s", l.sql(sctx), op.sql(op, r.sql(sctx), negative));
+			return String.format("%s %s", l.sql(sctx), op.sql(sctx, op, r.sql(sctx), negative));
 		}
 	}
 

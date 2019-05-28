@@ -37,8 +37,9 @@ public class TestTransc {
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
 			.where("%~", "f.funcName", "'bourgeoisie'")
+			.where("~%", "f.fullpath", "rf.funcId")
 			.commit(st.instancontxt(null), sqls);
-		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie'",
+		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie' AND f.fullpath like concat(rf.funcId, '%')",
 				sqls.get(0));
 
 		st.select("a_log", "lg")
