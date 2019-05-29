@@ -22,7 +22,13 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func { now("now()"), max("max(%s)"), isnull("ifnull"), dbSame("func"), ifNullElse("ifNullElse");
+	public enum Func {
+		now("now()"),
+		max("max(%s)"),
+		isnull("ifnull"),
+		ifElse("if"),
+		ifNullElse("ifNullElse"),
+		dbSame("func");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
@@ -92,6 +98,8 @@ public class Funcall extends ExprPart {
 			return sqlIfnull(context);
 		else if (func == Func.ifNullElse)
 			return sqlIfNullElse(context);
+		else if (func == Func.ifElse)
+			return sqlIfElse(context);
 		// else return func.fid();
 		else return dbSame(context);
 	}
@@ -124,6 +132,18 @@ public class Funcall extends ExprPart {
 		else {
 			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s", dt.name());
 			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
+		}
+	}
+
+	private String sqlIfElse(ISemantext context) {
+		dbtype dt = context.dbtype();
+		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
+			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
+		else if (dt == dbtype.mysql)
+			return String.format("if(%s, %s, %s)", args[0], args[1], args[2]);
+		else {
+			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s", dt.name());
+			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
 		}
 
 	}
@@ -166,5 +186,12 @@ public class Funcall extends ExprPart {
 		f.args = new Object[] {colElem, ifTrue, orElse};
 		return f;
 	}
+
+	public static Funcall ifElse(String logic, Object ifTrue, Object orElse) {
+		Funcall f = new Funcall(Func.ifElse);
+		f.args = new Object[] {logic, ifTrue, orElse};
+		return f;
+	}
+
 
 }
