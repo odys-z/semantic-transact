@@ -9,8 +9,13 @@ public class ExprPart extends AbsPart {
 	private String lexp;
 	private String rexp;
 
-	public ExprPart(op logic, String lexp, String rexp) {
-		this.logic =logic;
+	/**Create an expression.
+	 * @param op operator, not necessarily a logical one, can also a mathematical one.
+	 * @param lexp
+	 * @param rexp
+	 */
+	public ExprPart(op op, String lexp, String rexp) {
+		this.logic =op;
 		this.lexp = lexp;
 		this.rexp = rexp;
 	}

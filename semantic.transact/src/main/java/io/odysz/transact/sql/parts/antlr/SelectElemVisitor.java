@@ -19,7 +19,6 @@ import gen.antlr.sql.select.SelectParts.Expression_listContext;
 import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
 import gen.antlr.sql.select.SelectParts.Table_nameContext;
 import io.odysz.transact.sql.parts.Logic;
-import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.sql.parts.select.SelectElem;
@@ -185,14 +184,14 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			// expression IS null_notnull
 			else if (ctx.IS() != null) {
 				// simplified handling - all raw text as expression, bug here
-				op op = ctx.null_notnull().NOT() != null ?
+				Logic.op op = ctx.null_notnull().NOT() != null ?
 						Logic.op.isNotnull : Logic.op.isnull;
 				ExprPart expr = new ExprPart(op, ctx.expression().getText(), "");
 				ele = new SelectElem(expr);
 			}
 			// expression
 			else if (text != null) {
-				op logic = Logic.op(exp.op.getText());
+				Logic.op logic = Logic.op(exp.op.getText());
 				ExprPart expr = new ExprPart(logic, exp.getChild(0).getText(),
 					exp.getChildCount() > 2 ? exp.getChild(2).getText() : "");
 				ele = new SelectElem(expr);

@@ -9,7 +9,7 @@ public class Logic {
 	 * as {@link io.odysz.transact.sql.parts.condition.Condit}*/
 	public enum type { and, or, not, empty };
 
-	public enum op {eq, ne, lt, le, gt, ge, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
+	public enum op {eq, ne, lt, le, gt, ge, mul, div, add, minus, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
 
 		public String sql(ISemantext sctx, op oper, String rop, boolean... negative) {
 			if (oper == op.eq)
@@ -24,6 +24,14 @@ public class Logic {
 				return "> " + rop;
 			else if (oper == op.ge)
 				return ">= " + rop;
+			else if (oper == op.mul)
+				return "* ";
+			else if (oper == op.div)
+				return "/ ";
+			else if (oper == op.add)
+				return "+ ";
+			else if (oper == op.minus)
+				return "- ";
 			else if (oper == op.like)
 				if (negative != null && negative.length > 0 && negative[0])
 					return "not like " + likeOp(sctx, rop);
@@ -93,6 +101,10 @@ public class Logic {
 		oper = oper.toLowerCase();
 		// check SearchExprs.g4, ?0, !?0, etc. are not working
 		op jc = "=".equals(oper) || "eq".equals(oper) ? op.eq
+					 : "*".equals(oper) ? op.mul
+					 : "/".equals(oper) ? op.div
+					 : "+".equals(oper) ? op.add
+					 : "-".equals(oper) ? op.minus
 	   				 : "%".equals(oper) || "like".equals(oper) ? op.like
 	   				 : "~%".equals(oper) || "rlike".equals(oper) ? op.rlike // =% is not correct
 	   				 : "%~".equals(oper) || "llike".equals(oper) ? op.llike // %= is assignment operator

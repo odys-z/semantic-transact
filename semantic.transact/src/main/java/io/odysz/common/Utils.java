@@ -11,7 +11,7 @@ public class Utils {
 	 * In this way, the java compiler will optimize the code to nothing if the <i>staticBoolean</i> is false.
 	 * This flag is used for find out {@link #logi(String, String...)} calling that's not controlled by the flag.
 	 * */
-	private static boolean printCaller = true;
+	private static boolean printCaller = false;
 	
 	/**See {@link #printCaller}
 	 * @param printcall
