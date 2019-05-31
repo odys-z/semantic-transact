@@ -62,11 +62,6 @@ public class Funcall extends ExprPart {
 		this.func = Func.dbSame;
 	}
 
-//	public Funcall(String fid, String col, Object ifTrue, Object orElse) {
-//		super(fid);
-//		args = new Object[] {col, ifTrue, orElse};
-//	}
-
 	public Funcall args(String[] args) {
 		this.args = args;
 		return this;
@@ -92,23 +87,25 @@ public class Funcall extends ExprPart {
 
 	@Override
 	public String sql(ISemantext context) {
+		// args are handled before this tree node handling, making ExprPart's sql available.
+		String args[] = argsql(this.args, context);
+
 		if (func == Func.now)
-			return sqlNow(context);
+			return sqlNow(context, args);
 		else if (func == Func.isnull)
-			return sqlIfnull(context);
+			return sqlIfnull(context, args);
 		else if (func == Func.ifNullElse)
-			return sqlIfNullElse(context);
+			return sqlIfNullElse(context, args);
 		else if (func == Func.ifElse)
-			return sqlIfElse(context);
-		// else return func.fid();
-		else return dbSame(context);
+			return sqlIfElse(context, args);
+		else return dbSame(context, args);
 	}
 
 	/**return function string that database function used as the same style.
 	 * @param ctx
 	 * @return
 	 */
-	private String dbSame(ISemantext ctx) {
+	private String dbSame(ISemantext ctx, String[] args) {
 		String f = super.sql(ctx) + "(";
 		if (args != null && args.length > 0 && args[0] != null)
 			f += args[0];
@@ -119,12 +116,12 @@ public class Funcall extends ExprPart {
 		return f + ")";
 	}
 
-	private String sqlIfNullElse(ISemantext context) {
+	private static String sqlIfNullElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
 		else  if (dt == dbtype.sqlite)
-			return String.format("case %s when null then %s else %s end", args[0], args[1], args[2]);
+			return String.format("case when %s is null then %s else %s end", args[0], args[1], args[2]);
 		else if (dt == dbtype.ms2k)
 			return String.format("case when %s is null then %s else %s end", args[0], args[1], args[2]);
 		else if (dt == dbtype.oracle)
@@ -135,7 +132,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private String sqlIfElse(ISemantext context) {
+	private static String sqlIfElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
 			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
@@ -148,7 +145,20 @@ public class Funcall extends ExprPart {
 
 	}
 
-	private String sqlIfnull(ISemantext context) {
+	private static String[] argsql(Object[] args, ISemantext context) {
+		if (args == null)
+			return null;
+		String argus[] = new String[args.length];
+		for (int i = 0; i < args.length; i++) {
+			Object a = args[i];
+			if (a instanceof ExprPart)
+				argus[i] = ((ExprPart)a).sql(context);
+			else argus[i] = a.toString(); 
+		}
+		return argus;
+	}
+
+	private static String sqlIfnull(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("ifnull(%s, %s)", args[0], args[1]);
@@ -164,7 +174,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private String sqlNow(ISemantext context) {
+	private static String sqlNow(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return "now()";
