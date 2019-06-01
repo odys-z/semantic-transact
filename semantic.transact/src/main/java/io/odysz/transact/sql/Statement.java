@@ -195,7 +195,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 		if (postate != null)
 			for (Statement<?> pst : postate)
-				pst.commit(cxt, sqls);
+				if (pst != null)
+					pst.commit(cxt, sqls);
 
 		return (T) this;
 	}
