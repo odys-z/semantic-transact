@@ -63,16 +63,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
 	
-	public T where(ArrayList<String[]> conds) throws TransException {
+	public T where(ArrayList<Object[]> conds) throws TransException {
 		if (conds != null && conds.size() > 0)
-			for (String[] cond : conds) 
+			for (Object[] cond : conds) 
 				if (cond == null)
 					continue;
 				else if (cond.length != Ix.predicateSize)
 					throw new TransException("SQL predicate size is invalid: %s",
 								LangExt.toString(cond));
+				else if (cond[Ix.predicateR] instanceof ExprPart)
+					where((String)cond[Ix.predicateOper], (String)cond[Ix.predicateL], (ExprPart)cond[Ix.predicateR]);
 				else
-					where(cond[Ix.predicateOper], cond[Ix.predicateL], cond[Ix.predicateR]);
+					where((String)cond[Ix.predicateOper], (String)cond[Ix.predicateL], (String)cond[Ix.predicateR]);
 		
 		return (T) this;
 	}

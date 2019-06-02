@@ -23,7 +23,7 @@ import io.odysz.transact.x.TransException;
 public class Insert extends Statement<Insert> {
 
 	/**[col-name, col-index] */
-	private Map<String,Integer> insertCols;
+	private Map<String, Integer> insertCols;
 	
 	private Query selectValues;
 	/**[ list[Object[n, v], ... ], ... ] */
