@@ -114,6 +114,15 @@ public class SemanticObject extends Object {
 		return (int)obj;
 	}
 	
+	public SemanticObject total(int rsIdx, int total) throws TransException {
+		@SuppressWarnings("unchecked")
+		ArrayList<Integer> lst = (ArrayList<Integer>) get("total");
+		if (lst == null || lst.size() <= rsIdx)
+			throw new TransException("No such index for rs; %s", rsIdx);
+		lst.set(rsIdx, total);
+		return this;
+	}
+	
 	public String error() {
 		return (String) get("error");
 	}

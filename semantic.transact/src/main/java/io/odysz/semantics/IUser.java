@@ -19,7 +19,9 @@ public interface IUser {
 
 	/**The sqls is committed to database, do something for logging. 
 	 * If there are some operation needing to update db, return those sql statements.
-	 * Make sure the committed sqls is not returned, only logging sqls are needed.
+	 * <p><b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
+	 * If the parameter sqls is returned, it will be committed again because the semantic connection
+	 * is think it's the logging sql.</p>
 	 * @param sqls
 	 * @return SQLs for logging
 	 */

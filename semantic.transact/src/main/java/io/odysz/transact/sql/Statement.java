@@ -123,6 +123,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, resulving));
 	}
 
+	public T whereEq(String col, String constv) {
+		return where_("=", col, constv);
+	}
+
 	/**Add post semantics after the parent statement,
 	 * like add children after insert new parent.<br>
 	 * <b>Side effect</b>: the added post statement's context is changed
