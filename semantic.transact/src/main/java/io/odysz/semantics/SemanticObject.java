@@ -115,6 +115,9 @@ public class SemanticObject extends Object {
 	}
 	
 	public SemanticObject total(int rsIdx, int total) throws TransException {
+		// the total(int) returned -1
+		if (total < 0) return this;
+
 		@SuppressWarnings("unchecked")
 		ArrayList<Integer> lst = (ArrayList<Integer>) get("total");
 		if (lst == null || lst.size() <= rsIdx)

@@ -21,7 +21,6 @@ public class Update extends Statement<Update> {
 	private Map<String,Integer> updateCols;
 	public Map<String, Integer> getColumns() { return updateCols; }
 
-
 	private ArrayList<Object[]> nvs;
 
 	Update(Transcxt transc, String tabl) {
@@ -121,5 +120,4 @@ public class Update extends Statement<Update> {
 
 		return s.collect(Collectors.joining(" "));
 	}
-
 }

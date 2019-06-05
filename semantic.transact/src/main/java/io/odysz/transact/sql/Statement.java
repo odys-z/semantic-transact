@@ -59,6 +59,17 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		this.mainAlias = alias; // == null || alias.length == 0 ? null : alias[0];
 	}
 
+	private ArrayList<Object[]> attaches;
+	public ArrayList<Object[]> attaches() { return attaches; }
+	/**Add attachements can be handlered by <i>attaches</i> semantics handler.
+	 * @param attaches
+	 * @return
+	 */
+	public T attachs(ArrayList<Object[]> attaches) {
+		this.attaches = attaches;
+		return (T) this;
+	}
+
 	public T where(String logic, String loperand, String roperand) {
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
