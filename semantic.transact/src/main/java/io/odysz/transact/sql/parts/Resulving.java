@@ -40,6 +40,10 @@ public class Resulving extends ExprPart {
 		else return "'" + o.toString() + "'";
 	}
 
+	/**Get the resulved value
+	 * @param smtx
+	 * @return the resulved value or 'tabl.pk' (for null semantext)
+	 */
 	public String resulved(ISemantext smtx) {
 		if (smtx == null)
 			return "'" + tabl + "." + autok + "'";

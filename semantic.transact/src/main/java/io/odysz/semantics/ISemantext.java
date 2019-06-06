@@ -46,6 +46,7 @@ public interface ISemantext {
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
 	 * @param insert
+	 * @param statemt
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
 	 * @return the new ISemantext context instance for resolving semantics.
@@ -70,7 +71,7 @@ public interface ISemantext {
 	 * @return the ISemantext context, a thread safe context for resolving semantics like FK value resolving.<br>
 	 * @throws SemanticException 
 	 */
-	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws TransException;
+	ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws TransException;
 
 	/**Called each time an <@link Update} statement found itself will composing an update-sql.
 	 * @param update
@@ -147,5 +148,12 @@ public interface ISemantext {
 
 	public TableMeta colType(String tabl);
 
+	/**Resolve the path for the file system (without file name) for the running environment
+	 * - typically resolved an absolute path to the WEB-INF/sub[0]/sub[1]/...
+	 * @param sub
+	 * @return either a {@link io.odysz.transact.sql.parts.Resulving Resulving} or a constant string
+	 * @throws TransException path resolving failed
+	 */
+	public String pathname(String... sub) throws TransException;
 
 }

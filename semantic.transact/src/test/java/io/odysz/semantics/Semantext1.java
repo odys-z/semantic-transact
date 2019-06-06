@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
+import io.odysz.common.LangExt;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta;
 import io.odysz.semantics.meta.TableMeta;
@@ -14,7 +15,9 @@ import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving "AUTO" when generating sql.
@@ -103,21 +106,13 @@ class Semantext1 implements ISemantext {
 		return "";
 	}
 
-//	@Override
-//	public String resulvedVal(String ref) { return ref; }
-
 	@Override
 	public ISemantext clone(IUser usr) {
 		return new Semantext1(tabl, semantics, metas);
 	}
 
-//	@Override
-//	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
-
 	@Override
-	public SemanticObject resulves() {
-		return null;
-	}
+	public SemanticObject resulves() { return null; }
 	
 	@Override
 	public TableMeta colType(String tabl) {
@@ -127,4 +122,26 @@ class Semantext1 implements ISemantext {
 	@Override
 	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls)
 			throws TransException { return null; }
+
+	@Override
+	public String pathname(String... sub) throws TransException {
+		return path(sub);
+	}
+
+	/**compose path
+	 * Don't use this to compose filepath name, only for testing.
+	 * @param fn
+	 * @param root
+	 * @param sub
+	 * @return fake path
+	 * @throws TransException 
+	 */
+	static String path(String... sub) throws TransException {
+		String subp = "";
+		if (sub != null)
+			for (String s : sub)
+				if (!LangExt.isblank(s, "/*"))
+					subp += s + "/";
+		return subp;
+	}
 }

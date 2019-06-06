@@ -20,14 +20,13 @@ import io.odysz.transact.x.TransException;
 
 /**<p>Basic semantic context (semantics instance) for resolving semantics when generating sql.</p>
  * <p>This testing implementation handling autoPk, fullpath, and may be more.</p>
- * @author ody
+ * @author odys-z@github.com
  *
  */
 class Semantext2 implements ISemantext {
 
 	private String tabl;
 	private HashMap<String, Semantics2> semantics;
-//	private SemanticObject resolvedIds;
 	private HashMap<String, TableMeta> metas;
 
 	public Semantext2(String tabl, HashMap<String, Semantics2> semantics, HashMap<String, TableMeta> metas) {
@@ -70,7 +69,6 @@ class Semantext2 implements ISemantext {
 					}
 				}
 			}
-//		callerStatement = insert;
 		return this;
 	}
 
@@ -83,9 +81,7 @@ class Semantext2 implements ISemantext {
 	}
 
 	@Override
-	public ISemantext onDelete(Delete delete, String tabl, Condit condt) {
-		return this;
-	}
+	public ISemantext onDelete(Delete delete, String tabl, Condit condt) { return this; }
 
 	@Override
 	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
@@ -93,9 +89,7 @@ class Semantext2 implements ISemantext {
 	}
 
 	@Override
-	public ISemantext update(Update update, String mainTabl, IUser... usr) {
-		return null;
-	}
+	public ISemantext update(Update update, String mainTabl, IUser... usr) { return null; }
 
 	@Override
 	public Object resulvedVal(String tabl, String col) { return null; }
@@ -108,28 +102,23 @@ class Semantext2 implements ISemantext {
 		return "";
 	}
 
-//	@Override
-//	public String resulvedVal(String ref) { return ref; }
-
 	@Override
 	public ISemantext clone(IUser usr) {
 		return new Semantext2(tabl, semantics, metas);
 	}
 
-//	@Override
-//	public ISemantext onPrepare(Insert insert, String tabl, List<ArrayList<Object[]>> row) { return this; }
-
 	@Override
-	public SemanticObject resulves() {
-		return null;
-	}
+	public SemanticObject resulves() { return null; }
 	
 	@Override
-	public TableMeta colType(String tabl) {
-		return metas.get(tabl);
-	}
+	public TableMeta colType(String tabl) { return metas.get(tabl); }
 
 	@Override
 	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls)
 			throws TransException { return null; }
+
+	@Override
+	public String pathname(String... sub) throws TransException {
+		return Semantext1.path(sub);
+	}
 }

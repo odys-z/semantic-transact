@@ -208,4 +208,5 @@ public class TestTransc {
 		// insert into a_rolefunc  (funcId, roleId) values ('f 001', 'role 01')
 		assertEquals(3, sqls.size());
 	}
+
 }

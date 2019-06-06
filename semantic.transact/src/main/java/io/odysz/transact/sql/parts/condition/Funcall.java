@@ -28,17 +28,25 @@ public class Funcall extends ExprPart {
 		isnull("ifnull"),
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
-		dbSame("func");
+		dbSame("func"),
+		datetime("datetime");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
 
 		public static Func parse(String funcName) {
+			funcName = funcName.trim().toLowerCase();
 			if (now.fid.equals(funcName))
 				return now;
-			if (isnull.fid.equals(funcName))
+			else if (isnull.fid.equals(funcName))
 				return isnull;
-			return dbSame; // max is db same
+			else if (ifElse.fid.equals(funcName))
+				return ifElse;
+			else if (ifNullElse.fid.equals(funcName))
+				return ifNullElse;
+			else if (datetime.fid.equals(funcName) || "date".equals(funcName))
+				return datetime;
+			return dbSame; // max etc. are db same
 		}
 	}
 
@@ -98,6 +106,8 @@ public class Funcall extends ExprPart {
 			return sqlIfNullElse(context, args);
 		else if (func == Func.ifElse)
 			return sqlIfElse(context, args);
+		else if (func == Func.datetime)
+			return sql2Datetime(context, args);
 		else return dbSame(context, args);
 	}
 
@@ -114,6 +124,31 @@ public class Funcall extends ExprPart {
 			f += ", " + args[i];
 
 		return f + ")";
+	}
+
+	/**
+	 * str_to_date(str-val, '%Y-%m-%d %H:%i:%s')<br>
+	 * datetime('1866-12-12 14:12:12')<br>
+	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
+	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
+	 * @param ctx
+	 * @param args
+	 * @return
+	 */
+	private String sql2Datetime(ISemantext ctx, String[] args) {
+		dbtype dt = ctx.dbtype();
+		if (dt == dbtype.mysql)
+			return String.format("str_to_date('%s', '%Y-%m-%d %H:%i:%s')", args[0]);
+		else  if (dt == dbtype.sqlite)
+			return String.format("datetime('%s')", args[0]);
+		else if (dt == dbtype.ms2k)
+			return String.format("convert(datatime, '%s', 120)", args[0]);
+		else if (dt == dbtype.oracle)
+			return String.format("to_date('%s', 'YYYY-MM-DD HH24:MI:SS')", args[0]);
+		else {
+			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
+			return "'" + args[0] + "'";
+		}
 	}
 
 	private static String sqlIfNullElse(ISemantext context, String[] args) {
@@ -142,7 +177,6 @@ public class Funcall extends ExprPart {
 			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s", dt.name());
 			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
 		}
-
 	}
 
 	private static String[] argsql(Object[] args, ISemantext context) {
@@ -203,5 +237,23 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
+	/**Create a funcall, generating sql for<br>
+	 * <a href='https://dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_str-to-date'>mysq:</a><br>
+	 * str_to_date(str-val, '%Y-%m-%d %H:%i:%s')<br>
+	 * <a href='https://www.sqlite.org/lang_datefunc.html'>sqlite</a><br>
+	 * datetime('1866-12-12 14:12:12')<br>
+	 * <a href='https://stackoverflow.com/questions/1135746/sql-server-convert-string-to-datetime'>ms sql 2k</a><br>
+	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
+	 * <a href='www.sqlines.com/oracle-to-sql-server/to_date'>oracle</a><br>
+	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
+	 * @param dt
+	 * @param date
+	 * @return create a Funcal
+	 */
+	public static Funcall toDate(dbtype dt, String date) {
+		Funcall f = new Funcall(Func.datetime);
+		f.args = new Object[] {date};
+		return f;
+	}
 
 }
