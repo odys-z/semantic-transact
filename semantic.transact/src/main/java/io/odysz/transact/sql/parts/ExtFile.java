@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import io.odysz.common.AESHelper;
+import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
@@ -37,7 +38,7 @@ public class ExtFile extends AbsPart {
 		else
 			fn = resulv_const_path.sql(ctx);
 
-		fn = prefix + "/" + fn;
+		fn = LangExt.isblank(prefix) ? fn : prefix + "/" + fn;
 		Path f = Paths.get(fn);
 		try {
 			byte[] b = AESHelper.decode64(b64);
