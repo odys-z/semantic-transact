@@ -158,12 +158,16 @@ public interface ISemantext {
 	public String pathname(String... sub) throws TransException;
 
 	/** When the commitment succeeded, there are still things must be done,
-	 * like deleting exteranl files.
+	 * like deleting external files.
 	 * The operation's (instances of {@link IPostOperat ramda-expression}
 	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(Object)}.  
+	 * @param ctx
+	 * @throws SQLException 
+	 * @throws TransException 
 	 */
-	public void onOk();
+	void onCommitted(ISemantext ctx) throws TransException, SQLException;
 
-	public void addOnOkOperate(IPostOperat op);
+	void addOnOkOperate(IPostOperat op);
+
 
 }

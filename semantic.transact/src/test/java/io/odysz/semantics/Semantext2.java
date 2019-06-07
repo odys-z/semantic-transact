@@ -14,6 +14,7 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
+import io.odysz.transact.sql.Statement.IPostOperat;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -121,4 +122,10 @@ class Semantext2 implements ISemantext {
 	public String pathname(String... sub) throws TransException {
 		return Semantext1.path(sub);
 	}
+
+	@Override
+	public void onCommitted(ISemantext ctx) throws TransException, SQLException { }
+
+	@Override
+	public void addOnOkOperate(IPostOperat op) { }
 }
