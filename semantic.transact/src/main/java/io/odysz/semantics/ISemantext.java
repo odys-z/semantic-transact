@@ -9,6 +9,7 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
+import io.odysz.transact.sql.Statement.IPostOperat;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -155,5 +156,14 @@ public interface ISemantext {
 	 * @throws TransException path resolving failed
 	 */
 	public String pathname(String... sub) throws TransException;
+
+	/** When the commitment succeeded, there are still things must be done,
+	 * like deleting exteranl files.
+	 * The operation's (instances of {@link IPostOperat ramda-expression}
+	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(Object)}.  
+	 */
+	public void onOk();
+
+	public void addOnOkOperate(IPostOperat op);
 
 }

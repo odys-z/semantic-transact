@@ -49,6 +49,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	protected ArrayList<Statement<?>> postate;
 
+	/**The committing to db operation callback */
 	protected IPostOperat postOp;
 
 	protected ArrayList<Statement<?>> before;
