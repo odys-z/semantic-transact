@@ -12,6 +12,11 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
+/**External file representation.<br>
+ * An ExtFile can only been used as a set value.
+ * @author odys-z@github.com
+ *
+ */
 public class ExtFile extends AbsPart {
 	private String b64;
 	private ExprPart resulv_const_path;
@@ -50,7 +55,7 @@ public class ExtFile extends AbsPart {
 				fn += " " + filename;
 		
 		String dir = LangExt.isblank(prefix) ? fn : prefix;
-		checkDir(dir);
+		mkDir(dir);
 
 		fn = dir + "/" + fn;
 
@@ -58,14 +63,14 @@ public class ExtFile extends AbsPart {
 		try {
 			byte[] b = AESHelper.decode64(b64);
 			Files.write(f, b);
-			return fn;
+			return "'" + fn + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "";
+			return "''";
 		}
 	}
 
-	private void checkDir(String dir) {
+	private void mkDir(String dir) {
 		File f = new File(dir);
 		if (f.isDirectory())
 			return;
