@@ -15,6 +15,7 @@ import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Statement.IPostOperat;
+import io.odysz.transact.sql.Statement.IPostSelectOperat;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -131,4 +132,13 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public String containerRoot() { return null; }
+
+	@Override
+	public void onSelected(Object resultset) throws SQLException, TransException { }
+
+	@Override
+	public void addOnSelectedOperate(IPostSelectOperat op) { }
+
+	@Override
+	public void setRs(Object resultset, String col, String v) throws SQLException { }
 }

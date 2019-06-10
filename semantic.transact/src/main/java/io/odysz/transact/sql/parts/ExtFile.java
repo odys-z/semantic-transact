@@ -24,7 +24,7 @@ public class ExtFile extends AbsPart {
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
-	private String absroot;
+	private String absoluteroot;
 
 	public ExtFile(ExprPart resulvingPath) {
 		this.resulv_const_path = resulvingPath;
@@ -40,7 +40,7 @@ public class ExtFile extends AbsPart {
 	 * @return this
 	 */
 	public ExtFile absPath(String absRoot) {
-		this.absroot = absRoot;
+		this.absoluteroot = absRoot;
 		return this;
 	}
 
@@ -81,8 +81,8 @@ public class ExtFile extends AbsPart {
 
 		relatvFn = dir + "/" + relatvFn;
 
-		String absoluteFn = LangExt.isblank(absroot) ?
-				relatvFn : absroot + "/" + relatvFn;
+		String absoluteFn = LangExt.isblank(absoluteroot) ?
+				relatvFn : absoluteroot + "/" + relatvFn;
 		Path f = Paths.get(absoluteFn);
 		try {
 			byte[] b = AESHelper.decode64(b64);

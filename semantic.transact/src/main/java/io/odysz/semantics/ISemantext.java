@@ -183,10 +183,20 @@ public interface ISemantext {
 	 */
 	public void onSelected(Object resultset) throws SQLException, TransException;
 
+	/**Add an post selected operation. E.g. extFile Funcall will add a post file reading and replacing operation here.
+	 * @param op
+	 */
 	void addOnSelectedOperate(IPostSelectOperat op);
 
-	public void setRs(String als, String string);
-
-
-
+	/**Set resultset's current row's column's value.<br>
+	 * The current row is actually iterated over by {@link #onSelected(Object)}.
+	 * Because the semantic.transact is designed as independent of SReulstset, so it's handler 
+	 * needing a helper function (this function) to handler selected results.<br>
+	 * This makes the selected event handling very tricky, and it should be improved.
+	 * @param resultset
+	 * @param col
+	 * @param v
+	 * @throws SQLException setting value failed
+	 */
+	public void setRs(Object resultset, String col, String v) throws SQLException;
 }

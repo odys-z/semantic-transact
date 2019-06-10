@@ -3,6 +3,7 @@ package io.odysz.transact.sql.parts.condition;
 import java.util.Date;
 
 import io.odysz.common.DateFormat;
+import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
@@ -54,7 +55,10 @@ public class Funcall extends ExprPart {
 	}
 
 	private Func func;
-	private Object[] args;;
+	private Object[] args;
+
+	/**column name in resultset */
+	private String resultAlias;;
 
 	public Funcall(Func func) {
 		super(func.fid());
@@ -140,15 +144,18 @@ public class Funcall extends ExprPart {
 	 * @return sql for the SelectElem, a.k.a. args[0]
 	 */
 	private String sqlExtFile(ISemantext context, String[] args) {
-		if (args == null || args.length != 2)
-			Utils.warn("Function extFile() only accept 1 arguments: %s (And do not confused with class ExtFile)",
-					(Object[])args);
+		if (args == null || args.length != 1 || LangExt.isblank(args[0], "'\\s*'"))
+			Utils.warn("Function extFile() only accept 1 arguments. (And do not confused with class ExtFile)");
 		else {
+			if (LangExt.isblank(resultAlias)) {
+				String ss[] = LangExt.split(args[0], "\\.");
+				resultAlias = ss[ss.length - 1];
+			}
+
 			context.addOnSelectedOperate((stx, rs) -> {
 				final String pth = args[0]; 
-				final String als = args[1]; 
 				// read file
-				stx.setRs(als, "Readed: " + pth);
+				stx.setRs(rs, resultAlias, "Readed: " + pth);
 				return null;
 			});
 		}
@@ -283,6 +290,10 @@ public class Funcall extends ExprPart {
 		Funcall f = new Funcall(Func.datetime);
 		f.args = new Object[] {date};
 		return f;
+	}
+
+	public void selectElemAlias(String alias) {
+		this.resultAlias = alias;
 	}
 
 }
