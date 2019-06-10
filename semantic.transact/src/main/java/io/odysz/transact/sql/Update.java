@@ -87,7 +87,7 @@ public class Update extends Statement<Update> {
 			commit(stx, sqls);
 			// Connects.commit() usually return this for update
 
-			return postOp.op(stx, sqls);
+			return postOp.onCommitOk(stx, sqls);
 //			SemanticObject res = postOp.op(stx, sqls);
 //			if (res instanceof int[])
 //				res = LangExt.toString((int[])res);

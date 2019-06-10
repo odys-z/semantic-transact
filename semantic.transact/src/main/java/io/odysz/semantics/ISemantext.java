@@ -10,6 +10,7 @@ import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Statement.IPostOperat;
+import io.odysz.transact.sql.Statement.IPostSelectOperat;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -155,7 +156,13 @@ public interface ISemantext {
 	 * @return either a {@link io.odysz.transact.sql.parts.Resulving Resulving} or a constant string
 	 * @throws TransException path resolving failed
 	 */
-	public String pathname(String... sub) throws TransException;
+	public String relativpath(String... sub) throws TransException;
+
+	/**Get the container's runtime root path<br>
+	 * For servlet, return the absolute WEB-ROOT, for java application, return the starting relative dir.
+	 * @return the root path
+	 */
+	public String containerRoot();
 
 	/** When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.
@@ -168,6 +175,18 @@ public interface ISemantext {
 	void onCommitted(ISemantext ctx) throws TransException, SQLException;
 
 	void addOnOkOperate(IPostOperat op);
+
+	/**On selected event handler, the chance that the resultset can be modified.
+	 * @param resultset any result object that can be understood by handler. e.g. SResultSet
+	 * @throws SQLException iterating on resultset failed 
+	 * @throws TransException handling failed
+	 */
+	public void onSelected(Object resultset) throws SQLException, TransException;
+
+	void addOnSelectedOperate(IPostSelectOperat op);
+
+	public void setRs(String als, String string);
+
 
 
 }

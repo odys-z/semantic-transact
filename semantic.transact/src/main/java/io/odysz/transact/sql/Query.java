@@ -417,7 +417,7 @@ public class Query extends Statement<Query> {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
 			// return postOp.op(ctx.connId(), sqls);
-			return postOp.op(ctx, sqls);
+			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;
 	}

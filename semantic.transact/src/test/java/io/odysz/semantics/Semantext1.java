@@ -125,7 +125,7 @@ class Semantext1 implements ISemantext {
 			throws TransException { return null; }
 
 	@Override
-	public String pathname(String... sub) throws TransException {
+	public String relativpath(String... sub) throws TransException {
 		return path(sub);
 	}
 
@@ -151,4 +151,7 @@ class Semantext1 implements ISemantext {
 
 	@Override
 	public void addOnOkOperate(IPostOperat op) { }
+
+	@Override
+	public String containerRoot() { return null; }
 }

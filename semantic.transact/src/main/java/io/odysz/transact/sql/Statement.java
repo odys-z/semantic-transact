@@ -28,7 +28,10 @@ import io.odysz.transact.x.TransException;
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public interface IPostOperat {
-		SemanticObject op (ISemantext ctx, ArrayList<String> sqls) throws TransException, SQLException;
+		SemanticObject onCommitOk (ISemantext ctx, ArrayList<String> sqls) throws TransException, SQLException;
+	}
+	public interface IPostSelectOperat {
+		SemanticObject onSelected (ISemantext ctx, Object resultset) throws TransException, SQLException;
 	}
 
 	public enum Type { select, insert, update, delete }

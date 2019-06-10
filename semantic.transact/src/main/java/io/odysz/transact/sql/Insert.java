@@ -207,7 +207,7 @@ public class Insert extends Statement<Insert> {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
-			return postOp.op(ctx, sqls);
+			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;
 	}

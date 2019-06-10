@@ -29,7 +29,8 @@ public class Funcall extends ExprPart {
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
 		dbSame("func"),
-		datetime("datetime");
+		datetime("datetime"),
+		extFile("extfile");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
@@ -46,6 +47,8 @@ public class Funcall extends ExprPart {
 				return ifNullElse;
 			else if (datetime.fid.equals(funcName) || "date".equals(funcName))
 				return datetime;
+			else if (extFile.fid.equals(funcName) || "ext".equals(funcName))
+				return extFile;
 			return dbSame; // max etc. are db same
 		}
 	}
@@ -108,6 +111,8 @@ public class Funcall extends ExprPart {
 			return sqlIfElse(context, args);
 		else if (func == Func.datetime)
 			return sql2Datetime(context, args);
+		else if (func == Func.extFile)
+			return sqlExtFile(context, args);
 		else return dbSame(context, args);
 	}
 
@@ -124,6 +129,30 @@ public class Funcall extends ExprPart {
 			f += ", " + args[i];
 
 		return f + ")";
+	}
+
+	/**<p>Append additional file reading handlers to context's onSelected handling.</p>
+	 * What the handler is doing:<br>
+	 * 1. read file from the file of args[0]<br>
+	 * 2. set readed contents to the current row of contxt, with {@link ISemantext#setRs(String, String)}
+	 * @param context semantext
+	 * @param args [0] relative filepath (replacing contents), [1] select elem alias (to be replaced)
+	 * @return sql for the SelectElem, a.k.a. args[0]
+	 */
+	private String sqlExtFile(ISemantext context, String[] args) {
+		if (args == null || args.length != 2)
+			Utils.warn("Function extFile() only accept 1 arguments: %s (And do not confused with class ExtFile)",
+					(Object[])args);
+		else {
+			context.addOnSelectedOperate((stx, rs) -> {
+				final String pth = args[0]; 
+				final String als = args[1]; 
+				// read file
+				stx.setRs(als, "Readed: " + pth);
+				return null;
+			});
+		}
+		return args[0];
 	}
 
 	/**

@@ -14,6 +14,8 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 
 /**External file representation.<br>
  * An ExtFile can only been used as a set value.
+ * 
+ * FIXME Why this is not a {@link SetValue}, as the ExtRef is a SelectElem?
  * @author odys-z@github.com
  *
  */
@@ -22,11 +24,31 @@ public class ExtFile extends AbsPart {
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
+	private String absroot;
 
 	public ExtFile(ExprPart resulvingPath) {
 		this.resulv_const_path = resulvingPath;
 	}
 
+	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFile#prefixPath(String)}.<br>
+	 * The argurment doesn't have to be absolute path if the runtime can access a file from a relative paht.<br>
+	 * But the sevlet needing an absolute path to access a file, so this mus been set to the absolute path,
+	 * like with the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
+	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
+	 * If this is wrong, please feel free to correct the author at odysseusj@163.com.
+	 * @param absRoot
+	 * @return this
+	 */
+	public ExtFile absPath(String absRoot) {
+		this.absroot = absRoot;
+		return this;
+	}
+
+	/**Set the relative path of the file.
+	 * This part is saved in the replaced file path in database field.
+	 * @param path
+	 * @return this
+	 */
 	public ExtFile prefixPath(String path) {
 		this.prefix = path;
 		return this;
@@ -45,25 +67,27 @@ public class ExtFile extends AbsPart {
 	@Override
 	public String sql(ISemantext ctx) {
 		// save file to pathname
-		String fn;
+		String relatvFn;
 		if (resulv_const_path instanceof Resulving) 
-			fn = ((Resulving)resulv_const_path).resulved(ctx);
+			relatvFn = ((Resulving)resulv_const_path).resulved(ctx);
 		else
-			fn = resulv_const_path.sql(ctx);
+			relatvFn = resulv_const_path.sql(ctx);
 		
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
-				fn += " " + filename;
+				relatvFn += " " + filename;
 		
-		String dir = LangExt.isblank(prefix) ? fn : prefix;
+		String dir = LangExt.isblank(prefix) ? relatvFn : prefix;
 		mkDir(dir);
 
-		fn = dir + "/" + fn;
+		relatvFn = dir + "/" + relatvFn;
 
-		Path f = Paths.get(fn);
+		String absoluteFn = LangExt.isblank(absroot) ?
+				relatvFn : absroot + "/" + relatvFn;
+		Path f = Paths.get(absoluteFn);
 		try {
 			byte[] b = AESHelper.decode64(b64);
 			Files.write(f, b);
-			return "'" + fn + "'";
+			return "'" + relatvFn + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "''";
@@ -81,5 +105,4 @@ public class ExtFile extends AbsPart {
 			// must be a file
 			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
 	}
-
 }
