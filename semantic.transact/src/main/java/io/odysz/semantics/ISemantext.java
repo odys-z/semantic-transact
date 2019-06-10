@@ -186,7 +186,7 @@ public interface ISemantext {
 	/**Add an post selected operation. E.g. extFile Funcall will add a post file reading and replacing operation here.
 	 * @param op
 	 */
-	void addOnSelectedOperate(IPostSelectOperat op);
+	void addOnSelectedHandler(IPostSelectOperat op);
 
 	/**Set resultset's current row's column's value.<br>
 	 * The current row is actually iterated over by {@link #onSelected(Object)}.
@@ -197,6 +197,6 @@ public interface ISemantext {
 	 * @param col
 	 * @param v
 	 * @throws SQLException setting value failed
-	 */
 	public void setRs(Object resultset, String col, String v) throws SQLException;
+	 */
 }

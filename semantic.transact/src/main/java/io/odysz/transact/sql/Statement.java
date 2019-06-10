@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.odysz.common.LangExt;
@@ -28,10 +29,13 @@ import io.odysz.transact.x.TransException;
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public interface IPostOperat {
-		SemanticObject onCommitOk (ISemantext ctx, ArrayList<String> sqls) throws TransException, SQLException;
+		SemanticObject onCommitOk (ISemantext ctx, ArrayList<String> sqls)
+				throws TransException, SQLException;
 	}
+	
 	public interface IPostSelectOperat {
-		SemanticObject onSelected (ISemantext ctx, Object resultset) throws TransException, SQLException;
+		void onSelected (ISemantext ctx, ArrayList<Object> row,
+				HashMap<String, Object[]> cols) throws TransException, SQLException;
 	}
 
 	public enum Type { select, insert, update, delete }

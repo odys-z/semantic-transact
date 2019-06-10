@@ -137,8 +137,8 @@ class Semantext2 implements ISemantext {
 	public void onSelected(Object resultset) throws SQLException, TransException { }
 
 	@Override
-	public void addOnSelectedOperate(IPostSelectOperat op) { }
+	public void addOnSelectedHandler(IPostSelectOperat op) { }
 
-	@Override
-	public void setRs(Object resultset, String col, String v) throws SQLException { }
+//	@Override
+//	public void setRs(Object resultset, String col, String v) throws SQLException { }
 }
