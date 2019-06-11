@@ -81,6 +81,41 @@ public class SemanticsTest {
 				sqls.get(0));
 	}
 	
+	/**See <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>
+	 * How empty values are handled</a>
+	 * @throws TransException
+	 */
+	@Test
+	public void testEmptyVals() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_functions")
+			.nv("funcId", "AUTO")		// no coltype,		not empty	=> 'AUTO'
+			.nv("funcName", "")			// type text,		blank 		=> ''
+			.nv("sibling", null)		// type number,		null 		=> null
+			.nv("someDat", "")			// type datetime,	blank 		=> ''
+			.nv("parentId", null)		// type text,		null		=> null
+			.commit(st.instancontxt(null), sqls);
+		
+		assertEquals(
+			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+							  "values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')",
+			sqls.get(0));
+
+		st.insert("a_functions")
+			.nv("funcId", "AUTO")		// no coltype,		not empty	=> 'AUTO'
+			.nv("funcName", null)		// type text,		null 		=> null
+			.nv("sibling", "")			// type number,		blank 		=> 0
+			.nv("someDat", null)		// type datetime,	null 		=> null
+			.nv("parentId", "")			// type text,		blank		=> ''
+			.commit(st.instancontxt(null), sqls);
+		
+		assertEquals(
+			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+								"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
+			sqls.get(1));
+		
+	}
+	
 	@SuppressWarnings("serial")
 	static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {
@@ -92,6 +127,7 @@ public class SemanticsTest {
 	private static TableMeta fackFuncs() {
 		return new TableMeta("a_functions")
 				.col("sibling", coltype.number)
+				.col("someDat", coltype.datetime)
 				.col("parentId", coltype.text);
 	}
 }

@@ -25,13 +25,13 @@ public class Logic {
 			else if (oper == op.ge)
 				return ">= " + rop;
 			else if (oper == op.mul)
-				return "* ";
+				return "* " + (rop == null ? "''" : rop);
 			else if (oper == op.div)
-				return "/ ";
+				return "/ " + (rop == null ? "''" : rop);
 			else if (oper == op.add)
-				return "+ ";
+				return "+ " + (rop == null ? "''" : rop);
 			else if (oper == op.minus)
-				return "- ";
+				return "- " + (rop == null ? "''" : rop);
 			else if (oper == op.like)
 				if (negative != null && negative.length > 0 && negative[0])
 					return "not like " + likeOp(sctx, rop);

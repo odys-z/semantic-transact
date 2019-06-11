@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.meta.TableMeta;
@@ -62,19 +63,24 @@ public class InsertValues extends AbsPart {
 				else {
 					// Only value through java api know what's the type, the json massage handler don't.
 					// So we figure it out throw db meta data.
-					
-					// 2019.5.21 Resulving won't reach here
-//					String str = sctx == null ? (String)nv[1]
-//							 : (String) sctx.resulvedVal(String.valueOf(nv[1]));
 					String str = String.valueOf(nv[1]);
 					if (sctx == null)
-						// when testing
-						vs.constv(idx, str);
+						// when testing, sctx is null
+						if (nv[1] == null)
+							vs.v(idx, new ExprPart("null"));
+						else
+							vs.constv(idx, str);
 					else {
 						TableMeta cltyp = sctx.colType(tabl);
 						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
-							vs.constv(idx, str);
-						else vs.v(idx, new ExprPart(str));
+							// vs.constv(idx, str);
+							if (nv[1] == null)
+								vs.v(idx, new ExprPart("null"));
+							else
+								vs.constv(idx, str);
+						else vs.v(idx, nv[1] == null
+									 ? new ExprPart("null")
+									 : LangExt.isblank(str) ? new ExprPart("0") : new ExprPart(str));
 					}
 				}
 			} catch (TransException e) {

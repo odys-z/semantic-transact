@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FilenameUtils;
+
 import io.odysz.common.AESHelper;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -81,8 +83,10 @@ public class ExtFile extends AbsPart {
 
 		relatvFn = dir + "/" + relatvFn;
 
-		String absoluteFn = LangExt.isblank(absoluteroot) ?
-				relatvFn : absoluteroot + "/" + relatvFn;
+//		String absoluteFn = LangExt.isblank(absoluteroot) ?
+//				relatvFn : absoluteroot + "/" + relatvFn;
+		String absoluteFn = FilenameUtils.concat(absoluteroot, relatvFn);
+
 		Path f = Paths.get(absoluteFn);
 		try {
 			byte[] b = AESHelper.decode64(b64);
@@ -95,6 +99,7 @@ public class ExtFile extends AbsPart {
 	}
 
 	private void mkDir(String dir) {
+		dir = FilenameUtils.concat(absoluteroot, dir);
 		File f = new File(dir);
 		if (f.isDirectory())
 			return;

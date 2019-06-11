@@ -42,8 +42,8 @@ public class Delete extends Statement<Delete>  {
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-		if (sctx != null)
-			sctx.onDelete(this, mainTabl, where);
+//		if (sctx != null)
+//			sctx.onDelete(this, mainTabl, where);
 		
 		// if (where == null && inSelectCond == null)
 		if (where == null)

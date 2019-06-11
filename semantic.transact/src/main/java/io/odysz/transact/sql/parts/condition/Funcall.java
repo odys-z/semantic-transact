@@ -182,7 +182,10 @@ public class Funcall extends ExprPart {
 								byte[] fi = Files.readAllBytes(f);
 								row.set(c, AESHelper.encode64(fi));
 							}
-							else Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);
+							else {
+								Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);
+								row.set(c, "File not Found: " + fn);
+							}
 						}
 					} catch (IOException e) {
 						e.printStackTrace();

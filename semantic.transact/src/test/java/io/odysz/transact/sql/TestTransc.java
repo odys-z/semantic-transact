@@ -71,8 +71,6 @@ public class TestTransc {
 				sqls.get(2));
 	}
 
-	
-
 	@Test
 	public void testFunc() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
@@ -93,8 +91,12 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_funcs")
 			.nv("funcId", "a01")
+			.nv("funcName", "")
+			// because of no semantext, null is handled as constant string, resulting 'null'
+			.nv("uri", null)
 			.commit(sqls);
-		assertEquals(sqls.get(0), "insert into a_funcs  (funcId) values ('a01')");
+		assertEquals("insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)",
+				sqls.get(0));
 		
 		ArrayList<Object[]> vals = new ArrayList<Object[]>(2);
 		vals.add(new String[]{ "logId", "b01"});
