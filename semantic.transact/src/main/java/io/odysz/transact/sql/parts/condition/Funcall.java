@@ -162,13 +162,6 @@ public class Funcall extends ExprPart {
 
 			// Add extFile() handler to handle selected value
 			context.addOnSelectedHandler(
-				// (stx, rs) -> {
-				// 	final String pth = args[0]; 
-				// 	// read file
-				// 	// TODO let's support file input stream in rs -> json converting, in the future, in Anson.
-				// 	stx.setRs(rs, resultAlias, "Readed: " + pth);
-				// 	return null;
-				// }
 				(stx, row, cols) -> {
 					// replace path value in selected results with the content of file
 					try {

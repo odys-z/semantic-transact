@@ -20,6 +20,7 @@ public class ColumnList extends AbsPart {
 			Integer ix = colIdx.get(n);
 			if (ix == null)
 				continue;
+			// ix--; // because colindext set early is starting from 1! disgusting
 			if (ix >= cols.length)
 				Utils.warn("Column ignored, possibly results from duplicate name (%s) in column list.", n);
 			else

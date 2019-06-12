@@ -1,7 +1,11 @@
 package io.odysz.transact.sql;
 
+import java.sql.SQLException;
+
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
+import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
  * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
@@ -42,5 +46,9 @@ public class Transcxt {
 	
 	public Delete delete(String tabl) {
 		return new Delete(this, tabl);
+	}
+
+	public TableMeta tableMeta(String string) throws TransException, SQLException {
+		return null;
 	}
 }

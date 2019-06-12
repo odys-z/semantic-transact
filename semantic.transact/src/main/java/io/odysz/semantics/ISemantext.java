@@ -97,7 +97,8 @@ public interface ISemantext {
 	 */
 	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls) throws TransException;
 
-	/**Get results from handling semantics. typically new inserting records' auto Id,
+	/**Get results from handling semantics.<br>
+	 * Typically it's a new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
 	 * @param table
 	 * @param col

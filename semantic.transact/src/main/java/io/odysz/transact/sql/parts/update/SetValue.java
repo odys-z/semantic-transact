@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
@@ -35,6 +36,19 @@ public class SetValue extends ExprPart {
 		else if (rexp instanceof String)
 			constValue = (String) rexp;
 	}
+	
+	private String tabl;
+	private String col;
+	/**This value is set value to tabl.col. 
+	 * @param tabl
+	 * @param col
+	 * @return this
+	 */
+	public SetValue setVal2(String tabl, String col) {
+		this.tabl = tabl;
+		this.col = col;
+		return this;
+	}
 
 	@Override
 	public String sql(ISemantext sctx) {
@@ -54,7 +68,17 @@ public class SetValue extends ExprPart {
 		else if (constValue != null) {
 			// String v = sctx == null ? constValue : (String) sctx.resulvedVal(constValue);
 			// return "'" + v + "'";
-			return "'" + constValue + "'";
+
+			// return "'" + constValue + "'";
+			if (col == null || sctx.colType(tabl) == null)
+				return "'" + constValue + "'";
+			else {
+				TableMeta mt = sctx.colType(tabl);
+				if (mt.isQuoted(col))
+					return "'" + constValue + "'";
+				else 
+					return constValue;
+			}
 		}
 		else
 			return super.sql(sctx);

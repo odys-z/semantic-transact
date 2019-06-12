@@ -107,7 +107,7 @@ public class Update extends Statement<Update> {
 		Stream<String> s = Stream.concat(
 					Stream.of(new ExprPart("update"),
 						new ExprPart(mainTabl), new ExprPart(mainAlias),
-						new ExprPart("set"), new SetList(nvs)), 
+						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias)), 
 					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
 				  .map(m -> {
 					try {

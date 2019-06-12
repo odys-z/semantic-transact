@@ -113,18 +113,17 @@ public class SemanticsTest {
 			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
 								"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
 			sqls.get(1));
-		
 	}
 	
 	@SuppressWarnings("serial")
 	static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {
-			{put("a_functions", fackFuncs());}
+			{put("a_functions", fakeFuncs());}
 			{put("a_role_funcs", new TableMeta("a_role_funcs"));}
 		};
 	}
 
-	private static TableMeta fackFuncs() {
+	private static TableMeta fakeFuncs() {
 		return new TableMeta("a_functions")
 				.col("sibling", coltype.number)
 				.col("someDat", coltype.datetime)
