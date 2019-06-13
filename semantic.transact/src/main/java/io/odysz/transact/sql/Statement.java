@@ -28,6 +28,10 @@ import io.odysz.transact.x.TransException;
  */
 @SuppressWarnings("unchecked")
 public abstract class Statement<T extends Statement<T>> extends AbsPart {
+	protected static boolean verbose = true;
+
+	public enum Type { select, insert, update, delete }
+
 	public interface IPostOperat {
 		SemanticObject onCommitOk (ISemantext ctx, ArrayList<String> sqls)
 				throws TransException, SQLException;
@@ -38,11 +42,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 				HashMap<String, Object[]> cols) throws TransException, SQLException;
 	}
 
-	public enum Type { select, insert, update, delete }
-
-	protected static boolean verbose = true;
-
 	protected String mainTabl;
+	public Object mainTabl() { return mainTabl; }
+
 	protected String mainAlias;
 	public String alias() { return mainAlias; }
 	

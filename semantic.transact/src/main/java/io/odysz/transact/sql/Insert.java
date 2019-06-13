@@ -40,17 +40,22 @@ public class Insert extends Statement<Insert> {
 	public Insert nv(String n, Object v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
-		// currentRowNv.add(new String[] {n, String.valueOf(v)});
-		currentRowNv.add(new Object[] {n, v});
+		//  currentRowNv.add(new Object[] {n, v});
 		
 		// column names
 		if (insertCols == null)
 			insertCols = new HashMap<String, Integer>();
-		if (!insertCols.containsKey(n))
+		if (!insertCols.containsKey(n)) {
 			insertCols.put(n, insertCols.size());
-		// else Utils.warn("Column's (%s) value already exists, old value replaced by new value (%s)",
-		else Utils.warn("Column's value already exists, old value replaced by new value (%s = %s)",
+			currentRowNv.add(new Object[] {n, v});
+		}
+		else {
+			// replace the old one
+			currentRowNv.get(insertCols.get(n))[1] = v;
+			if (verbose) Utils.warn(
+				"Insert.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
 				n, v);
+		}
 		return this;
 	}
 

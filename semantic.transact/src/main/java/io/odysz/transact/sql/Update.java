@@ -35,16 +35,22 @@ public class Update extends Statement<Update> {
 	public Update nv(String n, Object v) {
 		if (nvs == null)
 			nvs = new ArrayList<Object[]>();
-		nvs.add(new Object[] {n, v});
+		// nvs.add(new Object[] {n, v});
 		
 		// column names
 		if (updateCols == null)
 			updateCols = new HashMap<String, Integer>();
-		if (!updateCols.containsKey(n))
+		if (!updateCols.containsKey(n)) {
 			updateCols.put(n, updateCols.size());
-		else Utils.warn("Column's value already exists, old value replaced by new value (%s = %s)",
+			nvs.add(new Object[] {n, v});
+		}
+		else {
+			// replace the old one
+			nvs.get(updateCols.get(n))[1] = v;
+			if (verbose) Utils.warn(
+				"Update.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
 				n, v);
-		
+		}
 		return this;
 	}
 

@@ -78,20 +78,19 @@ public class ExtFile extends AbsPart {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
 				relatvFn += " " + filename;
 		
-		String dir = LangExt.isblank(prefix) ? relatvFn : prefix;
+		String dir = LangExt.isblank(prefix) ? "" : prefix;
 		mkDir(dir);
 
-		relatvFn = dir + "/" + relatvFn;
+		relatvFn = FilenameUtils.concat(dir, relatvFn);
 
-//		String absoluteFn = LangExt.isblank(absoluteroot) ?
-//				relatvFn : absoluteroot + "/" + relatvFn;
 		String absoluteFn = FilenameUtils.concat(absoluteroot, relatvFn);
 
 		Path f = Paths.get(absoluteFn);
 		try {
 			byte[] b = AESHelper.decode64(b64);
 			Files.write(f, b);
-			return "'" + relatvFn + "'";
+			// mysql doesn't like windows' path separator
+			return "'" + relatvFn.replaceAll("\\\\", "/") + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "''";

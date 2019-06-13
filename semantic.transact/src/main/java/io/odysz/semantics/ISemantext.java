@@ -15,22 +15,23 @@ import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
-/**<p>Interface for semantic event handler.</p>
- * 
+/**
+ * <h6>Interface for Semantic Event Handler</h6>
+ * <p>In short, an ISemantext is the statement runtime context for building sql.</p>
  * <p>A semantic event can be for example starting an insert transaction with a data row.
  * Such data may needing some processing defined by the application requirements.</p>
  * 
- * <p>For example, a "fullpath" field in table means a deep first traveling order of tree nodes.</p>
+ * <p>For example, a "fullpath" field in a table means a deep first traveling notation of tree nodes.</p>
  * In this case, a user defined semantic event handler can compose this data (fullpath) according to it's parent's
  * fullpath, then append the field into the inserting row.</p>
  * 
  * <p>Semantic-transact is designed only process SQL structure, not handling the data semantics,
- * so it only fire the event to the handler, the implementation of ISemantext. </p>
+ * so it only fire the event to the handler, to the implementation of ISemantext. </p>
  * 
  * <p>An ISemantext instance is used as an sql composing context
  * by semantic-transact when travel the AST and composing SQL(s). There must be an {@link #insert}
- * event which fired at the beginning of composing an insert sql, and 1 or more times for inserting row
- * event, the {@link #onInsert}.</p>
+ * event which fired at the beginning of composing an insert sql, and one event for inserting each row,
+ * the {@link #onInsert}.</p>
  * @author ody
  *
  */
@@ -39,7 +40,9 @@ public interface ISemantext {
 	 * Regex.findGroups():<br>
 	 * [0] RESULVE<br>
 	 * [1] task_nodes<br>
-	 * [2] taskId*/
+	 * [2] taskId
+	 * @deprecated replaced by {@link io.odysz.transact.sql.parts.Resulving Resulving}
+	 * */
 	String refPattern = "^\\s*(RESULVE)\\s*(\\w+)\\s*\\.\\s*(\\w+)\\s*$";
 
 	public String connId();

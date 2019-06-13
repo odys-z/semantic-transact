@@ -90,13 +90,6 @@ public class ValueList extends AbsPart {
 
 	public ValueList constv(int idx, String v) throws TransException {
 		return v(idx, new ExprPart("'" + v + "'"));
-//		ExprPart vpart;
-//		if (sctx.colType().isString())
-//			vpart = new ExprPart("'" + v + "'");
-//		else 
-//			vpart = new ExprPart(v);
-//
-//		return v(idx, vpart);
 	}
 
 	public ValueList v(int idx, AbsPart v) throws TransException {
@@ -113,8 +106,7 @@ public class ValueList extends AbsPart {
 	}
 
 	public ValueList constv(String v) throws TransException {
-		throw new TransException("yes it's realy used.");
-		// return v(new ExprPart("'" + v + "'"));
+		throw new TransException("Yes it's realy used!");
 	}
 	
 	/**Add value to the last column.
@@ -135,11 +127,6 @@ public class ValueList extends AbsPart {
 	@Override
 	public String sql(ISemantext context) {
 		if (valst == null && valsArrIsnull) return "null";
-//		else if (valst != null){
-//			return valst.stream().map(v -> v == null ? "null" : "'" + v + "'").collect(Collectors.joining(", "));
-//		}
-//		else
-//			return Arrays.stream(valsArr).map(v -> v == null ? "null" : "'" + v + "'").collect(Collectors.joining(", "));
 		else if (valst != null)
 			return valst.stream().map(v -> {
 				try {
@@ -159,6 +146,4 @@ public class ValueList extends AbsPart {
 				}
 			}).collect(Collectors.joining(", ", "(", ")"));
 	}
-
-
 }
