@@ -8,6 +8,11 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
+/**The SET clause equetions' list:<br>
+ * col= v1, c2 = 'v2', ...<br>
+ * This class use {@link SetValue} as element type.
+ * @author odys-z@github.com
+ */
 public class SetList extends AbsPart {
 	private ArrayList<Object[]> nvs;
 
@@ -17,7 +22,9 @@ public class SetList extends AbsPart {
 
 	private String tabl;
 	private String col;
-	/**These values are set value to tabl.col. 
+	/**These values are set value to tabl.col. <br>
+	 * Some times this information is used for handling expression,
+	 * like {@link io.odysz.transact.sql.parts.condition.Funcall.Func#extFile extFile} will use to handle external file at committing succeed.
 	 * @param tabl
 	 * @param col
 	 * @return this

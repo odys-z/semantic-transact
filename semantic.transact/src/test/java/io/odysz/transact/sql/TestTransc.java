@@ -11,6 +11,7 @@ import org.junit.Test;
 import io.odysz.common.Utils;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
@@ -93,7 +94,7 @@ public class TestTransc {
 			.nv("funcId", "a01")
 			.nv("funcName", "")
 			// because of no semantext, null is handled as constant string, resulting 'null'
-			.nv("uri", null)
+			.nv("uri", ExprPart.constStr(null))
 			.commit(sqls);
 		assertEquals("insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)",
 				sqls.get(0));
@@ -205,10 +206,31 @@ public class TestTransc {
 							.nv("funcId", "f 001")
 							.nv("roleId", "role 01")))
 			.commit(sqls);
-		// update a_roles  set roleName='role-21' where roleId = 'role 01'
-		// delete from a_rolefunc where roleId = 'role 01'
-		// insert into a_rolefunc  (funcId, roleId) values ('f 001', 'role 01')
-		assertEquals(3, sqls.size());
+		assertEquals("update a_roles  set roleName='role-21' where roleId = 'role 01'",
+				sqls.get(0));
+		assertEquals("delete from a_rolefunc where roleId = 'role 01'",
+				sqls.get(1));
+		assertEquals("insert into a_rolefunc  (funcId, roleId) values ('f 001', 'role 01')",
+				sqls.get(2));
 	}
 
+	@Test
+	public void testExprVals() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_roles")
+			.nv("roleName", "roleName")
+			.nv("roleId", ExprsVisitor.parse("roleName + 3"))
+			.where_("=", "roleId", "role 01")
+			.post(st.update("a_rolefunc")
+					.nv("roleId", ExprsVisitor.parse("3 * 2"))
+					.where_("=", "roleId", "role 01"))
+			.commit(sqls);
+		
+		// insert into a_roles  (roleName, roleId) values ('roleName', roleName + 3)
+		// update a_rolefunc  set roleId=role where roleId = 'role 01'
+		assertEquals("insert into a_roles  (roleName, roleId) values ('roleName', roleName + 3)",
+				sqls.get(0));
+		assertEquals("update a_rolefunc  set roleId=3 * 2 where roleId = 'role 01'",
+				sqls.get(1));
+	}
 }

@@ -2,17 +2,24 @@ package io.odysz.transact.sql.parts.antlr;
 
 import java.util.List;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
+import gen.antlr.sql.exprs.SearchExprs;
 import gen.antlr.sql.exprs.SearchExprs.ConstantContext;
 import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
 import gen.antlr.sql.exprs.SearchExprs.Full_column_nameContext;
 import gen.antlr.sql.exprs.SearchExprs.Function_callContext;
 import gen.antlr.sql.exprs.SearchExprs.Unary_operator_expressionContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
+import gen.antlr.sql.exprs.TSqlLexer;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 
-/**Full or part of an expression.
+/**Full or part of an expression.<br>
+ * See <a href='https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4'>
+ * ANTLR4 grammar for T-SQL</a> 
  * <pre>
 expression_list
     : expression (',' expression)*
@@ -92,11 +99,24 @@ comparison_operator
 //     ;
 
 </pre>
- * @author ody
+ * For expression grammar, see {@link ExprPart}.
+ * @author odys-z@github.com
  *
  */
+@SuppressWarnings("deprecation")
 public class ExprsVisitor extends SearchExprsBaseVisitor<ExprPart> {
+	static ExprsVisitor visitor = new ExprsVisitor();
 
+	public static ExprPart parse(String strExpr) {
+		ANTLRInputStream inputStream = new ANTLRInputStream(strExpr);
+	        TSqlLexer markupLexer = new TSqlLexer(inputStream);
+	        CommonTokenStream commonTokenStream = new CommonTokenStream(markupLexer);
+	        SearchExprs exprParser = new SearchExprs(commonTokenStream);
+//	 
+	        ExpressionContext ctx = exprParser.expression();
+	        return visitor.visit(ctx);  
+	}
+	
 	/**<pre>
 expression
     : constant
@@ -145,18 +165,4 @@ expression
 			return null;
 //		}
 	}
-
-//	private List<String> funcArgs(Expression_listContext expression_list) {
-//		if (expression_list != null) {
-//			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
-//			for (ExpressionContext exp : expression_list.expression()) {
-//				String op = exp.op.getText();
-//				if (op != null)
-//					// recursive visit?
-//					lst.add(new ExprPart(exp.getText()));
-//			}
-//		}
-//		return null;
-//	}
-	
 }

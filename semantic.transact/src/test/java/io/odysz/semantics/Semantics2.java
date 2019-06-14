@@ -8,6 +8,7 @@ import java.util.Map;
 import org.xml.sax.SAXException;
 
 import io.odysz.common.AESHelper;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**Default data structure semantics description and supporter.<br>
@@ -394,22 +395,22 @@ class Semantics2 {
 		descFullpath = String.format("fullpath rule (%s = 'parent-%s.%s')", fullPath, fullPath, pathSufix);
 	}
 
-	public String genFullpath(ArrayList<Object[]> value, Map<String, Integer>colIx) {
+	public Object genFullpath(ArrayList<Object[]> value, Map<String, Integer>colIx) {
 		// can't compose fullpath as there is no parent's fullpath
-		String parentId = null;
-		String sibling = null;
-		String recId = null;
+		Object parentId = null;
+		Object sibling = null;
+		Object recId = null;
 
 		if (colIx.containsKey(parentField))
-			parentId = (String) value.get(colIx.get(parentField))[1];
+			parentId = value.get(colIx.get(parentField))[1];
 
 		if (colIx.containsKey(pathSufix))
-			sibling = (String) value.get(colIx.get(parentField))[1];
+			sibling = value.get(colIx.get(parentField))[1];
 		else sibling = pathSufix;
 
-		recId = (String) value.get(colIx.get(idField))[1];
+		recId = value.get(colIx.get(idField))[1];
 
-		return String.format("fullpath %s.%s %s", parentId, sibling, recId);
+		return ExprPart.constStr(String.format("fullpath %s.%s %s", parentId, sibling, recId));
 	}
 
 //	public String genFullpath2(String conn, Object parentId, Object recId, Object siblingOrder) throws SQLException {

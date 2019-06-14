@@ -56,7 +56,7 @@ class Semantext2 implements ISemantext {
 				}
 				if (s.is(smtype.fullpath)) {
 					String n = s.getFullpathField();
-					String fp = s.genFullpath(value, cols);
+					Object fp = s.genFullpath(value, cols);
 					Object[] nv = null;
 					if (!cols.containsKey(n)) {
 						// append fullpath nv

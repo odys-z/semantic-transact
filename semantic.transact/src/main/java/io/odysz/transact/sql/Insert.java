@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
+import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
@@ -37,7 +40,8 @@ public class Insert extends Statement<Insert> {
 		super(transc, tabl, null);
 	}
 
-	public Insert nv(String n, Object v) {
+	@Override
+	public Insert nv(String n, AbsPart v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
 		//  currentRowNv.add(new Object[] {n, v});
@@ -114,6 +118,28 @@ public class Insert extends Statement<Insert> {
 			valuesNv.add(currentRowNv);
 			currentRowNv = null;
 		}
+		
+		// v must be String constant or ExprPart
+		TableMeta mt = transc.tableMeta(mainTabl);
+		for (int i = 0; i < val.size(); i++) {
+			Object[] nv = val.get(i);
+			if (nv == null || nv[1] instanceof AbsPart)
+				continue;
+
+			String v = (String) nv[1];
+			String n = (String) nv[0];
+			// can this part merged with Statement#nv()?
+			if (mt == null || mt.isQuoted(v))
+				// nv[1] = ExprPart.constStr(v);
+				val.set(i, new Object[] {n, ExprPart.constStr(v)});
+			else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
+//				nv[1] = ExprPart.constVal("0");
+				val.set(i, new Object[] {n, ExprPart.constStr("0")});
+			else
+//				nv[1] = new ExprPart(v);		
+				val.set(i, new Object[] {n, new ExprPart(v)});
+		}
+
 		valuesNv.add(val);
 		return this;
 	}

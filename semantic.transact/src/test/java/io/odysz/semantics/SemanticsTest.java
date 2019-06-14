@@ -12,6 +12,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.sql.Transcxt;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
@@ -44,7 +45,7 @@ public class SemanticsTest {
 		r1.add(new String[] {"roleId", "r01"});
 		r1.add(new String[] {"funcId", "f01"});
 
-		ArrayList<String[]> r2 = new ArrayList<String[]>();
+		ArrayList<Object[]> r2 = new ArrayList<Object[]>();
 		r2.add(new String[] {"roleId", "r02"});
 		r2.add(new String[] {"funcId", "f02"});
 
@@ -53,9 +54,10 @@ public class SemanticsTest {
 		st.insert("a_role_funcs")
 			.cols(new String[] {"roleId", "funcId"})
 			.values(vals)
+			.value(r2)
 			.commit(st.instancontxt(null), sqls);
 
-		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02')",
+		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
 				sqls.get(1));
 		Utils.logi(sqls);
 	}
@@ -89,11 +91,11 @@ public class SemanticsTest {
 	public void testEmptyVals() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_functions")
-			.nv("funcId", "AUTO")		// no coltype,		not empty	=> 'AUTO'
-			.nv("funcName", "")			// type text,		blank 		=> ''
-			.nv("sibling", null)		// type number,		null 		=> null
-			.nv("someDat", "")			// type datetime,	blank 		=> ''
-			.nv("parentId", null)		// type text,		null		=> null
+			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
+			.nv("funcName", "")						// type text,		blank 		=> ''
+			.nv("sibling", ExprPart.constStr(null))	// type number,		null 		=> null
+			.nv("someDat", "")						// type datetime,	blank 		=> ''
+			.nv("parentId", ExprPart.constStr(null))// type text,		null		=> null
 			.commit(st.instancontxt(null), sqls);
 		
 		assertEquals(
@@ -102,11 +104,11 @@ public class SemanticsTest {
 			sqls.get(0));
 
 		st.insert("a_functions")
-			.nv("funcId", "AUTO")		// no coltype,		not empty	=> 'AUTO'
-			.nv("funcName", null)		// type text,		null 		=> null
-			.nv("sibling", "")			// type number,		blank 		=> 0
-			.nv("someDat", null)		// type datetime,	null 		=> null
-			.nv("parentId", "")			// type text,		blank		=> ''
+			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
+			.nv("funcName", ExprPart.constStr(null))// type text,		null 		=> null
+			.nv("sibling", "")						// type number,		blank 		=> 0
+			.nv("someDat", ExprPart.constStr(null))	// type datetime,	null 		=> null
+			.nv("parentId", "")						// type text,		blank		=> ''
 			.commit(st.instancontxt(null), sqls);
 		
 		assertEquals(

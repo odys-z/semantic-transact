@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import io.odysz.transact.x.TransException;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
-import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.x.TransException;
 
 /**Support value list in update set value elem and insert values list:<br>
  * value can only be:<br>
@@ -88,9 +87,9 @@ public class ValueList extends AbsPart {
 		valsArrIsnull = true;
 	}
 
-	public ValueList constv(int idx, String v) throws TransException {
-		return v(idx, new ExprPart("'" + v + "'"));
-	}
+//	public ValueList constv(int idx, String v) throws TransException {
+//		return v(idx, new ExprPart("'" + v + "'"));
+//	}
 
 	public ValueList v(int idx, AbsPart v) throws TransException {
 		if (idx < 0 || v == null)
@@ -105,9 +104,9 @@ public class ValueList extends AbsPart {
 		return this;
 	}
 
-	public ValueList constv(String v) throws TransException {
-		throw new TransException("Yes it's realy used!");
-	}
+//	public ValueList constv(String v) throws TransException {
+//		throw new TransException("Yes it's realy used!");
+//	}
 	
 	/**Add value to the last column.
 	 * @param v

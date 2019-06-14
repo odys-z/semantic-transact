@@ -38,6 +38,10 @@ public class Funcall extends ExprPart {
 		ifNullElse("ifNullElse"),
 		dbSame("func"),
 		datetime("datetime"),
+		/**Function extFile(uri):<br>
+		 * Handle external file when reading - a post operation is added to the on-select-ok event,
+		 * which will replace the uri with content of external file. 
+		 */
 		extFile("extfile");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }

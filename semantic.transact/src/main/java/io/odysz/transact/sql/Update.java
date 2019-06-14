@@ -11,6 +11,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.Query.Ix;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.update.SetList;
 import io.odysz.transact.x.TransException;
@@ -31,8 +32,31 @@ public class Update extends Statement<Update> {
 	 * @param n
 	 * @param v
 	 * @return this Update statement
+	public Update nv(String n, String v) {
+//		if (nvs == null)
+//			nvs = new ArrayList<Object[]>();
+//		// nvs.add(new Object[] {n, v});
+//		
+//		// column names
+//		if (updateCols == null)
+//			updateCols = new HashMap<String, Integer>();
+//		if (!updateCols.containsKey(n)) {
+//			updateCols.put(n, updateCols.size());
+//			nvs.add(new Object[] {n, v});
+//		}
+//		else {
+//			// replace the old one
+//			nvs.get(updateCols.get(n))[1] = v;
+//			if (verbose) Utils.warn(
+//				"Update.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
+//				n, v);
+//		}
+//		return this;
+		return nv(n, ExprPart.constStr(v));
+	}
 	 */
-	public Update nv(String n, Object v) {
+
+	public Update nv(String n, AbsPart v) {
 		if (nvs == null)
 			nvs = new ArrayList<Object[]>();
 		// nvs.add(new Object[] {n, v});
@@ -52,6 +76,7 @@ public class Update extends Statement<Update> {
 				n, v);
 		}
 		return this;
+
 	}
 
 	/**set array of [n, v], where if v is constant, e.g. 'val', must have a '' pair.
@@ -60,8 +85,13 @@ public class Update extends Statement<Update> {
 	 */
 	public Update nvs(ArrayList<Object[]> nvs) {
 		if (nvs != null)
-			for (Object[] nv : nvs)
-				nv((String)nv[Ix.nvn], nv[Ix.nvv]);
+			for (Object[] nv : nvs) {
+				Object v = nv[Ix.nvv];
+				if (v instanceof AbsPart)
+					nv((String)nv[Ix.nvn], (AbsPart)v);
+				else
+					nv((String)nv[Ix.nvn], ExprPart.constStr((String) v));
+			}
 		return this;
 	}
 	

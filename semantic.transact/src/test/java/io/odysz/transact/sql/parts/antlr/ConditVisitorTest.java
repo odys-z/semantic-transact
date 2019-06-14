@@ -1,11 +1,10 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import io.odysz.common.Utils;
-import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 
 public class ConditVisitorTest {

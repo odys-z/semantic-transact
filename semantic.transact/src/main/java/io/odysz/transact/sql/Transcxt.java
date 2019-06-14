@@ -1,7 +1,5 @@
 package io.odysz.transact.sql;
 
-import java.sql.SQLException;
-
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
@@ -48,7 +46,7 @@ public class Transcxt {
 		return new Delete(this, tabl);
 	}
 
-	public TableMeta tableMeta(String string) throws TransException, SQLException {
-		return null;
+	public TableMeta tableMeta(String tabl) throws TransException {
+		return basictx == null ? null : basictx.colType(tabl);
 	}
 }

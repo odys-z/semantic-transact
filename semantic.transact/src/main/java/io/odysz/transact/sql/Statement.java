@@ -10,6 +10,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.SemanticObject;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
@@ -78,6 +79,28 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public T attachs(ArrayList<Object[]> attaches) {
 		this.attaches = attaches;
 		return (T) this;
+	}
+
+	/**A wrapper that setting values to {@link Update} and {@link Insert}.<br>
+	 * The null/empty values are handled differently according data meta.<br>
+	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
+	 * @param n
+	 * @param v
+	 * @return
+	 * @throws TransException
+	 */
+	public T nv(String n, String v) throws TransException {
+		TableMeta mt = transc.tableMeta(mainTabl);
+		if (mt == null || mt.isQuoted(n))
+			return nv(n, ExprPart.constStr(v));
+		else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
+			return nv(n, ExprPart.constVal("0"));
+		else
+			return nv(n, new ExprPart(v));
+	}
+
+	public T nv(String n, AbsPart v) throws TransException {
+		throw new TransException("Only Update and Insert provide this function.");
 	}
 
 	public T where(String logic, String loperand, String roperand) {

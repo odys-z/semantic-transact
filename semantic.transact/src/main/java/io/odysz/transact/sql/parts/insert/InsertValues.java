@@ -10,6 +10,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
@@ -62,14 +63,15 @@ public class InsertValues extends AbsPart {
 					vs.v(idx, (AbsPart) nv[1]);
 				else {
 					// Only value through java api know what's the type, the json massage handler don't.
-					// So we figure it out throw db meta data.
+					// So we figure it out through db meta data.
 					String str = String.valueOf(nv[1]);
 					if (sctx == null)
 						// when testing, sctx is null
 						if (nv[1] == null)
 							vs.v(idx, new ExprPart("null"));
 						else
-							vs.constv(idx, str);
+							// vs.constv(idx, str);
+							vs.v(idx, ExprsVisitor.parse(str));
 					else {
 						TableMeta cltyp = sctx.colType(tabl);
 						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
@@ -77,7 +79,8 @@ public class InsertValues extends AbsPart {
 							if (nv[1] == null)
 								vs.v(idx, new ExprPart("null"));
 							else
-								vs.constv(idx, str);
+								// vs.constv(idx, str);
+								vs.v(idx, ExprsVisitor.parse(str));
 						else vs.v(idx, nv[1] == null
 									 ? new ExprPart("null")
 									 : LangExt.isblank(str) ? new ExprPart("0") : new ExprPart(str));

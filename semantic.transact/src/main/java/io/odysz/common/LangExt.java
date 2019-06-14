@@ -105,10 +105,11 @@ public class LangExt {
 	 * @return true: empty
 	 */
 	public static boolean isblank(String s, String... takeAsNull) {
-		if (s == null)
+		if (s == null || s.trim().length() == 0)
 			return true;
 		else if (takeAsNull == null || takeAsNull.length == 0)
-			return s.trim().length() == 0;
+			// return s.trim().length() == 0;
+			return false;
 		else {
 			for (String asNull : takeAsNull)
 				if (s.matches(asNull))
