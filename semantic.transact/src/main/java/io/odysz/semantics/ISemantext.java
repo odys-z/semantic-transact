@@ -12,6 +12,7 @@ import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Statement.IPostOperat;
 import io.odysz.transact.sql.Statement.IPostSelectOperat;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
@@ -32,7 +33,7 @@ import io.odysz.transact.x.TransException;
  * by semantic-transact when travel the AST and composing SQL(s). There must be an {@link #insert}
  * event which fired at the beginning of composing an insert sql, and one event for inserting each row,
  * the {@link #onInsert}.</p>
- * @author ody
+ * @author odys-z@github.com
  *
  */
 public interface ISemantext {
@@ -191,6 +192,19 @@ public interface ISemantext {
 	 * @param op
 	 */
 	void addOnSelectedHandler(IPostSelectOperat op);
+
+	/**Compose the v provide by client into target table column's value presentation in sql,
+	 * whether add single quote or not.<br>
+	 * <p>If v is an instance of string, add "'" according to db type;
+	 * if it is an instance of {@link io.odysz.transact.sql.parts.AbsPart AbsPart}, return it directly.</p>
+	 * The null/empty values are handled differently according data meta.<br>
+	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
+	 * @param v
+	 * @param tabl
+	 * @param col
+	 * @return the composed value object
+	 */
+	public AbsPart composeVal(Object v, String tabl, String col);
 
 	/**Set resultset's current row's column's value.<br>
 	 * The current row is actually iterated over by {@link #onSelected(Object)}.

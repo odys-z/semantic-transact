@@ -162,6 +162,8 @@ class Semantext1 implements ISemantext {
 	@Override
 	public void addOnSelectedHandler(IPostSelectOperat op) { }
 
-//	@Override
-//	public void setRs(Object resultset, String col, String v) throws SQLException { }
+	@Override
+	public AbsPart composeVal(Object v, String tabl, String col) {
+		return Statement.composeVal(v, metas.get(tabl), tabl, col);
+	}
 }

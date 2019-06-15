@@ -17,6 +17,7 @@ import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Statement.IPostOperat;
 import io.odysz.transact.sql.Statement.IPostSelectOperat;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
@@ -139,6 +140,8 @@ class Semantext2 implements ISemantext {
 	@Override
 	public void addOnSelectedHandler(IPostSelectOperat op) { }
 
-//	@Override
-//	public void setRs(Object resultset, String col, String v) throws SQLException { }
+	@Override
+	public AbsPart composeVal(Object v, String tabl, String col) {
+		return Statement.composeVal(v, metas.get(tabl), tabl, col);
+	}
 }

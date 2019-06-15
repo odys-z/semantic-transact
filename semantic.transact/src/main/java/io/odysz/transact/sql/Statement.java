@@ -86,7 +86,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
 	 * @param n
 	 * @param v
-	 * @return
+	 * @return this statement
 	 * @throws TransException
 	 */
 	public T nv(String n, String v) throws TransException {
@@ -167,8 +167,20 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, resulving));
 	}
 
+	/**Add a where condition. e.g. "t.col = 'constv'".
+	 * @param col
+	 * @param constv will add "'"
+	 * @return this
+	 */
 	public T whereEq(String col, String constv) {
 		return where_("=", col, constv);
+	}
+
+	public T whereEq(String col, Object v) {
+		if (v instanceof String)
+			return where_("=", col, (String)v);
+		else
+			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
 	}
 
 	/**Add post semantics after the parent statement,
@@ -272,5 +284,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return columns
 	 */
 	public Map<String, Integer> getColumns() { return null; }
+
+	public static AbsPart composeVal(Object v, TableMeta mt, String tabl, String col) {
+		if (mt == null || mt.isQuoted(col))
+			return ExprPart.constStr((String)v);
+		else if (mt != null && !mt.isQuoted(col) && LangExt.isblank(v, "''", "null"))
+			return ExprPart.constVal("0");
+		else
+			return new ExprPart((String)v);
+	}
 
 }

@@ -168,6 +168,9 @@ public class ExprPart extends AbsPart {
 		this.isNull = true;
 	}
 
+	/**<p>Mainly used for get string raw value.</p>
+	 * FIXME performance problem base64 string, add a class for binary value?
+	 */
 	@Override
 	public String toString() {
 		// This function shouldn't been called frequently and only for test,
