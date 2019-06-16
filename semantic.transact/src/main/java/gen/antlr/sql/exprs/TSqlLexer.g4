@@ -292,6 +292,7 @@ PROCEDURE:                             'PROCEDURE';
 PROCESS:                               'PROCESS';
 PUBLIC:                                'PUBLIC';
 PYTHON:                                'PYTHON';
+// ody: Is this for R language? but 'R' is frequently used for alias
 R:                                     'R';
 RAISERROR:                             'RAISERROR';
 RAW:                                   'RAW';

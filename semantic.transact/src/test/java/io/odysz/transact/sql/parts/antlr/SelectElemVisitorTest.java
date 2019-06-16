@@ -15,8 +15,12 @@ public class SelectElemVisitorTest {
 		String expect = "f.col";
 		SelectElem selem = SelectElemVisitor.parse(strExpr);
 		String sql = selem.sql(null);
-		System.out.print(sql);
 		assertEquals(sql, expect);
+		
+		// R is reserved, see TSqlLexer.g4
+		strExpr = "r.roleId";
+		selem = SelectElemVisitor.parse(strExpr);
+		assertEquals("r.roleId", selem.sql(null));
 	}
 
 }
