@@ -209,4 +209,8 @@ public class ExprPart extends AbsPart {
 			return new ExprPart(v);
 		else return new ExprPart();
 	}
+
+	public static AbsPart constVal(int v) {
+		return new ExprPart(String.valueOf(v));
+	}
 }
