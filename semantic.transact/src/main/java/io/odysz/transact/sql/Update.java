@@ -82,15 +82,22 @@ public class Update extends Statement<Update> {
 	/**set array of [n, v], where if v is constant, e.g. 'val', must have a '' pair.
 	 * @param nvs the n-v array
 	 * @return this Update statement
+	 * @throws TransException 
 	 */
-	public Update nvs(ArrayList<Object[]> nvs) {
+	public Update nvs(ArrayList<Object[]> nvs) throws TransException {
 		if (nvs != null)
 			for (Object[] nv : nvs) {
+				if (nv == null || nv[Ix.nvn] == null) {
+					if (nv != null && nv[Ix.nvv] != null)
+						Utils.warn("Update#nvs(): Ignoring value () for null column name.", nv[Ix.nvv]);
+					continue;
+				}
 				Object v = nv[Ix.nvv];
+
 				if (v instanceof AbsPart)
 					nv((String)nv[Ix.nvn], (AbsPart)v);
 				else
-					nv((String)nv[Ix.nvn], ExprPart.constStr((String) v));
+					nv((String)nv[Ix.nvn], (String)v);
 			}
 		return this;
 	}

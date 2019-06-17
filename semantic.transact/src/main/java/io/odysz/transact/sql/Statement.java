@@ -95,7 +95,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return nv(n, ExprPart.constStr(v));
 		else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
 			return nv(n, ExprPart.constVal("0"));
-		else
+		else // (mt != null && !mt.isQuoted(n) && !LangExt.isblank(v, "''", "null"))
 			return nv(n, new ExprPart(v));
 	}
 
