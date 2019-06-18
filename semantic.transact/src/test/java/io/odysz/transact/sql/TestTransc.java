@@ -96,10 +96,10 @@ public class TestTransc {
 			// because of no semantext, null is handled as constant string, resulting 'null'
 			.nv("uri", ExprPart.constStr(null))
 			.commit(sqls);
-		assertEquals("insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)",
-				sqls.get(0));
+		assertEquals(sqls.get(0),
+				"insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)");
 		
-		ArrayList<Object[]> vals = new ArrayList<Object[]>(2);
+		ArrayList<Object[]> vals = new ArrayList<Object[]>(3);
 		vals.add(new String[]{ "logId", "b01"});
 		vals.add(null);
 		vals.add(new String[]{ "txt", "log .... 01"});
@@ -108,8 +108,23 @@ public class TestTransc {
 			.cols("logId", "stamp", "txt")
 			.value(vals)
 			.commit(sqls);
-		assertEquals(sqls.get(1),
-				"insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')");
+		assertEquals("insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')",
+					sqls.get(1));
+		
+		
+		ArrayList<Object[]> nullrow = new ArrayList<Object[]>(3);
+		nullrow.add(new Object[] { null, null});
+		nullrow.add(new Object[] { null, null});
+		nullrow.add(new Object[] { null, null});
+
+		sqls.clear();
+		st.insert("a_log")
+			.cols("logId", "stamp", "txt")
+			.value(nullrow)
+			.value(vals)
+			.commit(sqls);
+		assertEquals("insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')",
+					sqls.get(0));
 	}
 
 	@Test

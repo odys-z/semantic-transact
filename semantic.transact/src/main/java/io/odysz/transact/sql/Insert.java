@@ -95,7 +95,8 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Append values after cols been set.
+	/**Append values (a row) after cols been set:<br>
+	 * [[col1, val1], [col2, val2], ...]
 	 * @param val
 	 * @return this
 	 * @throws TransException
@@ -111,7 +112,7 @@ public class Insert extends Statement<Insert> {
 			throw new TransException("columns' number didn't match rows field count.");
 
 		if (valuesNv == null)
-			valuesNv = new ArrayList<ArrayList<Object[]>>(val.size());
+			valuesNv = new ArrayList<ArrayList<Object[]>>();
 		
 		if (currentRowNv != null && currentRowNv.size() > 0) {
 			// append current row, then append new vals 
@@ -120,27 +121,34 @@ public class Insert extends Statement<Insert> {
 		}
 		
 		// v must be String constant or ExprPart
+		boolean notNull = false;
 		TableMeta mt = transc.tableMeta(mainTabl);
 		for (int i = 0; i < val.size(); i++) {
 			Object[] nv = val.get(i);
-			if (nv == null || nv[1] instanceof AbsPart)
+			if (nv == null || nv[1] instanceof AbsPart) {
+				notNull = true;
 				continue;
+			}
+			if (nv[0] == null)
+				if (!LangExt.isblank(nv[1], "''"))
+					Utils.warn("Insert#values(): Ignoring value for empty column name: %s", nv[1]);
+				else if (nv[1] == null) continue;
 
+			notNull = true;
 			String v = (String) nv[1];
 			String n = (String) nv[0];
+
 			// can this part merged with Statement#nv()?
 			if (mt == null || mt.isQuoted(v))
-				// nv[1] = ExprPart.constStr(v);
 				val.set(i, new Object[] {n, ExprPart.constStr(v)});
 			else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
-//				nv[1] = ExprPart.constVal("0");
 				val.set(i, new Object[] {n, ExprPart.constStr("0")});
 			else
-//				nv[1] = new ExprPart(v);		
 				val.set(i, new Object[] {n, new ExprPart(v)});
 		}
 
-		valuesNv.add(val);
+		if (notNull)
+			valuesNv.add(val);
 		return this;
 	}
 
