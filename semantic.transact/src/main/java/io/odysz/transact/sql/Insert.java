@@ -139,7 +139,7 @@ public class Insert extends Statement<Insert> {
 			String n = (String) nv[0];
 
 			// can this part merged with Statement#nv()?
-			if (mt == null || mt.isQuoted(v))
+			if (mt == null || mt.isQuoted(n))
 				val.set(i, new Object[] {n, ExprPart.constStr(v)});
 			else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
 				val.set(i, new Object[] {n, ExprPart.constStr("0")});

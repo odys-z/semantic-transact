@@ -143,8 +143,8 @@ public class Update extends Statement<Update> {
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-		if (sctx != null)
-			sctx.onUpdate(this, mainTabl, nvs);
+//		if (sctx != null)
+//			sctx.onUpdate(this, mainTabl, nvs);
 		
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s = Stream.concat(

@@ -39,6 +39,10 @@ public interface IUser {
 	/**Update last touched time stamp.*/
 	default void touch() {}
 
+	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
+	 * Default: 20 minutes */
+	default long touchedMs() { return 20 * 60 * 1000; }
+
 	/**user id */
 	String uid() ;
 	
@@ -46,7 +50,7 @@ public interface IUser {
 	 * @param prop
 	 * @return property value
 	 */
-	default String get(String prop) { return prop; };
+	default Object get(String prop) { return props.get(prop); };
 
 	default IUser set(String prop, Object v) {
 		props.put(prop, v);
@@ -58,5 +62,8 @@ public interface IUser {
 	default SemanticObject logout() { return null; }
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
+
+	default String sessionKey() { return (String) get("s-key"); }
+	default IUser sessionKey(String skey) { return set("s-key", skey); }
 
 }

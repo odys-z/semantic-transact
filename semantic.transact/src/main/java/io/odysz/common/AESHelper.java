@@ -138,7 +138,7 @@ public class AESHelper {
 	}
 	
 	public static String decrypt(String cypher, String key, byte[] iv)
-			throws Exception {
+			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
 		byte[] kb = getUTF8Bytes(pad16_32(key));
 		byte[] output = decryptEx(input, kb, iv);
