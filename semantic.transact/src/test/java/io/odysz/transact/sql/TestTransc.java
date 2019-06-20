@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 
@@ -127,6 +128,130 @@ public class TestTransc {
 					sqls.get(0));
 	}
 
+	@SuppressWarnings("serial")
+	@Test
+	public void testInsertPartialRow() throws TransException {
+		String[] cols = new String[] {"funcId", "funcName", "uri", "css", "ext1", "ext2"};
+		ArrayList<Object[]> row1 = new ArrayList<Object[]>() {
+			{add(new Object[] {"funcId", "f01"});}
+			{add(new String[] {"funcName", "f01-name"});}
+			{add(new String[] {"uri", "/pp/aa"});}
+			{add(new String[] {"css", null});}
+			{add(new String[] {"ext1", "extra 1/f01"});}
+			{add(new String[] {"ext2", "extra 2/f01"});}
+		};
+			
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.insert("a_funcs")
+			.nv("funcName", "pp")
+			.nv("funcId", "a01")
+			.nv("uri", ExprPart.constStr(null))
+			.commit(sqls);
+		assertEquals("insert into a_funcs  (funcName, funcId, uri) values ('pp', 'a01', null)",
+				sqls.get(0));
+
+		st.insert("a_funcs")
+			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+			.value(row1)
+			.commit(sqls);
+		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) values "
+				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01')",
+				sqls.get(1));
+
+		// illegal row2
+		ArrayList<Object[]> row2 = new ArrayList<Object[]>() {
+			{add(new String[] {});}
+			{add(new String[] {"funcId", "f02"});}
+			{add(new String[] {"funcName", "f02-name"});}
+			{add(new String[] {"css", ".cls {color: red;}"});}
+			{add(null);}
+			{add(new String[] {null, null, null});}
+			{add(new String[] {"funcId"});}
+			{add(new String[] {null, "f0x"});}
+		};	
+
+		try {
+			st.insert("a_funcs")
+			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+			.value(row2);
+			// too much columns
+			fail("Column number checking failed.");
+		} catch (TransException e) {
+			assertEquals("columns' number is less than rows field count.",
+				e.getMessage());
+		}
+		
+		row2.remove(row2.size() -1);
+		row2.remove(row2.size() -1);
+		st.insert("a_funcs")
+			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+			.value(row2)
+			.commit(sqls);
+		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) "
+				+ "values ('f02', 'f02-name', null, '.cls {color: red;}', null, null)",
+				sqls.get(2));
+
+		row2.remove(row2.size() -1);
+		row2.remove(row2.size() -1);
+		st.insert("a_funcs")
+			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+			.value(row2)
+			.commit(sqls);
+		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) "
+				+ "values ('f02', 'f02-name', null, '.cls {color: red;}', null, null)",
+				sqls.get(3));
+
+		// value() has a side effect on row2, now row 2 has an extra nv can't pass checking
+		row2.remove(0);
+		row2.remove(row2.size() -1);
+		row2.remove(row2.size() -1);
+		row2.remove(row2.size() -1);
+		ArrayList<ArrayList<?>> rows = new ArrayList<ArrayList<?>>() {
+			{add(new ArrayList<Object[]>(){ {add(new String[] {});} });}
+			{add(row1);}
+			{add(null);}
+			{add(new ArrayList<Object[]>() {
+					{add(null);}
+			});}
+			{add(new ArrayList<Object[]>(){
+							{add(null);}
+							{add(new String[] {null, "a"});} // row 4, col 1
+							});
+			}
+			{add(row2);}
+			{add(row1);}
+		};
+
+		try {
+			st.insert("a_funcs")
+				.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+				.values(rows);
+			fail("Checking nvs failed.");
+		}catch (TransException e) {
+			assertEquals("Invalid nv: [null, a]",
+					e.getMessage());
+		}
+		
+		rows.get(4).remove(1);
+		rows.get(0).remove(0);
+		rows.get(3).remove(0);
+
+		st.insert("a_funcs")
+			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
+			.value(row2)
+			.values(rows)
+			.value(row1)
+			.commit(sqls);
+		assertEquals("insert into a_funcs  "
+				+ "(funcId, funcName, uri, css, ext1, ext2) values "
+				+ "('f02', 'f02-name', null, '.cls {color: red;}', null, null), "
+				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01'), "
+				+ "('f02', 'f02-name', null, '.cls {color: red;}', null, null), "
+				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01'), "
+				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01')",
+				sqls.get(4));
+	}
+	
 	@Test
 	public void testUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();

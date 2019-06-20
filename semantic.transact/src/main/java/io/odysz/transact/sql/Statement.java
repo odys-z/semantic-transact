@@ -91,12 +91,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T nv(String n, String v) throws TransException {
 		TableMeta mt = transc.tableMeta(mainTabl);
-		if (mt == null || mt.isQuoted(n))
-			return nv(n, ExprPart.constStr(v));
-		else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
-			return nv(n, ExprPart.constVal("0"));
-		else // (mt != null && !mt.isQuoted(n) && !LangExt.isblank(v, "''", "null"))
-			return nv(n, new ExprPart(v));
+		return nv(n, composeVal(v, mt, mainTabl, n));
 	}
 
 	public T nv(String n, AbsPart v) throws TransException {
@@ -285,10 +280,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public Map<String, Integer> getColumns() { return null; }
 
-	public static AbsPart composeVal(Object v, TableMeta mt, String tabl, String col) {
-		if (mt == null || mt.isQuoted(col))
+	public static ExprPart composeVal(Object v, TableMeta mt, String tabl, String col) {
+		boolean isQuoted = mt == null || mt.isQuoted(col);
+		if (mt == null || isQuoted)
 			return ExprPart.constStr((String)v);
-		else if (mt != null && !mt.isQuoted(col) && LangExt.isblank(v, "''", "null"))
+		else if (mt != null && !isQuoted && v == null)
+			return ExprPart.constVal(null);
+		else if (mt != null && !isQuoted && LangExt.isblank(v, "''", "null"))
 			return ExprPart.constVal("0");
 		else
 			return new ExprPart((String)v);

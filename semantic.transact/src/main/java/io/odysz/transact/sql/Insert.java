@@ -3,13 +3,14 @@ package io.odysz.transact.sql;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
-import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.meta.TableMeta;
@@ -41,7 +42,7 @@ public class Insert extends Statement<Insert> {
 	}
 
 	@Override
-	public Insert nv(String n, AbsPart v) {
+	public Insert nv(String n, AbsPart v) throws TransException {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
 		//  currentRowNv.add(new Object[] {n, v});
@@ -55,10 +56,11 @@ public class Insert extends Statement<Insert> {
 		}
 		else {
 			// replace the old one
-			currentRowNv.get(insertCols.get(n))[1] = v;
-			if (verbose) Utils.warn(
-				"Insert.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
-				n, v);
+//			currentRowNv.get(insertCols.get(n))[1] = v;
+//			if (verbose) Utils.warn(
+//				"Insert.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
+//				n, v);
+			throw new TransException("If using nv(), don't use cols() and value(); If using cols(), don't use nv().");
 		}
 		return this;
 	}
@@ -104,12 +106,14 @@ public class Insert extends Statement<Insert> {
 	public Insert value(ArrayList<Object[]> val) throws TransException {
 		if (val == null)
 			return this;
+		if (insertCols == null)
+			throw new TransException("value() or values() can't been used befor cols() been called.");
 		if (insertCols != null && insertCols.size() > 0
 				&& selectValues != null && selectValues.size() > 0)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 
-		if (insertCols != null && insertCols.size() != val.size())
-			throw new TransException("columns' number didn't match rows field count.");
+		if (insertCols != null && insertCols.size() < val.size())
+			throw new TransException("columns' number is less than rows field count.");
 
 		if (valuesNv == null)
 			valuesNv = new ArrayList<ArrayList<Object[]>>();
@@ -120,35 +124,61 @@ public class Insert extends Statement<Insert> {
 			currentRowNv = null;
 		}
 		
-		// v must be String constant or ExprPart
 		boolean notNull = false;
+
+		// remember cols should be appended
+		Set<String> appendings = null;
+		if (val.size() < insertCols.size())
+			appendings = new HashSet<String>(insertCols.keySet());
+
 		TableMeta mt = transc.tableMeta(mainTabl);
 		for (int i = 0; i < val.size(); i++) {
 			Object[] nv = val.get(i);
-			if (nv == null || nv[1] instanceof AbsPart) {
+			
+			if (nv == null || nv.length == 0)
+				continue;
+			else if (nv.length >= 2 && LangExt.isblank(nv[0]) && nv[1] == null) {
+				val.set(i, null);
+				continue;
+			}
+			else if (nv != null && (nv.length != 2 || LangExt.isblank(nv[0]) && nv[1] != null))
+				throw new TransException("Invalid nv: [%s, %s]",
+						nv != null ? nv[0] : "",
+						nv != null && nv.length > 0 ? nv[1] : "");
+
+			// now col already known, only care about value
+
+			if (nv != null && nv[1] instanceof AbsPart) {
+				if (appendings != null)
+					appendings.remove(nv[0]);
 				notNull = true;
 				continue;
 			}
-			if (nv[0] == null)
-				if (!LangExt.isblank(nv[1], "''"))
-					Utils.warn("Insert#values(): Ignoring value for empty column name: %s", nv[1]);
-				else if (nv[1] == null) continue;
+
+//			if (nv[0] == null)
+//				if (!LangExt.isblank(nv[1], "''"))
+//					Utils.warn("Insert#values(): Ignoring value for empty column name: %s", nv[1]);
+//				else if (nv[1] == null) continue;
 
 			notNull = true;
 			String v = (String) nv[1];
 			String n = (String) nv[0];
 
-			// can this part merged with Statement#nv()?
-			if (mt == null || mt.isQuoted(n))
-				val.set(i, new Object[] {n, ExprPart.constStr(v)});
-			else if (mt != null && !mt.isQuoted(n) && LangExt.isblank(v, "''", "null"))
-				val.set(i, new Object[] {n, ExprPart.constStr("0")});
-			else
-				val.set(i, new Object[] {n, new ExprPart(v)});
+			// v must be String constant or number, etc.
+			val.set(i, new Object[] {n, composeVal(v, mt, mainTabl, n)});
+			if (appendings != null)
+				appendings.remove(n);
 		}
 
-		if (notNull)
+		// append null value to know cols
+		if (notNull) {
+			if (val.size() < insertCols.size()) 
+				for (String appcol : appendings) {
+					val.add(new Object[] {appcol, null});
+				}
 			valuesNv.add(val);
+		}
+
 		return this;
 	}
 

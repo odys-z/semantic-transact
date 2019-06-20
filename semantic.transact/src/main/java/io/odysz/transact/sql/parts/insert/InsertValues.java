@@ -45,17 +45,18 @@ public class InsertValues extends AbsPart {
 		if (row == null)
 			return null;
 
-		ValueList vs = new ValueList(row.size());
+		ValueList vs = new ValueList(colIdx == null ? row.size() : colIdx.size());
 		int idx = -1;
 		for (Object[] nv : row) {
-			if (nv == null) continue;
+			if (nv == null || nv.length <= 1) continue;
 
 			if (colIdx == null)
 				idx++;
-			else if (colIdx.containsKey(nv[0]))
+			else if (nv != null && nv.length >= 2 && colIdx.containsKey(nv[0]))
 					idx = colIdx.get(nv[0]);
 			else {
-				Utils.warn("Can't find column index for col %s (value = %s)", nv[0], nv[1]);
+				try { Utils.warn("Can't find column index for col %s (value = %s)", nv[0], nv[1]);
+				} catch (Exception e) {}
 				continue;
 			}
 			try {

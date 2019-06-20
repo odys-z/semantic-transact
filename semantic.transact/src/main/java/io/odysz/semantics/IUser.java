@@ -3,6 +3,7 @@ package io.odysz.semantics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import io.odysz.transact.x.TransException;
 
@@ -56,7 +57,7 @@ public interface IUser {
 		props.put(prop, v);
 		return this;
 	};
-	
+
 	IUser logAct(String funcName, String funcId);
 
 	default SemanticObject logout() { return null; }
@@ -66,4 +67,23 @@ public interface IUser {
 	default String sessionKey() { return (String) get("s-key"); }
 	default IUser sessionKey(String skey) { return set("s-key", skey); }
 
+	/**Add notifyings
+	 * @param n
+	 * @return this
+	 */
+	@SuppressWarnings("unchecked")
+	default IUser notify(Object note) {
+		if (!props.containsKey("_notifies_"))
+			props.put("_notifies_", new ArrayList<Object>());
+		((ArrayList<Object>)props.get("_notifies_")).add(note);
+		return this;
+	}
+
+	/**Get notified string list.
+	 * @return notifyings
+	 */
+	@SuppressWarnings("unchecked")
+	default List<Object> notifies() {
+		return (List<Object>) props.get("_notifies_");
+	}
 }
