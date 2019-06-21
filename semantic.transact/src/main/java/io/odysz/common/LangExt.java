@@ -119,7 +119,7 @@ public class LangExt {
 	}
 
 	public static boolean isblank(Object bid, String... takeAsNull) {
-		return bid instanceof String ? isblank((String)bid, takeAsNull)
+		return bid instanceof String ? isblank(bid.toString(), takeAsNull)
 				: bid == null;
 	}
 

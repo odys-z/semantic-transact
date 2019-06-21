@@ -1,5 +1,6 @@
 package io.odysz.transact.sql.parts;
 
+import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.x.TransException;
 
@@ -26,4 +27,10 @@ abstract public class AbsPart {
 	 * @throws TransException Something invalid while composing sql.
 	 */
 	public abstract String sql(ISemantext context) throws TransException;
+	
+	public static boolean isblank(Object obj, String... takeAsNull) {
+		if (obj instanceof AbsPart)
+			return LangExt.isblank(obj.toString(), "null");
+		else return LangExt.isblank(obj, takeAsNull);
+	}
 }
