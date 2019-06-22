@@ -2,7 +2,6 @@ package io.odysz.semantics;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.odysz.transact.x.TransException;
@@ -16,7 +15,7 @@ import io.odysz.transact.x.TransException;
  */
 public interface IUser {
 
-	HashMap<String, Object> props = new HashMap<String, Object>();
+//	HashMap<String, Object> props = new HashMap<String, Object>();
 
 	/**The sqls is committed to database, do something for logging. 
 	 * If there are some operation needing to update db, return those sql statements.
@@ -51,12 +50,12 @@ public interface IUser {
 	 * @param prop
 	 * @return property value
 	 */
-	default Object get(String prop) { return props.get(prop); };
+//	Object get(String prop); // { return props.get(prop); };
 
-	default IUser set(String prop, Object v) {
-		props.put(prop, v);
-		return this;
-	};
+//	IUser set(String prop, Object v); // {
+//		props.put(prop, v);
+//		return this;
+//	};
 
 	IUser logAct(String funcName, String funcId);
 
@@ -64,26 +63,25 @@ public interface IUser {
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
-	default String sessionKey() { return (String) get("s-key"); }
-	default IUser sessionKey(String skey) { return set("s-key", skey); }
+//	default String sessionKey() { return (String) get("s-key"); }
+//	default IUser sessionKey(String skey) { return set("s-key", skey); }
+	public String sessionKey();
+	public IUser sessionKey(String skey);
 
 	/**Add notifyings
 	 * @param n
 	 * @return this
+	 * @throws TransException 
 	 */
-	@SuppressWarnings("unchecked")
-	default IUser notify(Object note) {
-		if (!props.containsKey("_notifies_"))
-			props.put("_notifies_", new ArrayList<Object>());
-		((ArrayList<Object>)props.get("_notifies_")).add(note);
-		return this;
-	}
-
+	public IUser notify(Object note) throws TransException; // {
+//		if (!props.containsKey("_notifies_"))
+//			props.put("_notifies_", new ArrayList<Object>());
+//		((ArrayList<Object>)props.get("_notifies_")).add(note);
+//		return this;
+//	}
+//
 	/**Get notified string list.
 	 * @return notifyings
 	 */
-	@SuppressWarnings("unchecked")
-	default List<Object> notifies() {
-		return (List<Object>) props.get("_notifies_");
-	}
+	public List<Object> notifies();
 }
