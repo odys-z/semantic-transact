@@ -116,7 +116,8 @@ public class Logic {
    		   	   		 : "][".equals(oper) || "notin".equals(oper) || "not in".equals(oper) ? op.notin
    		   	   		 : "?0".equals(oper) || "is null".equals(oper) ? op.isnull
    		   	   		 : "!?0".equals(oper) || "?!0".equals(oper) || "!0".equals(oper) || "?!".equals(oper) ? op.isNotnull
-   		   	   		 : op.ne; // <> !=
+   		   	   		 : "<>".equals(oper) || "!=".equals(oper) ? op.ne //; // <> !=
+   		   	   		 : null; // unknown
 		if (withNot != null && withNot.length > 0 && withNot[0] == true) {
 			jc  = jc == op.like ? op.notlike
 				: jc == op.eq ? op.ne
