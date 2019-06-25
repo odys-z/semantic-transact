@@ -250,6 +250,20 @@ public class TestTransc {
 				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01'), "
 				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01')",
 				sqls.get(4));
+		
+		ArrayList<Object[]> nullrow = new ArrayList<Object[]>() {
+			{add(new Object[] {"funcId", null});}
+			{add(new String[] {"funcName", null});}
+			{add(new String[] {"uri", null});}
+			{add(new String[] {"css", null});}
+			{add(new String[] {"ext1", null});}
+			{add(new String[] {"ext2", null});}
+		};
+		st.insert("a_funcs")
+			.cols(cols)
+			.value(nullrow)
+			.commit(sqls);
+		assertEquals(5, sqls.size());
 	}
 	
 	@Test

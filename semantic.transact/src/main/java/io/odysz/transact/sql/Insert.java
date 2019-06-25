@@ -160,7 +160,9 @@ public class Insert extends Statement<Insert> {
 //					Utils.warn("Insert#values(): Ignoring value for empty column name: %s", nv[1]);
 //				else if (nv[1] == null) continue;
 
-			notNull = true;
+			if (nv != null && nv[1] != null)
+				notNull = true;
+
 			String v = (String) nv[1];
 			String n = (String) nv[0];
 
