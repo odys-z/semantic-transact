@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.Utils;
+import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.Query.Ix;
@@ -23,6 +24,7 @@ public class Update extends Statement<Update> {
 	public Map<String, Integer> getColumns() { return updateCols; }
 
 	private ArrayList<Object[]> nvs;
+	private String limit = null;
 
 	Update(Transcxt transc, String tabl) {
 		super(transc, tabl, null);
@@ -32,30 +34,7 @@ public class Update extends Statement<Update> {
 	 * @param n
 	 * @param v
 	 * @return this Update statement
-	public Update nv(String n, String v) {
-//		if (nvs == null)
-//			nvs = new ArrayList<Object[]>();
-//		// nvs.add(new Object[] {n, v});
-//		
-//		// column names
-//		if (updateCols == null)
-//			updateCols = new HashMap<String, Integer>();
-//		if (!updateCols.containsKey(n)) {
-//			updateCols.put(n, updateCols.size());
-//			nvs.add(new Object[] {n, v});
-//		}
-//		else {
-//			// replace the old one
-//			nvs.get(updateCols.get(n))[1] = v;
-//			if (verbose) Utils.warn(
-//				"Update.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
-//				n, v);
-//		}
-//		return this;
-		return nv(n, ExprPart.constStr(v));
-	}
 	 */
-
 	public Update nv(String n, AbsPart v) {
 		if (nvs == null)
 			nvs = new ArrayList<Object[]>();
@@ -76,7 +55,6 @@ public class Update extends Statement<Update> {
 				n, v);
 		}
 		return this;
-
 	}
 
 	/**set array of [n, v], where if v is constant, e.g. 'val', must have a '' pair.
@@ -99,6 +77,24 @@ public class Update extends Statement<Update> {
 				else
 					nv((String)nv[Ix.nvn], (String)v);
 			}
+		return this;
+	}
+	
+	/**<p>Update Limited Rows.</p>
+	 * <ul><li>ms sql 2k: update top(lmtExpr) ... see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#DML'>
+	 * 		Limiting the rows affected by DELETE, INSERT, or UPDATE</a></li>
+	 * 		<li>mysql: update ... limit N, see <a href='https://dev.mysql.com/doc/refman/8.0/en/update.html'>
+	 * 			Mysql Manual: 13.2.12 UPDATE Syntax</a></li>
+	 *		<li>sqlite: nothing. see <a href='https://www.sqlite.org/lang_update.html'>SQL As Understood By SQLite</a></li>
+	 * 		<li>Oracle: There should be no such syntax:
+	 * 		<a href='https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_10007.htm'>
+	 * 		Oracle Database SQL Reference - UPDATE</a></li>
+	 * </ul>
+	 * @param lmtExpr
+	 * @return this
+	 */
+	public Update limit(String lmtExpr) {
+		this.limit = lmtExpr;
 		return this;
 	}
 	
@@ -129,30 +125,40 @@ public class Update extends Statement<Update> {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(stx, sqls);
 			// Connects.commit() usually return this for update
-
 			return postOp.onCommitOk(stx, sqls);
-//			SemanticObject res = postOp.op(stx, sqls);
-//			if (res instanceof int[])
-//				res = LangExt.toString((int[])res);
-//			return new SemanticObject()
-//					.put("updated", res)
-//					.put("autoVals", stx.resulves());
 		}
 		return null;
 	}
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-//		if (sctx != null)
-//			sctx.onUpdate(this, mainTabl, nvs);
+		dbtype db = sctx.dbtype();
 		
 		// update tabl t set col = 'val' where t.col = 'val'
-		Stream<String> s = Stream.concat(
-					Stream.of(new ExprPart("update"),
+//		Stream<String> s = Stream.concat(
+//					Stream.of(new ExprPart("update"),
+//						limit != null && db == dbtype.ms2k ? new ExprPart("top(" + limit + ")") : null,
+//						new ExprPart(mainTabl), new ExprPart(mainAlias),
+//						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias)), 
+//					Stream.of(new ExprPart("where"), where).filter(w -> where != null)
+//				).map(m -> {
+//					try {
+//						return m == null ? "" : m.sql(sctx);
+//					} catch (TransException e) {
+//						e.printStackTrace();
+//						return "";
+//					}
+//				});
+
+		Stream<String> s1 = Stream.of(
+						new ExprPart("update"),
+						limit != null && db == dbtype.ms2k ? new ExprPart("top(" + limit + ")") : null,
 						new ExprPart(mainTabl), new ExprPart(mainAlias),
-						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias)), 
-					Stream.of(new ExprPart("where"), where).filter(w -> where != null))
-				  .map(m -> {
+						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias), 
+						where == null ? null : new ExprPart("where"),
+						where,
+						limit != null && db == dbtype.mysql ? new ExprPart("limit " + limit) : null
+				).map(m -> {
 					try {
 						return m == null ? "" : m.sql(sctx);
 					} catch (TransException e) {
@@ -161,6 +167,7 @@ public class Update extends Statement<Update> {
 					}
 				});
 
-		return s.collect(Collectors.joining(" "));
+
+		return s1.collect(Collectors.joining(" "));
 	}
 }

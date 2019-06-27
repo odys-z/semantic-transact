@@ -71,6 +71,8 @@ public class TestTransc {
 
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND userId = 'George' AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
+		
+		fail("test limit");
 	}
 
 	@Test
@@ -288,6 +290,8 @@ public class TestTransc {
 			.commit(sqls);
 		assertEquals("update a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin'",
 				sqls.get(0));
+
+		fail("test limit");
 	}
 
 	@Test

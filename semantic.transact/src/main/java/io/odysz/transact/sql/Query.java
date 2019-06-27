@@ -157,6 +157,9 @@ public class Query extends Statement<Query> {
 	int pgSize;
 	public int size() { return pgSize; }
 
+	private Object[] limit;
+	private String[] limitSqlit;
+
 	/**
 	private SelectQry q;
 	private boolean allColumn;
@@ -355,6 +358,41 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	/**<p>Update Limited Rows.</p>
+	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
+	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
+	 * 		Transact-SQL Syntax</a><br>
+	 * 		<b>Note: percent, with ties not supported yet.</b></li>
+	 * 		<li>mysql: update ... limit N, see <a href='https://dev.mysql.com/doc/refman/8.0/en/select.html'>
+	 * 			Mysql Manual: 13.2.12 SELECT Syntax</a></li>
+	 *		<li>sqlite: limit expr OFFSET expr2. see <a href='https://www.sqlite.org/lang_select.html'>
+	 *		SQL As Understood By SQLite - SELECT</a>
+	 * 		<b>Note: Don't use this if expr2 is not null, use #{@link #limit(String, String)}.</b></li>
+	 * 		<li>Oracle: There should be no such syntax:
+	 * 		<a href='https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_10002.htm#i2065706'>
+	 * 		Oracle Database SQL Reference - SELECT</a></li>
+	 * </ul>
+	 * @param lmtExpr
+	 * @param cnt only support mysql count
+	 * @return this
+	 */
+	public Query limit(String lmtExpr, int cnt) {
+		this.limit = new Object[] {lmtExpr, cnt};
+		return this;
+	}
+
+	/**For sqlite only, set limit expr OFFSET expr2 clause.<br>
+	 * see <a href='https://www.sqlite.org/lang_select.html'>SQL As Understood By SQLite - SELECT</a>
+	 * @see #limit(String, int)
+	 * @param lmtExpr
+	 * @param xpr2
+	 * @return
+	 */
+	public Query limit(String lmtExpr, String xpr2) {
+		this.limitSqlit = new String[] {lmtExpr, xpr2};
+		return this;
+	}
+	
 	@Override
 	public String sql(ISemantext sctx) {
 		Stream<String> s = Stream.of(
