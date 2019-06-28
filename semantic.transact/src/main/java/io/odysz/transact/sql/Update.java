@@ -132,7 +132,8 @@ public class Update extends Statement<Update> {
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-		dbtype db = sctx.dbtype();
+		dbtype db = null;
+		db = sctx == null ? null : sctx.dbtype();
 		
 		// update tabl t set col = 'val' where t.col = 'val'
 //		Stream<String> s = Stream.concat(

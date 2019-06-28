@@ -9,9 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
+import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.sql.Transcxt;
+import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
@@ -19,11 +21,19 @@ import io.odysz.transact.x.TransException;
 public class SemanticsTest {
 
 	private Transcxt st;
+	private Semantext2 mysqlCxt;
+	private Semantext2 sqlitCxt;
+	private Semantext2 ms2kCxt;
+	private Semantext2 orclCxt;
 
 	@Before
 	public void setUp() throws Exception {
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		st = new Transcxt(new Semantext2("root", semantics, fakeMetas()));
+		mysqlCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.mysql);
+		sqlitCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.sqlite);
+		ms2kCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.ms2k);
+		orclCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.oracle);
 	}
 
 	@Test
@@ -117,6 +127,39 @@ public class SemanticsTest {
 			sqls.get(1));
 	}
 	
+	@Test
+	public void testLimit() throws TransException {
+
+		ArrayList<String> sqls = new ArrayList<String>();
+
+		Update upd = st.update("a_users")
+				.limit("3 + 1")
+				.nv("userName", st.select("a_functions", "f")
+								.limit("3 * 2", "5")
+								.col("count(funcId)", "c")
+								.where_("=", "f.funcName", "admin"))
+			.where("=", "userId", "'admin'");
+		upd.commit(mysqlCxt, sqls);
+		upd.commit(sqlitCxt, sqls);
+		upd.commit(ms2kCxt, sqls);
+		upd.commit(orclCxt, sqls);
+		Utils.logi(sqls);
+		
+		// mysql
+		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin' limit 3 + 1",
+				sqls.get(0));
+		// sqlite
+		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin' ",
+				sqls.get(1));
+		// ms2k
+		assertEquals("update top(3 + 1) a_users  set userName=(select top(3 * 2) 5 count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
+				sqls.get(2));
+		// orcl
+		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
+				sqls.get(3));
+
+	}
+
 	@SuppressWarnings("serial")
 	static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {

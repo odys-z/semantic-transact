@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
@@ -157,8 +158,10 @@ public class Query extends Statement<Query> {
 	int pgSize;
 	public int size() { return pgSize; }
 
+	/**limit definition for ms2k, mysql */
 	private Object[] limit;
-	private String[] limitSqlit;
+	/**limit definition for sqlite
+	private String[] limitSqlit; */
 
 	/**
 	private SelectQry q;
@@ -362,12 +365,13 @@ public class Query extends Statement<Query> {
 	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
 	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
 	 * 		Transact-SQL Syntax</a><br>
-	 * 		<b>Note: percent, with ties not supported yet.</b></li>
+	 * 		<b>Note: percent, with ties not supported by this method, user {@link #limit(String, String)}.</b></li>
 	 * 		<li>mysql: update ... limit N, see <a href='https://dev.mysql.com/doc/refman/8.0/en/select.html'>
-	 * 			Mysql Manual: 13.2.12 SELECT Syntax</a></li>
+	 * 			Mysql Manual: 13.2.12 SELECT Syntax</a><br>
+	 * 			<b>Note: only 1 pair of offset rowcount is supported</b></li>
 	 *		<li>sqlite: limit expr OFFSET expr2. see <a href='https://www.sqlite.org/lang_select.html'>
-	 *		SQL As Understood By SQLite - SELECT</a>
-	 * 		<b>Note: Don't use this if expr2 is not null, use #{@link #limit(String, String)}.</b></li>
+	 *		SQL As Understood By SQLite - SELECT</a><br>
+	 * 		<b>Note: Don't use this if expr2 is not null, use {@link #limit(String, String)}.</b></li>
 	 * 		<li>Oracle: There should be no such syntax:
 	 * 		<a href='https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_10002.htm#i2065706'>
 	 * 		Oracle Database SQL Reference - SELECT</a></li>
@@ -389,15 +393,20 @@ public class Query extends Statement<Query> {
 	 * @return
 	 */
 	public Query limit(String lmtExpr, String xpr2) {
-		this.limitSqlit = new String[] {lmtExpr, xpr2};
+		this.limit = new String[] {lmtExpr, xpr2};
 		return this;
 	}
 	
 	@Override
 	public String sql(ISemantext sctx) {
+		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
 					// select ...
-					new ExprPart("select"), new SelectList(selectList),
+					new ExprPart("select"),
+					// top(expr) with ties
+					dbtp == dbtype.ms2k && limit != null ?
+						new ExprPart("top(" + limit[0] + ") " + (limit.length > 1 ? limit[1] : "")) : null,
+					new SelectList(selectList),
 					// from ... join ...
 					new JoinTabl(join.main, mainTabl, mainAlias),
 					// join can be null
@@ -408,7 +417,10 @@ public class Query extends Statement<Query> {
 					// group by
 					groupList == null ? null : new GroupbyList(groupList),
 					// order by
-					orderList == null ? null : new OrderyList(orderList)
+					orderList == null ? null : new OrderyList(orderList),
+					// limit
+					(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
+						new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
 			).filter(e -> e != null).map(m -> {
 				try {
 					return m == null ? "" : m.sql(sctx);
