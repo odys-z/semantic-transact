@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
 /**<p>Provide user e.g. servlet session information to modify some date in AST.</p>
@@ -14,7 +15,7 @@ import io.odysz.transact.x.TransException;
  *
  */
 public interface IUser {
-
+	TableMeta meta();
 //	HashMap<String, Object> props = new HashMap<String, Object>();
 
 	/**The sqls is committed to database, do something for logging. 
@@ -79,7 +80,7 @@ public interface IUser {
 //		((ArrayList<Object>)props.get("_notifies_")).add(note);
 //		return this;
 //	}
-//
+
 	/**Get notified string list.
 	 * @return notifyings
 	 */
