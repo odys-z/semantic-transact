@@ -100,9 +100,16 @@ class Semantext1 implements ISemantext {
 	@Override
 	public dbtype dbtype() { return dbtype.sqlite; }
 
+	String conn;
 	@Override
-	public String connId() { return null; }
+	public ISemantext connId(String conn) {
+		this.conn = conn;
+		return this;
+	}
 
+	@Override
+	public String connId() { return conn; }
+	
 	@Override
 	public String genId(String tabl, String col) throws SQLException, TransException {
 		return "";

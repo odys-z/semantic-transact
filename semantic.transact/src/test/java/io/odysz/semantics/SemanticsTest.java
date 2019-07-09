@@ -1,6 +1,6 @@
 package io.odysz.semantics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
-import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.meta.ColMeta.coltype;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.ExprPart;
@@ -44,7 +44,7 @@ public class SemanticsTest {
 			.nv("funcName", "Test 001")
 			.nv("sibling", "10")
 			.nv("parentId", "0")
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
 			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
@@ -65,7 +65,7 @@ public class SemanticsTest {
 			.cols(new String[] {"roleId", "funcId"})
 			.values(vals)
 			.value(r2)
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 
 		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
 				sqls.get(1));
@@ -88,8 +88,23 @@ public class SemanticsTest {
 					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
 					"tf", "tf.funcId = f.funcId")
 			.col("f.funcName", "func")
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 		assertEquals("select f.funcName func from a_functions f left outer join ( select case when rf.funcId is null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
+				sqls.get(0));
+	}
+	
+	/**Test function calls needing semantics.
+	 * @throws TransException
+	 */
+	@Test
+	public void testSmFuncall() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_roles")
+			.nv("roleName", Funcall.concat("roleName", "'add 0 '", "'add 1'"))
+			.where("=", "roleId", "'admin'")
+			.commit(st.instancontxt(null, null), sqls);
+
+		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
 				sqls.get(0));
 	}
 	
@@ -106,7 +121,7 @@ public class SemanticsTest {
 			.nv("sibling", ExprPart.constStr(null))	// type number,		null 		=> null
 			.nv("someDat", "")						// type datetime,	blank 		=> ''
 			.nv("parentId", ExprPart.constStr(null))// type text,		null		=> null
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
 			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
@@ -119,7 +134,7 @@ public class SemanticsTest {
 			.nv("sibling", "")						// type number,		blank 		=> 0
 			.nv("someDat", ExprPart.constStr(null))	// type datetime,	null 		=> null
 			.nv("parentId", "")						// type text,		blank		=> ''
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
 			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
@@ -163,12 +178,12 @@ public class SemanticsTest {
 	@SuppressWarnings("serial")
 	static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {
-			{put("a_functions", fakeFuncs());}
+			{put("a_functions", fakeFuncsMeta());}
 			{put("a_role_funcs", new TableMeta("a_role_funcs"));}
 		};
 	}
 
-	private static TableMeta fakeFuncs() {
+	private static TableMeta fakeFuncsMeta() {
 		return new TableMeta("a_functions")
 				.col("sibling", coltype.number)
 				.col("someDat", coltype.datetime)

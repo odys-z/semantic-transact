@@ -55,7 +55,7 @@ public class InsertValues extends AbsPart {
 			else if (nv != null && nv.length >= 2 && colIdx.containsKey(nv[0]))
 					idx = colIdx.get(nv[0]);
 			else {
-				try { Utils.warn("Can't find column index for col %s (value = %s)", nv[0], nv[1]);
+				try { Utils.warn("InsertValues#getValue(): Can't find column index for col %s (value = %s)", nv[0], nv[1]);
 				} catch (Exception e) {}
 				continue;
 			}
@@ -71,16 +71,13 @@ public class InsertValues extends AbsPart {
 						if (nv[1] == null)
 							vs.v(idx, new ExprPart("null"));
 						else
-							// vs.constv(idx, str);
 							vs.v(idx, ExprsVisitor.parse(str));
 					else {
 						TableMeta cltyp = sctx.colType(tabl);
 						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
-							// vs.constv(idx, str);
 							if (nv[1] == null)
 								vs.v(idx, new ExprPart("null"));
 							else
-								// vs.constv(idx, str);
 								vs.v(idx, ExprsVisitor.parse(str));
 						else vs.v(idx, nv[1] == null
 									 ? new ExprPart("null")

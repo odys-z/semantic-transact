@@ -75,8 +75,15 @@ class Semantext2 implements ISemantext {
 		return this;
 	}
 
+	String conn;
 	@Override
-	public String connId() { return null; }
+	public ISemantext connId(String conn) {
+		this.conn = conn;
+		return this;
+	}
+
+	@Override
+	public String connId() { return conn; }
 
 	@Override
 	public ISemantext onUpdate(Update update, String tabl, ArrayList<Object[]> nvs) {

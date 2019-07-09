@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -14,6 +16,7 @@ import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.parts.AbsPart;
 
 /**
  * <pre>
@@ -36,13 +39,14 @@ public class Funcall extends ExprPart {
 		isnull("ifnull"),
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
-		dbSame("func"),
 		datetime("datetime"),
+		concat("concat"),
 		/**Function extFile(uri):<br>
 		 * Handle external file when reading - a post operation is added to the on-select-ok event,
 		 * which will replace the uri with content of external file. 
 		 */
-		extFile("extfile");
+		extFile("extfile"),
+		dbSame("func");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
@@ -61,6 +65,8 @@ public class Funcall extends ExprPart {
 				return datetime;
 			else if (extFile.fid.equals(funcName) || "ext".equals(funcName))
 				return extFile;
+			else if (concat.fid.equals(funcName))
+				return concat;
 			return dbSame; // max etc. are db same
 		}
 	}
@@ -128,6 +134,8 @@ public class Funcall extends ExprPart {
 			return sql2Datetime(context, args);
 		else if (func == Func.extFile)
 			return sqlExtFile(context, args);
+		else if (func == Func.concat)
+			return sqlConcat(context, args);
 		else return dbSame(context, args);
 	}
 
@@ -190,6 +198,14 @@ public class Funcall extends ExprPart {
 				});
 		}
 		return args[0];
+	}
+
+	private static String sqlConcat(ISemantext ctx, String[] args) {
+		dbtype dt = ctx.dbtype();
+		if (dt != dbtype.mysql && dt != dbtype.oracle
+			&& dt != dbtype.sqlite && dt != dbtype.ms2k)
+			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
+		return Stream.of(args).collect(Collectors.joining(" || "));
 	}
 
 	/**
@@ -322,8 +338,21 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
+	public static AbsPart concat(String to, String... with) {
+		Funcall f = new Funcall(Func.concat);
+		if (with == null)
+			f.args = new Object[] {to};
+		else {
+			f.args = new Object[with.length + 1];
+			f.args[0] = to;
+			for (int ix = 0; ix < with.length; ix++)
+				f.args[ix + 1] = with[ix];
+		}
+		return f;
+	}
+
+
 	public void selectElemAlias(String alias) {
 		this.resultAlias = alias;
 	}
-
 }

@@ -224,7 +224,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
 		// ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
-		ISemantext context = transc.instancontxt(usrInfo == null || usrInfo.length == 0 ? null : usrInfo[0]);
+		ISemantext context = transc.instancontxt(
+				transc != null && transc.basictx != null ? transc.basictx.connId() : null,
+				usrInfo == null || usrInfo.length == 0 ? null : usrInfo[0]);
 		
 		if (context == null)
 			Utils.warn("WARNING: your are building sql with null context, it should only happen for testing.");

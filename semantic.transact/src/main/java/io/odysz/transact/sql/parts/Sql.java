@@ -21,7 +21,6 @@ public class Sql {
 		if (op != null && args != null && args.length == 2)
 			return condt(op, (String)args[0], (String)args[1]);
 
-		// TODO parse
 		String exp = String.format(format, args);
 		
 		return parseCondit(exp);
@@ -39,4 +38,14 @@ public class Sql {
 		return new Condit(op, loperand, part);
 	}
 	
+	/**Filter "'", replace with "''".
+	 * @param v
+	 * @return
+	 */
+	public static String filterVal(String v) {
+		// for java regex lookahead and lookbehined, see
+		// https://www.logicbig.com/tutorials/core-java-tutorial/java-regular-expressions/regex-lookahead.html
+		// https://www.logicbig.com/tutorials/core-java-tutorial/java-regular-expressions/regex-lookbehind.html
+		return v == null ? null : v.replaceAll("(?<!^)'(?!$)", "''");
+	}
 }

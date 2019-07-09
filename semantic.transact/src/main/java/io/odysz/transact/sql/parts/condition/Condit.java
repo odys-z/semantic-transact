@@ -166,5 +166,4 @@ search_condition_not
 
 		return null;
 	}
-
 }

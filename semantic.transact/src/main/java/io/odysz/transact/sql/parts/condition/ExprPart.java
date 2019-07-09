@@ -2,6 +2,7 @@ package io.odysz.transact.sql.parts.condition;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.Logic.op;
 
 /**Expression Nodet.
@@ -140,7 +141,6 @@ simple_id
  * @author odys-z@github.com
  */
 public class ExprPart extends AbsPart {
-//	private static final op AbsPart = null;
 	private boolean isNull;
 	private op logic;
 	private String lexp;
@@ -168,6 +168,32 @@ public class ExprPart extends AbsPart {
 		this.isNull = true;
 	}
 
+	public static ExprPart constStr(String v) {
+		if (v != null)
+			return new ExprPart("'" + v + "'");
+		else return new ExprPart();
+	}
+
+	public static ExprPart constVal(String v) {
+		if (v != null)
+			return new ExprPart(v);
+		else return new ExprPart();
+	}
+
+	public static AbsPart constVal(int v) {
+		return new ExprPart(String.valueOf(v));
+	}
+
+	boolean escape = true;
+	/**Stop escape the string value (replace ' with '')
+	 * @param v
+	 * @return this
+	 */
+	public ExprPart escape(boolean esc) {
+		escape = esc;
+		return this;
+	}
+
 	/**<p>Mainly used for get string raw value.</p>
 	 * FIXME performance problem base64 string, add a class for binary value?
 	 */
@@ -185,32 +211,13 @@ public class ExprPart extends AbsPart {
 		if (isNull)
 			return "null";
 		if (logic == null)
-			return lexp == null ? "" : lexp;
+			// return lexp == null ? "" : lexp;
+			return lexp == null ? "" : escape ? Sql.filterVal(lexp) : lexp;
 		else {
-//			Object lresulved = ctx == null ? lexp : ctx.resulvedVal(lexp);
-//			Object rresulved = ctx == null ? rexp : ctx.resulvedVal(rexp);
-//			return String.format("%s %s",
-//				lexp == null ? "" : lresulved,
-//				logic.sql(logic, rexp == null ? "" : (String) rresulved));
 			return String.format("%s %s",
-				lexp == null ? "" : lexp,
+				// lexp == null ? "" : lexp,
+				lexp == null ? "" : escape? Sql.filterVal(lexp) : lexp,
 				logic.sql(ctx, logic, rexp == null ? "" : rexp));
 		}
-	}
-
-	public static ExprPart constStr(String v) {
-		if (v != null)
-			return new ExprPart("'" + v + "'");
-		else return new ExprPart();
-	}
-
-	public static ExprPart constVal(String v) {
-		if (v != null)
-			return new ExprPart(v);
-		else return new ExprPart();
-	}
-
-	public static AbsPart constVal(int v) {
-		return new ExprPart(String.valueOf(v));
 	}
 }

@@ -16,11 +16,13 @@ public class Transcxt {
 	public ISemantext basictx() { return basictx; }
 
 	/**Get a {@link ISemantext} that typically handle configured semantics,
+	 * @param conn not used
 	 * @param usr the session user
 	 * @return a new instance for building sql, resulving sql, etc.
+	 * @throws TransException 
 	 */
-	public ISemantext instancontxt(IUser usr) {
-		return basictx == null ? null : basictx.clone(usr);
+	public ISemantext instancontxt(String conn, IUser usr) throws TransException {
+		return basictx == null ? null : basictx.clone(usr).connId(conn == null ? basictx.connId() : conn);
 	}
 
 	/**Create a statements manager.

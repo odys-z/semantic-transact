@@ -107,7 +107,7 @@ public class Insert extends Statement<Insert> {
 		if (val == null)
 			return this;
 		if (insertCols == null)
-			throw new TransException("value() or values() can't been used befor cols() been called.");
+			throw new TransException("Insert#value(): value() or values() can't been used before cols() has been called.");
 		if (insertCols != null && insertCols.size() > 0
 				&& selectValues != null && selectValues.size() > 0)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");

@@ -40,7 +40,7 @@ public class TestTransc {
 			.where("=", "f.isUsed", "'Y'")
 			.where("%~", "f.funcName", "'bourgeoisie'")
 			.where("~%", "f.fullpath", "rf.funcId")
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie' AND f.fullpath like concat(rf.funcId, '%')",
 				sqls.get(0));
 
@@ -48,7 +48,7 @@ public class TestTransc {
 			.col("lg.stamp", "logtime")
 			.col("lg.txt", "log")
 			.where(">=", "lg.stamp", "'1776-07-04'")
-			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'"))
+			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'").escape(false))
 			// .where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'"))
 			.groupby("lg.stamp")
 			.groupby("log")
@@ -71,8 +71,6 @@ public class TestTransc {
 
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND userId = 'George' AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
-		
-//		fail("test limit");
 	}
 
 	@Test
@@ -83,7 +81,7 @@ public class TestTransc {
 			.col("f.funcName is not null", "checked")
 			.col("f.funcId", "fid")
 			.col("substring(notes, 1, 16)", "notes")
-			.commit(st.instancontxt(null), sqls);
+			.commit(st.instancontxt(null, null), sqls);
 
 		assertEquals("select f.funcName is not null checked, f.funcId fid, substring(notes, 1, 16) notes " +
 				"from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId = '123456'",
@@ -305,17 +303,16 @@ public class TestTransc {
 					.nv("funcount", st.select("a_rolefunc")
 										.col("count(funcId)")
 										.where("=", "roleId", "'admin'"))
-					.nv("roleName", new ExprPart("roleName || 'abc'"))
+					.nv("roleName", new ExprPart("roleName || 'abc'").escape(false))
 					.where("=", "roleId", "'admin'"))
 			.commit(sqls);
 
-		// insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'
-		// update a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'
-		// Utils.logi(sqls);
-		assertEquals(sqls.get(0),
-				"insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'");
-		assertEquals(sqls.get(1),
-				"update  a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ");
+		Utils.logi(sqls);
+		assertEquals("insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
+				sqls.get(0));
+
+		assertEquals("update  a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ",
+				sqls.get(1));
 	}
 
 	@Test
@@ -375,19 +372,37 @@ public class TestTransc {
 	public void testExprVals() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_roles")
-			.nv("roleName", "roleName")
+			.nv("roleName", "roleName'-new")
 			.nv("roleId", ExprsVisitor.parse("roleName + 3"))
-			.where_("=", "roleId", "role 01")
+			.nv("s1", "'s - %'x")
+			.nv("s2", "''")
+			.nv("s3", "%%")
+			.where_("=", "roleId", "role 01") // ignored safely
 			.post(st.update("a_rolefunc")
 					.nv("roleId", ExprsVisitor.parse("3 * 2"))
+
+					// where*() function generate a Predicate, which will default ignore escaping,
+					// so you should get this: roleName = 'roleName-old'' .
+					// If you wanna this: roleName = 'roleName-old''',
+					// you need create a condition with escaped like this:
+					// .where(Sql.condt("roleName = '%s'", "roleName-old'''"))	// roleName = 'roleName-old'''
+					// or this:
+					// .whereEq("roleName", new ExprPart("'roleName-old'''"))	// roleName = 'roleName-old'''
+					.where(Sql.condt(op.eq, "roleName", new ExprPart("'roleName-old''")).escape(true))	// roleName = 'roleName-old'''
+
+					// .whereEq("roleName", new ExprPart("'roleName-old''"))	// roleName = 'roleName-old''
+					
+					// FIXME Predicate is designed to handle "'" when escape = true.
+					// But this test shows that it parsed the condt string "'roleName-old''" into "'roleName-old'"
+					// A grammar mistakes?
+					// docs: notes/semantics/ref-transact.html#issue-sql-condt
+					
 					.where_("=", "roleId", "role 01"))
 			.commit(sqls);
 		
-		// insert into a_roles  (roleName, roleId) values ('roleName', roleName + 3)
-		// update a_rolefunc  set roleId=role where roleId = 'role 01'
-		assertEquals("insert into a_roles  (roleName, roleId) values ('roleName', roleName + 3)",
+		assertEquals("insert into a_roles  (roleName, roleId, s1, s2, s3) values ('roleName''-new', roleName + 3, '''s - %''x', '''''', '%%')",
 				sqls.get(0));
-		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleId = 'role 01' ",
+		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
 				sqls.get(1));
 	}
 }

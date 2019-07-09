@@ -42,12 +42,21 @@ public interface ISemantext {
 	 * [0] RESULVE<br>
 	 * [1] task_nodes<br>
 	 * [2] taskId
-	 * @deprecated replaced by {@link io.odysz.transact.sql.parts.Resulving Resulving}
-	 * */
+	 * replaced by {@link io.odysz.transact.sql.parts.Resulving Resulving}
 	String refPattern = "^\\s*(RESULVE)\\s*(\\w+)\\s*\\.\\s*(\\w+)\\s*$";
+	 * */
 
+	/**
+	 * @return current connId
+	 */
 	public String connId();
 	
+	/**Set connId for committing statement.
+	 * @param conn
+	 * @return this context
+	 */
+	public ISemantext connId(String conn);
+
 	/**Called when starting a insert transaction's sql composing.<br>
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 

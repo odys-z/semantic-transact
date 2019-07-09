@@ -124,8 +124,22 @@ public class Predicate extends AbsPart {
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));
 		else {
-			return String.format("%s %s", l.sql(sctx), op.sql(sctx, op, r.sql(sctx), negative));
+			// return String.format("%s %s", l.sql(sctx), op.sql(sctx, op, r.sql(sctx), negative));
+			// FIXME Should pedicate's operands always can't escape ' ? 
+			return String.format("%s %s", l.escape(escape).sql(sctx),
+					op.sql(sctx, op, r.escape(escape).sql(sctx), negative));
 		}
 	}
 
+	/** escape ' with ''<br>
+	 * Predicate's default escape is false?*/
+	boolean escape = false;
+	/** escape ' with ''
+	 * @param esc
+	 * @return this
+	 */
+	public Predicate escape(boolean esc) {
+		escape = esc;
+		return this;
+	}
 }
