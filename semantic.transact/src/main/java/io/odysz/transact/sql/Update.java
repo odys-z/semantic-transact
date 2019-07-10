@@ -104,12 +104,12 @@ public class Update extends Statement<Update> {
 			throw new TransException("Empty conditions for updating. io.odysz.transact.sql.Update is enforcing updating with conditions.");
 
 		if (cxt != null)
-			cxt.onUpdate(this, mainTabl, nvs);
+			cxt.onUpdate(this, mainTabl.name(), nvs);
 
 		Update upd = super.commit(cxt, sqls);
 
 		if (cxt != null)
-			cxt.onPost(this, mainTabl, nvs, sqls);
+			cxt.onPost(this, mainTabl.name(), nvs, sqls);
 
 		return upd;
 	}
@@ -136,26 +136,12 @@ public class Update extends Statement<Update> {
 		db = sctx == null ? null : sctx.dbtype();
 		
 		// update tabl t set col = 'val' where t.col = 'val'
-//		Stream<String> s = Stream.concat(
-//					Stream.of(new ExprPart("update"),
-//						limit != null && db == dbtype.ms2k ? new ExprPart("top(" + limit + ")") : null,
-//						new ExprPart(mainTabl), new ExprPart(mainAlias),
-//						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias)), 
-//					Stream.of(new ExprPart("where"), where).filter(w -> where != null)
-//				).map(m -> {
-//					try {
-//						return m == null ? "" : m.sql(sctx);
-//					} catch (TransException e) {
-//						e.printStackTrace();
-//						return "";
-//					}
-//				});
-
 		Stream<String> s1 = Stream.of(
 						new ExprPart("update"),
 						limit != null && db == dbtype.ms2k ? new ExprPart("top(" + limit + ")") : null,
-						new ExprPart(mainTabl), new ExprPart(mainAlias),
-						new ExprPart("set"), new SetList(nvs).setVal2(mainTabl, mainAlias), 
+						mainTabl, mainAlias,
+						new ExprPart("set"),
+						new SetList(nvs).setVal2(mainTabl), 
 						where == null ? null : new ExprPart("where"),
 						where,
 						limit != null && db == dbtype.mysql ? new ExprPart("limit " + limit) : null

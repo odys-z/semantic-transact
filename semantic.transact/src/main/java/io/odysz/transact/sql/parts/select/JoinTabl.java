@@ -7,10 +7,11 @@ import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
-import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 
@@ -36,21 +37,21 @@ public class JoinTabl extends AbsPart {
 	} };
 
 	protected join jtype;
-	protected String jtablias;
+	protected Alias jtablias;
 	protected AbsPart jtabl;
 	private Condit on;
 
 	public JoinTabl(join joinType, String tabl, Condit on) {
 		this.on = on;
-		this.jtabl = new ExprPart(tabl);
+		this.jtabl = new Tabl(tabl);
 		this.jtype = joinType;
 	}
 
 	public JoinTabl(join joinType, String tabl, String alias, Condit... on) {
 		this.on = on == null || on.length == 0 ? null : on[0];
 		this.jtype = joinType;
-		this.jtabl = new ExprPart(tabl);
-		this.jtablias = alias;
+		this.jtabl = new Tabl(tabl);
+		this.jtablias = new Alias(alias);
 	}
 	
 	public JoinTabl(join jt, Query select, String alias, String onCondit) {
@@ -61,6 +62,12 @@ public class JoinTabl extends AbsPart {
 		joinTabl(jt, select, alias, on);
 	}
 
+	public JoinTabl(join jtype, Tabl tabl, Alias as) {
+		this.jtype = jtype;
+		this.jtabl = tabl;
+		this.jtablias = as;
+	}
+
 	private void joinTabl(join jt, Query select, String alias, Condit... on) {
 		this.on = on == null || on.length == 0 ? null : on[0];
 		this.jtype = jt;
@@ -68,14 +75,17 @@ public class JoinTabl extends AbsPart {
 		if (LangExt.isblank(alias))
 			this.jtablias = select.alias();
 		else 
-			this.jtablias = alias;
+			this.jtablias = new Alias(alias);
 	}
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
+//		if (sctx != null && sctx.dbtype() == dbtype.oracle)
+//			return sql_orcl(sctx);
+		
 		if (jtype == join.main)
-			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias);
-
+			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias.sql(sctx));
+		
 		Stream<String> s = Stream.of(
 				sql(jtype),
 				jtabl instanceof Query ? "(" : null,
@@ -95,6 +105,33 @@ public class JoinTabl extends AbsPart {
 				}) ;
 		return s.collect(Collectors.joining(" "));
 	}
+
+//	private String sql_orcl(ISemantext sctx) throws TransException {
+//		if (jtype == join.main)
+//			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias.sql(sctx));
+//		
+//		Stream<String> s = Stream.of(
+//				sql(jtype),
+//				jtabl instanceof Query ? "(" : null,
+//					// jtabl instanceof Query ? jtabl : "\"" + jtabl + "\"",
+//					jtabl,
+//				jtabl instanceof Query ? ")" : null,
+//					// "\"" + jtablias + "\"",
+//					jtablias,
+//				on == null ? null : "on",
+//				on)
+//				.filter(p -> p != null)
+//				.map(m -> {
+//					try {
+//						return m instanceof String ? (String)m : ((AbsPart)m).sql(sctx);
+//					} catch (TransException e) {
+//						e.printStackTrace();
+//						return "";
+//					}
+//				}) ;
+//		return s.collect(Collectors.joining(" "));
+//
+//	}
 
 	private String sql(join jt) {
 		if (jt == join.main) return "from";

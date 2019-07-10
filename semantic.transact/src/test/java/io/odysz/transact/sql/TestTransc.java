@@ -393,8 +393,8 @@ public class TestTransc {
 					// .whereEq("roleName", new ExprPart("'roleName-old''"))	// roleName = 'roleName-old''
 					
 					// FIXME Predicate is designed to handle "'" when escape = true.
-					// But this test shows that it parsed the condt string "'roleName-old''" into "'roleName-old'"
-					// A grammar mistakes?
+					// But this test shows that it parsed the Condt string "'roleName-old''" into "'roleName-old'".
+					// Is this a grammar mistakes?
 					// docs: notes/semantics/ref-transact.html#issue-sql-condt
 					
 					.where_("=", "roleId", "role 01"))

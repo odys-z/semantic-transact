@@ -16,12 +16,12 @@ import io.odysz.transact.x.TransException;
 
 public class InsertValues extends AbsPart {
 
-	private List<ArrayList<Object[]>> values;
-	private Map<String, Integer> cols;
-	private String tabl;
+	protected List<ArrayList<Object[]>> values;
+	protected Map<String, Integer> cols;
+	protected String tablName;
 
 	public InsertValues(String tabl, Map<String, Integer> cols, List<ArrayList<Object[]>> values) {
-		this.tabl = tabl;
+		this.tablName = tabl;
 		this.cols = cols;
 		this.values = values;
 	}
@@ -32,7 +32,7 @@ public class InsertValues extends AbsPart {
 			return "";
 
 		return values.stream().map(row -> getValue(sctx, row, cols).sql(sctx))
-				.collect(Collectors.joining(", "));
+				.collect(Collectors.joining(", ", "values ", ""));
 	}
 
 	/**Get row's value list used in sql values.
@@ -41,7 +41,7 @@ public class InsertValues extends AbsPart {
 	 * @param colIdx
 	 * @return value list
 	 */
-	private ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
+	protected ValueList getValue(ISemantext sctx, ArrayList<Object[]> row, Map<String, Integer> colIdx) {
 		if (row == null)
 			return null;
 
@@ -73,7 +73,7 @@ public class InsertValues extends AbsPart {
 						else
 							vs.v(idx, ExprsVisitor.parse(str));
 					else {
-						TableMeta cltyp = sctx.colType(tabl);
+						TableMeta cltyp = sctx.colType(tablName);
 						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
 							if (nv[1] == null)
 								vs.v(idx, new ExprPart("null"));

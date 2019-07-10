@@ -6,7 +6,10 @@ import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Colname;
+import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.x.TransException;
 
 /**The SET clause equetions' list:<br>
  * col= v1, c2 = 'v2', ...<br>
@@ -20,18 +23,17 @@ public class SetList extends AbsPart {
 		this.nvs = nvs;
 	}
 
-	private String tabl;
-	private String col;
+	private Tabl tabl;
+
 	/**These values are set value to tabl.col. <br>
 	 * Some times this information is used for handling expression,
-	 * like {@link io.odysz.transact.sql.parts.condition.Funcall.Func#extFile extFile} will use to handle external file at committing succeed.
-	 * @param tabl
-	 * @param col
+	 * like {@link io.odysz.transact.sql.parts.condition.Funcall.Func#extFile extFile}
+	 * will use this to handle external file at committing succeed.
+	 * @param table
 	 * @return this
 	 */
-	public SetList setVal2(String tabl, String col) {
-		this.tabl = tabl;
-		this.col = col;
+	public SetList setVal2(Tabl table) {
+		this.tabl = table;
 		return this;
 	}
 
@@ -41,8 +43,18 @@ public class SetList extends AbsPart {
 			return "";
 		else
 			return nvs.stream().map(nv -> {
-				String s = Stream.of(new ExprPart((String) nv[0]), new ExprPart("="), new SetValue(nv[1]).setVal2(tabl, col))
-						.map(m -> m.sql(context)).collect(Collectors.joining(""));
+				String s = Stream.of(
+							// new ExprPart((String) nv[0]), new ExprPart("="),
+							Colname.parseFullname((String) nv[0]), new ExprPart("="),
+							new SetValue(nv[1]).setVal2(tabl, (String) nv[0]))
+						.map(m -> {
+							try {
+								return m.sql(context);
+							} catch (TransException e) {
+								e.printStackTrace();
+								return "";
+							}
+						}).collect(Collectors.joining(""));
 				return s;
 			}).collect(Collectors.joining(", "));
 	}

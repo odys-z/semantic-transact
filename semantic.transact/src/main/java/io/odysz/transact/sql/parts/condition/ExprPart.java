@@ -2,8 +2,9 @@ package io.odysz.transact.sql.parts.condition;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
-import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.Logic.op;
+import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.x.TransException;
 
 /**Expression Nodet.
  * For the Antlr4 grammar, see <a href='https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4'>
@@ -202,12 +203,18 @@ public class ExprPart extends AbsPart {
 		// This function shouldn't been called frequently and only for test,
 		// or inner referencing, like fullpath, ectc.
 		// So this is not a performance problem?
-		String v = sql(null);
-		return v.replaceAll("^'|'$", "");
+		String v;
+			try {
+				v = sql(null);
+				return v.replaceAll("^'|'$", "");
+			} catch (TransException e) {
+				e.printStackTrace();
+				return e.getMessage();
+			}
 	}
 
 	@Override
-	public String sql(ISemantext ctx) {
+	public String sql(ISemantext ctx) throws TransException {
 		if (isNull)
 			return "null";
 		if (logic == null)

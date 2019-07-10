@@ -18,6 +18,7 @@ import gen.antlr.sql.select.SelectParts.ExpressionContext;
 import gen.antlr.sql.select.SelectParts.Expression_listContext;
 import gen.antlr.sql.select.SelectParts.Select_list_elemContext;
 import gen.antlr.sql.select.SelectParts.Table_nameContext;
+import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
@@ -166,7 +167,9 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 						String coln = "*";
 						if (f.aggregate_windowed_function().full_column_name() != null)
 							coln = f.aggregate_windowed_function().full_column_name().getText();
-						Funcall func = new Funcall(text, coln);
+						// 2019 v9.2
+						// Funcall func = new Funcall(text, coln);
+						Funcall func = new Funcall(text, new Colname[] {Colname.parseFullname(coln)});
 						ele = new SelectElem(func);
 					}
 				}
@@ -179,7 +182,6 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 						ele = new SelectElem(func);
 					}
 				}
-
 			}
 			// expression IS null_notnull
 			else if (ctx.IS() != null) {
@@ -208,17 +210,18 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 		return null;
 	}
 
-	public static String[] funcArgs(List<?> list) {
+	public static ExprPart[] funcArgs(List<?> list) {
 		if (list != null) {
-			ArrayList<String> lst = new ArrayList<String>();
+			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
 			for (Object exp : list) {
-				
-//				String op = exp.op.getText();
-//				if (op != null)
-					// FIXME no recursive expression visit here?
-					lst.add(((ParserRuleContext)exp).getText());
+				// FIXME no recursive expression visit here?
+				// lst.add(((ParserRuleContext)exp).getText());
+
+				// 2019 v 9.2 parse func args, at least find out full column name, for adding "" to oracle
+				ExprPart arg = ExprsVisitor.parse(((ParserRuleContext)exp).getText());
+				lst.add(arg);
 			}
-			return lst.toArray(new String[lst.size()]);
+			return lst.toArray(new ExprPart[lst.size()]);
 		}
 		return null;
 	}

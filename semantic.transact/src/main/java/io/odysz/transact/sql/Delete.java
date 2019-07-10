@@ -35,7 +35,7 @@ public class Delete extends Statement<Delete>  {
 			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletiong with conditions.");
 		
 		if (cxt != null)
-			cxt.onDelete(this, mainTabl, where);
+			cxt.onDelete(this, mainTabl.name(), where);
 
 		return super.commit(cxt, sqls);
 	}
@@ -52,7 +52,7 @@ public class Delete extends Statement<Delete>  {
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s = // Stream.concat(
 					Stream.of(  new ExprPart("delete from"),
-								new ExprPart(mainTabl),
+								mainTabl,
 //								new ExprPart("where"), 
 //								where == null ? inSelectCond : where
 								where == null ? null : new ExprPart("where"), 

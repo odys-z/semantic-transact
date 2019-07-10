@@ -12,6 +12,7 @@ import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.condition.ExprPart;
@@ -82,14 +83,33 @@ public class SemanticsTest {
 	public void testSelectJoin() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
+		Query q = st.select("a_functions", "f")
+			// .j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
+			.l(st.select("a_role_func", "rf")
+					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
+				"tf", "tf.funcId = f.funcId")
+			.col("f.funcName", "func")
+			.commit(st.instancontxt(null, null), sqls);
+		assertEquals("select f.funcName func from a_functions f left outer join ( select case when rf.funcId is null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
+				sqls.get(0));
+
+		q.commit(orclCxt, sqls);
+		assertEquals("select \"f\".\"funcName\" \"func\" from \"a_functions\" \"f\" left outer join ( select decode(\"rf\".\"funcId\", null, 1, 0) from \"a_role_func\" \"rf\" ) \"tf\" on \"tf\".\"funcId\" = \"f\".\"funcId\"",
+				sqls.get(1));
+	}
+	
+	@Test
+	public void testSelectOracle() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+
 		st.select("a_functions", "f")
 			// .j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
 			.l(st.select("a_role_func", "rf")
 					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
 					"tf", "tf.funcId = f.funcId")
 			.col("f.funcName", "func")
-			.commit(st.instancontxt(null, null), sqls);
-		assertEquals("select f.funcName func from a_functions f left outer join ( select case when rf.funcId is null then true else false end from a_role_func rf ) tf on tf.funcId = f.funcId",
+			.commit(orclCxt, sqls);
+		assertEquals("select \"f\".\"funcName\" \"func\" from \"a_functions\" \"f\" left outer join ( select decode(\"rf\".\"funcId\", null, 1, 0) from \"a_role_func\" \"rf\" ) \"tf\" on \"tf\".\"funcId\" = \"f\".\"funcId\"",
 				sqls.get(0));
 	}
 	
@@ -170,9 +190,8 @@ public class SemanticsTest {
 		assertEquals("update top(3 + 1) a_users  set userName=(select top(3 * 2) 5 count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
 				sqls.get(2));
 		// orcl
-		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
+		assertEquals("update  \"a_users\"  set \"userName\"=(select count(\"funcId\") \"c\" from \"a_functions\" \"f\" where \"f\".\"funcName\" = 'admin') where \"userId\" = 'admin' ",
 				sqls.get(3));
-
 	}
 
 	@SuppressWarnings("serial")

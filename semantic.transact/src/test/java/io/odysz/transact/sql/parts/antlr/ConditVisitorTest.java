@@ -6,10 +6,11 @@ import org.junit.Test;
 
 import io.odysz.common.Utils;
 import io.odysz.transact.sql.parts.condition.Condit;
+import io.odysz.transact.x.TransException;
 
 public class ConditVisitorTest {
 	@Test
-	public void testLike() {
+	public void testLike() throws TransException {
 		String expr = "f.col LIKE 'abc'";
 		test("f.col like '%abc%'", expr);
 
@@ -24,13 +25,15 @@ public class ConditVisitorTest {
 	}
 		
 	@Test
-	public void testIsNull() {
-		String expr = "i.nodeId = n.nodeId and i.handlingCmd is null and n.isFinish = false";
+	public void testIsNull() throws TransException {
+		String expr = "i.nodeId = n.nodeId and  n.isFinish = false";
+		test("i.nodeId = n.nodeId AND n.isFinish = false", expr);
+		expr = "i.nodeId = n.nodeId and i.handlingCmd is null and n.isFinish = false";
 		test("i.nodeId = n.nodeId AND i.handlingCmd is null AND n.isFinish = false", expr);
 	}
 
 	@Test
-	public void testIn() {
+	public void testIn() throws TransException {
 		String strExpr = "userId in ('1', '2')";
 		String expect = "userId in ('1', '2')";
 		Condit condt = ConditVisitor.parse(strExpr);
@@ -40,7 +43,7 @@ public class ConditVisitorTest {
 	}
 	
 	@Test
-	public void testAndOrPrecedence() {
+	public void testAndOrPrecedence() throws TransException {
 		String strExpr = "a.id = b.roleId and (a.c>d OR x> y) and a.c = '5'";
 		String expect = "a.id = b.roleId AND (a.c > d OR x > y) AND a.c = '5'";
 		Condit condt = ConditVisitor.parse(strExpr);
@@ -49,7 +52,7 @@ public class ConditVisitorTest {
 		assertEquals(expect, sql);
 	}
 	
-	private void test(String expected, String testing) {
+	private void test(String expected, String testing) throws TransException {
 		Condit condt = ConditVisitor.parse(testing);
 		String sql = condt.sql(null);
 		// Utils.logi(sql);

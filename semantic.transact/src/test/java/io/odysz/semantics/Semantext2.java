@@ -149,6 +149,6 @@ class Semantext2 implements ISemantext {
 
 	@Override
 	public AbsPart composeVal(Object v, String tabl, String col) {
-		return Statement.composeVal(v, metas.get(tabl), tabl, col);
+		return Statement.composeVal(v, metas.get(tabl), col);
 	}
 }

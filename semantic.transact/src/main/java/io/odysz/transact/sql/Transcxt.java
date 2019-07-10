@@ -33,6 +33,8 @@ public class Transcxt {
 	}
 	
 	public Query select(String tabl, String ... alias) {
+//		if (basictx.dbtype() == dbtype.oracle)
+//			return new QueryOrcl(this, tabl, alias);
 		return new Query(this, tabl, alias);
 	}
 	

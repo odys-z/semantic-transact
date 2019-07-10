@@ -10,6 +10,7 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic;
+import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.x.TransException;
 
 /**Basically a logic expression. For predicate definition, see {@link io.odysz.transact.sql.parts.antlr.PredicatVisitor}.
@@ -36,7 +37,8 @@ public class Predicate extends AbsPart {
 	public Predicate(Logic.op op, ExprPart lexpr, String rop) {
 		this.op = op;
 		this.l = lexpr;
-		this.r = new ExprPart(rop);
+		// this.r = new ExprPart(rop);
+		this.r = rop == null ? null : ExprsVisitor.parse(rop);
 	}
 
 	public Predicate() {
@@ -67,20 +69,30 @@ public class Predicate extends AbsPart {
 		op = inlike;
 		l = expression;
 		String rstr = inlikes.stream()
-			.map(var -> var.sql(null)) // variable resolving goes here 
+			.map(var -> {
+				try {
+					return var.sql(null);
+				} catch (TransException e) {
+					e.printStackTrace();
+					return e.getMessage();
+				}
+			}) // variable resolving goes here 
 			.collect(Collectors.joining(", "));
 		r = new ExprPart(rstr);
 	}
 
-	public Predicate(Logic.op op, String from, String rp) {
+	public Predicate(Logic.op op, String lp, String rp) {
 		this.op = op;
-		this.l = new ExprPart(from);
-		this.r = new ExprPart(rp);
+		// this.l = new ExprPart(from);
+		// this.r = new ExprPart(rp);
+		this.l = lp == null ? null : ExprsVisitor.parse(lp);
+		this.r = rp == null ? null : ExprsVisitor.parse(rp);
 	}
 
-	public Predicate(Logic.op op, String from, ExprPart rp) {
+	public Predicate(Logic.op op, String lp, ExprPart rp) {
 		this.op = op;
-		this.l = new ExprPart(from);
+		// this.l = new ExprPart(from);
+		this.l = lp == null ? null : ExprsVisitor.parse(lp);
 		this.r = rp;
 	}
 
@@ -96,7 +108,8 @@ public class Predicate extends AbsPart {
 		this.op = in;
 		if (in != Logic.op.in && in != Logic.op.notin)
 			throw new TransException("Currently only '(not) in' operator is supported for select condition. select:\n %s", s.sql(null));
-		this.l = new ExprPart(col);
+		// this.l = new ExprPart(col);
+		this.l = col == null ? null : ExprsVisitor.parse(col);
 		this.inSelect = s;
 	}
 
@@ -105,7 +118,7 @@ public class Predicate extends AbsPart {
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		if (empty) return "";
 		else if ((op == Logic.op.in || op == Logic.op.notin) && inSelect != null)
 			return Stream.of(l,

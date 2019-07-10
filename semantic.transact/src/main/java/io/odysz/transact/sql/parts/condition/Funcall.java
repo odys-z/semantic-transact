@@ -17,6 +17,10 @@ import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Alias;
+import io.odysz.transact.sql.parts.Colname;
+import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.x.TransException;
 
 /**
  * <pre>
@@ -75,7 +79,7 @@ public class Funcall extends ExprPart {
 	private Object[] args;
 
 	/**column name in resultset */
-	private String resultAlias;;
+	private Alias resultAlias;;
 
 	public Funcall(Func func) {
 		super(func.fid());
@@ -92,6 +96,12 @@ public class Funcall extends ExprPart {
 		super(funcName);
 		args = new String[] {colName};
 		this.func = Func.dbSame;
+	}
+
+	public Funcall(String funcName, ExprPart[] funcArgs) {
+		super(funcName);
+		this.func = Func.parse(funcName);
+		args = funcArgs;
 	}
 
 	public Funcall args(String[] args) {
@@ -118,7 +128,7 @@ public class Funcall extends ExprPart {
 	}
 
 	@Override
-	public String sql(ISemantext context) {
+	public String sql(ISemantext context) throws TransException {
 		// args are handled before this tree node handling, making ExprPart's sql available.
 		String args[] = argsql(this.args, context);
 
@@ -136,14 +146,21 @@ public class Funcall extends ExprPart {
 			return sqlExtFile(context, args);
 		else if (func == Func.concat)
 			return sqlConcat(context, args);
-		else return dbSame(context, args);
+		else
+			try {
+				return dbSame(context, args);
+			} catch (TransException e) {
+				e.printStackTrace();
+				return null;
+			}
 	}
 
 	/**return function string that database function used as the same style.
 	 * @param ctx
 	 * @return
+	 * @throws TransException 
 	 */
-	private String dbSame(ISemantext ctx, String[] args) {
+	private String dbSame(ISemantext ctx, String[] args) throws TransException {
 		String f = super.sql(ctx) + "(";
 		if (args != null && args.length > 0 && args[0] != null)
 			f += args[0];
@@ -169,7 +186,7 @@ public class Funcall extends ExprPart {
 		else {
 			if (LangExt.isblank(resultAlias)) {
 				String ss[] = LangExt.split(args[0], "\\.");
-				resultAlias = ss[ss.length - 1];
+				resultAlias = new Alias(ss[ss.length - 1]);
 			}
 
 			// Add extFile() handler to handle selected value
@@ -236,16 +253,22 @@ public class Funcall extends ExprPart {
 	private static String sqlIfNullElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
-			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
+			return String.format("if(%s is null, %s, %s)",
+					args[0], args[1], args[2]);
 		else  if (dt == dbtype.sqlite)
-			return String.format("case when %s is null then %s else %s end", args[0], args[1], args[2]);
+			return String.format("case when %s is null then %s else %s end",
+					args[0], args[1], args[2]);
 		else if (dt == dbtype.ms2k)
-			return String.format("case when %s is null then %s else %s end", args[0], args[1], args[2]);
+			return String.format("case when %s is null then %s else %s end",
+					args[0], args[1], args[2]);
 		else if (dt == dbtype.oracle)
-			return String.format("decode(%s, null, %s, %s)", args[0], args[1], args[2]);
+			return String.format("decode(%s, null, %s, %s)", args[0],
+					Sql.bool2Int(args[1]), Sql.bool2Int(args[2]));
 		else {
-			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s", dt.name());
-			return String.format("if(%s is null, %s, %s)", args[0], args[1], args[2]);
+			Utils.warn("Funcall#sqlIfelse(): Using is(a is null, b, c) for unknown db type: %s",
+					dt.name());
+			return String.format("if(%s is null, %s, %s)",
+					args[0], args[1], args[2]);
 		}
 	}
 
@@ -261,14 +284,14 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private static String[] argsql(Object[] args, ISemantext context) {
+	private static String[] argsql(Object[] args, ISemantext context) throws TransException {
 		if (args == null)
 			return null;
 		String argus[] = new String[args.length];
 		for (int i = 0; i < args.length; i++) {
 			Object a = args[i];
-			if (a instanceof ExprPart)
-				argus[i] = ((ExprPart)a).sql(context);
+			if (a instanceof AbsPart)
+				argus[i] = ((AbsPart)a).sql(context);
 			else argus[i] = a.toString(); 
 		}
 		return argus;
@@ -309,7 +332,7 @@ public class Funcall extends ExprPart {
 
 	public static Funcall ifNullElse(String colElem, Object ifTrue, Object orElse) {
 		Funcall f = new Funcall(Func.ifNullElse);
-		f.args = new Object[] {colElem, ifTrue, orElse};
+		f.args = new Object[] {Colname.parseFullname(colElem), ifTrue, orElse};
 		return f;
 	}
 
@@ -351,8 +374,7 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-
-	public void selectElemAlias(String alias) {
+	public void selectElemAlias(Alias alias) {
 		this.resultAlias = alias;
 	}
 }

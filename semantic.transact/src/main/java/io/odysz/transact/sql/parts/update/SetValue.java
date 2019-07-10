@@ -5,6 +5,8 @@ import java.util.stream.Stream;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
+import io.odysz.transact.sql.parts.Colname;
+import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
@@ -26,7 +28,6 @@ import io.odysz.transact.x.TransException;
 public class SetValue extends ExprPart {
 
 	private Query selectValue;
-//	private String constValue;
 	private ExprPart expr;
 
 	public SetValue(Object rexp) {
@@ -42,23 +43,25 @@ public class SetValue extends ExprPart {
 	}
 	
 	@SuppressWarnings("unused")
-	private String tabl;
+	private Tabl tabl;
 	@SuppressWarnings("unused")
-	private String col;
+	private Colname col;
 
-	/**This value is set value to tabl.col. 
+	/**This value is set value to tabl.col. <br>
+	 * Set this information is initially designed for generating data according to meta,
+	 * but seems unused now?
 	 * @param tabl
-	 * @param col
+	 * @param colname
 	 * @return this
 	 */
-	public SetValue setVal2(String tabl, String col) {
+	public SetValue setVal2(Tabl tabl, String colname) {
 		this.tabl = tabl;
-		this.col = col;
+		this.col = new Colname(colname);
 		return this;
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		if (selectValue != null)
 			return Stream.of(new ExprPart("("), selectValue, new ExprPart(")"))
 					.map(p -> {
@@ -72,24 +75,5 @@ public class SetValue extends ExprPart {
 					.collect(Collectors.joining(""));
 		else
 			return expr.sql(sctx);
-//		else if (expr != null)
-//			return expr.sql(sctx);
-//		else if (constValue != null) {
-//			// String v = sctx == null ? constValue : (String) sctx.resulvedVal(constValue);
-//			// return "'" + v + "'";
-//
-//			// return "'" + constValue + "'";
-//			if (col == null || sctx.colType(tabl) == null)
-//				return "'" + constValue + "'";
-//			else {
-//				TableMeta mt = sctx.colType(tabl);
-//				if (mt.isQuoted(col))
-//					return "'" + constValue + "'";
-//				else 
-//					return constValue;
-//			}
-//		}
-//		else
-//			return super.sql(sctx);
 	}
 }

@@ -132,7 +132,7 @@ search_condition_not
 	}
 
 	@Override
-	public String sql(ISemantext sctx) {
+	public String sql(ISemantext sctx) throws TransException {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
 //		if (predict != null)
@@ -145,7 +145,14 @@ search_condition_not
 		else if (logitype == type.and) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
-					.map(cdt -> cdt.sql(sctx))
+					.map(cdt -> {
+						try {
+							return cdt.sql(sctx);
+						} catch (TransException e) {
+							e.printStackTrace();
+							return e.getMessage();
+						}
+					})
 					.collect(Collectors.joining(" AND "));
 				return sql;
 			}
@@ -154,7 +161,14 @@ search_condition_not
 		else if (logitype == type.or) {
 			if (condts != null && condts.size() > 0) {
 				String sql = condts.stream()
-					.map(cdt -> cdt.sql(sctx))
+					.map(cdt -> {
+						try {
+							return cdt.sql(sctx);
+						} catch (TransException e) {
+							e.printStackTrace();
+							return e.getMessage();
+						}
+					})
 					.collect(Collectors.joining(" OR "));
 				return sql;
 			}

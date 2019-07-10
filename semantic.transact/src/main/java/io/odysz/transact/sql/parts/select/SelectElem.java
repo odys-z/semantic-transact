@@ -1,6 +1,8 @@
 package io.odysz.transact.sql.parts.select;
 
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.parts.Alias;
+import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 
@@ -17,30 +19,30 @@ public class SelectElem extends ExprPart {
 	public enum ElemType { asterisk, tableCol, col, expr, constant }
 
 	private ElemType elemtype;
-	private String tabl;
+	private Alias tabl;
 	/**in simple case, this is Column name,
 	 * for {@link #elemtype} = {@link ElemType#expr}, this is not used - using {@link #expr} instead.
 	 */
-	private String col;
+	private Colname col;
 	/**in func case, this is the expression part.
 	 * for {@link #elemtype} = {@link ElemType#col}, using {@link #col} instead.
 	 */
 	private ExprPart expr;
 
-	private String alias;
+	private Alias alias;
 
 
 	public SelectElem(ElemType elemType, String col) {
 		super(null);
 		this.elemtype = elemType;
-		this.col = col;
+		this.col = new Colname(col);
 	}
 
 	public SelectElem(ElemType type, String tabl, String col) {
 		super(null);
 		this.elemtype = type;
-		this.tabl = tabl;
-		this.col = col;
+		this.tabl = new Alias(tabl);
+		this.col = new Colname(col);
 	}
 	
 	public SelectElem(ExprPart expr) {
@@ -51,31 +53,33 @@ public class SelectElem extends ExprPart {
 
 	@Override
 	public String sql(ISemantext sctx) {
-		String sql;
-		if (elemtype == ElemType.asterisk)
-			sql = col;
-//		else if (elemtype == ElemType.func)
-//			sql = new Funcall(col).sql(sctx) + " " + alias;
-		// expr also handling func?
-		else if (elemtype == ElemType.expr) {
-			if (expr instanceof Funcall)
-				// extFile() needing handle post selected results,
-				// it's needing to know the alias to find out the results to be replaced 
-				((Funcall)expr).selectElemAlias(alias);
-			sql = expr.sql(sctx); // + " " + alias;
-		}
-		else if (tabl == null)
-			sql = col;
-		else 
-			sql = tabl + "." + col;
+		String sql = "";
+		try {
+			if (elemtype == ElemType.asterisk)
+				sql = col.sql(sctx);
+			// expr also handling func?
+			else if (elemtype == ElemType.expr) {
+				if (expr instanceof Funcall)
+					// extFile() needing handle post selected results,
+					// it's needing to know the alias to find out the results to be replaced 
+					((Funcall)expr).selectElemAlias(alias);
+				sql = expr.sql(sctx); // + " " + alias;
+			}
+			else if (tabl == null)
+				sql = col.sql(sctx);
+			else 
+				sql = tabl.sql(sctx) + "." + col.sql(sctx);
 
-		if (alias != null)
-			return sql += " " + alias;
+			if (alias != null)
+				return sql += " " + alias.sql(sctx);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		return sql;
 	}
 
 	public void as(String alias) {
-		this.alias = alias;
+		this.alias = new Alias(alias);
 	}
 
 }

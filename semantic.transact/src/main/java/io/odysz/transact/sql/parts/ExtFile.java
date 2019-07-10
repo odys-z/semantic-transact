@@ -13,6 +13,7 @@ import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.x.TransException;
 
 /**External file representation.<br>
  * An ExtFile can only been used as a set value.
@@ -67,7 +68,7 @@ public class ExtFile extends AbsPart {
 	}
 
 	@Override
-	public String sql(ISemantext ctx) {
+	public String sql(ISemantext ctx) throws TransException {
 		// save file to pathname
 		String relatvFn;
 		if (resulv_const_path instanceof Resulving) 

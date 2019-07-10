@@ -13,8 +13,10 @@ import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Predicate;
@@ -43,11 +45,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 				HashMap<String, Object[]> cols) throws TransException, SQLException;
 	}
 
-	protected String mainTabl;
-	public Object mainTabl() { return mainTabl; }
+	protected Tabl mainTabl;
+	public Tabl mainTabl() { return mainTabl; }
 
-	protected String mainAlias;
-	public String alias() { return mainAlias; }
+	protected Alias mainAlias;
+	public Alias alias() { return mainAlias; }
 	
 	/**Conditions of where conditions */
 	protected Condit where;
@@ -66,8 +68,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
-		this.mainTabl = tabl;
-		this.mainAlias = alias; // == null || alias.length == 0 ? null : alias[0];
+		this.mainTabl = new Tabl(tabl);
+		this.mainAlias = alias == null ? null : new Alias(alias);
 	}
 
 	private ArrayList<Object[]> attaches;
@@ -90,8 +92,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T nv(String n, String v) throws TransException {
-		TableMeta mt = transc.tableMeta(mainTabl);
-		return nv(n, composeVal(v, mt, mainTabl, n));
+		TableMeta mt = transc.tableMeta(mainTabl.name());
+		return nv(n, composeVal(v, mt, n));
 	}
 
 	public T nv(String n, AbsPart v) throws TransException {
@@ -282,7 +284,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public Map<String, Integer> getColumns() { return null; }
 
-	public static ExprPart composeVal(Object v, TableMeta mt, String tabl, String col) {
+	public static ExprPart composeVal(Object v, TableMeta mt, String col) {
 		boolean isQuoted = mt == null || mt.isQuoted(col);
 		if (mt == null || isQuoted)
 			return ExprPart.constStr((String)v);

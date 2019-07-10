@@ -87,10 +87,6 @@ public class ValueList extends AbsPart {
 		valsArrIsnull = true;
 	}
 
-//	public ValueList constv(int idx, String v) throws TransException {
-//		return v(idx, new ExprPart("'" + v + "'"));
-//	}
-
 	public ValueList v(int idx, AbsPart v) throws TransException {
 		if (idx < 0 || v == null)
 			return this;
@@ -104,10 +100,6 @@ public class ValueList extends AbsPart {
 		return this;
 	}
 
-//	public ValueList constv(String v) throws TransException {
-//		throw new TransException("Yes it's realy used!");
-//	}
-	
 	/**Add value to the last column.
 	 * @param v
 	 * @return this

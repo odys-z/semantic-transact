@@ -5,11 +5,12 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
+import io.odysz.transact.x.TransException;
 
 public class ExprPartTest {
 
 	@Test
-	public void test() {
+	public void test() throws TransException {
 		ExprPart e = ExprsVisitor.parse("0");
 		assertEquals("0", e.sql(null));
 

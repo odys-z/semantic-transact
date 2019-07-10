@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
+import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.meta.TableMeta;
@@ -18,6 +19,7 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
+import io.odysz.transact.sql.parts.insert.InsertValuesOrcl;
 import io.odysz.transact.x.TransException;
 
 /**sql: insert into tabl(...) values(...) / select ...
@@ -27,17 +29,17 @@ import io.odysz.transact.x.TransException;
 public class Insert extends Statement<Insert> {
 
 	/**[col-name, col-index] */
-	private Map<String, Integer> insertCols;
+	protected Map<String, Integer> insertCols;
 	
-	private Query selectValues;
-	/**[ list[Object[n, v], ... ], ... ] */
-	private List<ArrayList<Object[]>> valuesNv;
+	protected Query selectValues;
+	/**list[ list[Object[n, v], ... ], ... ] */
+	protected List<ArrayList<Object[]>> valuesNv;
 	
 	/**current row's nv.<br>
 	 * TODO let's depcate this - all new nv are appended to last of valuesNv */
 	private ArrayList<Object[]> currentRowNv;
 
-	Insert(Transcxt transc, String tabl) {
+	protected Insert(Transcxt transc, String tabl) {
 		super(transc, tabl, null);
 	}
 
@@ -131,7 +133,7 @@ public class Insert extends Statement<Insert> {
 		if (val.size() < insertCols.size())
 			appendings = new HashSet<String>(insertCols.keySet());
 
-		TableMeta mt = transc.tableMeta(mainTabl);
+		TableMeta mt = transc.tableMeta(mainTabl.name());
 		for (int i = 0; i < val.size(); i++) {
 			Object[] nv = val.get(i);
 			
@@ -167,7 +169,7 @@ public class Insert extends Statement<Insert> {
 			String n = (String) nv[0];
 
 			// v must be String constant or number, etc.
-			val.set(i, new Object[] {n, composeVal(v, mt, mainTabl, n)});
+			val.set(i, new Object[] {n, composeVal(v, mt, n)});
 			if (appendings != null)
 				appendings.remove(n);
 		}
@@ -218,22 +220,24 @@ public class Insert extends Statement<Insert> {
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
 			// insert into tabl(...)
-			Stream.of(new ExprPart("insert into"), new ExprPart(mainTabl), new ExprPart(mainAlias),
+			Stream.of(new ExprPart("insert into"), mainTabl, mainAlias,
 					// (...)
 					new ColumnList(insertCols)
 			   // values(...) / select ...
 			), Stream.concat(
 				// values (...)
 				// whether 'values()' appears or not is the same as value valuesNv
-				Stream.of(new ExprPart("values"),
+				Stream.of(// new ExprPart("values"),
 						// 'v1', 'v2', ...)
-					new InsertValues(mainTabl, insertCols, valuesNv)
+					sctx != null && sctx.dbtype() == dbtype.oracle ?
+							new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
+							new InsertValues(mainTabl.name(), insertCols, valuesNv)
 				).filter(w -> hasVals),
 				// select ...
 				Stream.of(selectValues).filter(w -> selectValues != null))
 			).map(m -> {
 				try {
-					return m.sql(sctx);
+					return m == null ? "" : m.sql(sctx);
 				} catch (TransException e) {
 					e.printStackTrace();
 					return "";
@@ -242,7 +246,6 @@ public class Insert extends Statement<Insert> {
 
 		return s.collect(Collectors.joining(" "));
 	}
-
 
 	public Map<String, Integer> getColumns() { return insertCols; }
 
@@ -288,13 +291,13 @@ public class Insert extends Statement<Insert> {
 		List<ArrayList<Object[]>> values = prepareNv(cxt);
 
 		if (cxt != null)
-			cxt.onInsert(this, mainTabl, values);
+			cxt.onInsert(this, mainTabl.name(), values);
 
 		Insert ins = super.commit(cxt, sqls);
 		
 		if (cxt != null && values != null)
 			for (ArrayList<Object[]> row : values)
-				cxt.onPost(this, mainTabl, row, sqls);
+				cxt.onPost(this, mainTabl.name(), row, sqls);
 
 		return ins;
 	}

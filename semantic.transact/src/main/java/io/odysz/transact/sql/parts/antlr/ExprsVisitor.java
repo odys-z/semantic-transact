@@ -13,6 +13,7 @@ import gen.antlr.sql.exprs.SearchExprs.Function_callContext;
 import gen.antlr.sql.exprs.SearchExprs.Unary_operator_expressionContext;
 import gen.antlr.sql.exprs.SearchExprsBaseVisitor;
 import gen.antlr.sql.exprs.TSqlLexer;
+import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.Logic;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
@@ -133,12 +134,6 @@ expression
 	 */
 	@Override
 	public ExprPart visitExpression(ExpressionContext ctx) {
-//		if (ctx.op != null)
-//			return new ExprPart(Logic.op.eq, "A", "B");
-//		else {
-//			Primitive_expressionContext pe = ctx.primitive_expression();
-//			if (pe != null)
-//				return new ExprPart(pe.getText());
 			ConstantContext constant = ctx.constant();
 			if (constant != null)
 				return new ExprPart(constant.getText());
@@ -150,19 +145,20 @@ expression
 
 			Full_column_nameContext fn = ctx.full_column_name();
 			if (fn != null)
-				return new ExprPart(fn.getText());
+				// return new ExprPart(fn.getText());
+				return Colname.parseFullname(fn.getText());
 
 			Unary_operator_expressionContext uni_op = ctx.unary_operator_expression();
 			if (uni_op != null)
 				return new ExprPart(Logic.op(uni_op.getText()), ctx.expression().get(0).getText(), null);
 			
-			String op = ctx.op.getText();
-			if (op != null)
-				return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
-						ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
+			if (ctx.op != null) {
+				String op = ctx.op.getText();
+				if (op != null)
+					return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
+							ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
+			}
 
-			// what's commparison_operator expression used for?
-			return null;
-//		}
+			return new ExprPart(ctx.getText());
 	}
 }
