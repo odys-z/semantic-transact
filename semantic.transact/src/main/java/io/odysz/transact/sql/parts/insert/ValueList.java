@@ -81,6 +81,13 @@ public class ValueList extends AbsPart {
 	/** This is also the flag of multi-row values */
 	private boolean valsArrIsnull;
 	
+	/** values (one row) has beginning and ending parentheses. */
+	boolean withParens = true;
+	public ValueList withParentheses(boolean with) {
+		withParens = with;
+		return this;
+	}
+
 	public ValueList(int size) {
 		if (size > 0)
 			valsArr = new AbsPart[size];
@@ -135,6 +142,6 @@ public class ValueList extends AbsPart {
 					e.printStackTrace();
 					return null;
 				}
-			}).collect(Collectors.joining(", ", "(", ")"));
+			}).collect(Collectors.joining(", ", withParens ? "(" : "", withParens ? ")" : ""));
 	}
 }

@@ -330,6 +330,12 @@ public class Funcall extends ExprPart {
 		}
 	}
 
+	/**Create a function decoding null value, e.g. for oracle: decode (colElem, null, ifTrue, orElse).
+	 * @param colElem can only be a full column name.
+	 * @param ifTrue
+	 * @param orElse
+	 * @return the Funcall object
+	 */
 	public static Funcall ifNullElse(String colElem, Object ifTrue, Object orElse) {
 		Funcall f = new Funcall(Func.ifNullElse);
 		f.args = new Object[] {Colname.parseFullname(colElem), ifTrue, orElse};
@@ -363,13 +369,18 @@ public class Funcall extends ExprPart {
 
 	public static AbsPart concat(String to, String... with) {
 		Funcall f = new Funcall(Func.concat);
+		
+		Colname argTo = Colname.parseFullname(to);
 		if (with == null)
-			f.args = new Object[] {to};
+			f.args = new Object[] {argTo == null ? to : argTo};
 		else {
 			f.args = new Object[with.length + 1];
-			f.args[0] = to;
-			for (int ix = 0; ix < with.length; ix++)
-				f.args[ix + 1] = with[ix];
+			f.args[0] = argTo == null ? to : argTo;
+			for (int ix = 0; ix < with.length; ix++) {
+				// f.args[ix + 1] = with[ix];
+				Colname argWith = Colname.parseFullname(with[ix]);
+				f.args[ix + 1] = argWith == null ? with[ix] : argWith;
+			}
 		}
 		return f;
 	}

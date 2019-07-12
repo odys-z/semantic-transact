@@ -81,10 +81,11 @@ public class TestTransc {
 			.col("f.funcName is not null", "checked")
 			.col("f.funcId", "fid")
 			.col("substring(notes, 1, 16)", "notes")
+			.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)")
 			.commit(st.instancontxt(null, null), sqls);
 
 		assertEquals("select f.funcName is not null checked, f.funcId fid, substring(notes, 1, 16) notes " +
-				"from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId = '123456'",
+				"from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId = '123456' where r.stamp > dateDiff(day, r.stamp, sysdate)",
 				sqls.get(0));
 	}
 	

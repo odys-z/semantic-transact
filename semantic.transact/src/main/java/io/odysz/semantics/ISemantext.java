@@ -202,7 +202,7 @@ public interface ISemantext {
 	 */
 	void addOnSelectedHandler(IPostSelectOperat op);
 
-	/**Compose the v provide by client into target table column's value presentation in sql,
+	/**Compose the v provide by client into target table column's value represented in sql,
 	 * whether add single quote or not.<br>
 	 * <p>If v is an instance of string, add "'" according to db type;
 	 * if it is an instance of {@link io.odysz.transact.sql.parts.AbsPart AbsPart}, return it directly.</p>

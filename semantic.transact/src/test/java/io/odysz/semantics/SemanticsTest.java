@@ -113,6 +113,39 @@ public class SemanticsTest {
 				sqls.get(0));
 	}
 	
+	@Test
+	public void testInsertOracle() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+
+		ArrayList<Object[]> row0 = new ArrayList<Object[]>(2);
+		row0.add(new Object[] { "funcName", "oracle 01" });
+		row0.add(new Object[] { "funcId", "orcl-01" });
+		ArrayList<Object[]> row1 = new ArrayList<Object[]>(2);
+		row1.add(new Object[] { "funcName", "oracle 02" });
+		row1.add(new Object[] { "funcId", "orcl-02" });
+
+		st.insert("a_functions")
+			.cols("funcName", "funcId")
+			.value(row0)
+			.value(row1)
+			.commit(orclCxt, sqls);
+
+		assertEquals("insert into \"a_functions\"  (\"funcName\", \"funcId\", \"fullpath\") select 'oracle 01', 'orcl-01', 'fullpath null.sibling orcl-01' from dual union select 'oracle 02', 'orcl-02', 'fullpath null.sibling orcl-02' from dual",
+				sqls.get(0));
+		
+		ArrayList<Object[]> user = new ArrayList<Object[]>(2);
+		user.add(new Object[] { "userName", "user 01" });
+		user.add(new Object[] { "userId", "u-01" });
+
+		st.insert("a_users")
+			.cols("userName", "userId")
+			.value(user)
+			.commit(orclCxt, sqls);
+
+		assertEquals("insert into \"a_users\"  (\"userName\", \"userId\") values ('user 01', 'u-01')",
+				sqls.get(1));
+	}
+
 	/**Test function calls needing semantics.
 	 * @throws TransException
 	 */
@@ -126,6 +159,29 @@ public class SemanticsTest {
 
 		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
 				sqls.get(0));
+	}
+	
+	@Test
+	public void testFuncallOrcl() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_roles")
+			.nv("roleName", Funcall.concat("roleName", "'add 0 '", "'add 1'"))
+			.where("=", "roleId", "'admin'")
+			.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)")
+			.commit(orclCxt, sqls);
+
+		// update  "a_roles"  set "roleName"=roleName || 'add 0 ' || 'add 1' where "roleId" = 'admin' AND "r"."stamp" > dateDiff("day", "r"."stamp", "sysdate")
+		assertEquals("update  \"a_roles\"  set \"roleName\"=\"roleName\" || 'add 0 ' || 'add 1' where \"roleId\" = 'admin' AND \"r\".\"stamp\" > dateDiff(\"day\", \"r\".\"stamp\", \"sysdate\") ",
+				sqls.get(0));
+		
+		// WHERE decode("r"."stamp", NULL, sysdate, "r"."stamp") - sysdate > -0.1
+		st.select("b_reports", "r")
+			.j("b_repreocords", "rec", "r.repId = rec.repId")
+			.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1")
+			.commit(orclCxt, sqls);
+
+		assertEquals("select * from \"b_reports\" \"r\" join \"b_repreocords\" \"rec\" on \"r\".\"repId\" = \"rec\".\"repId\" where decode(\"r\".\"stamp\",null,sysdate,\"r\".\"stamp\") - sysdate > -0.1",
+				sqls.get(1));
 	}
 	
 	/**See <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>
@@ -173,7 +229,7 @@ public class SemanticsTest {
 								.limit("3 * 2", "5")
 								.col("count(funcId)", "c")
 								.where_("=", "f.funcName", "admin"))
-			.where("=", "userId", "'admin'");
+				.where("=", "userId", "'admin'");
 		upd.commit(mysqlCxt, sqls);
 		upd.commit(sqlitCxt, sqls);
 		upd.commit(ms2kCxt, sqls);

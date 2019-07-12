@@ -28,7 +28,16 @@ public class Colname extends ExprPart {
 					c : tabl.sql(ctx) + "." + c;
 	}
 
+	/**Parse the full column name, can distinguish constant like ".*"
+	 * @param coln
+	 * @return null for constant, otherwise always a colname, with or without table name.
+	 */
 	public static Colname parseFullname(String coln) {
+		// Some times both full column name and constants can be used as arguments.
+		// This is shortcut, not fully parsed 
+		if (coln == null || coln.matches("^\\s*'.*'\\s*$"))
+			return null;
+
 		String[] colnss =  coln.split("\\.");
 		Colname col = new Colname(colnss[colnss.length - 1]);
 		if (colnss.length > 1)

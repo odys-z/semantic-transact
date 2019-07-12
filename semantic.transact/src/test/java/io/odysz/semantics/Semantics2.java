@@ -353,12 +353,6 @@ class Semantics2 {
 	}
 
 	private void addParentChildren(String tabl, String pk, String[] args) {
-//		if (pathSufix != null) {
-//			if (!target.equals(args[0]) || !idField.equals(args[1]))
-//				System.err.println(String.format(
-//					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
-//					args[0], args[1], target, pathSufix));
-//		}
 		target = tabl;
 		idField = pk;
 		if (childConstraints == null)
@@ -381,12 +375,6 @@ class Semantics2 {
 	 * @param args 0: parent-field, 1: path-suffix (sibling field?), 2: fullpath-field
 	 */
 	private void addFullpath(String tabl, String pk, String[] args) {
-//		if (pathSufix != null) {
-//			if (!target.equals(args[0]) || !pathSufix.equals(args[1]))
-//				System.err.println(String.format(
-//					"WARN - IrSemantics: The adding parent.id(%s.%s) is inconsistant with the exist one(%s.%s).",
-//					args[0], args[1], target, pathSufix));
-//		}
 		target = tabl;
 		idField = pk;
 		parentField =  args[0];
@@ -412,31 +400,6 @@ class Semantics2 {
 
 		return ExprPart.constStr(String.format("fullpath %s.%s %s", parentId, sibling, recId));
 	}
-
-//	public String genFullpath2(String conn, Object parentId, Object recId, Object siblingOrder) throws SQLException {
-//		int order = 0;
-//		try { order = Integer.valueOf((String) siblingOrder); } catch (Exception e) {}
-//		String sibling = Radix64.toString(order, 2);
-//		// 无上级节点，根 fullpath = sibling-val
-//		if (parentId == null || parentId.equals(recId))
-//			return String.format("%1$2s %2$s", sibling, recId); //.replace(' ', '0');
-//		ICResultset rs = CpDriver.select(conn, String.format( "select %s as parentPath from %s where %s = '%s'",
-//				fullPath, target, idField, parentId), DA.flag_nothing);
-//		// find parent.fullpath
-//		if (rs.getRowCount() == 0)
-//			// no parent (path) found
-//			return String.format("%1$2s %2$s", sibling, recId); //.replace(' ', '0');
-//
-//		rs.beforeFirst().next();
-//		String parentPath = rs.getString("parentPath");
-//		if (parentPath == null || parentPath.trim().length() == 0)
-//			return String.format("%1$2s %2$s", sibling, recId); //.replace(' ', '0');
-//		else {
-////			System.out.println(String.format("WARN - using empty sufix for sibling order? %s : %s",
-////					recId, getDesc(smtype.fullpath)));
-//			return String.format("%s.%2s %s", parentPath, sibling, recId); //.replace(' ', '0');
-//		}
-//	}
 
 	public boolean isFullpath(String f) {
 		return fullPath!=null && fullPath.equals(f);
@@ -481,67 +444,6 @@ class Semantics2 {
 	public boolean isCheckCountTable(String tabl) {
 		return target != null && target.equals(tabl) && checkCountPkCol_Del != null && checkCountSql_Del != null;
 	}
-
-	/**If the configured sql has a resulting count (with pk-arg select) > 0,
-	 * throw an IrSemanticsException of message add while configuration.
-	 * @param pkCol
-	 * @param pkv
-	 * @throws IrSemanticsException thrown when semantics-checking(IrSemantics.checkSqlCountOnDel, ...) failed.
-	public void checkRefereeCount(String connId, String pkCol, String pkv) throws IrSemanticsException {
-		try {
-			if (pkCol.equals(checkCountPkCol_Del)) {
-				ICResultset rs = CpDriver.select(connId, String.format(checkCountSql_Del, pkv), DA.flag_nothing);
-				rs.beforeFirst();
-				if (rs.next()) {
-					int cnt = rs.getInt(1);
-					int cols = rs.getColumnCount();
-					String arg1 = cols >= 2 ? rs.getString(2) : "";
-					String arg2 = cols >= 3 ? rs.getString(3) : "";
-					String arg3 = cols >= 4 ? rs.getString(4) : "";
-					String arg4 = cols >= 5 ? rs.getString(5) : "";
-					if (cnt > 0)
-						throw new IrSemanticsException(String.format(checkCountErrFormat_Del, cnt, arg1, arg2, arg3, arg4));
-					// else return ok
-				}
-				else
-					throw new IrSemanticsException(String.format(checkCountErrFormat_Del, 0, "", "", "", ""));
-			} // else check nothing
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	 */
-
-	/**[{tabl: child-1, act: {act-obj}}, <br>
-	 *  {tabl: child-2, act: {act-obj}}]
-	 * @param parentId
-	 * @return
-	@SuppressWarnings("unchecked")
-	public JSONObject[] getDeleteChildrenCond(String parentId) {
-		if (childConstraints == null) return null;
-		JSONObject[] jreqs = new JSONObject[childConstraints.size()];
-
-		for (int i = 0; i < jreqs.length; i++) {
-		//for (String[] childfk : childConstraints) {
-			String[] childfk = childConstraints.get(i);
-			JSONObject cond = new JSONObject();
-			cond.put("field", childfk[1]);
-			cond.put("v", parentId);
-			cond.put("logic", "=");
-			JSONArray jconds = new JSONArray();
-			jconds.add(cond);
-
-			JSONObject req = new JSONObject();
-			JSONObject act = new JSONObject();
-			act.put("a", "delete");
-			act.put("conds", jconds);
-			req.put("tabl", childfk[0]);
-			req.put("act", act);
-			jreqs[i] = req;
-		}
-		return jreqs;
-	}
-	 */
 
 	public boolean isCipherField(String c) { return c != null && c.equals(cipherCol); }
 
@@ -595,19 +497,6 @@ class Semantics2 {
 		}
 	}
 
-	/**
-	 * @param conn
-	 * @param n
-	 * @return
-	public boolean isClob(String conn, String n) {
-		if (!CpDriver.isOracle(conn) || lobFields == null) return false;
-		for (String lob : lobFields)
-			if (lob.equals(n))
-				return true;
-		return false;
-	}
-	 */
-
 	public boolean hasOperTime() {
 		return operField != null;
 	}
@@ -619,36 +508,6 @@ class Semantics2 {
 	public String getOpTimeField() {
 		return opTimeField;
 	}
-
-	/**
-	 * @param connId
-	 * @param chkf
-	 * @param chkv
-	 * @throws IrSemanticsException
-	public void checkSqlCountIns(String connId, String chkf, Object chkv) throws IrSemanticsException {
-		try {
-			if (chkf.equals(checkCountValueCol_Ins)) {
-				ICResultset rs = CpDriver.select(connId, String.format(checkCountSql_Ins, chkv), DA.flag_nothing);
-				rs.beforeFirst();
-				if (rs.next()) {
-					int cnt = rs.getInt(1);
-					int cols = rs.getColumnCount();
-					String arg1 = cols >= 2 ? rs.getString(2) : "";
-					String arg2 = cols >= 3 ? rs.getString(3) : "";
-					String arg3 = cols >= 4 ? rs.getString(4) : "";
-					String arg4 = cols >= 5 ? rs.getString(5) : "";
-					if (cnt > 0)
-						throw new IrSemanticsException(String.format(checkCountErrFormat_Ins, cnt, arg1, arg2, arg3, arg4));
-					// else return ok
-				}
-				else
-					throw new IrSemanticsException(String.format(checkCountErrFormat_Ins, 0, "", "", "", ""));
-			} // else check nothing
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}	
-	}
-	 */
 
 	public boolean isCheckCountInsert(String tabl) {
 		return this.target.equals(tabl) && checkCountValueCol_Ins != null;
@@ -694,26 +553,6 @@ class Semantics2 {
 		return composedCol;
 	}
 
-	/**Composing componds and newIds into composed column.<br>
-	 * Calling UpdateBatch.resolveAuto to resolve reference.
-	 * @param newIds
-	 * @param componds
-	 * @return
-	public String getComposedV(ArrayList<String> newIds, String[] componds) {
-		String res = "";
-		for (int ix = 0; ix < composingCols.length; ix++) {
-			String t = composingCols[ix];
-			// constant
-			if (t.startsWith("'") && t.endsWith("'")) {
-				res += t.replaceFirst("^'", "").replaceAll("'$", "");
-			}
-			// variable from client
-			else res += UpdateBatch.resolveAuto(componds[ix], newIds);
-		}
-		return res;
-	}
-	 */
-	
 	//////////////////// stamp up-stamp 1 more than down-stamp ///////////////////
 	private String upStamp;
 	@SuppressWarnings("unused")
@@ -745,47 +584,9 @@ class Semantics2 {
 
 	public String defltRefeeVal() { return defltRefeeVal; }
 
-	/**For null, '0', invalid date string, return "1776-07-04 00:00:00", other wise add 1 second to dataStr.
-	 * @param conn
-	 * @param dateStr
-	 * @return
-	public String upstampOnInsert(String conn, Object dateStr) {
-		try {
-			if (dateStr == null || ((String)dateStr).trim().length() < 6)
-				// len(76-7-4) = 6
-				return DateFormat.incSeconds(DA.getConnType(conn), "1776-07-04 00:00:00", 0);
-			return DateFormat.incSeconds(DA.getConnType(conn), (String) dateStr, 1);
-		} catch (Exception e) { return DateFormat.getTimeStampYMDHms(DA.getConnType(conn)); }
-	}
-	 */
-
 	public boolean isUpstamp(String n) {
 		return upStamp != null && upStamp.equals(n);
 	}
-
-	/**Get up-stamp on update (increase down stamp).<br>
-	 * Return null if semantics is specified as no up-stamp generating (like on DB that support timestamp on update)
-	 * @param conn
-	 * @param tabl
-	 * @param recId
-	 * @return
-	public String upstampOnUpdate(String conn, String tabl, String recId) {
-		if (!supportUpStampOnUpdate)
-			return null;
-		try {
-			// <mysql>select Date_add(%s, interval 1 second) upstamp from %s where %s = '%s'</mysql>
-			// 
-			String sql = DatasetCfg.getSqlx(conn, "semantics.get-downstamp",
-					downStamp, tabl, this.idField, recId);
-			ICResultset rs = DA.select(sql, DA.flag_nothing);
-			rs.next();
-			return rs.getString("upstamp");
-		} catch (SQLException e) {
-			return DateFormat.getTimeStampYMDHms(DA.dirverType(conn));
-		}
-	}
-	 */
-
 }
 
 

@@ -1,7 +1,5 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import java.util.List;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -134,31 +132,31 @@ expression
 	 */
 	@Override
 	public ExprPart visitExpression(ExpressionContext ctx) {
-			ConstantContext constant = ctx.constant();
-			if (constant != null)
-				return new ExprPart(constant.getText());
-			
-			Function_callContext fc = ctx.function_call();
-			if (fc != null)
-				return new Funcall(fc.func_proc_name().getText(),
-						SelectElemVisitor.funcArgs((List<?>) fc.expression_list()));
+		ConstantContext constant = ctx.constant();
+		if (constant != null)
+			return new ExprPart(constant.getText());
+		
+		Function_callContext fc = ctx.function_call();
+		if (fc != null)
+			return new Funcall(fc.func_proc_name().getText(),
+					SelectElemVisitor.funcArgs(fc.expression_list().expression()));
 
-			Full_column_nameContext fn = ctx.full_column_name();
-			if (fn != null)
-				// return new ExprPart(fn.getText());
-				return Colname.parseFullname(fn.getText());
+		Full_column_nameContext fn = ctx.full_column_name();
+		if (fn != null)
+			// return new ExprPart(fn.getText());
+			return Colname.parseFullname(fn.getText());
 
-			Unary_operator_expressionContext uni_op = ctx.unary_operator_expression();
-			if (uni_op != null)
-				return new ExprPart(Logic.op(uni_op.getText()), ctx.expression().get(0).getText(), null);
-			
-			if (ctx.op != null) {
-				String op = ctx.op.getText();
-				if (op != null)
-					return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
-							ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
-			}
+		Unary_operator_expressionContext uni_op = ctx.unary_operator_expression();
+		if (uni_op != null)
+			return new ExprPart(Logic.op(uni_op.getText()), ctx.expression().get(0).getText(), null);
+		
+		if (ctx.op != null) {
+			String op = ctx.op.getText();
+			if (op != null)
+				return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
+						ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
+		}
 
-			return new ExprPart(ctx.getText());
+		return new ExprPart(ctx.getText());
 	}
 }

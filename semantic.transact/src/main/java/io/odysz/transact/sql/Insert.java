@@ -157,11 +157,6 @@ public class Insert extends Statement<Insert> {
 				continue;
 			}
 
-//			if (nv[0] == null)
-//				if (!LangExt.isblank(nv[1], "''"))
-//					Utils.warn("Insert#values(): Ignoring value for empty column name: %s", nv[1]);
-//				else if (nv[1] == null) continue;
-
 			if (nv != null && nv[1] != null)
 				notNull = true;
 
@@ -311,13 +306,6 @@ public class Insert extends Statement<Insert> {
 			currentRowNv = null;
 		}
 		return valuesNv;
-
-//		if (ctx != null)
-//			ctx.onPrepare(this, mainTabl, valuesNv);
-//		
-//		if (postate != null)
-//			for (Statement<?> pst : postate)
-//				pst.prepare(ctx);
 	}
 
 	/**Add multi del insert update for children table<br>

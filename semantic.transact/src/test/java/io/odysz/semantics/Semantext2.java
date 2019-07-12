@@ -67,12 +67,36 @@ class Semantext2 implements ISemantext {
 						cols.put(n, c);
 					}
 					else {
+						// in the second row, cols contains the name, but row is not the same size
+						if (value.size() <= cols.get(n))
+							value = expandRow(value, cols);
+						
 						nv = value.get(cols.get(n));
 						nv[1] = fp;
 					}
 				}
 			}
 		return this;
+	}
+
+	/**Expand the row to the size of cols - in case the cols expanded by semantics handling
+	 * @param row row to expand
+	 * @param cols column index
+	 * @return the row expanded
+	 */
+	static ArrayList<Object[]> expandRow(ArrayList<Object[]> row, Map<String, Integer> cols) {
+		if (row == null || cols == null || row.size() >= cols.size())
+			return row;
+		
+		int size0 = row.size();
+		
+		for (int cx = size0; cx < cols.size(); cx ++)
+			row.add(new Object[] { null, null});
+
+		for (String col : cols.keySet())
+			if (cols.get(col) >= size0)
+				row.set(cols.get(col), new Object[] { col, null});
+		return row;
 	}
 
 	String conn;
