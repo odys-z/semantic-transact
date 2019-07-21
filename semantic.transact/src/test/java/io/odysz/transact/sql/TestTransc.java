@@ -62,14 +62,14 @@ public class TestTransc {
 			.col("count", "cnt")
 			.where("=", "userId", "funders")
 			// (userId = 'user2' or userId = 'user3') and stamp <= '1911-10-10'
-			.where(Sql.condt("userId = '%s'", "George").or("userId = '%s'", "Washington"),
+			.where(Sql.condt("userId = '%s'", "George").or(Sql.condt("userId = '%s'", "Washington")),
 					Sql.condt("<=", "stamp", "'1911-10-10'"),
 					Sql.condt(op.eq, "userId", "'Sun Yat-sen'"))
 			.orderby("cnt", "desc")
 			.orderby("stamp")
 			.commit(sqls);
 
-		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND userId = 'George' AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
+		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND (userId = 'George' OR userId = 'Washington') AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
 	}
 

@@ -87,7 +87,7 @@ search_condition_not
 				condts.add(and);
 				return this;
 			}
-			else { // empty logic, and to it
+			else { // empty logic, AND with it
 				ArrayList<Condit> ands = new ArrayList<Condit>();
 				ands.add(this);
 				ands.add(and);
@@ -98,20 +98,71 @@ search_condition_not
 			
 	}
 
-	public Condit or(String logic, String from, String... to) {
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		return this;
+//	public Condit condt(String format, Object... args) {
+//		Condit or = Sql.condt(format, args);
+//		return or(or);
+//	}
+	
+	public Condit or(Condit or) {
+		if (logitype == type.or) {
+			condts.add(or);
+			return this;
+		}
+		else if (logitype == type.and) {
+			condts.get(condts.size() - 1).or(or);
+			return this;
+		}else if (logitype == type.not) {
+			// shouldn't reach here
+			Condit left = new Condit(type.not, condts);
+			condts = new ArrayList<Condit>();
+			condts.add(left);
+			logitype = type.or;
+			condts.add(or);
+			return this;
+		}
+		else { // empty logic, OR with it
+			ArrayList<Condit> ands = new ArrayList<Condit>();
+			ands.add(this);
+			ands.add(or);
+			return new Condit(Logic.type.or, ands);
+		}
 	}
 
 	/** Additional information of left alias for generating sql. */
 	String lAlias;
 	/** Additional information of right alias for generating sql. */
 	String rAlias;
+	private int priority = 0;
+
+	/**Set the priority 1 more higher than parent
+	 * - call this only when composing sql(conditions won't changing)
+	 * @param parentLogic
+	 * @return
+	 */
+	private Condit prio(Logic.type parentLogic) {
+		if (parentLogic == Logic.type.and && logitype == Logic.type.or
+			// call this only when composing sql(conditions won't changing)
+			&& condts != null && condts.size() > 1)
+			this.priority = 1;
+
+		return this;
+	}
+	
+	private String lbrace() {
+		String l = "";
+		if (condts != null && condts.size() > 0)
+			for (int b = 0; b < priority; b++)
+				l += "(";
+		return l;
+	}
+
+	private String rbrace() {
+		String r = "";
+		if (condts != null && condts.size() > 0)
+			for (int b = 0; b < priority; b++)
+				r += ")";
+		return r;
+	}
 
 	/**<p>Sometimes conditions's table name or alias are ignored by client.
 	 * This method can be called by {@link io.odysz.transact.sql.parts.select.JoinTabl}
@@ -147,13 +198,14 @@ search_condition_not
 				String sql = condts.stream()
 					.map(cdt -> {
 						try {
+							cdt.prio(logitype);
 							return cdt.sql(sctx);
 						} catch (TransException e) {
 							e.printStackTrace();
 							return e.getMessage();
 						}
 					})
-					.collect(Collectors.joining(" AND "));
+					.collect(Collectors.joining(" AND ", lbrace(), rbrace()));
 				return sql;
 			}
 		}
@@ -169,7 +221,7 @@ search_condition_not
 							return e.getMessage();
 						}
 					})
-					.collect(Collectors.joining(" OR "));
+					.collect(Collectors.joining(" OR ", lbrace(), rbrace()));
 				return sql;
 			}
 		}

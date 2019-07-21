@@ -147,7 +147,7 @@ public class Predicate extends AbsPart {
 	/** escape ' with ''<br>
 	 * Predicate's default escape is false?*/
 	boolean escape = false;
-	/** escape ' with ''
+	/** enable escape - replace ' with ''. (default true)
 	 * @param esc
 	 * @return this
 	 */

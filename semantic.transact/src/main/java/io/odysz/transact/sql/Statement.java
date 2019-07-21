@@ -127,7 +127,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return where(new Condit(pred), new Condit[0]);
 	}
 
-	/**
+	/**Set 'where' clause conditions with 'AND' logic.
 	 * @param condt
 	 * @param ands
 	 * @return current Statement object

@@ -91,7 +91,6 @@ public class Logic {
 			return op;
 		}
 	
-	
 		private String likeOp(ISemantext sctx, String op) {
 			return rlikeOp(sctx, llikeOp(sctx, op));
 		}
