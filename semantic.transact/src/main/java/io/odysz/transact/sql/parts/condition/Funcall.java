@@ -118,7 +118,7 @@ public class Funcall extends ExprPart {
 	}
 	
 	/**@deprecated
-	 * @param dtype
+	 * @param args
 	 * @return Funcall object
 	 */
 	public static Funcall max(String... args) {

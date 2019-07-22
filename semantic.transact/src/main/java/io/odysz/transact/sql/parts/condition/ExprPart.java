@@ -10,7 +10,7 @@ import io.odysz.transact.x.TransException;
  * For the Antlr4 grammar, see <a href='https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4'>
  * Antlr4 grammars-v4/tsql/TSqlParser.g4</a>.<br>
  * For referencing grammar and how this is parsed, see {@link io.odysz.transact.sql.parts.antlr.ExprsVisitor}
- * and {@link io.odysz.transact.sql.parts.antlr.ExprsVisitor#visitExpression(ExpressionContextt) visit()};<br>
+ * and {@link io.odysz.transact.sql.parts.antlr.ExprsVisitor#visitExpression(gen.antlr.sql.exprs.SearchExprs.ExpressionContext)  ExprsVisitor.visitExpression()};<br>
  * Expression Grammar: <pre>
 // Expression.
 
@@ -187,7 +187,7 @@ public class ExprPart extends AbsPart {
 
 	boolean escape = true;
 	/**Stop escape the string value (replace ' with '')
-	 * @param v
+	 * @param esc
 	 * @return this
 	 */
 	public ExprPart escape(boolean esc) {

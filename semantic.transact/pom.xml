@@ -4,7 +4,7 @@
 
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
-  <version>0.9.2-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>semantic sql builder</name>
   <description>semantic sql builder</description>
 
@@ -79,7 +79,6 @@
 	  	</executions>
 	  </plugin>
 
-		<!-- 
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-release-plugin</artifactId>
@@ -98,7 +97,6 @@
 			</dependency>
 		</dependencies>
 	  </plugin>
-	   -->
 
 	  <plugin>
 		<groupId>org.sonatype.plugins</groupId>
@@ -106,7 +104,7 @@
 		<version>1.6.7</version>
 		<extensions>true</extensions>
 		<configuration>
-			<serverId>odys-z</serverId>
+			<serverId>ossrh</serverId>
 			<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 			<autoReleaseAfterClose>true</autoReleaseAfterClose>
 		</configuration>

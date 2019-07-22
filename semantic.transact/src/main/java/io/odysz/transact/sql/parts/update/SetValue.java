@@ -14,7 +14,7 @@ import io.odysz.transact.x.TransException;
 
 /**Support value list in update({@link SetList})
  * set value elem and insert values list
- * ({@link io.odysz.transact.sql.parts.insert.ValueList insert's-ValueList}).<br>
+ * ({@link io.odysz.transact.sql.parts.insert.ValueList insert-ValueList}).<br>
  * Value can only be:<br>
  * sub-query ({@link Query} statement),<br>
  * expression ({@link ExprPart}),<br>
