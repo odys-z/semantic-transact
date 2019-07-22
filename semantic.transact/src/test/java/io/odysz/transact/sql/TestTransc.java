@@ -293,6 +293,30 @@ public class TestTransc {
 	}
 
 	@Test
+	public void testCondtPrecedence() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_users")
+			.nv("userName", "abc-x01")
+			.where(Sql.condt("userId = 'admin'"))
+			.where(Sql.condt("userName = 'Washington' or userName = 'Washinton'"))
+			.commit(sqls);
+
+		assertEquals("update  a_users  set userName='abc-x01' where userId = 'admin' AND (userName = 'Washington' OR userName = 'Washinton') ",
+				sqls.get(0));
+
+		st.select("a_users", "u")
+			.j("a_org", "o", Sql.condt("u.orgId = o.orgId or (u.orgId = '%s' and (u.name <> '%s' or u.name <> '%s'))",
+					"ChaoYang People", "James Bond", "007"))
+			.commit(sqls);
+
+		// select * from a_users u 
+		// join a_org o on u.orgId = o.orgId OR
+		// (u.orgId = 'ChaoYang People' AND (u.name <> 'admin' OR u.name <> '007'))
+		assertEquals("select * from a_users u join a_org o on u.orgId = o.orgId OR (u.orgId = 'ChaoYang People' AND (u.name <> 'James Bond' OR u.name <> '007'))",
+				sqls.get(1));
+	}
+	
+	@Test
 	public void testInsertSelectPostUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_rolefunc")
