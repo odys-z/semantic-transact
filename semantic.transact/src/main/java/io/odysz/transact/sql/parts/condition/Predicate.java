@@ -83,10 +83,11 @@ public class Predicate extends AbsPart {
 
 	public Predicate(Logic.op op, String lp, String rp) {
 		this.op = op;
-		// this.l = new ExprPart(from);
-		// this.r = new ExprPart(rp);
 		this.l = lp == null ? null : ExprsVisitor.parse(lp);
-		this.r = rp == null ? null : ExprsVisitor.parse(rp);
+		this.r = rp == null ? null :
+			// for IN's rp, it's an array of expressions, ExprsVisitor can't parse it
+			op == Logic.op.in ? new ExprPart(rp)
+							  : ExprsVisitor.parse(rp);
 	}
 
 	public Predicate(Logic.op op, String lp, ExprPart rp) {
