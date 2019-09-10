@@ -124,6 +124,11 @@ public class LangExt {
 	}
 
 
+	/**Add a prefix to <i>dest</i> if it's not empty.
+	 * @param prefix
+	 * @param dest
+	 * @return prefixed string
+	 */
 	public static String prefixIfnull(String prefix, String dest) {
 		if (isblank(prefix) || dest.startsWith(prefix))
 			return dest;
