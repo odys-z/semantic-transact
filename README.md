@@ -37,13 +37,13 @@ can be committed in a batch operation. That's why it's named as "transact".
 
 At first sight, you may dislike this approach because it's somehow anti instinction - all
 programmers are already being comfort with SQL syntax. But when the SQL composing
-task became complicated, or have to be done according to data, remote request or
-data relationship, it's immediatly showing the advantages - you care about data,
-let semantic-transact handle SQL AST for you.
+tasks became complicated, or have to be done according to data at runtime, remote
+request or data relationship, it's immediatly showing the advantages - you care
+only about data, let semantic-transact handling SQL AST for you.
 
 # Quick Start
 
-Semantic-transact now released as a jar lib, which can be found at
+Semantic-transact 1.0.0 now is released as a jar package, which can be found at
 [maven central repository](https://search.maven.org/artifact/io.github.odys-z/semantics.transact)
 
 For maven project, in pom.xml
