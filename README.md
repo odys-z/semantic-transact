@@ -1,6 +1,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantic.transact/badge.svg)](https://search.maven.org/artifact/io.github.odys-z/semantics.transact)
 
-# Building SQL, the semantic-transact solution
+# About
+
+### Building SQL, the semantic-transact solution
 
 Semantic-transact is a sql builder providing structured API.
 
