@@ -72,7 +72,38 @@ public class TestTransc {
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND (userId = 'George' OR userId = 'Washington') AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
 	}
+	
+	@Test
+	public void testSelect_Union() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Query q2 = st.select("a_users", "u")
+			.j("a_roles", "r", Sql.condt("u.roleId=r.roleId and r.roleName='bourgeoisie'"))
+			.col("u.userName")
+			.col("r.roleName");
+		Query q1 = st.select("a_users", "u")
+			.j("a_roles", "r", Sql.condt("u.roleId=r.roleId and r.roleName='farmer'"))
+			.col("u.userName")
+			.col("r.roleName")
+			.except(q2);
 
+		st.select("a_users", "u")
+			.j("a_roles", "r", Sql.condt("u.roleId=r.roleId and r.roleName='nationalist'"))
+			.col("u.userName")
+			.col("r.roleName")
+			.asQueryExpr().union(q1, true)
+			.commit(sqls);
+
+		assertEquals("select u.userName, r.roleName from a_users u " +  
+				"join a_roles r on u.roleId = r.roleId AND r.roleName = 'nationalist' " + 
+				"union " + 
+				"(select u.userName, r.roleName from a_users u " + 
+				"join a_roles r on u.roleId = r.roleId AND r.roleName = 'farmer' " + 
+				"except " + 
+				"select u.userName, r.roleName from a_users u " + 
+				"join a_roles r on u.roleId = r.roleId AND r.roleName = 'bourgeoisie')",
+				sqls.get(0));
+	}
+	
 	@Test
 	public void testFunc() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();

@@ -104,6 +104,12 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, roperand));
 	}
 	
+	/**Append where clause, with arguments of array.<br>
+	 * Each element is arguments array is index by {@link io.odysz.transact.sql.Query.Ix Query.Ix}.
+	 * @param conds
+	 * @return this
+	 * @throws TransException
+	 */
 	public T where(ArrayList<Object[]> conds) throws TransException {
 		if (conds != null && conds.size() > 0)
 			for (Object[] cond : conds) 
@@ -205,7 +211,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**Wrapper of {@link #post(Statement)}.
 	/**Wrapper of {@link #post(Statement)}.
 	 * @param posts
 	 * @return

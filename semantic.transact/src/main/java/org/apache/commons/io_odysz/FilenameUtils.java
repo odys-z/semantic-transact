@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.io.odysz;
+package org.apache.commons.io_odysz;
 
 import java.io.File;
 import java.io.IOException;

@@ -21,6 +21,7 @@ import io.odysz.transact.sql.parts.select.JoinTabl.join;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
+import io.odysz.transact.sql.parts.select.SqlUnion;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -115,7 +116,6 @@ public class Query extends Statement<Query> {
 					}
 				}).collect(Collectors.joining(" "));
 		}
-
 	}
 
 	/**String Array Index definition. Not using java field for compliance with JS (without GWT).
@@ -163,22 +163,19 @@ public class Query extends Statement<Query> {
 	/**limit definition for sqlite
 	private String[] limitSqlit; */
 
-	/**
-	private SelectQry q;
-	private boolean allColumn;
-	Query(Transc transc, String tabl, String... alias) {
-		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
-		q = new SelectQry();
+	/**Is this object a query_expression or (true) a query_sepcification?
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre>
+	 * */
+	private boolean isQueryExpr = false;
 
-		Table tbl = transc.getTable(tabl);
-		if (alias != null && alias[0] != null)
-			tbl = new RejoinTable(tbl, alias[0]);
-
-		q.addFromTable(tbl);
-		allColumn = true;
-	}
-	*/
-
+	/**Array of unioned query [[0] union | except | intersect, [1] Query], ...<br>
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre> */
+	private ArrayList<SqlUnion> union_except_intersect;
+	
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
 	}
@@ -260,7 +257,6 @@ public class Query extends Statement<Query> {
 		JoinTabl joining = new JoinTabl(jt, withTabl, alias, onCondit);
 		j(joining);
 		return this;
-	
 	}
 
 	/**Inner or outer join
@@ -396,7 +392,67 @@ public class Query extends Statement<Query> {
 		this.limit = new String[] {lmtExpr, xpr2};
 		return this;
 	}
+
+	/**Union query sepecification or expresion(s)<br>
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre>
+	 * @param with
+	 * @param isExpression
+	 * @return
+	 */
+	public Query union(Query with, boolean ... isExpression) {
+		return sqlUnion(SqlUnion.UNION, with, isExpression);
+	}
+
+	/**Union query sepecification or expresion(s)<br>
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre>
+	 * @param with
+	 * @param isExpression
+	 * @return
+	 */
+	public Query except(Query with, boolean ... isExpression) {
+		return sqlUnion(SqlUnion.EXCEPT, with, isExpression);
+	}
+
+	private Query sqlUnion(int type, Query with, boolean[] asExpression) {
+		SqlUnion u = new SqlUnion(type, with,
+			asExpression != null && asExpression.length > 0 ?
+			asExpression[0] : false);
+		if (union_except_intersect == null)
+			union_except_intersect = new ArrayList<SqlUnion>();
+		union_except_intersect.add(u); 
+		return this;
+	}
+
+	/**Union query sepecification or expresion(s)<br>
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre>
+	 * @param with
+	 * @param isExpression
+	 * @return
+	 */
+	public Query intersect(Query with, boolean ... isExpression) {
+		return sqlUnion(SqlUnion.INTERSECT, with, isExpression);
+	}
 	
+	/**Take this instance as query_expression. 
+	 * Default is false.
+	 * grammar reference: <pre>sql_union
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+    ;</pre>
+	 * @param isExpression
+	 * @return
+	 */
+	public Query asQueryExpr(boolean ... isExpression) {
+		this.isQueryExpr = isExpression != null && isExpression.length > 0 ?
+				isExpression[0] : false;
+		return this;
+	}
+
 	@Override
 	public String sql(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
@@ -421,6 +477,15 @@ public class Query extends Statement<Query> {
 					// limit
 					(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
 						new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
+//						,
+//					union_except_intersect == null ? null
+//							: union_except_intersect
+//								.stream()
+//								.filter(e -> e != null)
+//								.map(m -> {
+//									// return ((Query)m[1]);
+//									return new ExprPart("");
+//								})
 			).filter(e -> e != null).map(m -> {
 				try {
 					return m == null ? "" : m.sql(sctx);
@@ -430,7 +495,22 @@ public class Query extends Statement<Query> {
 				}
 			});
 		
-		return s.collect(Collectors.joining(" "));
+		if (union_except_intersect != null)
+			 s = Stream.concat(s, union_except_intersect
+				.stream()
+				.filter(e -> e != null)
+				.map(m -> {
+					try {
+						return m.sql(sctx);
+					} catch (TransException e1) {
+						e1.printStackTrace();
+						return null;
+					}
+				}));
+		
+		return isQueryExpr
+				? s.collect(Collectors.joining(" ", "(", ")"))
+				: s.collect(Collectors.joining(" "));
 	}
 	
 	/**<p>Use this method to do post operation, a. k. a. for {@link Query} getting selected results -
@@ -471,7 +551,4 @@ public class Query extends Statement<Query> {
 		}
 		return null;
 	}
-
-
-
 }
