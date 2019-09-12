@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.odysz.FilenameUtils;
 
 import io.odysz.common.AESHelper;
 import io.odysz.common.LangExt;
