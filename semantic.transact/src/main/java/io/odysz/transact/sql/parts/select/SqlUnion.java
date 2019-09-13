@@ -9,6 +9,12 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
+/**
+ * grammar reference: <pre>sql_union
+: (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
+;</pre>
+ * @author odys-z@github.com
+ */
 public class SqlUnion extends AbsPart {
 	public static final int UNION = 1;
 	public static final int EXCEPT = 2;

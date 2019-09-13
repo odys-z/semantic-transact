@@ -171,13 +171,13 @@ public class Funcall extends ExprPart {
 		return f + ")";
 	}
 
-	/**<p>Generate sql for select statement used as "SelectElem",
-	 * append additional file reading handlers to context's onSelected handling.</p>
+	/**
 	 * What the handler is doing:<br>
 	 * 1. read file from the file of args[0]<br>
 	 * 2. set readed contents to the current row of contxt, with {@link ISemantext#setRs(String, String)}
 	 * @param context semantext
-	 * @param args [0] relative filepath (replacing contents), [1] select elem alias (to be replaced)
+	 * @param args <br>[0] relative filepath (replacing contents),
+	 * <br>[1] select elem alias (to be replaced)
 	 * @return sql for the SelectElem, a.k.a. args[0]
 	 */
 	private String sqlExtFile(ISemantext context, String[] args) {
@@ -190,29 +190,30 @@ public class Funcall extends ExprPart {
 			}
 
 			// Add extFile() handler to handle selected value
-			context.addOnSelectedHandler(
-				(stx, row, cols) -> {
-					// replace path value in selected results with the content of file
-					try {
-						int c = (Integer) cols.get(resultAlias.toUpperCase())[0];
-						c--; // in SResultset, column index start at 1
-						String fn = (String) row.get(c);
-						if (!LangExt.isblank(fn, "\\.", "\\*")) {
-							fn = FilenameUtils.concat(stx.containerRoot(), fn);
-							Path f = Paths.get(fn);
-							if (Files.exists(f) && !Files.isDirectory(f)) {
-								byte[] fi = Files.readAllBytes(f);
-								row.set(c, AESHelper.encode64(fi));
+			if (!context.hasOnSelectedHandler(Func.extFile.fid()))
+				context.addOnSelectedHandler(Func.extFile.fid(),
+					(stx, row, cols) -> {
+						// replace path value in selected results with the content of file
+						try {
+							int c = (Integer) cols.get(resultAlias.toUpperCase())[0];
+							c--; // in SResultset, column index start at 1
+							String fn = (String) row.get(c);
+							if (!LangExt.isblank(fn, "\\.", "\\*")) {
+								fn = FilenameUtils.concat(stx.containerRoot(), fn);
+								Path f = Paths.get(fn);
+								if (Files.exists(f) && !Files.isDirectory(f)) {
+									byte[] fi = Files.readAllBytes(f);
+									row.set(c, AESHelper.encode64(fi));
+								}
+								else {
+									Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);
+									row.set(c, "File not Found: " + fn);
+								}
 							}
-							else {
-								Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);
-								row.set(c, "File not Found: " + fn);
-							}
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				});
+					});
 		}
 		return args[0];
 	}

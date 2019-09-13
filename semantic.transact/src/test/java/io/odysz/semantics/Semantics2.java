@@ -53,7 +53,7 @@ import io.odysz.transact.x.TransException;
  * with null semantics, which will disable semantic supporting. 
  * @author ody
  */
-class Semantics2 {
+public class Semantics2 {
 	/**error code key word*/
 	public static final String ERR_CHK = "err_smtcs";;
 

@@ -197,10 +197,22 @@ public interface ISemantext {
 	 */
 	public void onSelected(Object resultset) throws SQLException, TransException;
 
-	/**Add an post selected operation. E.g. extFile Funcall will add a post file reading and replacing operation here.
+	/**Check is an operator already exists.
+	 * @param name handler name
+	 * @return true if has the named operater
+	 */
+	boolean hasOnSelectedHandler(String name);
+
+	/**Add an post selected operation.
+	 * <p>E.g. extFile Funcall will add a post file reading and replacing operation here.</p>
+	 * <p>Only one type of handler can be added to a context. Use {@link #hasOnSelectedHandler()}
+	 * to check is there a same type of handler already been added.</p>
+	 * <p>Operations are managed as a linked hash map. All rows are iterated and processed by
+	 * op one by one, from first to last, independently.</p>
+	 * <p>For each row, operations are iterated in the order of been added.</p>
 	 * @param op
 	 */
-	void addOnSelectedHandler(IPostSelectOperat op);
+	void addOnSelectedHandler(String name, IPostSelectOperat op);
 
 	/**Compose the v provide by client into target table column's value represented in sql,
 	 * whether add single quote or not.<br>

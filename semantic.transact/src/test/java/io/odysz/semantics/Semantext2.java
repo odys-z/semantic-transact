@@ -169,10 +169,15 @@ class Semantext2 implements ISemantext {
 	public void onSelected(Object resultset) throws SQLException, TransException { }
 
 	@Override
-	public void addOnSelectedHandler(IPostSelectOperat op) { }
-
-	@Override
 	public AbsPart composeVal(Object v, String tabl, String col) {
 		return Statement.composeVal(v, metas.get(tabl), col);
 	}
+
+	@Override
+	public boolean hasOnSelectedHandler(String name) {
+		return false;
+	}
+
+	@Override
+	public void addOnSelectedHandler(String name, IPostSelectOperat op) { }
 }
