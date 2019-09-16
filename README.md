@@ -1,4 +1,5 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantic.transact/badge.svg)](https://search.maven.org/artifact/io.github.odys-z/semantics.transact)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantic.transact/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantics.transact/)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # About
 
