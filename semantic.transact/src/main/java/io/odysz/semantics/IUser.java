@@ -16,7 +16,6 @@ import io.odysz.transact.x.TransException;
  */
 public interface IUser {
 	TableMeta meta();
-//	HashMap<String, Object> props = new HashMap<String, Object>();
 
 	/**The sqls is committed to database, do something for logging. 
 	 * If there are some operation needing to update db, return those sql statements.
@@ -47,25 +46,12 @@ public interface IUser {
 	/**user id */
 	String uid() ;
 	
-	/**Get any property other than uid.
-	 * @param prop
-	 * @return property value
-	 */
-//	Object get(String prop); // { return props.get(prop); };
-
-//	IUser set(String prop, Object v); // {
-//		props.put(prop, v);
-//		return this;
-//	};
-
 	IUser logAct(String funcName, String funcId);
 
 	default SemanticObject logout() { return null; }
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
-//	default String sessionKey() { return (String) get("s-key"); }
-//	default IUser sessionKey(String skey) { return set("s-key", skey); }
 	public String sessionKey();
 	public IUser sessionKey(String skey);
 
@@ -74,12 +60,7 @@ public interface IUser {
 	 * @return this
 	 * @throws TransException 
 	 */
-	public IUser notify(Object note) throws TransException; // {
-//		if (!props.containsKey("_notifies_"))
-//			props.put("_notifies_", new ArrayList<Object>());
-//		((ArrayList<Object>)props.get("_notifies_")).add(note);
-//		return this;
-//	}
+	public IUser notify(Object note) throws TransException;
 
 	/**Get notified string list.
 	 * @return notifyings
