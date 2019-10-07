@@ -31,6 +31,7 @@ Here is a simple example:
         .nv("parentId", "0")
         .commit(null, sqls);
 
+    // fullpath is auto handled by semantics context - ignore it now
     AssertEquals(
         "insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
         sqls.get(0));
@@ -38,7 +39,7 @@ Here is a simple example:
 All SQL string are accumulated in sqls. When this process completed, all statements
 can be committed in a batch operation. That's why it's named as "transact".
 
-At first sight, you may dislike this approach because it's somehow anti instinction - all
+At first sight, you may dislike this approach because it's somehow anti intuitive - all
 programmers are already being comfort with SQL syntax. But when the SQL composing
 tasks became complicated, or have to be done according to data at runtime, remote
 request or data relationship, it's immediatly showing the advantages - you care
@@ -60,7 +61,7 @@ For maven project, in pom.xml
 
 For examples, see the test cases:
 
-- [Pure transaction buliding without semantic context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/transact/sql/TestTransc.java)
+- [Pure transaction buliding without semantics context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/transact/sql/TestTransc.java)
 
 - [With help of semantics context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/semantics/SemanticsTest.java)
 
