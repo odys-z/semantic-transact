@@ -182,7 +182,7 @@ public class Insert extends Statement<Insert> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Insert values(ArrayList<ArrayList<?>> arrayList) throws TransException {
+	public Insert values(ArrayList<ArrayList<Object[]>> arrayList) throws TransException {
 		if (arrayList != null)
 			for (ArrayList<?> val : arrayList)
 				value((ArrayList<Object[]>)val);

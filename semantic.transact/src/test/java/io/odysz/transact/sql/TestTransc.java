@@ -238,7 +238,7 @@ public class TestTransc {
 		row2.remove(row2.size() -1);
 		row2.remove(row2.size() -1);
 		row2.remove(row2.size() -1);
-		ArrayList<ArrayList<?>> rows = new ArrayList<ArrayList<?>>() {
+		ArrayList<ArrayList<Object[]>> rows = new ArrayList<ArrayList<Object[]>>() {
 			{add(new ArrayList<Object[]>(){ {add(new String[] {});} });}
 			{add(row1);}
 			{add(null);}

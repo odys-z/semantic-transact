@@ -51,8 +51,8 @@ public class SemanticsTest {
 			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
 			sqls.get(0));
 		
-		ArrayList<ArrayList<?>> vals = new ArrayList<ArrayList<?>>();
-		ArrayList<String[]> r1 = new ArrayList<String[]>();
+		ArrayList<ArrayList<Object[]>> vals = new ArrayList<ArrayList<Object[]>>();
+		ArrayList<Object[]> r1 = new ArrayList<Object[]>();
 		r1.add(new String[] {"roleId", "r01"});
 		r1.add(new String[] {"funcId", "f01"});
 
@@ -177,7 +177,16 @@ public class SemanticsTest {
 		// WHERE decode("r"."stamp", NULL, sysdate, "r"."stamp") - sysdate > -0.1
 		st.select("b_reports", "r")
 			.j("b_repreocords", "rec", "r.repId = rec.repId")
-			.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1")
+
+			// TODO 
+			// TODO 
+			// TODO 
+			// TODO 
+			// TODO 
+			// TODO 
+			// bug: ExprsVisitor can not parse docode(...)
+			// line 1:7 mismatched input '"rx"' expecting {'BLOCKING_HIERARCHY', 'INIT', 'ROWCOUNT', 'AGGREGATE', 'AVG', 'BIGINT', 'BINARY BASE64', COUNT, 'COUNT_BIG', 'COUNTER', 'DATEADD', 'DATEDIFF', 'DATENAME', 'DATEPART', 'DAYS', FIRST, 'FIRST_VALUE', 'FOLLOWING', 'HOURS', 'IDENTITY_VALUE', 'INT', 'LAST', 'LAST_VALUE', 'LOW', MAX, MIN, 'MINUTES', 'NUMBER', 'ROW', 'ROW_NUMBER', 'STDEV', 'STDEVP', 'SUM', 'TIME', 'VAR', 'VARP', DECIMAL, ID, STRING, BINARY, FLOAT, REAL, '(', ')', '+', '-', '~'}
+			.where(">", "decode(\"rx\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1")
 			.commit(orclCxt, sqls);
 
 		assertEquals("select * from \"b_reports\" \"r\" join \"b_repreocords\" \"rec\" on \"r\".\"repId\" = \"rec\".\"repId\" where decode(\"r\".\"stamp\",null,sysdate,\"r\".\"stamp\") - sysdate > -0.1",
