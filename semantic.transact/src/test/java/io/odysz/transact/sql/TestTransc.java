@@ -71,6 +71,19 @@ public class TestTransc {
 
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND (userId = 'George' OR userId = 'Washington') AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
+
+			// 2019.10.12
+		st.select("Orders")
+			.col("Employees.LastName").col("COUNT(Orders.OrderID)", "NumberOfOrders")
+			.j("Employees", null, "Orders.EmployeeID = Employees.EmployeeID)")
+			.groupby("LastName")
+			.having("COUNT(Orders.OrderID) > 10")
+			.commit(sqls);
+		assertEquals("select Employees.LastName, COUNT(Orders.OrderID) NumberOfOrders "
+				+ "from Orders  join Employees null on Orders.EmployeeID = Employees.EmployeeID "
+				+ "group by LastName "
+				+ "having COUNT(Orders.OrderID) > 10",
+				sqls.get(3));
 	}
 	
 	@Test

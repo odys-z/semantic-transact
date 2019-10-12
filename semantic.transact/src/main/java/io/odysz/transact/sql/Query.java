@@ -16,6 +16,7 @@ import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.select.GroupbyList;
+import io.odysz.transact.sql.parts.select.Havings;
 import io.odysz.transact.sql.parts.select.JoinTabl;
 import io.odysz.transact.sql.parts.select.JoinTabl.join;
 import io.odysz.transact.sql.parts.select.OrderyList;
@@ -157,6 +158,8 @@ public class Query extends Statement<Query> {
 	public int page() { return pg; }
 	int pgSize;
 	public int size() { return pgSize; }
+
+	protected Condit havings;
 
 	/**limit definition for ms2k, mysql */
 	private Object[] limit;
@@ -357,6 +360,22 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	public Query having(String scond, Object... args) {
+		return having(Sql.condt(scond, args));
+	}
+
+	public Query having(Condit condt, Condit... ands) {
+		if (havings == null)
+			havings = condt;
+		else
+			havings = havings.and(condt);
+
+		if (ands != null)
+			for (Condit and : ands)
+				havings = havings.and(and);
+		return this;
+	}
+
 	/**<p>Update Limited Rows.</p>
 	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
 	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
@@ -472,20 +491,13 @@ public class Query extends Statement<Query> {
 					where,
 					// group by
 					groupList == null ? null : new GroupbyList(groupList),
+					// having
+					havings == null ? null : new Havings(havings),
 					// order by
 					orderList == null ? null : new OrderyList(orderList),
 					// limit
 					(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
 						new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
-//						,
-//					union_except_intersect == null ? null
-//							: union_except_intersect
-//								.stream()
-//								.filter(e -> e != null)
-//								.map(m -> {
-//									// return ((Query)m[1]);
-//									return new ExprPart("");
-//								})
 			).filter(e -> e != null).map(m -> {
 				try {
 					return m == null ? "" : m.sql(sctx);

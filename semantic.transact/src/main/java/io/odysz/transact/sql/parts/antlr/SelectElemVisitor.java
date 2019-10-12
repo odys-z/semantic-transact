@@ -214,16 +214,18 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 		if (list != null) {
 			ArrayList<ExprPart> lst = new ArrayList<ExprPart>();
 			for (Object exp : list) {
-				// FIXME no recursive expression visit here?
-				// lst.add(((ParserRuleContext)exp).getText());
-
-				// 2019 v 9.2 parse func args, at least find out full column name, for adding "" to oracle
+				// 2019 v 0.9.2 parse func args, at least find out full column name, for adding "" to oracle
 				ExprPart arg = ExprsVisitor.parse(((ParserRuleContext)exp).getText());
 				lst.add(arg);
 			}
 			return lst.toArray(new ExprPart[lst.size()]);
 		}
 		return null;
+	}
+
+	public static ExprPart[] funcArgs(ParserRuleContext exp) {
+		ExprPart arg = ExprsVisitor.parse(exp.getText());
+		return new ExprPart[] {arg};
 	}
 	
 }

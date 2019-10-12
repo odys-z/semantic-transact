@@ -171,7 +171,7 @@ public class SemanticsTest {
 			.commit(orclCxt, sqls);
 
 		// update  "a_roles"  set "roleName"=roleName || 'add 0 ' || 'add 1' where "roleId" = 'admin' AND "r"."stamp" > dateDiff("day", "r"."stamp", "sysdate")
-		assertEquals("update  \"a_roles\"  set \"roleName\"=\"roleName\" || 'add 0 ' || 'add 1' where \"roleId\" = 'admin' AND \"r\".\"stamp\" > dateDiff(\"day\", \"r\".\"stamp\", \"sysdate\") ",
+		assertEquals("update  \"a_roles\"  set \"roleName\"=\"roleName\" || 'add 0 ' || 'add 1' where \"roleId\" = 'admin' AND \"r\".\"stamp\" > dateDiff(day, \"r\".\"stamp\", sysdate) ",
 				sqls.get(0));
 		
 		// WHERE decode("r"."stamp", NULL, sysdate, "r"."stamp") - sysdate > -0.1
@@ -189,8 +189,10 @@ public class SemanticsTest {
 			.where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1")
 			.commit(orclCxt, sqls);
 
+		// "sysdate" won't work
+		// - all reserved words for oracle won't work
 		assertEquals("select * from \"b_reports\" \"r\" join \"b_repreocords\" \"rec\" on \"r\".\"repId\" = \"rec\".\"repId\" "
-				+ "where decode(\"r\".\"stamp\", null, \"sysdate\", \"r\".\"stamp\") - \"sysdate\" > - 0.1",
+				+ "where decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate > - 0.1",
 				sqls.get(1));
 	}
 	

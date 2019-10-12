@@ -11,6 +11,14 @@ import io.odysz.transact.x.TransException;
  */
 public class Colname extends ExprPart {
 
+	/**<p>Regex for reserved key words may presented like a column name in select element list.</p>
+	 * <p>Matched words like "SYSDATE" won't be quoted with "" if database is oracle.</p>
+	 * <p>This regex is case insensitive.</p>
+	 * <p>For oracle documents, see <a href='https://docs.oracle.com/cd/B19306_01/em.102/b40103/app_oracle_reserved_words.htm'>
+	 * Oracle Reserved Words</a>.</p>
+	 */
+	public static String regCantColumnOrcl = "(SYSDATE)|(OID)|(TIME)|(TIMESTAMP)|(UID)|(ZONE)|(INTERVAL)|(YEAR)|(MONTH)|(DAY)|(HOURE)|(MINUTE)|(SECOND)";
+
 	protected String c;
 	protected Alias tabl;
 
@@ -22,10 +30,16 @@ public class Colname extends ExprPart {
 	public String sql(ISemantext ctx) throws TransException {
 		if (ctx != null && ctx.dbtype() == dbtype.oracle)
 			return LangExt.isblank(tabl) ?
-					"\"" + c + "\"" : tabl.sql(ctx) + ".\"" + c + "\"";
+					cantOrclColname(c) ? c : "\"" + c + "\""
+					: tabl.sql(ctx) + ".\"" + c + "\"";
 		else
 			return LangExt.isblank(tabl) ?
 					c : tabl.sql(ctx) + "." + c;
+	}
+
+	private static boolean cantOrclColname(String col) {
+		return col == null ? true :
+			col.toUpperCase().matches(regCantColumnOrcl);
 	}
 
 	/**Parse the full column name, can distinguish constant like ".*"
@@ -49,8 +63,4 @@ public class Colname extends ExprPart {
 		this.tabl = new Alias(tbl);
 		return this;
 	}
-
-//	public String toUpperCase() {
-//		return a == null ? "" : a.toUpperCase();
-//	}
 }
