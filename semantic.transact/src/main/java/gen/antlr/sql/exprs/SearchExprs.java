@@ -946,9 +946,6 @@ public class SearchExprs extends Parser {
 
 	public static class ExpressionContext extends ParserRuleContext {
 		public Token op;
-		public ConstantContext constant() {
-			return getRuleContext(ConstantContext.class,0);
-		}
 		public Function_callContext function_call() {
 			return getRuleContext(Function_callContext.class,0);
 		}
@@ -960,6 +957,9 @@ public class SearchExprs extends Parser {
 		}
 		public Unary_operator_expressionContext unary_operator_expression() {
 			return getRuleContext(Unary_operator_expressionContext.class,0);
+		}
+		public Constant_expressionContext constant_expression() {
+			return getRuleContext(Constant_expressionContext.class,0);
 		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
@@ -1014,31 +1014,31 @@ public class SearchExprs extends Parser {
 			case 1:
 				{
 				setState(100);
-				constant();
+				function_call();
 				}
 				break;
 			case 2:
 				{
 				setState(101);
-				function_call();
+				full_column_name();
 				}
 				break;
 			case 3:
 				{
 				setState(102);
-				full_column_name();
+				bracket_expression();
 				}
 				break;
 			case 4:
 				{
 				setState(103);
-				bracket_expression();
+				unary_operator_expression();
 				}
 				break;
 			case 5:
 				{
 				setState(104);
-				unary_operator_expression();
+				constant_expression();
 				}
 				break;
 			}
@@ -1059,7 +1059,7 @@ public class SearchExprs extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(107);
-						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(108);
 						((ExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1072,7 +1072,7 @@ public class SearchExprs extends Parser {
 							consume();
 						}
 						setState(109);
-						expression(5);
+						expression(6);
 						}
 						break;
 					case 2:
@@ -1080,7 +1080,7 @@ public class SearchExprs extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(110);
-						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
+						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(111);
 						((ExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1093,7 +1093,7 @@ public class SearchExprs extends Parser {
 							consume();
 						}
 						setState(112);
-						expression(4);
+						expression(5);
 						}
 						break;
 					case 3:
@@ -1101,11 +1101,11 @@ public class SearchExprs extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(113);
-						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
+						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(114);
 						comparison_operator();
 						setState(115);
-						expression(3);
+						expression(4);
 						}
 						break;
 					case 4:
@@ -1113,11 +1113,11 @@ public class SearchExprs extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(117);
-						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 						setState(118);
 						assignment_operator();
 						setState(119);
-						expression(2);
+						expression(3);
 						}
 						break;
 					}
@@ -1194,7 +1194,7 @@ public class SearchExprs extends Parser {
 				setState(130);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==BLOCKING_HIERARCHY || _la==INIT || _la==ROWCOUNT || ((((_la - 396)) & ~0x3f) == 0 && ((1L << (_la - 396)) & ((1L << (AGGREGATE - 396)) | (1L << (AVG - 396)) | (1L << (BIGINT - 396)) | (1L << (BINARY_BASE64 - 396)) | (1L << (COUNT - 396)) | (1L << (COUNT_BIG - 396)) | (1L << (COUNTER - 396)))) != 0) || ((((_la - 460)) & ~0x3f) == 0 && ((1L << (_la - 460)) & ((1L << (DATEADD - 460)) | (1L << (DATEDIFF - 460)) | (1L << (DATENAME - 460)) | (1L << (DATEPART - 460)) | (1L << (DAYS - 460)) | (1L << (FIRST - 460)) | (1L << (FIRST_VALUE - 460)) | (1L << (FOLLOWING - 460)))) != 0) || ((((_la - 537)) & ~0x3f) == 0 && ((1L << (_la - 537)) & ((1L << (HOURS - 537)) | (1L << (IDENTITY_VALUE - 537)) | (1L << (INT - 537)) | (1L << (LAST - 537)) | (1L << (LAST_VALUE - 537)) | (1L << (LOW - 537)) | (1L << (MAX - 537)) | (1L << (MIN - 537)) | (1L << (MINUTES - 537)))) != 0) || _la==NUMBER || ((((_la - 697)) & ~0x3f) == 0 && ((1L << (_la - 697)) & ((1L << (ROW - 697)) | (1L << (ROW_NUMBER - 697)) | (1L << (STDEV - 697)) | (1L << (STDEVP - 697)) | (1L << (SUM - 697)) | (1L << (TIME - 697)))) != 0) || ((((_la - 773)) & ~0x3f) == 0 && ((1L << (_la - 773)) & ((1L << (VAR - 773)) | (1L << (VARP - 773)) | (1L << (DECIMAL - 773)) | (1L << (ID - 773)) | (1L << (STRING - 773)) | (1L << (BINARY - 773)) | (1L << (FLOAT - 773)) | (1L << (REAL - 773)) | (1L << (LR_BRACKET - 773)) | (1L << (PLUS - 773)) | (1L << (MINUS - 773)) | (1L << (BIT_NOT - 773)))) != 0)) {
+				if (_la==BLOCKING_HIERARCHY || _la==INIT || _la==NULL || _la==ROWCOUNT || ((((_la - 396)) & ~0x3f) == 0 && ((1L << (_la - 396)) & ((1L << (AGGREGATE - 396)) | (1L << (AVG - 396)) | (1L << (BIGINT - 396)) | (1L << (BINARY_BASE64 - 396)) | (1L << (COUNT - 396)) | (1L << (COUNT_BIG - 396)) | (1L << (COUNTER - 396)))) != 0) || ((((_la - 460)) & ~0x3f) == 0 && ((1L << (_la - 460)) & ((1L << (DATEADD - 460)) | (1L << (DATEDIFF - 460)) | (1L << (DATENAME - 460)) | (1L << (DATEPART - 460)) | (1L << (DAYS - 460)) | (1L << (FIRST - 460)) | (1L << (FIRST_VALUE - 460)) | (1L << (FOLLOWING - 460)))) != 0) || ((((_la - 537)) & ~0x3f) == 0 && ((1L << (_la - 537)) & ((1L << (HOURS - 537)) | (1L << (IDENTITY_VALUE - 537)) | (1L << (INT - 537)) | (1L << (LAST - 537)) | (1L << (LAST_VALUE - 537)) | (1L << (LOW - 537)) | (1L << (MAX - 537)) | (1L << (MIN - 537)) | (1L << (MINUTES - 537)))) != 0) || _la==NUMBER || ((((_la - 697)) & ~0x3f) == 0 && ((1L << (_la - 697)) & ((1L << (ROW - 697)) | (1L << (ROW_NUMBER - 697)) | (1L << (STDEV - 697)) | (1L << (STDEVP - 697)) | (1L << (SUM - 697)) | (1L << (TIME - 697)))) != 0) || ((((_la - 773)) & ~0x3f) == 0 && ((1L << (_la - 773)) & ((1L << (VAR - 773)) | (1L << (VARP - 773)) | (1L << (DECIMAL - 773)) | (1L << (ID - 773)) | (1L << (STRING - 773)) | (1L << (BINARY - 773)) | (1L << (FLOAT - 773)) | (1L << (REAL - 773)) | (1L << (LR_BRACKET - 773)) | (1L << (PLUS - 773)) | (1L << (MINUS - 773)) | (1L << (BIT_NOT - 773)))) != 0)) {
 					{
 					setState(129);
 					expression_list();
@@ -2345,13 +2345,13 @@ public class SearchExprs extends Parser {
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 4);
+			return precpred(_ctx, 5);
 		case 1:
-			return precpred(_ctx, 3);
+			return precpred(_ctx, 4);
 		case 2:
-			return precpred(_ctx, 2);
+			return precpred(_ctx, 3);
 		case 3:
-			return precpred(_ctx, 1);
+			return precpred(_ctx, 2);
 		}
 		return true;
 	}
@@ -2398,10 +2398,10 @@ public class SearchExprs extends Parser {
 		"\2WX\7\u0337\2\2XY\5\2\2\2YZ\7\u0338\2\2Z\\\3\2\2\2[?\3\2\2\2[C\3\2\2"+
 		"\2[L\3\2\2\2[S\3\2\2\2[W\3\2\2\2\\\t\3\2\2\2]b\5\f\7\2^_\7\u0339\2\2_"+
 		"a\5\f\7\2`^\3\2\2\2ad\3\2\2\2b`\3\2\2\2bc\3\2\2\2c\13\3\2\2\2db\3\2\2"+
-		"\2ef\b\7\1\2fl\5$\23\2gl\5\16\b\2hl\5\24\13\2il\5\32\16\2jl\5\30\r\2k"+
-		"e\3\2\2\2kg\3\2\2\2kh\3\2\2\2ki\3\2\2\2kj\3\2\2\2l}\3\2\2\2mn\f\6\2\2"+
-		"no\t\2\2\2o|\5\f\7\7pq\f\5\2\2qr\t\3\2\2r|\5\f\7\6st\f\4\2\2tu\5\36\20"+
-		"\2uv\5\f\7\5v|\3\2\2\2wx\f\3\2\2xy\5 \21\2yz\5\f\7\4z|\3\2\2\2{m\3\2\2"+
+		"\2ef\b\7\1\2fl\5\16\b\2gl\5\24\13\2hl\5\32\16\2il\5\30\r\2jl\5\34\17\2"+
+		"ke\3\2\2\2kg\3\2\2\2kh\3\2\2\2ki\3\2\2\2kj\3\2\2\2l}\3\2\2\2mn\f\7\2\2"+
+		"no\t\2\2\2o|\5\f\7\bpq\f\6\2\2qr\t\3\2\2r|\5\f\7\7st\f\5\2\2tu\5\36\20"+
+		"\2uv\5\f\7\6v|\3\2\2\2wx\f\4\2\2xy\5 \21\2yz\5\f\7\5z|\3\2\2\2{m\3\2\2"+
 		"\2{p\3\2\2\2{s\3\2\2\2{w\3\2\2\2|\177\3\2\2\2}{\3\2\2\2}~\3\2\2\2~\r\3"+
 		"\2\2\2\177}\3\2\2\2\u0080\u0089\5\20\t\2\u0081\u0082\5\22\n\2\u0082\u0084"+
 		"\7\u0337\2\2\u0083\u0085\5\n\6\2\u0084\u0083\3\2\2\2\u0084\u0085\3\2\2"+

@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import gen.antlr.sql.exprs.SearchExprs;
-import gen.antlr.sql.exprs.SearchExprs.ConstantContext;
+import gen.antlr.sql.exprs.SearchExprs.Constant_expressionContext;
 import gen.antlr.sql.exprs.SearchExprs.ExpressionContext;
 import gen.antlr.sql.exprs.SearchExprs.Full_column_nameContext;
 import gen.antlr.sql.exprs.SearchExprs.Function_callContext;
@@ -132,7 +132,7 @@ expression
 	 */
 	@Override
 	public ExprPart visitExpression(ExpressionContext ctx) {
-		ConstantContext constant = ctx.constant();
+		Constant_expressionContext constant = ctx.constant_expression();
 		if (constant != null)
 			return new ExprPart(constant.getText());
 		
@@ -148,13 +148,20 @@ expression
 
 		Unary_operator_expressionContext uni_op = ctx.unary_operator_expression();
 		if (uni_op != null)
-			return new ExprPart(Logic.op(uni_op.getText()), ctx.expression().get(0).getText(), null);
+			return new ExprPart(Logic.op(uni_op.op.getText()), null, uni_op.expression().getText());
 		
 		if (ctx.op != null) {
 			String op = ctx.op.getText();
 			if (op != null)
-				return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
-						ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
+				// FIXME [recursive expression parse]
+				// Problem: expression operands can also an expression.
+				// See test case: SemanticsTest#testFuncallOrcl(), function decode of select.
+				// This feature is only needed for oracle
+//				return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
+//						ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
+				return new ExprPart(Logic.op(op),
+						parse(ctx.expression().get(0).getText()),
+						ctx.expression().size() > 1 ? parse(ctx.expression().get(1).getText()) : null);
 		}
 
 		return new ExprPart(ctx.getText());

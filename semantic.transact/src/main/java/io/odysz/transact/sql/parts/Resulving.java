@@ -22,7 +22,8 @@ public class Resulving extends ExprPart {
 	private String tabl;
 
 	public Resulving(String tabl, String autok) {
-		super(op.eq, null, null);
+		// super(op.eq, null, null);
+		super(op.eq, "", "");
 		this.tabl = tabl;
 		this.autok = autok;
 	}

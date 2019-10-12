@@ -6,7 +6,7 @@ import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.x.TransException;
 
-/**Expression Nodet.
+/**Expression Node.
  * For the Antlr4 grammar, see <a href='https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4'>
  * Antlr4 grammars-v4/tsql/TSqlParser.g4</a>.<br>
  * For referencing grammar and how this is parsed, see {@link io.odysz.transact.sql.parts.antlr.ExprsVisitor}
@@ -144,8 +144,8 @@ simple_id
 public class ExprPart extends AbsPart {
 	private boolean isNull;
 	private op logic;
-	private String lexp;
-	private String rexp;
+	private Object lexp;
+	private Object rexp;
 
 	/**Create an expression.
 	 * @param op operator, not necessarily a logical one, can also a mathematical one.
@@ -153,6 +153,19 @@ public class ExprPart extends AbsPart {
 	 * @param rexp
 	 */
 	public ExprPart(op op, String lexp, String rexp) {
+		this.logic =op;
+		this.lexp = lexp;
+		this.rexp = rexp;
+		this.isNull = false;
+	}
+
+	/**2019.10.12: operand and also be an expression.<br>
+	 * Create an expression.
+	 * @param op
+	 * @param lexp
+	 * @param rexp
+	 */
+	public ExprPart(op op, ExprPart lexp, ExprPart rexp) {
 		this.logic =op;
 		this.lexp = lexp;
 		this.rexp = rexp;
@@ -219,12 +232,31 @@ public class ExprPart extends AbsPart {
 			return "null";
 		if (logic == null)
 			// return lexp == null ? "" : lexp;
-			return lexp == null ? "" : escape ? Sql.filterVal(lexp) : lexp;
+//			return lexp == null ? ""
+//					: escape && lexp instanceof String ? 
+//							Sql.filterVal((String) lexp)
+//							: ((ExprPart)lexp).sql(ctx);
+			return expString(lexp, ctx);
 		else {
-			return String.format("%s %s",
-				// lexp == null ? "" : lexp,
-				lexp == null ? "" : escape? Sql.filterVal(lexp) : lexp,
-				logic.sql(ctx, logic, rexp == null ? "" : rexp));
+//			return String.format("%s %s",
+//				lexp == null ? "" : escape && lexp instanceof String ? Sql.filterVal((String)lexp) : lexp,
+//				logic.sql(ctx, logic, rexp == null ? ""
+//						: rexp instanceof String ? (String)rexp : ((ExprPart)rexp).sql(ctx)));
+			return lexp == null ? 
+					logic.sql(ctx, logic, expString(rexp, ctx)) :
+					String.format("%s %s",
+						expString(lexp, ctx),
+						logic.sql(ctx, logic, expString(rexp, ctx)));
 		}
+	}
+	
+	private String expString(Object exp, ISemantext ctx) throws TransException {
+		if (exp == null)
+			return null;
+		else if (escape && exp instanceof String)
+			return Sql.filterVal((String) exp);
+		else if (exp instanceof ExprPart)
+			return ((ExprPart)exp).sql(ctx);
+		else return exp.toString();
 	}
 }

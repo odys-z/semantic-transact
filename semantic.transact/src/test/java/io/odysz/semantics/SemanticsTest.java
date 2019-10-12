@@ -178,18 +178,19 @@ public class SemanticsTest {
 		st.select("b_reports", "r")
 			.j("b_repreocords", "rec", "r.repId = rec.repId")
 
-			// TODO 
-			// TODO 
-			// TODO 
-			// TODO 
-			// TODO 
-			// TODO 
-			// bug: ExprsVisitor can not parse docode(...)
-			// line 1:7 mismatched input '"rx"' expecting {'BLOCKING_HIERARCHY', 'INIT', 'ROWCOUNT', 'AGGREGATE', 'AVG', 'BIGINT', 'BINARY BASE64', COUNT, 'COUNT_BIG', 'COUNTER', 'DATEADD', 'DATEDIFF', 'DATENAME', 'DATEPART', 'DAYS', FIRST, 'FIRST_VALUE', 'FOLLOWING', 'HOURS', 'IDENTITY_VALUE', 'INT', 'LAST', 'LAST_VALUE', 'LOW', MAX, MIN, 'MINUTES', 'NUMBER', 'ROW', 'ROW_NUMBER', 'STDEV', 'STDEVP', 'SUM', 'TIME', 'VAR', 'VARP', DECIMAL, ID, STRING, BINARY, FLOAT, REAL, '(', ')', '+', '-', '~'}
-			.where(">", "decode(\"rx\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1")
+			// bug fixed 2019.10.12
+			// FIX ME [recursive expression parse]
+			// The correct call for oracle should be (no quotes):
+			// .where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1")
+			// But the ExprsVisitor#parse() can only handle operands of string
+			// This feature is only needed for oracle
+			// FIX: ExprPart is the expression object, now can constructed from op, l-expr, r-expr.
+			//      Then function argument list now can be parsed as ExprPart, which now can use column_name
+			.where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1")
 			.commit(orclCxt, sqls);
 
-		assertEquals("select * from \"b_reports\" \"r\" join \"b_repreocords\" \"rec\" on \"r\".\"repId\" = \"rec\".\"repId\" where decode(\"r\".\"stamp\",null,sysdate,\"r\".\"stamp\") - sysdate > -0.1",
+		assertEquals("select * from \"b_reports\" \"r\" join \"b_repreocords\" \"rec\" on \"r\".\"repId\" = \"rec\".\"repId\" "
+				+ "where decode(\"r\".\"stamp\", null, \"sysdate\", \"r\".\"stamp\") - \"sysdate\" > - 0.1",
 				sqls.get(1));
 	}
 	

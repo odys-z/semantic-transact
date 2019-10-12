@@ -2,8 +2,8 @@
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * section select_statement, seach_conditon_list and expression
  * compile:
- * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
- * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
+ * java -jar ~/antlr4/antlr-4.7.1-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
+ * java -jar ~/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
  */
  
 
@@ -38,9 +38,9 @@ expression_list
     ;
 
 expression
-    // : primitive_expression    <- ody: replaced by constant
-    : constant
-    | function_call
+    // : primitive_expression    <- ody: 2019.10.12 replaced by constant_expression
+    // : primitive_expression    <- ody: v1.0 replaced by constant
+    : function_call
     | full_column_name
     | bracket_expression
     | unary_operator_expression
@@ -48,6 +48,7 @@ expression
     | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     | expression assignment_operator expression
+    | constant_expression
     ;
 
 function_call

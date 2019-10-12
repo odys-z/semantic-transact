@@ -220,10 +220,14 @@ public class Funcall extends ExprPart {
 
 	private static String sqlConcat(ISemantext ctx, String[] args) {
 		dbtype dt = ctx.dbtype();
-		if (dt != dbtype.mysql && dt != dbtype.oracle
-			&& dt != dbtype.sqlite && dt != dbtype.ms2k)
-			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
-		return Stream.of(args).collect(Collectors.joining(" || "));
+//		if (dt == dbtype.oracle)
+//			?;
+//		else {
+			if (dt != dbtype.mysql && dt != dbtype.oracle
+					&& dt != dbtype.sqlite && dt != dbtype.ms2k)
+				Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
+			return Stream.of(args).collect(Collectors.joining(" || "));
+//		}
 	}
 
 	/**
