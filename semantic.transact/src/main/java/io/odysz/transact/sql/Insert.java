@@ -160,8 +160,10 @@ public class Insert extends Statement<Insert> {
 			if (nv != null && nv[1] != null)
 				notNull = true;
 
-			String v = (String) nv[1];
-			String n = (String) nv[0];
+//			String v = (String) nv[1];
+//			String n = (String) nv[0];
+			String v = nv[1].toString();
+			String n = nv[0].toString();
 
 			// v must be String constant or number, etc.
 			val.set(i, new Object[] {n, composeVal(v, mt, n)});

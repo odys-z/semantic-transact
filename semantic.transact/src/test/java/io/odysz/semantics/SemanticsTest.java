@@ -179,7 +179,7 @@ public class SemanticsTest {
 			.j("b_repreocords", "rec", "r.repId = rec.repId")
 
 			// bug fixed 2019.10.12
-			// FIX ME [recursive expression parse]
+			// [recursive expression parse]
 			// The correct call for oracle should be (no quotes):
 			// .where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1")
 			// But the ExprsVisitor#parse() can only handle operands of string
@@ -187,6 +187,13 @@ public class SemanticsTest {
 			// FIX: ExprPart is the expression object, now can constructed from op, l-expr, r-expr.
 			//      Then function argument list now can be parsed as ExprPart, which now can use column_name
 			.where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1")
+
+			// ISSUE 2019.10.14 [Antlr4 visitor doesn't throw exception when parsing failed]
+			// For a quoted full column name like "r"."stamp", in
+			// .where(">", "decode(\"r\".\"stamp\", null, sysdate, r.stamp) - sysdate", "-0.1")
+			// Antlr4.7.1/2 only report an error in console error output:
+			// line 1:7 no viable alternative at input 'decode("r"'
+			// This makes semantic-jserv won't report error until Oracle complain about sql error.
 			.commit(orclCxt, sqls);
 
 		// "sysdate" won't work
