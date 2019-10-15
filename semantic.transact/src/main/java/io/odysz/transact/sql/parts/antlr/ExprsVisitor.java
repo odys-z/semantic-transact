@@ -1,7 +1,5 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import java.util.ArrayList;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -141,12 +139,14 @@ expression
 		Function_callContext fc = ctx.function_call();
 		if (fc != null) {
 			if (fc.aggregate_windowed_function() != null)
-				return new Funcall(fc.aggregate_windowed_function().getText(),
-					// SelectElemVisitor.funcArgs(new ArrayList() { { add(fc.aggregate_windowed_function().full_column_name()); }}));
-					SelectElemVisitor.funcArgs(fc.aggregate_windowed_function().full_column_name()));
+				return new Funcall(
+						fc.aggregate_windowed_function().getChild(0).getText(),
+						SelectElemVisitor.funcArgs(fc.aggregate_windowed_function().full_column_name()));
 			else
-				return new Funcall(fc.func_proc_name().getText(),
-					SelectElemVisitor.funcArgs(fc.expression_list().expression()));
+				return new Funcall(
+						fc.func_proc_name().getText(),
+						SelectElemVisitor.funcArgs(fc.expression_list() == null ?
+									null : fc.expression_list().expression()));
 		}
 
 		Full_column_nameContext fn = ctx.full_column_name();

@@ -19,7 +19,7 @@ public class Havings extends AbsPart {
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
 		return Stream.of("having", condits.sql(sctx))
-				.collect(Collectors.joining(", ", "having ", ""));
+				.collect(Collectors.joining(" "));
 	}
 
 }

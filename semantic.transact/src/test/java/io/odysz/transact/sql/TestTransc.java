@@ -133,6 +133,35 @@ public class TestTransc {
 				sqls.get(0));
 	}
 	
+	/**<pre>aggregate_windowed_function
+    : (AVG | MAX | MIN | SUM | STDEV | STDEVP | VAR | VARP)
+      '(' full_column_name ')'
+    | (COUNT | COUNT_BIG)
+      '(' ('*' | full_column_name) ')'
+    ; </pre>
+	 * @throws TransException
+	 */
+	@Test
+	public void testAggregateFunc() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.select("a_funcs", "f")
+			.col("STDEV(notes)", "notes")
+			.col("AVG(col1)", "avgcol")
+			.j("a_rolefunc", "rf", Sql.condt("COUNT(Orders.OrderID) > 5"))
+			.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)")
+			.groupby("max(col2) > 3")
+			.having("sum(Orders.OrderID) > 10")
+			.commit(st.instancontxt(null, null), sqls);
+
+		// Utils.logi(sqls.get(0));
+		assertEquals("select STDEV(notes) notes, AVG(col1) avgcol from a_funcs f "
+				+ "join a_rolefunc rf on COUNT(Orders.OrderID) > 5 "
+				+ "where r.stamp > dateDiff(day, r.stamp, sysdate) "
+				+ "group by max(col2) > 3 "
+				+ "having sum(Orders.OrderID) > 10",
+				sqls.get(0));
+	}
+	
 	@Test
 	public void testInsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();

@@ -51,7 +51,7 @@ public class PredicatVisitor extends SearchExprsBaseVisitor<Predicate> {
 
 		List<ExprPart> exprs = ctx.expression()
 				.stream()
-				.map(expr -> expr.accept(expvisit))
+				.map(exprCtx -> exprCtx.accept(expvisit))
 				.collect(Collectors.toList());
 
 		boolean not = ctx.NOT() != null;
