@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import io.odysz.anson.Anson;
 import io.odysz.transact.x.TransException;
 
 /**<p>The semantics data used internally by semantic-DA to handle semantics configuration.</p>
@@ -20,7 +21,7 @@ import io.odysz.transact.x.TransException;
  * 
  * @author odys-z@github.com
  */
-public class SemanticObject extends Object {
+public class SemanticObject extends Anson {
 
 	protected HashMap<String, Object> props;
 	public HashMap<String, Object> props() { return props; }
@@ -38,8 +39,8 @@ public class SemanticObject extends Object {
 				: p.getClass();
 	}
 
-	public boolean has(String tabl) {
-		return props != null && props.containsKey(tabl) && props.get(tabl) != null;
+	public boolean has(String prop) {
+		return props != null && props.containsKey(prop) && props.get(prop) != null;
 	}
 
 	public Object get(String prop) {
