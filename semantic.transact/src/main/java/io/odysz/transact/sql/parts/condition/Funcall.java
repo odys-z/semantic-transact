@@ -110,10 +110,9 @@ public class Funcall extends ExprPart {
 	}
 	
 	/**Create a now() sql function.
-	 * @param dtype
 	 * @return Funcall object
 	 */
-	public static Funcall now (dbtype dtype) {
+	public static Funcall now () {
 		return new Funcall(Func.now);
 	}
 	
