@@ -24,7 +24,7 @@ public class ExprPartTest {
 		assertEquals("tabl.col + 1", e.sql(null));
 
 		e = ExprsVisitor.parse("tabl.col + 1 * 100");
-		assertEquals("tabl.col + 1*100", e.sql(null));
+		assertEquals("tabl.col + 1 * 100", e.sql(null));
 
 		e = ExprsVisitor.parse("''");
 		assertEquals("''", e.sql(null));

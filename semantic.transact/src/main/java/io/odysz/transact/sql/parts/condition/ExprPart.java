@@ -219,7 +219,7 @@ public class ExprPart extends AbsPart {
 		String v;
 			try {
 				v = sql(null);
-				return v.replaceAll("^'|'$", "");
+				return v == null ? null : v.replaceAll("^'|'$", "");
 			} catch (TransException e) {
 				e.printStackTrace();
 				return e.getMessage();
