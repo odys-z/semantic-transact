@@ -32,7 +32,7 @@ public class Delete extends Statement<Delete>  {
 
 	public Delete commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		if ((where == null || where.isEmpty()))
-			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletiong with conditions.");
+			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletion with conditions.");
 		
 		if (cxt != null)
 			cxt.onDelete(this, mainTabl.name(), where);
