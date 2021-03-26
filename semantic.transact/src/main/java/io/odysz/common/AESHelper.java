@@ -47,6 +47,9 @@ public class AESHelper {
 		}
     }
 
+	/**TODO move to test
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		String s = "plain text 1";
 		byte[] iv = getRandom();

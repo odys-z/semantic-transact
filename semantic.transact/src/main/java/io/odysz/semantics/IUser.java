@@ -52,8 +52,8 @@ public interface IUser {
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
-	public String sessionKey();
-	public IUser sessionKey(String skey);
+	// public String sessionId();
+	public IUser sessionId(String ssId);
 
 	/**Add notifyings
 	 * @param n

@@ -340,10 +340,11 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public void groupby(String[] groups) {
+	public Query groupby(String[] groups) {
 		if (groups != null && groups.length > 0)
 			for (String g : groups)
 				groupby(g);
+		return this;
 	}
 	
 	public Query orderby(String col, String... desc) {
@@ -353,6 +354,10 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	/**set query orders
+	 * @param orders [ [col, desc], ...]
+	 * @return
+	 */
 	public Query orderby(ArrayList<String[]> orders) {
 		if (orders != null && orders.size() > 0)
 			for (String[] order : orders)
