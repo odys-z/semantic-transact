@@ -361,7 +361,7 @@ public class Query extends Statement<Query> {
 	public Query orderby(ArrayList<String[]> orders) {
 		if (orders != null && orders.size() > 0)
 			for (String[] order : orders)
-				orderby(order[0], order[1]);
+				orderby(order[0], order.length > 1 ? order[1] : "asc");
 		return this;
 	}
 
