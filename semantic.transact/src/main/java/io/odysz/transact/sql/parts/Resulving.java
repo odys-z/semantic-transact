@@ -11,7 +11,7 @@ import io.odysz.transact.x.TransException;
  * <p>Design Memo:<br>
  * If leting Resulving can resolve post fk value, all statement tree nodes
  * must traveled by a pre-inserting event handler, that's not possible to
- * remember all generated key if there are to nodes inserting the same table.<br>
+ * remember all generated key if there are two nodes inserting the same table.<br>
  * So statement tree events do not travel across sub-trees is a rule of the design.
  * Then it's impossible to post resolve children pk using Resulving.</p>
  * @author odys-z@github.com
