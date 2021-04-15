@@ -40,8 +40,8 @@ public interface IUser {
 	default void touch() {}
 
 	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
-	 * Default: 20 minutes */
-	default long touchedMs() { return 20 * 60 * 1000; }
+	 */
+	long touchedMs(); // { return 20 * 60 * 1000; }
 
 	/**user id */
 	String uid() ;
