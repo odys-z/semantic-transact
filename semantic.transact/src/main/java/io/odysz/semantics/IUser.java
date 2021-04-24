@@ -11,8 +11,11 @@ import io.odysz.transact.x.TransException;
  * <p>This is not necessary if using semantic-transact directly. But if the caller
  * want to set user information like fingerpirnt for modified records, this can be used
  * to let semantic-transact providing user identity to the semantics handler.</p>
+ * 
+ * <p>In v1.1.1, sessionId is read only. If a new password bee updated,
+ * just remove then re-login</p>
+ * 
  * @author ody
- *
  */
 public interface IUser {
 	TableMeta meta();
@@ -34,6 +37,10 @@ public interface IUser {
 	 */
 	default boolean login(Object request) throws TransException { return false; }
 
+	/**A session Id can never be changed.
+	 * If a new password been updated, just remove the session and re-login.
+	 * @return
+	 */
 	default String sessionId() { return null; }
 
 	/**Update last touched time stamp.*/
@@ -41,7 +48,7 @@ public interface IUser {
 
 	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
 	 */
-	long touchedMs(); // { return 20 * 60 * 1000; }
+	long touchedMs();
 
 	/**user id */
 	String uid() ;
@@ -51,9 +58,6 @@ public interface IUser {
 	default SemanticObject logout() { return null; }
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
-
-	// public String sessionId();
-	public IUser sessionId(String ssId);
 
 	/**Add notifyings
 	 * @param n
@@ -66,4 +70,8 @@ public interface IUser {
 	 * @return notifyings
 	 */
 	public List<Object> notifies();
+
+	public IUser sessionKey(String string);
+
+	public String sessionKey();
 }
