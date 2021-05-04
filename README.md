@@ -60,12 +60,12 @@ only about data, let semantic-transact handling SQL AST for you.
 Semantic-transact is released as a jar package, which can be found at
 [maven central repository](https://search.maven.org/artifact/io.github.odys-z/semantics.transact)
 
-For maven project, in pom.xml
+For maven project, to use the latest package, in pom.xml
 ~~~
     <dependency>
         <groupId>io.github.odys-z</groupId>
         <artifactId>semantics.transact</artifactId>
-        <version>1.1.0</version>
+        <version>[1.1.3,)</version>
     </dependency>
 ~~~
 For latest released version, see [releas notes](release-notes.md).
