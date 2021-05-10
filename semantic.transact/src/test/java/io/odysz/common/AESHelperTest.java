@@ -41,9 +41,10 @@ public class AESHelperTest {
 				AESHelper.decode64(iv));
 		assertEquals("Plain Text", plain.trim());
 		
-		key = "----------123456";
 		plain = "-----------admin";
-		assertEquals("NLy7ldimKuNgOA8IlWqloA==",
+		key =   "----------123456";
+		iv = "ZqlZsmoC3SNd2YeTTCkbVw==";
+		assertEquals("3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM=",
 				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
 	}
 
