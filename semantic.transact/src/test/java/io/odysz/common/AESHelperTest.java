@@ -19,9 +19,16 @@ public class AESHelperTest {
 	DITVJZA2mSDAw496hBz6BA==
 	Expacting:
 	Plain Text</pre>
-	 * @throws IOException 
-	 * @throws GeneralSecurityException 
-	 * 
+
+	 * Case 2: user pswd (why c# AES padded an extra block in CBC?)<pre>
+	 uid:  "-----------admin"
+	 pswd: "----------123456"
+	 iv64: "ZqlZsmoC3SNd2YeTTCkbVw=="
+	 tk64: "3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM="
+	 </pre>
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 *
 	 */
 	@Test
 	public void testDecrypt() throws GeneralSecurityException, IOException {
