@@ -28,6 +28,12 @@ public class AESHelperTest {
 	 iv64: "ZqlZsmoC3SNd2YeTTCkbVw=="
 	 tk64: "3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM="
 	 </pre>
+	 * Case 3: AES-128/CBC/NoPadding</pre>
+	 uid:  "-----------admin"
+	 pswd: "----------123456"
+	 iv64: "CTpAnB/jSRQTvelFwmJnlA=="
+	 tk64: "WQiXlFCt5AGCabjSCkVh0Q=="
+	 </pre>
 	 * @throws IOException
 	 * @throws GeneralSecurityException
 	 *
@@ -40,7 +46,7 @@ public class AESHelperTest {
 		String plain = AESHelper.decrypt(cipher, key,
 				AESHelper.decode64(iv));
 		assertEquals("Plain Text", plain.trim());
-		
+
 		plain = "-----------admin";
 		key =   "----------123456";
 		iv = "ZqlZsmoC3SNd2YeTTCkbVw==";
