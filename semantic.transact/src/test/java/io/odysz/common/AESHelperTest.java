@@ -31,6 +31,11 @@ public class AESHelperTest {
 		String plain = AESHelper.decrypt(cipher, key,
 				AESHelper.decode64(iv));
 		assertEquals("Plain Text", plain.trim());
+		
+		key = "----------123456";
+		plain = "-----------admin";
+		assertEquals("NLy7ldimKuNgOA8IlWqloA==",
+				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
 	}
 
 }
