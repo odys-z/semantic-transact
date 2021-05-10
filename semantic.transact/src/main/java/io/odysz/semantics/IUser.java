@@ -74,4 +74,6 @@ public interface IUser {
 	public IUser sessionKey(String string);
 
 	public String sessionKey();
+
+	default IUser sessionId(String rad64num) { return this; }
 }

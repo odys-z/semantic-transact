@@ -1,7 +1,7 @@
 package io.odysz.common;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -50,7 +50,12 @@ public class AESHelperTest {
 		plain = "-----------admin";
 		key =   "----------123456";
 		iv = "ZqlZsmoC3SNd2YeTTCkbVw==";
-		assertEquals("3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM=",
+		// PCKS7 Padding results not suitable for here - AES-128/CBC/NoPadding
+		assertNotEquals("3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM=",
+				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
+		
+		iv = "CTpAnB/jSRQTvelFwmJnlA==";
+		assertEquals("WQiXlFCt5AGCabjSCkVh0Q==",
 				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
 	}
 
