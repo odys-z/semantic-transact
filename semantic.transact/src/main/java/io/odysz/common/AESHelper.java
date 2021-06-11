@@ -121,20 +121,20 @@ public class AESHelper {
         try {
 			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
-        byte[] output = new byte[((input.length)/16 + 2) * 16]; // + 1 will throw exception
+			byte[] output = new byte[((input.length)/16 + 2) * 16]; // + 1 will throw exception
 
-        // int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
-        // above code is incorrect (not working with PKCS#7 padding),
-        // check Apache Common Crypto User Guide:
-        // https://commons.apache.org/proper/commons-crypto/userguide.html
-        // Usage of Byte Array Encryption/Decryption, CipherByteArrayExample.java
-        int updateBytes = encipher.update(input, 0, input.length, output, 0);
-        //System.out.println("updateBytes " + updateBytes);
-        int finalBytes = encipher.doFinal(input, 0, 0, output, updateBytes);
-        //System.out.println("finalBytes " + finalBytes);
-        output = Arrays.copyOf(output, updateBytes + finalBytes);
-        encipher.close();
-        return output;
+			// int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
+			// above code is incorrect (not working with PKCS#7 padding),
+			// check Apache Common Crypto User Guide:
+			// https://commons.apache.org/proper/commons-crypto/userguide.html
+			// Usage of Byte Array Encryption/Decryption, CipherByteArrayExample.java
+			int updateBytes = encipher.update(input, 0, input.length, output, 0);
+			//System.out.println("updateBytes " + updateBytes);
+			int finalBytes = encipher.doFinal(input, 0, 0, output, updateBytes);
+			//System.out.println("finalBytes " + finalBytes);
+			output = Arrays.copyOf(output, updateBytes + finalBytes);
+			encipher.close();
+			return output;
 		} catch (GeneralSecurityException e) {
 			throw new GeneralSecurityException(e.getMessage());
 		}
