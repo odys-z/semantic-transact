@@ -62,7 +62,7 @@ public class Insert extends Statement<Insert> {
 //			if (verbose) Utils.warn(
 //				"Insert.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
 //				n, v);
-			throw new TransException("If using nv(), don't use cols() and value(); If using cols(), don't use nv().");
+			throw new TransException("n-v already exists. Duplicated rows? If using nv(), don't use cols() and value(); If using cols(), don't use nv().");
 		}
 		return this;
 	}
