@@ -22,7 +22,7 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Predicate;
 import io.odysz.transact.x.TransException;
 
-/**Statement like inert, update - the structured API.<br>
+/**Statement like insert, update - the structured API.<br>
  * Design Notes:<br>
  * Statement don't know semantic context. Only when committing, it's needed.
  * @author odys-z@github.com
