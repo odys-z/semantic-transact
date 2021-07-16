@@ -237,7 +237,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 	
-	public Query l(String withTabl, String alias, String onCondit) {
+	public Query l(String withTabl, String alias, String onCondit) throws TransException {
 		return j(join.l, withTabl, alias, onCondit);
 	}
 
@@ -245,7 +245,7 @@ public class Query extends Statement<Query> {
 		return j(join.l, select, alias, onCondit);
 	}
 
-	public Query r(String withTabl, String alias, String onCondit) {
+	public Query r(String withTabl, String alias, String onCondit) throws TransException {
 		return j(join.r, withTabl, alias, onCondit);
 	}
 
@@ -255,8 +255,11 @@ public class Query extends Statement<Query> {
 	 * @param alias
 	 * @param onCondit
 	 * @return current select statement
+	 * @throws TransException 
 	 */
-	public Query j(join jt, String withTabl, String alias, Condit onCondit) {
+	public Query j(join jt, String withTabl, String alias, Condit onCondit) throws TransException {
+		if (jt == null || withTabl == null || onCondit == null)
+			throw new TransException("Join condition is not correct.");
 		JoinTabl joining = new JoinTabl(jt, withTabl, alias, onCondit);
 		j(joining);
 		return this;
@@ -267,8 +270,9 @@ public class Query extends Statement<Query> {
 	 * @param withTabl
 	 * @param onCondit
 	 * @return current select statement
+	 * @throws TransException 
 	 */
-	public Query j(join jt, String withTabl, String alias, String onCondit) {
+	public Query j(join jt, String withTabl, String alias, String onCondit) throws TransException {
 		Condit condit = ConditVisitor.parse(onCondit);
 		j(jt, withTabl, alias, condit);
 		return this;
@@ -278,8 +282,9 @@ public class Query extends Statement<Query> {
 	 * @param withTabl
 	 * @param onCondit e.g "t.f1='a' t.f2='b'", 2 AND conditions
 	 * @return current select statement
+	 * @throws TransException 
 	 */
-	public Query j(String withTabl, Condit onCondit) {
+	public Query j(String withTabl, Condit onCondit) throws TransException {
 		return j(join.j, withTabl, null, onCondit);
 	}
 
@@ -315,8 +320,9 @@ public class Query extends Statement<Query> {
 	 * @param withTabl
 	 * @param onCondit
 	 * @return current select statement
+	 * @throws TransException 
 	 */
-	public Query j(String withTabl, String onCondit) {
+	public Query j(String withTabl, String onCondit) throws TransException {
 		Condit condit = ConditVisitor.parse(onCondit);
 		j(withTabl, condit);
 		return this;
