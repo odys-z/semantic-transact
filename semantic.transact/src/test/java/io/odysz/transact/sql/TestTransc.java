@@ -502,5 +502,14 @@ public class TestTransc {
 				sqls.get(0));
 		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
 				sqls.get(1));
+
+		st.update("a_roles")
+			.nvs(new ArrayList<Object[]>() {
+				private static final long serialVersionUID = 1L;
+				{add(new Object[] {"roleId", 1});} })
+			.where_("=", "roleId", "role 01")
+			.commit(sqls);
+		assertEquals("update  a_roles  set roleId=1 where roleId = 'role 01' ",
+				sqls.get(2));
 	}
 }

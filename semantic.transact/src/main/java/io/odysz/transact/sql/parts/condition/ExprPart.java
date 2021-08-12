@@ -198,6 +198,10 @@ public class ExprPart extends AbsPart {
 		return new ExprPart(String.valueOf(v));
 	}
 
+	public static AbsPart constVal(Object v) {
+		return new ExprPart(String.valueOf(v));
+	}
+
 	boolean escape = true;
 	/**Stop escape the string value (replace ' with '')
 	 * @param esc
@@ -231,17 +235,8 @@ public class ExprPart extends AbsPart {
 		if (isNull)
 			return "null";
 		if (logic == null)
-			// return lexp == null ? "" : lexp;
-//			return lexp == null ? ""
-//					: escape && lexp instanceof String ? 
-//							Sql.filterVal((String) lexp)
-//							: ((ExprPart)lexp).sql(ctx);
 			return expString(lexp, ctx);
 		else {
-//			return String.format("%s %s",
-//				lexp == null ? "" : escape && lexp instanceof String ? Sql.filterVal((String)lexp) : lexp,
-//				logic.sql(ctx, logic, rexp == null ? ""
-//						: rexp instanceof String ? (String)rexp : ((ExprPart)rexp).sql(ctx)));
 			return lexp == null ? 
 					logic.sql(ctx, logic, expString(rexp, ctx)) :
 					String.format("%s %s",
