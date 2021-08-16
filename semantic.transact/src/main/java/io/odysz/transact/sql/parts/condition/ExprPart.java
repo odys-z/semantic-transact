@@ -254,4 +254,8 @@ public class ExprPart extends AbsPart {
 			return ((ExprPart)exp).sql(ctx);
 		else return exp.toString();
 	}
+
+	public boolean isNull() {
+		return isNull;
+	}
 }
