@@ -512,4 +512,16 @@ public class TestTransc {
 		assertEquals("update  a_roles  set roleId=1 where roleId = 'role 01' ",
 				sqls.get(2));
 	}
+	
+	@Test
+	public void testWhereInArray() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_rolefunc")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.whereIn("roleId", new String[] {"01", "bb"})
+			.commit(sqls);
+
+		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleId in ('01', 'bb') ",
+				sqls.get(0));
+	}
 }

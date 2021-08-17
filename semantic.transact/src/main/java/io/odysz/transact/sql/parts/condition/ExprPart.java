@@ -1,5 +1,8 @@
 package io.odysz.transact.sql.parts.condition;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic.op;
@@ -172,9 +175,16 @@ public class ExprPart extends AbsPart {
 		this.isNull = false;
 	}
 
-	public ExprPart(String id) {
+	public ExprPart(String constv) {
 		this.logic = null;
-		lexp = id;
+		lexp = constv;
+		this.isNull = false;
+	}
+
+	// TAG: v1.3.0
+	public ExprPart(String[] constvs) {
+		this.logic = null;
+		lexp = constvs;
 		this.isNull = false;
 	}
 
@@ -252,6 +262,9 @@ public class ExprPart extends AbsPart {
 			return Sql.filterVal((String) exp);
 		else if (exp instanceof ExprPart)
 			return ((ExprPart)exp).sql(ctx);
+		// Tag v1.3.0
+		else if (exp instanceof String[])
+			return Stream.of((String[])exp).collect(Collectors.joining("', '", "'", "'"));
 		else return exp.toString();
 	}
 

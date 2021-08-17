@@ -10,7 +10,7 @@ public class AbsPartTest {
 
 	@Test
 	public void testIsblank() {
-		ExprPart nexpr = new ExprPart(null);
+		ExprPart nexpr = new ExprPart((String)null);
 		assertTrue(AbsPart.isblank(nexpr));
 
 		nexpr = new ExprPart("null");

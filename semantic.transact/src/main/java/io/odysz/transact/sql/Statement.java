@@ -3,6 +3,7 @@ package io.odysz.transact.sql;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.odysz.common.LangExt;
@@ -184,6 +185,20 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return where_("=", col, (String)v);
 		else
 			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
+	}
+	
+	/**Tag: v1.3.0
+	 * @param col
+	 * @param constv
+	 * @return
+	 */
+	public T whereIn(String col, String[] constv) {
+		ExprPart inOp = new ExprPart(constv);
+		return where(Sql.condt(Logic.op.in, col, inOp));
+	}
+
+	public T whereIn(String col, List<String> constvs) {
+		return whereIn(col, (String[]) constvs.toArray());
 	}
 
 	/**Add post semantics after the parent statement,
