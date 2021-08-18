@@ -1,3 +1,5 @@
 /target/
 main.net
 .classpath
+bin
+.settings
