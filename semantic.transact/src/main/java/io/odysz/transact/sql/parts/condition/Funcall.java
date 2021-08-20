@@ -50,6 +50,7 @@ public class Funcall extends ExprPart {
 		 * which will replace the uri with content of external file. 
 		 */
 		extFile("extfile"),
+		/** such as max, probably are the same for various DB */
 		dbSame("func");
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
