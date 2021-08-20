@@ -33,20 +33,20 @@ public class SelectElem extends ExprPart {
 
 
 	public SelectElem(ElemType elemType, String col) {
-		super(null);
+		super((String)null);
 		this.elemtype = elemType;
 		this.col = new Colname(col);
 	}
 
 	public SelectElem(ElemType type, String tabl, String col) {
-		super(null);
+		super((String)null);
 		this.elemtype = type;
 		this.tabl = new Alias(tabl);
 		this.col = new Colname(col);
 	}
 	
 	public SelectElem(ExprPart expr) {
-		super(null);
+		super((String)null);
 		this.elemtype = ElemType.expr;
 		this.expr = expr;
 	}

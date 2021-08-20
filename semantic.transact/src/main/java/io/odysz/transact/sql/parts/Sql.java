@@ -39,7 +39,7 @@ public class Sql {
 		return new Condit(op, loperand, part);
 	}
 	
-	/**Filter "'", replace with "''".
+	/**Filtering out "'", replaced with "''".
 	 * @param v
 	 * @return
 	 */

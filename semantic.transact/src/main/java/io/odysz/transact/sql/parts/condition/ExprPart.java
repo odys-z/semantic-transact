@@ -1,5 +1,8 @@
 package io.odysz.transact.sql.parts.condition;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic.op;
@@ -172,9 +175,16 @@ public class ExprPart extends AbsPart {
 		this.isNull = false;
 	}
 
-	public ExprPart(String id) {
+	public ExprPart(String constv) {
 		this.logic = null;
-		lexp = id;
+		lexp = constv;
+		this.isNull = false;
+	}
+
+	// TAG: v1.3.0
+	public ExprPart(String[] constvs) {
+		this.logic = null;
+		lexp = constvs;
 		this.isNull = false;
 	}
 
@@ -195,6 +205,10 @@ public class ExprPart extends AbsPart {
 	}
 
 	public static AbsPart constVal(int v) {
+		return new ExprPart(String.valueOf(v));
+	}
+
+	public static AbsPart constVal(Object v) {
 		return new ExprPart(String.valueOf(v));
 	}
 
@@ -231,17 +245,8 @@ public class ExprPart extends AbsPart {
 		if (isNull)
 			return "null";
 		if (logic == null)
-			// return lexp == null ? "" : lexp;
-//			return lexp == null ? ""
-//					: escape && lexp instanceof String ? 
-//							Sql.filterVal((String) lexp)
-//							: ((ExprPart)lexp).sql(ctx);
 			return expString(lexp, ctx);
 		else {
-//			return String.format("%s %s",
-//				lexp == null ? "" : escape && lexp instanceof String ? Sql.filterVal((String)lexp) : lexp,
-//				logic.sql(ctx, logic, rexp == null ? ""
-//						: rexp instanceof String ? (String)rexp : ((ExprPart)rexp).sql(ctx)));
 			return lexp == null ? 
 					logic.sql(ctx, logic, expString(rexp, ctx)) :
 					String.format("%s %s",
@@ -257,6 +262,13 @@ public class ExprPart extends AbsPart {
 			return Sql.filterVal((String) exp);
 		else if (exp instanceof ExprPart)
 			return ((ExprPart)exp).sql(ctx);
+		// Tag v1.3.0
+		else if (exp instanceof String[])
+			return Stream.of((String[])exp).collect(Collectors.joining("', '", "'", "'"));
 		else return exp.toString();
+	}
+
+	public boolean isNull() {
+		return isNull;
 	}
 }

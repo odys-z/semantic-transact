@@ -74,8 +74,10 @@ public class Update extends Statement<Update> {
 
 				if (v instanceof AbsPart)
 					nv((String)nv[Ix.nvn], (AbsPart)v);
-				else
+				else if (v instanceof String)
 					nv((String)nv[Ix.nvn], (String)v);
+				else
+					nv((String)nv[Ix.nvn], ExprPart.constVal(v));
 			}
 		return this;
 	}

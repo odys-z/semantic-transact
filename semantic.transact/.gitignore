@@ -2,3 +2,5 @@
 main.net
 .settings
 .classpath
+bin
+.settings
