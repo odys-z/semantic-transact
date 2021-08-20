@@ -562,6 +562,7 @@ public class Query extends Statement<Query> {
 	 * use it directly.
 	 * @param ctx 
 	 * @return the result set
+	 * (For a select result, {@link Query}'s doneOp will set the {@AnResultset}.)
 	 * @throws TransException
 	 * @throws SQLException
 	 */
