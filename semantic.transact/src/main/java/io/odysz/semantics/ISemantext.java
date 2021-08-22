@@ -227,6 +227,11 @@ public interface ISemantext {
 	 */
 	public AbsPart composeVal(Object v, String tabl, String col);
 
+	/**Reset resulves
+	 * @return this
+	 */
+	public ISemantext reset();
+
 	/**Set resultset's current row's column's value.<br>
 	 * The current row is actually iterated over by {@link #onSelected(Object)}.
 	 * Because the semantic.transact is designed as independent of SReulstset, so it's handler 

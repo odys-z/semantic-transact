@@ -59,6 +59,10 @@ public class SemanticObject extends Anson {
 		return put("data", data);
 	}
 	
+	public void clear() {
+		props.clear();
+	}
+	
 	public String port() {
 		return (String) get("port");
 	}

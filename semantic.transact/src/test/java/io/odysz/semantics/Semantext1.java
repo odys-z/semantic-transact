@@ -120,6 +120,8 @@ class Semantext1 implements ISemantext {
 		return new Semantext1(tabl, semantics, metas);
 	}
 
+	public ISemantext reset() { return this; }
+	
 	@Override
 	public SemanticObject resulves() { return null; }
 	

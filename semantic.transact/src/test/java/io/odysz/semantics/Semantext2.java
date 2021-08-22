@@ -142,6 +142,9 @@ class Semantext2 implements ISemantext {
 	}
 
 	@Override
+	public ISemantext reset() { return this; }
+
+	@Override
 	public SemanticObject resulves() { return null; }
 	
 	@Override
