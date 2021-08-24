@@ -198,7 +198,10 @@ public class SemanticObject extends Anson {
 					continue;
 				else if (c.isAssignableFrom(SemanticObject.class)
 					|| SemanticObject.class.isAssignableFrom(c))
-					((SemanticObject)get(k)).print(out);
+					if ((SemanticObject)get(k) == null)
+						out.print(k + ": null");
+					else
+						((SemanticObject)get(k)).print(out);
 				else if (Collection.class.isAssignableFrom(c) || Map.class.isAssignableFrom(c)) {
 					Iterator<?> i = ((Collection<?>) get(k)).iterator(); 
 					out.println("[" + ((Collection<?>) get(k)).size() + "]");

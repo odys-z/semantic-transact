@@ -198,7 +198,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T whereIn(String col, List<String> constvs) {
-		return whereIn(col, (String[]) constvs.toArray());
+		return whereIn(col, constvs.toArray(new String[0]));
 	}
 
 	/**Add post semantics after the parent statement,
