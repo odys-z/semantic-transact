@@ -237,21 +237,34 @@ public class Funcall extends ExprPart {
 	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
 	 * @param ctx
 	 * @param args
+	 * @return see {@link #sqlDatetime(ISemantext, String)}
+	 */
+	private static String sqlDatetime(ISemantext ctx, String[] args) {
+		return sqlDatetime(ctx, args[0]);
+	}
+
+	/**<p>Convert string value to datatiem.</p>
+	 * str_to_date(str-val, '%Y-%m-%d %H:%i:%s')<br>
+	 * datetime('1866-12-12 14:12:12')<br>
+	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
+	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
+	 * @param ctx
+	 * @param args
 	 * @return the correct sql snippet
 	 */
-	private String sqlDatetime(ISemantext ctx, String[] args) {
+	public static String sqlDatetime(ISemantext ctx, String str) {
 		dbtype dt = ctx.dbtype();
 		if (dt == dbtype.mysql)
-			return String.format("str_to_date('%s', '%Y-%m-%d %H:%i:%s')", args[0]);
+			return String.format("str_to_date('%s', '%Y-%m-%d %H:%i:%s')", str);
 		else  if (dt == dbtype.sqlite)
-			return String.format("datetime('%s')", args[0]);
+			return String.format("datetime('%s')", str);
 		else if (dt == dbtype.ms2k)
-			return String.format("convert(datatime, '%s', 120)", args[0]);
+			return String.format("convert(datatime, '%s', 120)", str);
 		else if (dt == dbtype.oracle)
-			return String.format("to_date('%s', 'YYYY-MM-DD HH24:MI:SS')", args[0]);
+			return String.format("to_date('%s', 'YYYY-MM-DD HH24:MI:SS')", str);
 		else {
-			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
-			return "'" + args[0] + "'";
+			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", str, dt.name());
+			return "'" + str + "'";
 		}
 	}
 

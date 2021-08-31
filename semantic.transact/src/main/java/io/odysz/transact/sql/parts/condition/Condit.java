@@ -47,7 +47,6 @@ search_condition_not
 	}
 
 	public Condit(Predicate predicate) {
-		// this.predict = predicate;
 		super(predicate);
 		this.logitype = Logic.type.empty;
 	}
@@ -62,46 +61,30 @@ search_condition_not
 	}
 
 	public Condit and(Condit and) {
-//		if (condts == null || condts.size() == 0) {
-//			if (condts == null) {
-//				condts = new ArrayList<Condit>();
-//			}
-//			condts.add(this);
-//			condts.add(and);
-//			return new Condit(type.and, condts);
-//		}
-//		else {	
-			if (logitype == type.or) {
-				// and is prior to the other ors
-				condts.get(condts.size() - 1).and(and);
-				return this;
-			}
-			else if (logitype == type.and) {
-				condts.add(and);
-				return this;
-			}else if (logitype == type.not) {
-				Condit left = new Condit(type.not, condts);
-				condts = new ArrayList<Condit>();
-				condts.add(left);
-				logitype = type.and;
-				condts.add(and);
-				return this;
-			}
-			else { // empty logic, AND with it
-				ArrayList<Condit> ands = new ArrayList<Condit>();
-				ands.add(this);
-				ands.add(and);
-				return new Condit(Logic.type.and, ands);
-			}
-
-//		}
+		if (logitype == type.or) {
+			// and is prior to the other ors
+			condts.get(condts.size() - 1).and(and);
+			return this;
+		}
+		else if (logitype == type.and) {
+			condts.add(and);
+			return this;
+		}else if (logitype == type.not) {
+			Condit left = new Condit(type.not, condts);
+			condts = new ArrayList<Condit>();
+			condts.add(left);
+			logitype = type.and;
+			condts.add(and);
+			return this;
+		}
+		else { // empty logic, AND with it
+			ArrayList<Condit> ands = new ArrayList<Condit>();
+			ands.add(this);
+			ands.add(and);
+			return new Condit(Logic.type.and, ands);
+		}
 			
 	}
-
-//	public Condit condt(String format, Object... args) {
-//		Condit or = Sql.condt(format, args);
-//		return or(or);
-//	}
 	
 	public Condit or(Condit or) {
 		if (logitype == type.or) {

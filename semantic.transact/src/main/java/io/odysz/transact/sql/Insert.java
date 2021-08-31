@@ -160,8 +160,6 @@ public class Insert extends Statement<Insert> {
 			if (nv != null && nv[1] != null)
 				notNull = true;
 
-//			String v = (String) nv[1];
-//			String n = (String) nv[0];
 			String n = nv[0].toString();
 			String v = nv[1] == null ? null : nv[1].toString();
 
