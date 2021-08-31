@@ -141,7 +141,7 @@ public class Funcall extends ExprPart {
 		else if (func == Func.ifElse)
 			return sqlIfElse(context, args);
 		else if (func == Func.datetime)
-			return sql2Datetime(context, args);
+			return sqlDatetime(context, args);
 		else if (func == Func.extFile)
 			return sqlExtFile(context, args);
 		else if (func == Func.concat)
@@ -155,9 +155,9 @@ public class Funcall extends ExprPart {
 			}
 	}
 
-	/**return function string that database function used as the same style.
+	/**Get function string that the database can understand, e.g. ["f," "arg1", "arg2"] => "f(arg1, arg2)".
 	 * @param ctx
-	 * @return
+	 * @return formatted function call
 	 * @throws TransException 
 	 */
 	private String dbSame(ISemantext ctx, String[] args) throws TransException {
@@ -230,16 +230,16 @@ public class Funcall extends ExprPart {
 //		}
 	}
 
-	/**
+	/**<p>Convert string value to datatiem.</p>
 	 * str_to_date(str-val, '%Y-%m-%d %H:%i:%s')<br>
 	 * datetime('1866-12-12 14:12:12')<br>
 	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
 	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
 	 * @param ctx
 	 * @param args
-	 * @return
+	 * @return the correct sql snippet
 	 */
-	private String sql2Datetime(ISemantext ctx, String[] args) {
+	private String sqlDatetime(ISemantext ctx, String[] args) {
 		dbtype dt = ctx.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("str_to_date('%s', '%Y-%m-%d %H:%i:%s')", args[0]);
