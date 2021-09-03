@@ -191,7 +191,7 @@ public class AESHelper {
     
     /**Converts UTF8 bytes to String
      * @param input
-     * @return
+     * @return converted result
      */
     private static String setUTF8Bytes(byte[] input) {
     	return new String(input, StandardCharsets.UTF_8);
