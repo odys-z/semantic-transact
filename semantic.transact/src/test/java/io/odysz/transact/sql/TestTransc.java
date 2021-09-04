@@ -14,6 +14,7 @@ import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
 public class TestTransc {
@@ -363,6 +364,15 @@ public class TestTransc {
 		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
 				sqls.get(0));
 
+	}
+	
+	@Test
+	public void testUpdateJoin() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_users")
+			.nv("userName", Funcall.concat("userName", "o.orgName"))
+			// TODO .j("a_org", "o", "o.orgId = a_users.orgId")
+			.commit(sqls);
 	}
 
 	@Test
