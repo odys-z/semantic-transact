@@ -366,13 +366,27 @@ public class TestTransc {
 
 	}
 	
+	/** Sqlite tested case
+	 *<pre>with backtrace (indId, parent, fullpath) as (
+	select indId indId, parent parent, fullpath fullpath from ind_emotion where indId = 'C' 
+	union all 
+	select me.indId, me.parent, p.fullpath || '.' || printf('%02d', sort) from backtrace p join ind_emotion me on me.fullpath = p.indId
+	) update ind_emotion set fullpath = (
+	select fullpath from backtrace t where ind_emotion.indId = t.indId) where indId in (select indId from backtrace)
+	</pre>
+	 * @throws TransException
+	 */
 	@Test
 	public void testUpdateJoin() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
-		st.update("a_users")
-			.nv("userName", Funcall.concat("userName", "o.orgName"))
-			// TODO .j("a_org", "o", "o.orgId = a_users.orgId")
-			.commit(sqls);
+		try {
+			st.update("a_users")
+				.nv("userName", Funcall.concat("userName", "o.orgName"))
+				// TODO .j("a_org", "o", "o.orgId = a_users.orgId")
+				.commit(sqls);
+		} catch (Exception e) {
+			Utils.warn("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
+		}
 	}
 
 	@Test
