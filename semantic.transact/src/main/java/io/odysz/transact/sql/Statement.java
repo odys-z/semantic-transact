@@ -180,6 +180,15 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_("=", col, constv);
 	}
 
+	/** where col like %likev%
+	 * @param col
+	 * @param likev
+	 * @return
+	 */
+	public T whereLike(String col, String likev) {
+		return where("%", col, "%" + likev + "%");
+	}
+
 	public T whereEq(String col, Object v) {
 		if (v instanceof String)
 			return where_("=", col, (String)v);
