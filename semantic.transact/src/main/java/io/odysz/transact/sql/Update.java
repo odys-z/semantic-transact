@@ -118,7 +118,7 @@ public class Update extends Statement<Update> {
 
 	/**Commit updating sql(s) to db.
 	 * @param stx semantext instance
-	 * @return semanticObject, return of postOp.
+	 * @return semanticObject, return of postOp; null if no postOp.
 	 * @throws TransException
 	 * @throws SQLException
 	 */
