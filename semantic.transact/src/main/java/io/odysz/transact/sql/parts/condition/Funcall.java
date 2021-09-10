@@ -39,7 +39,7 @@ public class Funcall extends ExprPart {
 
 	public enum Func {
 		now("now()"),
-		max("max(%s)"),
+		max("max"),
 		isnull("ifnull"),
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
@@ -117,7 +117,7 @@ public class Funcall extends ExprPart {
 		return new Funcall(Func.now);
 	}
 	
-	/**@deprecated
+	/**
 	 * @param args
 	 * @return Funcall object
 	 */
@@ -218,7 +218,11 @@ public class Funcall extends ExprPart {
 		return args[0];
 	}
 
-	private static String sqlConcat(ISemantext ctx, String[] args) {
+	public void selectElemAlias(Alias alias) {
+		this.resultAlias = alias;
+	}
+
+	public static String sqlConcat(ISemantext ctx, String[] args) {
 		dbtype dt = ctx.dbtype();
 //		if (dt == dbtype.oracle)
 //			?;
@@ -268,7 +272,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private static String sqlIfNullElse(ISemantext context, String[] args) {
+	public static String sqlIfNullElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("if(%s is null, %s, %s)",
@@ -290,7 +294,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private static String sqlIfElse(ISemantext context, String[] args) {
+	public static String sqlIfElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
 			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
@@ -302,7 +306,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private static String[] argsql(Object[] args, ISemantext context) throws TransException {
+	public static String[] argsql(Object[] args, ISemantext context) throws TransException {
 		if (args == null)
 			return null;
 		String argus[] = new String[args.length];
@@ -315,7 +319,9 @@ public class Funcall extends ExprPart {
 		return argus;
 	}
 
-	private static String sqlIfnull(ISemantext context, String[] args) {
+	public static String sqlIfnull(ISemantext context, String... args) throws TransException {
+		if (args == null || args.length != 2)
+			throw new TransException("Arugments are invalid.");
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("ifnull(%s, %s)", args[0], args[1]);
@@ -331,7 +337,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	private static String sqlNow(ISemantext context, String[] args) {
+	public static String sqlNow(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return "now()";
@@ -403,7 +409,12 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	public void selectElemAlias(Alias alias) {
-		this.resultAlias = alias;
+	/**
+	 * @param dt db type is ignored (optional)
+	 * @param col
+	 * @return avg(col)
+	 */
+	public static ExprPart average(dbtype dt, String col) {
+		return new ExprPart(String.format("avg(%s)", col));
 	}
 }
