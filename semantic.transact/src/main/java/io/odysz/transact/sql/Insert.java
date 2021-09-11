@@ -101,7 +101,7 @@ public class Insert extends Statement<Insert> {
 
 	/**Append values (a row) after cols been set:<br>
 	 * [[col1, val1], [col2, val2], ...]
-	 * @param val
+	 * @param val pairs of col-val
 	 * @return this
 	 * @throws TransException
 	 */
