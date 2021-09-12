@@ -186,7 +186,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return
 	 */
 	public T whereLike(String col, String likev) {
-		return where("%", col, "%" + likev + "%");
+		return where("%", col, "'" + likev + "'");
 	}
 
 	public T whereEq(String col, Object v) {

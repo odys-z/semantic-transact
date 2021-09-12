@@ -85,6 +85,23 @@ public class TestTransc {
 				+ "group by LastName "
 				+ "having COUNT(Orders.OrderID) > 10",
 				sqls.get(3));
+		
+		// 2021.9.12
+		Query q = st.select("n_mykids", "u")
+				.col("u.userId").col("userName").col("nebula").col("count(p.pid)", "todos")
+				.l("polls", "p", "u.userId = p.userId and p.state in ('wait', 'poll')")
+				.j("nebulae", "n", "n.nid = u.orgId")
+				.groupby("p.userId");
+	
+		q.j("n_teaching", "o", String.format("o.class = n.nid and o.teacher = '%s'", "becky"));
+		q.whereEq("n.nid", "ap01-22");
+
+		q.whereLike("userName", "A")
+			.commit(sqls);
+		
+		assertEquals("select u.userId, userName, nebula, count(p.pid) todos from n_mykids u left outer join polls p on u.userId = p.userId AND p.state in ('wait', 'poll') join nebulae n on n.nid = u.orgId join n_teaching o on o.class = n.nid AND o.teacher = 'becky' where n.nid = 'ap01-22' AND userName like '%A%' group by p.userId",
+				sqls.get(4));
+
 	}
 	
 	@Test
