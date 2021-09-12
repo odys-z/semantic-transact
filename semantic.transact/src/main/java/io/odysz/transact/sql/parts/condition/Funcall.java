@@ -40,6 +40,7 @@ public class Funcall extends ExprPart {
 	public enum Func {
 		now("now()"),
 		max("max"),
+		count("count"),
 		isnull("ifnull"),
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
@@ -124,6 +125,12 @@ public class Funcall extends ExprPart {
 	public static Funcall max(String... args) {
 		Funcall f = new Funcall(Func.max);
 		f.args = args;
+		return f;
+	}
+
+	public static Funcall count(String... col) {
+		Funcall f = new Funcall(Func.count);
+		f.args = col == null ? new String[]{"*"} : col;
 		return f;
 	}
 
