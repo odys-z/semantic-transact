@@ -141,7 +141,7 @@ public class Predicate extends AbsPart {
 			// return String.format("%s %s", l.sql(sctx), op.sql(sctx, op, r.sql(sctx), negative));
 			// FIXME Should pedicate's operands always can't escape ' ? 
 			return String.format("%s %s", l.escape(escape).sql(sctx),
-					op.sql(sctx, op, r.escape(escape).sql(sctx), negative));
+					op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx), negative));
 		}
 	}
 
