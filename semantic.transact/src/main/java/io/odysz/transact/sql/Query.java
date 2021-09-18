@@ -416,7 +416,7 @@ public class Query extends Statement<Query> {
 	 * @see #limit(String, int)
 	 * @param lmtExpr
 	 * @param xpr2
-	 * @return
+	 * @return this
 	 */
 	public Query limit(String lmtExpr, String xpr2) {
 		this.limit = new String[] {lmtExpr, xpr2};
@@ -429,7 +429,7 @@ public class Query extends Statement<Query> {
     ;</pre>
 	 * @param with
 	 * @param isExpression
-	 * @return
+	 * @return this
 	 */
 	public Query union(Query with, boolean ... isExpression) {
 		return sqlUnion(SqlUnion.UNION, with, isExpression);
@@ -441,7 +441,7 @@ public class Query extends Statement<Query> {
     ;</pre>
 	 * @param with
 	 * @param isExpression
-	 * @return
+	 * @return this
 	 */
 	public Query except(Query with, boolean ... isExpression) {
 		return sqlUnion(SqlUnion.EXCEPT, with, isExpression);
@@ -463,7 +463,7 @@ public class Query extends Statement<Query> {
     ;</pre>
 	 * @param with
 	 * @param isExpression
-	 * @return
+	 * @return this
 	 */
 	public Query intersect(Query with, boolean ... isExpression) {
 		return sqlUnion(SqlUnion.INTERSECT, with, isExpression);
@@ -475,7 +475,7 @@ public class Query extends Statement<Query> {
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre>
 	 * @param isExpression
-	 * @return
+	 * @return this
 	 */
 	public Query asQueryExpr(boolean ... isExpression) {
 		this.isQueryExpr = isExpression != null && isExpression.length > 0 ?

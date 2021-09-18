@@ -122,13 +122,13 @@ public class Funcall extends ExprPart {
 	 * @param args
 	 * @return Funcall object
 	 */
-	public static Funcall max(String... args) {
+	public static Funcall sqlMax(String... args) {
 		Funcall f = new Funcall(Func.max);
 		f.args = args;
 		return f;
 	}
 
-	public static Funcall count(String... col) {
+	public static Funcall sqlCount(String... col) {
 		Funcall f = new Funcall(Func.count);
 		f.args = col == null ? new String[]{"*"} : col;
 		return f;
@@ -353,7 +353,7 @@ public class Funcall extends ExprPart {
 		else if (dt == dbtype.ms2k)
 			return ms2kUseUTCtime ? "getutcdate()" : "getdate()";
 		else if (dt == dbtype.oracle)
-			return "SYSDATE()";
+			return "sysdate";
 		else {
 			String s = DateFormat.formatime(new Date());
 			Utils.warn("Formating now() for unknown db type: %s as %s", dt.name(), s);
@@ -417,11 +417,11 @@ public class Funcall extends ExprPart {
 	}
 
 	/**
-	 * @param dt db type is ignored (optional)
+	 * @param dt db type is ignored (optional) - same for mysql, sqlite, oracle, postgre
 	 * @param col
 	 * @return avg(col)
 	 */
-	public static ExprPart average(dbtype dt, String col) {
+	public static ExprPart sqlAvg(dbtype dt, String col) {
 		return new ExprPart(String.format("avg(%s)", col));
 	}
 }
