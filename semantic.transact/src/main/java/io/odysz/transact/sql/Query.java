@@ -119,7 +119,7 @@ public class Query extends Statement<Query> {
 		}
 	}
 
-	/**String Array Index definition. Not using java field for compliance with JS (without user type).
+	/**String Array Index definition. Data using array instead of java field for compliance with JS (without user type).
 	 * @author odys-z@github.com
 	 */
 	public static class Ix {
