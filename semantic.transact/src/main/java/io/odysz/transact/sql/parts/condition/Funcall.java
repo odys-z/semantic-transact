@@ -301,6 +301,10 @@ public class Funcall extends ExprPart {
 		}
 	}
 
+	public static String sqlIfElse(ISemantext context, String exp, String then, String otherwise) {
+		return sqlIfElse(context, new String[] {exp, then, otherwise});
+	}
+
 	public static String sqlIfElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
