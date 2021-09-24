@@ -98,7 +98,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T nv(String n, AbsPart v) throws TransException {
-		throw new TransException("Only Update and Insert provide this function.");
+		throw new TransException("Only Update and Insert can use nv() function.");
 	}
 
 	public T where(String logic, String loperand, String roperand) {
