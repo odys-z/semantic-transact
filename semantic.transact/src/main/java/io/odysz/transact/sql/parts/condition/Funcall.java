@@ -179,6 +179,15 @@ public class Funcall extends ExprPart {
 	}
 
 	/**
+	 * Wrapper for triggering action of read files after uri is resolved - must have context.
+	 * The same as client query with string "extfile(t.uri)" - already used in Query.
+	 * @param uri
+	 * @return
+	 */
+	public static String extFile(String uri) {
+		return String.format("%s(%s)", Func.extFile.name(), uri);
+	}
+	/**
 	 * What the handler is doing:<br>
 	 * 1. read file from the file of args[0]<br>
 	 * 2. set readed contents to the current row of contxt, with {@link ISemantext#setRs(String, String)}
@@ -214,7 +223,7 @@ public class Funcall extends ExprPart {
 								}
 								else {
 									Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);
-									row.set(c, "File not Found: " + fn);
+									row.set(c, "File not Found: " + row.get(c)); // no absolute path - error message for client
 								}
 							}
 						} catch (IOException e) {

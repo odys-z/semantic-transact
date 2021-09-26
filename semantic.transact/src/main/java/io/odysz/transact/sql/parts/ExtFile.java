@@ -16,11 +16,9 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**External file representation.<br>
- * An ExtFile can only been used as a set value.
- * 
- * FIXME Why this is not a {@link SetValue}, as the ExtRef is a SelectElem?
+ * An ExtFile can only been used as a set value in update/insert statement.
+ * This is only used for update and insert. For reading, use {@link io.odysz.transact.sql.parts.condition.Funcall#sqlExtFile(ISemantext, String[]) Funcall.sqlExtFile()} 
  * @author odys-z@github.com
- *
  */
 public class ExtFile extends AbsPart {
 	private String b64;
@@ -34,11 +32,11 @@ public class ExtFile extends AbsPart {
 	}
 
 	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFile#prefixPath(String)}.<br>
-	 * The argurment doesn't have to be absolute path if the runtime can access a file from a relative paht.<br>
-	 * But the sevlet needing an absolute path to access a file, so this mus been set to the absolute path,
+	 * The argument doesn't have to be absolute path if the runtime can access a file from a relative path.<br>
+	 * But servlet containers needing absolute paths to access file, so this must been set to the absolute path,
 	 * like with the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
-	 * If this is wrong, please feel free to correct the author at odysseusj@163.com.
+	 * If this is wrong, please feel free to correct the author.
 	 * @param absRoot
 	 * @return this
 	 */
