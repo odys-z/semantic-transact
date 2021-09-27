@@ -58,6 +58,8 @@ public class Update extends Statement<Update> {
 	}
 
 	/**set array of [n, v], where if v is constant, e.g. 'val', must have a '' pair.
+	 * 
+	 * FIXME As Query.col() already parsing sql expression, why not this method do the same to have client feel the same?
 	 * @param nvs the n-v array
 	 * @return this Update statement
 	 * @throws TransException 
