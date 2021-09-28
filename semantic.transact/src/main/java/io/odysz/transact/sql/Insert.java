@@ -47,7 +47,6 @@ public class Insert extends Statement<Insert> {
 	public Insert nv(String n, AbsPart v) throws TransException {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
-		//  currentRowNv.add(new Object[] {n, v});
 		
 		// column names
 		if (insertCols == null)
@@ -57,11 +56,6 @@ public class Insert extends Statement<Insert> {
 			currentRowNv.add(new Object[] {n, v});
 		}
 		else {
-			// replace the old one
-//			currentRowNv.get(insertCols.get(n))[1] = v;
-//			if (verbose) Utils.warn(
-//				"Insert.nv(%1$s, %2$s): Column's value already exists, old value replaced by new value (%1$s = %2$s)",
-//				n, v);
 			throw new TransException("n-v already exists. Duplicated rows? If using nv(), don't use cols() and value(); If using cols(), don't use nv().");
 		}
 		return this;
