@@ -179,7 +179,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return this
 	 */
 	public T where(Logic.op op, String loperand, String roperand) {
-		System.out.print("docker tag: v1.3.0.1");
 		return where(Sql.condt(op, loperand, roperand));
 	}
 
