@@ -104,7 +104,11 @@ public class Logic {
 
 			if (db != dbtype.mysql || db != dbtype.oracle || db != dbtype.sqlite)
 				Utils.warn("db function concat(%s, %s)", op, with);
-			return String.format("concat(%s, %s)", op, with);
+
+			if (db == dbtype.sqlite)
+				return String.format("%s || %s)", op, with);
+			else
+				return String.format("concat(%s, %s)", op, with);
 		}
 
 		private String likeOp(ISemantext sctx, String op) {

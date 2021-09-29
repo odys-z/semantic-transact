@@ -182,6 +182,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(op, loperand, roperand));
 	}
 
+	/**This is a wraper of {@link #where(String, String, String)} for convenient
+	 * - the third arg is taken as a string constant and added single quotes at begin and end.
+	 * @param op
+	 * @param loperand
+	 * @param roperand
+	 * @param rconst right constant WILL be adding single quotes "''"
+	 * @return
+	 */
+	public T where_(Logic.op op, String loperand, String roperand) {
+		return where(Sql.condt(op, loperand, "'" + roperand + "'"));
+	}
+
 	/**Add a where condition. e.g. "t.col = 'constv'".
 	 * @param col
 	 * @param constv will add "'"
@@ -191,7 +203,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_("=", col, constv);
 	}
 
-	/** where col like %likev%
+	/** where col like '%likev%'
 	 * @param col
 	 * @param likev
 	 * @return
