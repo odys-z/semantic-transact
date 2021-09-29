@@ -9,7 +9,13 @@ public class Logic {
 	 * as {@link io.odysz.transact.sql.parts.condition.Condit}*/
 	public enum type { and, or, not, empty };
 
-	public enum op {eq, ne, lt, le, gt, ge, mul, div, add, minus, like, rlike, llike, notlike, in, notin, isnull, isNotnull;
+	public enum op {eq,
+		/** not equal: lop <> rop */
+		ne, lt, le, gt, ge, mul, div, add, minus, like,
+		/** right like: lop like '[rop]%' */
+		rlike,
+		/** left like: lop like '%[rop]' */
+		llike, notlike, in, notin, isnull, isNotnull;
 
 		public String sql(ISemantext sctx, op oper, String rop, boolean... negative) {
 			if (oper == op.eq)
@@ -63,11 +69,29 @@ public class Logic {
 				return " TODO ";
 		}
 	
+		/**
+		 * @param sctx
+		 * @param op
+		 * @return '%' + op
+		 */
 		private String llikeOp(ISemantext sctx, String op) {
-			if (op != null && op.length() > 2)
+			if (op != null && op.length() >= 2)
 				if (op.startsWith("'") && !op.startsWith("'%"))
 					return op.replaceFirst("^'", "'%");
 				else return concat(sctx, "'%'", op);
+			return op;
+		}
+	
+		/**
+		 * @param sctx
+		 * @param op
+		 * @return op + '%'
+		 */
+		private String rlikeOp(ISemantext sctx, String op) {
+			if (op != null && op.length() >= 2)
+				if (op.endsWith("'") && !op.endsWith("%'"))
+					return op.replaceFirst("'$", "%'");
+				else return concat(sctx, op, "'%'");
 			return op;
 		}
 	
@@ -83,14 +107,6 @@ public class Logic {
 			return String.format("concat(%s, %s)", op, with);
 		}
 
-		private String rlikeOp(ISemantext sctx, String op) {
-			if (op != null && op.length() > 2)
-				if (op.endsWith("'") && !op.endsWith("%'"))
-					return op.replaceFirst("'$", "%'");
-				else return concat(sctx, op, "'%'");
-			return op;
-		}
-	
 		private String likeOp(ISemantext sctx, String op) {
 			return rlikeOp(sctx, llikeOp(sctx, op));
 		}

@@ -171,6 +171,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op(logic), loperand, resulving));
 	}
 
+	/**This is a wraper of {@link #where(String, String, String)} for convenient
+	 * - the third arg is taken as a string constant and added single quotes at begin and end.
+	 * @param op
+	 * @param lcol left column
+	 * @param rconst right constant will NOT be adding single quotes "''"
+	 * @return this
+	 */
+	public T where(Logic.op op, String loperand, String roperand) {
+		System.out.print("docker tag: v1.3.0.1");
+		return where(Sql.condt(op, loperand, roperand));
+	}
+
 	/**Add a where condition. e.g. "t.col = 'constv'".
 	 * @param col
 	 * @param constv will add "'"
