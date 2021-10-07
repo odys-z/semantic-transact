@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.apache.commons.io_odysz.FilenameUtils;
 
 import io.odysz.common.AESHelper;
+import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
@@ -25,10 +26,14 @@ public class ExtFile extends AbsPart {
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
-	private String absoluteroot;
+//	private String absoluteroot;
+	private String configRoot;
+	private String runtimePath;
 
-	public ExtFile(ExprPart resulvingPath) {
+	public ExtFile(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
 		this.resulv_const_path = resulvingPath;
+		this.configRoot = configRoot;
+		this.runtimePath = runtimeRoot;
 	}
 
 	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFile#prefixPath(String)}.<br>
@@ -39,11 +44,11 @@ public class ExtFile extends AbsPart {
 	 * If this is wrong, please feel free to correct the author.
 	 * @param absRoot
 	 * @return this
-	 */
 	public ExtFile absRootPath(String absRoot) {
 		this.absoluteroot = absRoot;
 		return this;
 	}
+	 */
 
 	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
@@ -77,15 +82,20 @@ public class ExtFile extends AbsPart {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
 			relatvFn += " " + filename;
 		
-		String dir = "";
-		if (!LangExt.isblank(prefix)) {
-			dir = prefix;
-			touchDir(dir);
-		}
+//		String dir = "";
+//		if (!LangExt.isblank(prefix)) {
+//			dir = prefix;
+//			touchDir(dir);
+//		}
 
-		relatvFn = FilenameUtils.concat(dir, relatvFn);
+		// relatvFn = FilenameUtils.concat(dir, relatvFn);
+		// String absoluteFn = FilenameUtils.concat(absoluteroot, relatvFn);
 
-		String absoluteFn = FilenameUtils.concat(absoluteroot, relatvFn);
+		relatvFn = EnvPath.encodeUri(configRoot, prefix, relatvFn);
+
+		String absoluteFn = EnvPath.decodeUri(runtimePath, relatvFn);
+//		absoluteFn = FilenameUtils.concat(runtimePath, absoluteFn);
+		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
 		try {
@@ -99,8 +109,7 @@ public class ExtFile extends AbsPart {
 		}
 	}
 
-	private void touchDir(String dir) {
-		dir = FilenameUtils.concat(absoluteroot, dir);
+	protected void touchDir(String dir) {
 		File f = new File(dir);
 		if (f.isDirectory())
 			return;

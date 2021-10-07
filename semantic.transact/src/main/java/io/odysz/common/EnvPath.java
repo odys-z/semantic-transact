@@ -5,7 +5,16 @@ import java.util.Map;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
-public class EnvHelper {
+/**<p>A helper to handler environment variable affected file path.</p>
+ * Suppose $VOLUME_HOME = "/home/ody/volume"
+ * <pre>
+ 
+ $VOLUME_HOME/shares/ody/000001 f.txt : /home/ody/volume/shares/000001 f.txt
+ </pre>
+ * @author Odys Zhou
+ *
+ */
+public class EnvPath {
 	static String regSrc = "\\$(\\w+)";
 	static Regex reg = new Regex(regSrc);
 
@@ -35,15 +44,14 @@ public class EnvHelper {
 	/**A path start with "/" or "$" is absolute.
 	 * @param path
 	 * @return true if relative
-	 */
 	public static boolean isRelativePath(String path) {
 		return !(path.startsWith("/") || path.startsWith("$"));
 	}
+	 */
 
 	/**Get starting environment variable value
 	 * @param varStr string with $Vars
 	 * @return
-	 */
 	public static String startVar(String varStr) {
 		List<String> envs = reg.findGroups(varStr);
 		if (envs != null && envs.size() > 0) {
@@ -61,13 +69,46 @@ public class EnvHelper {
 		return "";
 	}
 
-	public static String unreplaceEnv(String uri, String envExpr) {
+	protected static String unreplaceEnv(String uri, String envExpr) {
 		String env = startVar(envExpr);
 		if (env != null) {
 			return FilenameUtils.concat(env, uri);
 
 		}
 		return uri;
+	}
+	 */
+	
+//	public static String getAbsPath(String fn) {
+//		// fn = EnvHelper.isRelativePath(abspath) ?
+//		// 		FilenameUtils.concat(stx.containerRoot(), fn) : fn;
+//		return null;
+//	}
+
+
+	/**Convert uri to absolute path, according to env.
+	 * 
+	 * @see FilenameUtils#concat(String, String)
+	 * 
+	 * @param root (optinal) runtiem root path 
+	 * @param uri saved path with env variables
+	 * @return decode then concatenated absolute path, for file accessing. 
+	 */
+	public static String decodeUri(String root, String uri) {
+		root = root == null ? "" : root;
+		return FilenameUtils.concat(root, replaceEnv(uri));
+	}
+
+	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
+	 * E.g.<br>
+	 * configRoot: $VOLUME_HOME/shares, uri: f.jpg --&gt; /home/ody/volume/shares/f.jpg <br>
+	 * configRoot: upload/a_users, uri: f.jpg --&gt; [webroot/]upload/a_users/f.jpg
+	 * @param configRoot relative/absolute path with env variables
+	 * @param uri sub-path(s), file path, in concatenating order
+	 * @return encoded uri (with env variable) for DB persisting
+	 */
+	public static String encodeUri(String configRoot, String... uri) {
+		return FilenameUtils.concat(configRoot, uri);
 	}
 
 }

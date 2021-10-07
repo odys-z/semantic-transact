@@ -9,20 +9,11 @@ public class EnvHelperTest {
 	@Test
 	public void testReplace() {
 		String home = System.getenv("HOME");
-		assertEquals(home + "/v", EnvHelper.replaceEnv("$HOME/v"));
+		assertEquals(home + "/v", EnvPath.replaceEnv("$HOME/v"));
 		
 		System.setProperty("VOLUME", "volume");
-		assertEquals("volume/v", EnvHelper.replaceEnv("$VOLUME/v"));
-		
-		assertEquals("volume", EnvHelper.startVar("$VOLUME/v"));
+		assertEquals("volume/v", EnvPath.replaceEnv("$VOLUME/v"));
 	}
 
-	@Test
-	public void testIsRelativePath() {
-		assertFalse(EnvHelper.isRelativePath("/"));
-		assertFalse(EnvHelper.isRelativePath("$"));
-		assertTrue(EnvHelper.isRelativePath("home"));
-		assertFalse(EnvHelper.isRelativePath("$HOME/v"));
-	}
 
 }

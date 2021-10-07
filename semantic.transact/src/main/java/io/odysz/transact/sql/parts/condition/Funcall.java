@@ -8,11 +8,9 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.io_odysz.FilenameUtils;
-
 import io.odysz.common.AESHelper;
 import io.odysz.common.DateFormat;
-import io.odysz.common.EnvHelper;
+import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
@@ -147,7 +145,7 @@ public class Funcall extends ExprPart {
 
 	@Override
 	public String sql(ISemantext context) throws TransException {
-		// args are handled before this tree node handling, making ExprPart's sql available.
+		// function parameters are handled before this AST node handling, making ExprPart's sql available.
 		String args[] = argsql(this.args, context);
 
 		if (func == Func.now)
@@ -228,8 +226,9 @@ public class Funcall extends ExprPart {
 							String fn = (String) row.get(c);
 							if (!LangExt.isblank(fn, "\\.", "\\*")) {
 								// to be continued: this is a design error: transact can't recover configured root path!
-								fn = EnvHelper.isRelativePath(abspath) ?
-										FilenameUtils.concat(stx.containerRoot(), fn) : fn;
+								// fn = EnvHelper.isRelativePath(abspath) ?
+								// 		FilenameUtils.concat(stx.containerRoot(), fn) : fn;
+								fn = EnvPath.decodeUri(stx.containerRoot(), fn);
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
 									byte[] fi = Files.readAllBytes(f);

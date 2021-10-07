@@ -1,6 +1,7 @@
 package io.odysz.semantics;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,16 @@ public interface IUser {
 	 * @throws TransException Checking login information failed
 	 */
 	default boolean login(Object request) throws TransException { return false; }
+
+	/** If a user is allowed to change password, this is used to verify old and must be overriden to check the old password cipher.
+	 * @param pswdCypher64 decrypted with my token id
+	 * @param iv64
+	 * @return yes or no
+	 * @throws TransException
+	 * @throws IOException 
+	 * @throws GeneralSecurityException 
+	 */
+	default boolean guessPswd(String pswdCypher64, String iv64) throws TransException, GeneralSecurityException, IOException { return false; }
 
 	/**A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
