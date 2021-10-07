@@ -12,6 +12,7 @@ import org.apache.commons.io_odysz.FilenameUtils;
 
 import io.odysz.common.AESHelper;
 import io.odysz.common.DateFormat;
+import io.odysz.common.EnvHelper;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
@@ -118,7 +119,7 @@ public class Funcall extends ExprPart {
 		return new Funcall(Func.now);
 	}
 	
-	/**
+	/**FIXME rename to max?
 	 * @param args
 	 * @return Funcall object
 	 */
@@ -128,9 +129,19 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
+	/**FIXME rename to count?
+	 * @param col
+	 * @return Funcall object
+	 */
 	public static Funcall sqlCount(String... col) {
 		Funcall f = new Funcall(Func.count);
 		f.args = col == null ? new String[]{"*"} : col;
+		return f;
+	}
+	
+	public static Funcall extfile(String[] args) {
+		Funcall f = new Funcall(Func.extFile);
+		f.args = args;
 		return f;
 	}
 
@@ -187,9 +198,10 @@ public class Funcall extends ExprPart {
 	public static String extFile(String uri) {
 		return String.format("%s(%s)", Func.extFile.name(), uri);
 	}
+
 	/**
 	 * What the handler is doing:<br>
-	 * 1. read file from the file of args[0]<br>
+	 * 1. read file from the file named by args[0]<br>
 	 * 2. set readed contents to the current row of contxt, with {@link ISemantext#setRs(String, String)}
 	 * @param context semantext
 	 * @param args <br>[0] relative filepath (replacing contents),
@@ -215,7 +227,9 @@ public class Funcall extends ExprPart {
 							c--; // in SResultset, column index start at 1
 							String fn = (String) row.get(c);
 							if (!LangExt.isblank(fn, "\\.", "\\*")) {
-								fn = FilenameUtils.concat(stx.containerRoot(), fn);
+								// to be continued: this is a design error: transact can't recover configured root path!
+								fn = EnvHelper.isRelativePath(abspath) ?
+										FilenameUtils.concat(stx.containerRoot(), fn) : fn;
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
 									byte[] fi = Files.readAllBytes(f);

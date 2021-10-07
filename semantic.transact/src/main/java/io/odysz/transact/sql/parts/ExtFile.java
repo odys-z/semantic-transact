@@ -17,7 +17,7 @@ import io.odysz.transact.x.TransException;
 
 /**External file representation.<br>
  * An ExtFile can only been used as a set value in update/insert statement.
- * This is only used for update and insert. For reading, use {@link io.odysz.transact.sql.parts.condition.Funcall#sqlExtFile(ISemantext, String[]) Funcall.sqlExtFile()} 
+ * This is only used for update and insert. For reading, use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) Funcall.extFile(String)} 
  * @author odys-z@github.com
  */
 public class ExtFile extends AbsPart {
@@ -40,12 +40,12 @@ public class ExtFile extends AbsPart {
 	 * @param absRoot
 	 * @return this
 	 */
-	public ExtFile absPath(String absRoot) {
+	public ExtFile absRootPath(String absRoot) {
 		this.absoluteroot = absRoot;
 		return this;
 	}
 
-	/**Set the relative path of the file.
+	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
 	 * @param path
 	 * @return this
@@ -75,10 +75,13 @@ public class ExtFile extends AbsPart {
 			relatvFn = resulv_const_path.sql(ctx);
 		
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
-				relatvFn += " " + filename;
+			relatvFn += " " + filename;
 		
-		String dir = LangExt.isblank(prefix) ? "" : prefix;
-		mkDir(dir);
+		String dir = "";
+		if (!LangExt.isblank(prefix)) {
+			dir = prefix;
+			touchDir(dir);
+		}
 
 		relatvFn = FilenameUtils.concat(dir, relatvFn);
 
@@ -96,7 +99,7 @@ public class ExtFile extends AbsPart {
 		}
 	}
 
-	private void mkDir(String dir) {
+	private void touchDir(String dir) {
 		dir = FilenameUtils.concat(absoluteroot, dir);
 		File f = new File(dir);
 		if (f.isDirectory())

@@ -39,7 +39,8 @@ public class DateFormat {
 		return sdflong_mysql.format(d0);
 	}
 
-	/**https://stackoverflow.com/questions/9474121/i-want-to-get-year-month-day-etc-from-java-date-to-compare-with-gregorian-cal
+	/**@deprecated
+	 * https://stackoverflow.com/questions/9474121/i-want-to-get-year-month-day-etc-from-java-date-to-compare-with-gregorian-cal
 	 * @param date
 	 * @return formatted string
 	 */

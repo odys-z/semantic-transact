@@ -164,13 +164,13 @@ public interface ISemantext {
 
 	public TableMeta colType(String tabl);
 
-	/**Resolve the path for the file system (without file name) for the running environment
-	 * - typically resolved an absolute path to the WEB-INF/sub[0]/sub[1]/...
-	 * @param sub
+	/**Concatenate the path for the file system (without file name) for the running environment
+	 * - typically for resolving a relative path to the WEB-INF/sub[0]/sub[1]/...
+	 * @param subs
 	 * @return either a {@link io.odysz.transact.sql.parts.Resulving Resulving} or a constant string
 	 * @throws TransException path resolving failed
 	 */
-	public String relativpath(String... sub) throws TransException;
+	public String relativpath(String... subs) throws TransException;
 
 	/**Get the container's runtime root path<br>
 	 * For servlet, return the absolute WEB-ROOT, for java application, return the starting relative dir.
@@ -199,7 +199,7 @@ public interface ISemantext {
 
 	/**Check is an operator already exists.
 	 * @param name handler name
-	 * @return true if has the named operater
+	 * @return true if has the named operator
 	 */
 	boolean hasOnSelectedHandler(String name);
 
