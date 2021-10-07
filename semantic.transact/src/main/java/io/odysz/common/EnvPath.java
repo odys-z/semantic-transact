@@ -8,9 +8,17 @@ import org.apache.commons.io_odysz.FilenameUtils;
 /**<p>A helper to handler environment variable affected file path.</p>
  * Suppose $VOLUME_HOME = "/home/ody/volume"
  * <pre>
- 
- $VOLUME_HOME/shares/ody/000001 f.txt : /home/ody/volume/shares/000001 f.txt
- </pre>
+ args: $VOLUME_HOME/shares,uri,userId,cate,docName
+ encoded: $VOLUME_HOME/shares/ody/000001 f.txt:
+ decoded: /home/ody/volume/shares/000001 f.txt</pre>
+ * relative upload folder:<pre>
+ args: upload,uri,userId,cate,docName
+ encoded: upload/admin/000002 f.txt
+ decoded: src/test/res/upload/admin/000002 f.txt</pre>
+ * absoluted upload folder:<pre>
+ args: /home/ody/upload,uri,userId,cate,docName
+ encoded: /home/ody/upload/admin/000003 f.txt
+ decoded: /home/ody/upload/admin/000003 f.txt</pre>
  * @author Odys Zhou
  *
  */
