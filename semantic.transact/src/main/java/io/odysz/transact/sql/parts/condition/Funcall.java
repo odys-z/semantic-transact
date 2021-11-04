@@ -40,11 +40,15 @@ public class Funcall extends ExprPart {
 		now("now()"),
 		max("max"),
 		count("count"),
+		sum("sum"), avg("avg"),
 		isnull("ifnull"),
 		ifElse("if"),
 		ifNullElse("ifNullElse"),
 		datetime("datetime"),
 		concat("concat"),
+
+		div("div"), add("add"), minus("minus"), mul("mul"),
+
 		/**Function extFile(uri):<br>
 		 * Handle external file when reading - a post operation is added to the on-select-ok event,
 		 * which will replace the uri with content of external file. 
@@ -60,6 +64,20 @@ public class Funcall extends ExprPart {
 			funcName = funcName.trim().toLowerCase();
 			if (now.fid.equals(funcName))
 				return now;
+			else if (max.fid.equals(funcName))
+				return max;
+			else if (count.fid.equals(funcName))
+				return count;
+			else if (sum.fid.equals(funcName))
+				return sum;
+			else if (avg.fid.equals(funcName))
+				return avg;
+
+			else if (add.fid.equals(funcName))   return add;
+			else if (minus.fid.equals(funcName)) return minus;
+			else if (mul.fid.equals(funcName))   return mul;
+			else if (div.fid.equals(funcName))   return div;
+
 			else if (isnull.fid.equals(funcName))
 				return isnull;
 			else if (ifElse.fid.equals(funcName))
@@ -117,26 +135,56 @@ public class Funcall extends ExprPart {
 		return new Funcall(Func.now);
 	}
 	
-	/**FIXME rename to max?
+	/**
 	 * @param args
 	 * @return Funcall object
 	 */
-	public static Funcall sqlMax(String... args) {
+	public static Funcall max(String... args) {
 		Funcall f = new Funcall(Func.max);
 		f.args = args;
 		return f;
 	}
 
-	/**FIXME rename to count?
+	public static Funcall avg(Object... args) {
+		Funcall f = new Funcall(Func.avg);
+		f.args = args;
+		return f;
+	}
+
+	/**
 	 * @param col
 	 * @return Funcall object
 	 */
-	public static Funcall sqlCount(String... col) {
+	public static Funcall count(String... col) {
 		Funcall f = new Funcall(Func.count);
 		f.args = col == null ? new String[]{"*"} : col;
 		return f;
 	}
+
+	public static Funcall count(ExprPart exp) {
+		Funcall f = new Funcall(Func.count);
+		f.args = exp == null ? new String[]{"*"} : new Object[] {exp};
+		return f;
+	}
 	
+	public static Funcall sum(ExprPart exp) {
+		Funcall f = new Funcall(Func.sum);
+		f.args = new Object[] {exp};
+		return f;
+	}
+
+	public static Funcall sum(String col) {
+		Funcall f = new Funcall(Func.sum);
+		f.args = new String[] {col};
+		return f;
+	}
+	
+	public static Funcall isnull(Object col, Object ifnull) {
+		Funcall f = new Funcall(Func.isnull);
+		f.args = new Object[] {col};
+		return f;
+	}
+
 	public static Funcall extfile(String[] args) {
 		Funcall f = new Funcall(Func.extFile);
 		f.args = args;
@@ -162,6 +210,14 @@ public class Funcall extends ExprPart {
 			return sqlExtFile(context, args);
 		else if (func == Func.concat)
 			return sqlConcat(context, args);
+		else if (func == Func.add)
+			return sqlAdd(context, args);
+		else if (func == Func.minus)
+			return sqlMinus(context, args);
+		else if (func == Func.mul)
+			return sqlMul(context, args);
+		else if (func == Func.div)
+			return sqlDiv(context, args);
 		else
 			try {
 				return dbSame(context, args);
@@ -171,12 +227,28 @@ public class Funcall extends ExprPart {
 			}
 	}
 
+	protected String sqlAdd(ISemantext context, String[] args) {
+		return Stream.of(args).collect(Collectors.joining(" + ", "(", ")"));
+	}
+
+	protected String sqlMinus(ISemantext context, String[] args) {
+		return Stream.of(args).collect(Collectors.joining(" - ", "(", ")"));
+	}
+
+	protected String sqlMul(ISemantext context, String[] args) {
+		return Stream.of(args).collect(Collectors.joining(" * ", "(", ")"));
+	}
+
+	protected String sqlDiv(ISemantext context, String[] args) {
+		return Stream.of(args).collect(Collectors.joining(" / ", "(", ")"));
+	}
+
 	/**Get function string that the database can understand, e.g. ["f," "arg1", "arg2"] => "f(arg1, arg2)".
 	 * @param ctx
 	 * @return formatted function call
 	 * @throws TransException 
 	 */
-	private String dbSame(ISemantext ctx, String[] args) throws TransException {
+	protected String dbSame(ISemantext ctx, String[] args) throws TransException {
 		String f = super.sql(ctx) + "(";
 		if (args != null && args.length > 0 && args[0] != null)
 			f += args[0];
@@ -185,16 +257,6 @@ public class Funcall extends ExprPart {
 			f += ", " + args[i];
 
 		return f + ")";
-	}
-
-	/**
-	 * Wrapper for triggering action of read files after uri is resolved - must have context.
-	 * The same as client query with string "extfile(t.uri)" - already used in Query.
-	 * @param uri
-	 * @return
-	 */
-	public static String extFile(String uri) {
-		return String.format("%s(%s)", Func.extFile.name(), uri);
 	}
 
 	/**
@@ -251,16 +313,14 @@ public class Funcall extends ExprPart {
 		this.resultAlias = alias;
 	}
 
-	public static String sqlConcat(ISemantext ctx, String[] args) {
+	protected static String sqlConcat(ISemantext ctx, String[] args) throws TransException {
 		dbtype dt = ctx.dbtype();
-//		if (dt == dbtype.oracle)
-//			?;
-//		else {
-			if (dt != dbtype.mysql && dt != dbtype.oracle
-					&& dt != dbtype.sqlite && dt != dbtype.ms2k)
-				Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
-			return Stream.of(args).collect(Collectors.joining(" || "));
-//		}
+		if (dt == dbtype.oracle)
+			throw new TransException("TODO ...");
+		else if (dt != dbtype.mysql && dt != dbtype.oracle
+				&& dt != dbtype.sqlite && dt != dbtype.ms2k)
+			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
+		return Stream.of(args).collect(Collectors.joining(" || "));
 	}
 
 	/**<p>Convert string value to datatiem.</p>
@@ -272,7 +332,7 @@ public class Funcall extends ExprPart {
 	 * @param args
 	 * @return see {@link #sqlDatetime(ISemantext, String)}
 	 */
-	private static String sqlDatetime(ISemantext ctx, String[] args) {
+	protected static String sqlDatetime(ISemantext ctx, String[] args) {
 		return sqlDatetime(ctx, args[0]);
 	}
 
@@ -285,7 +345,7 @@ public class Funcall extends ExprPart {
 	 * @param args
 	 * @return the correct sql snippet
 	 */
-	public static String sqlDatetime(ISemantext ctx, String str) {
+	protected static String sqlDatetime(ISemantext ctx, String str) {
 		dbtype dt = ctx.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("str_to_date('%s', '%Y-%m-%d %H:%i:%s')", str);
@@ -301,7 +361,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	public static String sqlIfNullElse(ISemantext context, String[] args) {
+	protected static String sqlIfNullElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("if(%s is null, %s, %s)",
@@ -323,11 +383,11 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	public static String sqlIfElse(ISemantext context, String exp, String then, String otherwise) {
+	protected static String sqlIfElse(ISemantext context, String exp, String then, String otherwise) {
 		return sqlIfElse(context, new String[] {exp, then, otherwise});
 	}
 
-	public static String sqlIfElse(ISemantext context, String[] args) {
+	protected static String sqlIfElse(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
 			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
@@ -339,7 +399,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	public static String[] argsql(Object[] args, ISemantext context) throws TransException {
+	protected static String[] argsql(Object[] args, ISemantext context) throws TransException {
 		if (args == null)
 			return null;
 		String argus[] = new String[args.length];
@@ -352,7 +412,7 @@ public class Funcall extends ExprPart {
 		return argus;
 	}
 
-	public static String sqlIfnull(ISemantext context, String... args) throws TransException {
+	protected static String sqlIfnull(ISemantext context, String... args) throws TransException {
 		if (args == null || args.length != 2)
 			throw new TransException("Arugments are invalid.");
 		dbtype dt = context.dbtype();
@@ -370,7 +430,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	public static String sqlNow(ISemantext context, String[] args) {
+	protected static String sqlNow(ISemantext context, String[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return "now()";
@@ -387,6 +447,16 @@ public class Funcall extends ExprPart {
 		}
 	}
 
+	/**
+	 * Wrapper for triggering action of read files after uri is resolved - must have context.
+	 * The same as client query with string "extfile(t.uri)" - already used in Query.
+	 * @param uri
+	 * @return
+	 */
+	public static String extFile(String uri) {
+		return String.format("%s(%s)", Func.extFile.name(), uri);
+	}
+
 	/**Create a function decoding null value, e.g. for oracle: decode (colElem, null, ifTrue, orElse).
 	 * @param colElem can only be a full column name.
 	 * @param ifTrue
@@ -399,6 +469,24 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
+	/**Create a function decoding value, e.g. for oracle: decode (colElem, logic, ifTrue, orElse).
+	 * @param logic the boolean expression
+	 * @param ifTrue
+	 * @param orElse
+	 * @return Funcall instance will generating sql if-else
+	 */
+	public static Funcall ifElse(Predicate logic, Object ifTrue, Object orElse) {
+		Funcall f = new Funcall(Func.ifElse);
+		f.args = new Object[] {logic, ifTrue, orElse};
+		return f;
+	}
+
+	/**@see #ifElse(Predicate, Object, Object)
+	 * @param logic
+	 * @param ifTrue
+	 * @param orElse
+	 * @return Funcall instance will generating sql if-else
+	 */
 	public static Funcall ifElse(String logic, Object ifTrue, Object orElse) {
 		Funcall f = new Funcall(Func.ifElse);
 		f.args = new Object[] {logic, ifTrue, orElse};
@@ -414,13 +502,33 @@ public class Funcall extends ExprPart {
 	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
 	 * <a href='www.sqlines.com/oracle-to-sql-server/to_date'>oracle</a><br>
 	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
-	 * @param dt
+	 * 
+	 * <h6>How to use</h6><pre>
+	 	// req: parsed jmsg body, e.g. AnsonQueryReq.
+		String conn = Connects.uri2conn(req.uri());
+		Query q = st
+			.select("polls", "p")
+			.col(Funcall.toDate(Connects.driverType(conn), "p.optime"), "pdate")
+	 * </pre>
+	 * 
 	 * @param date
 	 * @return create a Funcal
 	 */
-	public static Funcall toDate(dbtype dt, String date) {
+	public static Funcall toDate(String date) {
 		Funcall f = new Funcall(Func.datetime);
 		f.args = new Object[] {date};
+		return f;
+	}
+
+	public static Funcall toDate(ExprPart expr) {
+		Funcall f = new Funcall(Func.datetime);
+		f.args = new Object[] {expr};
+		return f;
+	}
+	
+	public static Funcall divid(Object l, Object r) {
+		Funcall f = new Funcall(Func.div);
+		f.args = new Object[] {l, r};
 		return f;
 	}
 
@@ -440,14 +548,5 @@ public class Funcall extends ExprPart {
 			}
 		}
 		return f;
-	}
-
-	/**
-	 * @param dt db type is ignored (optional) - same for mysql, sqlite, oracle, postgre
-	 * @param col
-	 * @return avg(col)
-	 */
-	public static ExprPart sqlAvg(dbtype dt, String col) {
-		return new ExprPart(String.format("avg(%s)", col));
 	}
 }

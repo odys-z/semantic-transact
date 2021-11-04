@@ -156,4 +156,13 @@ public class Predicate extends AbsPart {
 		escape = esc;
 		return this;
 	}
+
+	/**Helper for creating a equal predicate.
+	 * @param col
+	 * @param constv
+	 * @return predicate for col = 'constv'
+	 */
+	public static Predicate eq(String col, String constv) {
+		return new Predicate(Logic.op.eq, col, "'" + constv + "'");
+	}
 }
