@@ -49,51 +49,6 @@ public class EnvPath {
 		return src;
 	}
 	
-	/**A path start with "/" or "$" is absolute.
-	 * @param path
-	 * @return true if relative
-	public static boolean isRelativePath(String path) {
-		return !(path.startsWith("/") || path.startsWith("$"));
-	}
-	 */
-
-	/**Get starting environment variable value
-	 * @param varStr string with $Vars
-	 * @return
-	public static String startVar(String varStr) {
-		List<String> envs = reg.findGroups(varStr);
-		if (envs != null && envs.size() > 0) {
-			String env = envs.get(0);
-
-			Map<String, String> sysenvs = System.getenv();
-			if (sysenvs.containsKey(env))
-				return sysenvs.get(env);
-
-			String p = System.getProperty(env);
-			if (p == null)
-				return "";
-			return p;
-		}
-		return "";
-	}
-
-	protected static String unreplaceEnv(String uri, String envExpr) {
-		String env = startVar(envExpr);
-		if (env != null) {
-			return FilenameUtils.concat(env, uri);
-
-		}
-		return uri;
-	}
-	 */
-	
-//	public static String getAbsPath(String fn) {
-//		// fn = EnvHelper.isRelativePath(abspath) ?
-//		// 		FilenameUtils.concat(stx.containerRoot(), fn) : fn;
-//		return null;
-//	}
-
-
 	/**Convert uri to absolute path, according to env.
 	 * 
 	 * @see FilenameUtils#concat(String, String)
