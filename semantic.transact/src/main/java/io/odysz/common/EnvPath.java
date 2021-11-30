@@ -43,7 +43,7 @@ public class EnvPath {
 			for (String env : envs) {
 				String v = sysenvs.get(env);
 				v = v == null ? System.getProperty(env) : v;
-				if (v != null)
+				if (v != null) // still can be null
 					src = src.replaceAll("\\$" + env, v);
 			}
 		}
