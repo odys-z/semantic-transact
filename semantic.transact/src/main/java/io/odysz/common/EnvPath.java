@@ -45,6 +45,8 @@ public class EnvPath {
 				v = v == null ? System.getProperty(env) : v;
 				if (v != null) // still can be null
 					src = src.replaceAll("\\$" + env, v);
+				else
+					src = src.replaceAll("\\$" + env, "");
 			}
 		}
 		return src;
