@@ -140,6 +140,9 @@ public class Predicate extends AbsPart {
 		else {
 			// return String.format("%s %s", l.sql(sctx), op.sql(sctx, op, r.sql(sctx), negative));
 			// FIXME Should pedicate's operands always can't escape ' ? 
+
+			if (l == null) throw new TransException(
+					"Predictat sql can't built with null left operand. op: %s", op.name());
 			return String.format("%s %s", l.escape(escape).sql(sctx),
 					op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx), negative));
 		}
