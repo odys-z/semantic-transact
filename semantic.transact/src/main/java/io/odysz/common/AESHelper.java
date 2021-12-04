@@ -17,9 +17,6 @@ import org.apache.commons.crypto.random.CryptoRandomFactory;
 import org.apache.commons.crypto.utils.Utils;
 
 /**Static helpers for encrypt/decipher string.
- * <table>
- * <tr><td></td><td></td></tr>
- * </trable>
  * @author ody
  */
 public class AESHelper {
