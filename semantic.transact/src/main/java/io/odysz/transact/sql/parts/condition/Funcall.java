@@ -315,11 +315,8 @@ public class Funcall extends ExprPart {
 
 	protected static String sqlConcat(ISemantext ctx, String[] args) throws TransException {
 		dbtype dt = ctx.dbtype();
-//		if (dt == dbtype.oracle)
-//			throw new TransException("TODO ...");
-//		else
 		if (dt != dbtype.mysql && dt != dbtype.oracle
-				&& dt != dbtype.sqlite && dt != dbtype.ms2k)
+			&& dt != dbtype.sqlite && dt != dbtype.ms2k)
 			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
 		return Stream.of(args).collect(Collectors.joining(" || "));
 	}
