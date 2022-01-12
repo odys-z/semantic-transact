@@ -50,7 +50,7 @@ public interface IUser {
 
 	/**A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
-	 * @return
+	 * @return the session token
 	 */
 	default String sessionId() { return null; }
 
@@ -71,7 +71,7 @@ public interface IUser {
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
 	/**Add notifyings
-	 * @param n
+	 * @param note
 	 * @return this
 	 * @throws TransException 
 	 */

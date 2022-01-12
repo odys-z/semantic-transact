@@ -243,7 +243,7 @@ public class Funcall extends ExprPart {
 		return Stream.of(args).collect(Collectors.joining(" / ", "(", ")"));
 	}
 
-	/**Get function string that the database can understand, e.g. ["f," "arg1", "arg2"] => "f(arg1, arg2)".
+	/**Get function string that the database can understand, e.g. ["f," "arg1", "arg2"] =&gt; "f(arg1, arg2)".
 	 * @param ctx
 	 * @return formatted function call
 	 * @throws TransException 
@@ -340,7 +340,7 @@ public class Funcall extends ExprPart {
 	 * CONVERT(datetime, '2009/07/16 08:28:01', 120)<br>
 	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
 	 * @param ctx
-	 * @param args
+	 * @param str the date string
 	 * @return the correct sql snippet
 	 */
 	protected static String sqlDatetime(ISemantext ctx, String str) {
@@ -449,7 +449,7 @@ public class Funcall extends ExprPart {
 	 * Wrapper for triggering action of read files after uri is resolved - must have context.
 	 * The same as client query with string "extfile(t.uri)" - already used in Query.
 	 * @param uri
-	 * @return
+	 * @return extfile(uri)
 	 */
 	public static String extFile(String uri) {
 		return String.format("%s(%s)", Func.extFile.name(), uri);
@@ -501,7 +501,7 @@ public class Funcall extends ExprPart {
 	 * <a href='www.sqlines.com/oracle-to-sql-server/to_date'>oracle</a><br>
 	 * TO_DATE('2012-07-18 13:27:18', 'YYYY-MM-DD HH24:MI:SS')
 	 * 
-	 * <h6>How to use</h6><pre>
+	 * <p>How to use</p><pre>
 	 	// req: parsed jmsg body, e.g. AnsonQueryReq.
 		String conn = Connects.uri2conn(req.uri());
 		Query q = st

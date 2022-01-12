@@ -14,7 +14,7 @@ public class Sql {
 	 * Note: '%' (like) in format must be '%%'.
 	 * @param format e.g. on condition string in join clause.
 	 * @param args runtime arguements
-	 * @return
+	 * @return Condit object
 	 */
 	public static Condit condt(String format, Object... args) {
 		// try format == op - user can be confused like condt("=", "f.c1", "v1");
@@ -41,7 +41,7 @@ public class Sql {
 	
 	/**Filtering out "'", replaced with "''".
 	 * @param v
-	 * @return
+	 * @return replaced v
 	 */
 	public static String filterVal(String v) {
 		// for java regex lookahead and lookbehined, see
@@ -51,7 +51,7 @@ public class Sql {
 	}
 
     /**Convert a boolean represented by string to integer represented by string.
-     * e.g. "true" | int != 0 | "T" | "Y" -&gt; "1", else -&gt "0", 
+     * e.g. "true" | int != 0 | "T" | "Y" -&gt; "1", else -&gt; "0", 
      * @param bool
      * @return "1" or "0"
      */

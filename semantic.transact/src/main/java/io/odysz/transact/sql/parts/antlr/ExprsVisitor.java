@@ -32,7 +32,7 @@ expression
     | bracket_expression
     | unary_operator_expression
     | expression op=('*' | '/' | '%') expression
-    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
+    | expression op=('+' | '-' | '&amp;' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     // | expression assignment_operator expression
     ;
@@ -90,11 +90,11 @@ constant_expression
 // Spaces are allowed for comparison operators.
 // TODO rlike, llike
 comparison_operator
-    : '=' | '>' | '<' | '<' '=' | '>' '=' | '<' '>' | '!' '=' | '!' '>' | '!' '<'
+    : '=' | '&gt;' | '&lt;' | '&lt;' '=' | '&gt;' '=' | '&lt;' '&gt;' | '!' '=' | '!' '&gt;' | '!' '&lt;'
     ;
 
 // assignment_operator
-//     : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '^=' | '|='
+//     : '+=' | '-=' | '*=' | '/=' | '%=' | '&amp;=' | '^=' | '|='
 //     ;
 
 </pre>
@@ -111,7 +111,7 @@ public class ExprsVisitor extends SearchExprsBaseVisitor<ExprPart> {
 	        TSqlLexer markupLexer = new TSqlLexer(inputStream);
 	        CommonTokenStream commonTokenStream = new CommonTokenStream(markupLexer);
 	        SearchExprs exprParser = new SearchExprs(commonTokenStream);
-//	 
+
 	        ExpressionContext ctx = exprParser.expression();
 	        return visitor.visit(ctx);  
 	}
@@ -124,7 +124,7 @@ expression
     | bracket_expression
     | unary_operator_expression
     | expression op=('*' | '/' | '%') expression
-    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
+    | expression op=('+' | '-' | '&amp;' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     // | expression assignment_operator expression
     ;</pre>

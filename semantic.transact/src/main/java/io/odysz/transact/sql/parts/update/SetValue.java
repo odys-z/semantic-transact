@@ -21,7 +21,7 @@ import io.odysz.transact.x.TransException;
  * function_call: method_name '(' expression_list ')'
  * where {@link Funcall} can handle 'now' for different db, like
  * <pre>datetime('now'), strftime('%Y-%m-%d %H-%M-%f','now')</pre>
- * @see {@link io.odysz.transact.sql.parts.insert.ValueList}
+ * see {@link io.odysz.transact.sql.parts.insert.ValueList}
  * 
  * @author odys-z@github.com
  * */

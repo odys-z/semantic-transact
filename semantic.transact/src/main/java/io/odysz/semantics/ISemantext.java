@@ -61,7 +61,6 @@ public interface ISemantext {
 	 * Create a context for the insert-sql composing process.<br>
 	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
 	 * @param insert
-	 * @param statemt
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
 	 * @return the new ISemantext context instance for resolving semantics.
@@ -180,11 +179,11 @@ public interface ISemantext {
 
 	/** When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.
-	 * The operation's (instances of {@link IPostOperat ramda-expression}
-	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(Object)}.  
+	 * The operation's (instances of {@link IPostOperat lambda-expression}
+	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(IPostOperat)}.  
 	 * @param ctx
-	 * @throws SQLException 
 	 * @throws TransException 
+	 * @throws SQLException 
 	 */
 	void onCommitted(ISemantext ctx) throws TransException, SQLException;
 
@@ -205,7 +204,7 @@ public interface ISemantext {
 
 	/**Add an post selected operation.
 	 * <p>E.g. extFile Funcall will add a post file reading and replacing operation here.</p>
-	 * <p>Only one type of handler can be added to a context. Use {@link #hasOnSelectedHandler()}
+	 * <p>Only one type of handler can be added to a context. Use {@link #hasOnSelectedHandler(String)}
 	 * to check is there a same type of handler already been added.</p>
 	 * <p>Operations are managed as a linked hash map. All rows are iterated and processed by
 	 * op one by one, from first to last, independently.</p>
