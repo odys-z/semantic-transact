@@ -16,9 +16,11 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
-/**External file representation.<br>
- * An ExtFile can only been used as a set value in update/insert statement.
- * This is only used for update and insert. For reading, use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) Funcall.extFile(String)} 
+/**External file representation - mapping URI and file path back and forth.<br>
+ * An ExtFile can only been used as a setting value in update/insert statement.
+ * <p>This class is only used for update and insert. For reading,
+ * use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) Funcall.extFile(String)} </p>
+ * 
  * @author odys-z@github.com
  */
 public class ExtFile extends AbsPart {
@@ -26,10 +28,14 @@ public class ExtFile extends AbsPart {
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
-//	private String absoluteroot;
 	private String configRoot;
 	private String runtimePath;
 
+	/**
+	 * @param resulvingPath
+	 * @param configRoot
+	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
+	 */
 	public ExtFile(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
 		this.resulv_const_path = resulvingPath;
 		this.configRoot = configRoot;
@@ -39,16 +45,15 @@ public class ExtFile extends AbsPart {
 	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFile#prefixPath(String)}.<br>
 	 * The argument doesn't have to be absolute path if the runtime can access a file from a relative path.<br>
 	 * But servlet containers needing absolute paths to access file, so this must been set to the absolute path,
-	 * like with the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
+	 * such as the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
-	 * If this is wrong, please feel free to correct the author.
-	 * @param absRoot
-	 * @return this
-	public ExtFile absRootPath(String absRoot) {
-		this.absoluteroot = absRoot;
-		return this;
-	}
+	 * @param fn file name to be resolved
+	 * @param configRoot
+	 * @param stx instance of run time context
 	 */
+	public ExtFile(Resulving fn, String configRoot, ISemantext stx) {
+		this(fn, configRoot, stx.containerRoot());
+	}
 
 	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
@@ -82,19 +87,9 @@ public class ExtFile extends AbsPart {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
 			relatvFn += " " + filename;
 		
-//		String dir = "";
-//		if (!LangExt.isblank(prefix)) {
-//			dir = prefix;
-//			touchDir(dir);
-//		}
-
-		// relatvFn = FilenameUtils.concat(dir, relatvFn);
-		// String absoluteFn = FilenameUtils.concat(absoluteroot, relatvFn);
-
 		relatvFn = EnvPath.encodeUri(configRoot, prefix, relatvFn);
 
 		String absoluteFn = EnvPath.decodeUri(runtimePath, relatvFn);
-//		absoluteFn = FilenameUtils.concat(runtimePath, absoluteFn);
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
