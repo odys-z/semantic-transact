@@ -55,6 +55,15 @@ public class ExtFile extends AbsPart {
 		this(fn, configRoot, stx.containerRoot());
 	}
 
+	/**see {@link #ExtFile(Ruulving, String, ISemantext)}
+	 * @param resulvingPath
+	 * @param configRoot
+	 * @param stx
+	 */
+	public ExtFile(ExprPart resulvingPath, String configRoot, ISemantext stx) {
+		this(resulvingPath, configRoot, stx.containerRoot());
+	}
+
 	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
 	 * @param path
