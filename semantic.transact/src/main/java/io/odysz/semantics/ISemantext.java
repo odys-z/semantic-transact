@@ -179,7 +179,7 @@ public interface ISemantext {
 
 	/** When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.
-	 * The operation's (instances of {@link IPostOperat lambda-expression}
+	 * The operation's (instances of {@link IPostOperat} lambda expression
 	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(IPostOperat)}.  
 	 * @param ctx
 	 * @throws TransException 

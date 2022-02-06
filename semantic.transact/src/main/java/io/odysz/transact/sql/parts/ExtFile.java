@@ -55,7 +55,7 @@ public class ExtFile extends AbsPart {
 		this(fn, configRoot, stx.containerRoot());
 	}
 
-	/**see {@link #ExtFile(Ruulving, String, ISemantext)}
+	/**@see #ExtFile(Resulving, String, ISemantext)
 	 * @param resulvingPath
 	 * @param configRoot
 	 * @param stx

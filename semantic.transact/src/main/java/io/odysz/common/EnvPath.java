@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
+import io.odysz.semantics.ISemantext;
+
 /**<p>A helper to handler environment variable affected file path.</p>
  * Suppose $VOLUME_HOME = "/home/ody/volume"
  * <pre>
@@ -49,6 +51,8 @@ public class EnvPath {
 					src = src.replaceAll("\\$" + env, "");
 			}
 		}
+		if (src.startsWith("\\$"))
+			Utils.warn("Requried env variable may not parsed correctly: %s", src);
 		return src;
 	}
 	
@@ -62,7 +66,7 @@ public class EnvPath {
 	 */
 	public static String decodeUri(String root, String uri) {
 		root = root == null ? "" : root;
-		return FilenameUtils.concat(root, replaceEnv(uri));
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(uri));
 	}
 
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
@@ -75,6 +79,10 @@ public class EnvPath {
 	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
+	}
+
+	public static String decodeUri(ISemantext stx, String uri) {
+		return decodeUri(stx.containerRoot(), uri);
 	}
 
 }
