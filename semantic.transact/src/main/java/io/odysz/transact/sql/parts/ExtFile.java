@@ -30,6 +30,7 @@ public class ExtFile extends AbsPart {
 	private String filename;
 	private String configRoot;
 	private String runtimePath;
+//	private String[] presub;
 
 	/**
 	 * @param resulvingPath
@@ -67,10 +68,11 @@ public class ExtFile extends AbsPart {
 	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
 	 * @param path
+	 * @param subs
 	 * @return this
 	 */
-	public ExtFile prefixPath(String path) {
-		this.prefix = path;
+	public ExtFile prefixPath(String path, String...subs) {
+		this.prefix = FilenameUtils.concat(path, subs);
 		return this;
 	}
 	
