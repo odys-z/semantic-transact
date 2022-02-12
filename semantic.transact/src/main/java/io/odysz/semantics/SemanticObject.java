@@ -220,4 +220,14 @@ public class SemanticObject extends Anson {
 			}
 		out.println("");
 	}
+
+	/**Helper for finding out auto key after new id generated.
+	 * @param tabl
+	 * @param pk
+	 * @return the first resolved id
+	 */
+	public String resulve(String tabl, String pk) {
+		SemanticObject res = (SemanticObject) ((SemanticObject) data()).get(tabl);
+		return ((SemanticObject)res.get(tabl)).getString(pk);
+	}
 }
