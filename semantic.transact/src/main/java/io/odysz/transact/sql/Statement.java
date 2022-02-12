@@ -75,9 +75,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	private ArrayList<Object[]> attaches;
 	public ArrayList<Object[]> attaches() { return attaches; }
-	/**Add attachements can be handlered by <i>attaches</i> semantics handler.
+
+	/**Add attachments can be handled by <i>attaches</i> semantics handler.
 	 * @param attaches
-	 * @return
+	 * @return this
 	 */
 	public T attachs(ArrayList<Object[]> attaches) {
 		this.attaches = attaches;
@@ -174,8 +175,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	/**This is a wraper of {@link #where(String, String, String)} for convenient
 	 * - the third arg is taken as a string constant and added single quotes at begin and end.
 	 * @param op
-	 * @param lcol left column
-	 * @param rconst right constant will NOT be adding single quotes "''"
+	 * @param loperand left column
+	 * @param roperand right constant will NOT be adding single quotes "''"
 	 * @return this
 	 */
 	public T where(Logic.op op, String loperand, String roperand) {
@@ -186,9 +187,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * - the third arg is taken as a string constant and added single quotes at begin and end.
 	 * @param op
 	 * @param loperand
-	 * @param roperand
-	 * @param rconst right constant WILL be adding single quotes "''"
-	 * @return
+	 * @param roperand right constant WILL be adding single quotes "''"
+	 * @return this
 	 */
 	public T where_(Logic.op op, String loperand, String roperand) {
 		return where(Sql.condt(op, loperand, "'" + roperand + "'"));
@@ -206,7 +206,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	/** where col like '%likev%'
 	 * @param col
 	 * @param likev
-	 * @return
+	 * @return this
 	 */
 	public T whereLike(String col, String likev) {
 		return where("%", col, "'" + likev + "'");
@@ -222,7 +222,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	/**Tag: v1.3.0
 	 * @param col
 	 * @param constv
-	 * @return
+	 * @return this
 	 */
 	public T whereIn(String col, String[] constv) {
 		ExprPart inOp = new ExprPart(constv);
@@ -260,7 +260,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	/**Wrapper of {@link #post(Statement)}.
 	 * @param posts
-	 * @return
+	 * @return this
 	 */
 	public T post(ArrayList<Statement<?>> posts) {
 		if (posts != null && posts.size() > 0)

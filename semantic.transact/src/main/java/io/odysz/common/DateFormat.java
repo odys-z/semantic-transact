@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 public class DateFormat {
 	/**yyyy-MM-dd or %Y-%M-%e*/
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+	public static SimpleDateFormat yy_MM = new SimpleDateFormat("yyyy_MM");
+
 	/**yyyy-MM-dd-hhmmss or %Y-%M-%e ...*/
 	public static SimpleDateFormat sdflong_sqlite = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.0");
 	public static SimpleDateFormat sdflong_mysql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -20,6 +23,12 @@ public class DateFormat {
 	 * @return formatted string
 	 */
 	static public String format(Date d) { return d == null ? " - - " : sdf.format(d); }
+
+	/**
+	 * @param d
+	 * @return yyyy_MM
+	 */
+	static public String formatYYmm(Date d) { return d == null ? " - - " : yy_MM.format(d); }
 
 	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
 

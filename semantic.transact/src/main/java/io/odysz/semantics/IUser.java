@@ -8,12 +8,18 @@ import java.util.List;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
-/**<p>Provide user e.g. servlet session information to modify some date in AST.</p>
+/**<p>Provide user e.g. servlet session information to modify some data in AST.</p>
+ * <h5>Usage</h5>
+ * <p>
+ * 1. Configure the implementations class name in config.xml.<br>
+ * 2. If the client needing logging in and responsed with a user object, the class must extend {@link SemanticObject}. <br>
+ * - For default implementation, see semantic.jserv/JUser. 
+ * </p> 
  * <p>This is not necessary if using semantic-transact directly. But if the caller
  * want to set user information like fingerpirnt for modified records, this can be used
  * to let semantic-transact providing user identity to the semantics handler.</p>
  * 
- * <p>In v1.1.1, sessionId is read only. If a new password bee updated,
+ * <p>In v1.1.1, sessionId is read only. If a new password have been updated,
  * just remove then re-login</p>
  * 
  * @author ody
@@ -50,7 +56,7 @@ public interface IUser {
 
 	/**A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
-	 * @return
+	 * @return the session token
 	 */
 	default String sessionId() { return null; }
 
@@ -71,7 +77,7 @@ public interface IUser {
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
 	/**Add notifyings
-	 * @param n
+	 * @param note
 	 * @return this
 	 * @throws TransException 
 	 */

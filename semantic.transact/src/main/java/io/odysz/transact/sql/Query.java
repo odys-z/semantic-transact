@@ -92,7 +92,7 @@ column_elem
     : (table_name '.')? (column_name=id) as_column_alias?
     ;
 	</pre>
- * @author odys-z@github.com
+ * @author odys-z@github.io
  *
  */
 public class Query extends Statement<Query> {
@@ -362,7 +362,7 @@ public class Query extends Statement<Query> {
 
 	/**set query orders
 	 * @param orders [ [col, desc], ...]
-	 * @return
+	 * @return this
 	 */
 	public Query orderby(ArrayList<String[]> orders) {
 		if (orders != null && orders.size() > 0)
@@ -552,17 +552,17 @@ public class Query extends Statement<Query> {
 	 * <h3>Where is the sample code?</h3>
 	 * <p>To see how to extend {@link Transcxt}, see DATranscxt in project semantic-DA.<br>
 	 * To see how to use this method, see io.odysz.semantic.DASemantextTest in project sematic-DA.</p>
-	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList, int...)}
+	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList, io.odysz.semantics.IUser...)}
 	 * because the inserting values will be handled / smirred in both methods.</p>
 	 * <p>If you can make sure the ISemantext instance provided to Transcxt is clean of data
 	 * invention, you can safely use both of these methods. But it's not guaranteed in the
 	 * future version.</p>
 	 * Also it's not recommended for the performance reason. The sql string is already generated
-	 * by {@link #commit(ArrayList, int...)}, don't generate it and travels AST again in this method, 
-	 * use it directly.
+	 * by {@link #commit(ArrayList, io.odysz.semantics.IUser...)}, don't generate it and travels AST again
+	 * in this method, use it directly.
 	 * @param ctx 
 	 * @return the result set
-	 * (For a select result, {@link Query}'s doneOp will set the {@AnResultset}.)
+	 * (For a select result, {@link Query}'s doneOp will set the AnResultset.)
 	 * @throws TransException
 	 * @throws SQLException
 	 */
