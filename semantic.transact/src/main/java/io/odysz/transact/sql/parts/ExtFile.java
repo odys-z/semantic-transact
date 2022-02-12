@@ -26,7 +26,6 @@ public class ExtFile extends AbsPart {
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
-//	private String absoluteroot;
 	private String configRoot;
 	private String runtimePath;
 
