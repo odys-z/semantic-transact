@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.anson.Anson;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
@@ -104,4 +105,12 @@ public interface IUser {
 	 * @return this
 	 */
 	public default String sessionKey() { return null; }
+
+	/**
+	 * Since v1.3.5, user object has a change to initialize with login request, e.g. set client device Id.
+	 * @param sessionReqBody e.g. AnSessionReq
+	 * @return
+	 * @throws SsException 
+	 */
+	public default IUser onCreate(Anson sessionReqBody) throws GeneralSecurityException { return this; }
 }
