@@ -39,6 +39,13 @@ public class Insert extends Statement<Insert> {
 	 * TODO let's depcate this - all new nv are appended to last of valuesNv */
 	private ArrayList<Object[]> currentRowNv;
 
+	/** Insert statement intialization, not come with a post operation for committing SQL.
+	 * So don't confused with DATranscxt#Insert(String tabl, IUser usr), which will instert into 
+	 * DB when calling ins().
+	 * 
+	 * @param transc
+	 * @param tabl
+	 */
 	protected Insert(Transcxt transc, String tabl) {
 		super(transc, tabl, null);
 	}

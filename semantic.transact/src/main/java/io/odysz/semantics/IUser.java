@@ -54,14 +54,18 @@ public interface IUser {
 	 */
 	default boolean guessPswd(String pswdCypher64, String iv64) throws TransException, GeneralSecurityException, IOException { return false; }
 
+	default IUser sessionId(String rad64num) { return this; }
+
 	/**A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
 	 * @return the session token
 	 */
 	default String sessionId() { return null; }
 
-	/**Update last touched time stamp.*/
-	default void touch() {}
+	/**Note: science v1.3.5, this requires users implement a touch function, and return the instance.
+	 * If the session object must been terminated when time out, this method must touch the current time.
+	 * Update last touched time stamp.*/
+	default IUser touch() { return this; };
 
 	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
 	 */
@@ -88,9 +92,16 @@ public interface IUser {
 	 */
 	public List<Object> notifies();
 
-	public IUser sessionKey(String string);
+	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
+	 * 
+	 * @param string
+	 * @return this
+	 */
+	public default IUser sessionKey(String string) { return this; }
 
-	public String sessionKey();
-
-	default IUser sessionId(String rad64num) { return this; }
+	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
+	 * 
+	 * @return this
+	 */
+	public default String sessionKey() { return null; }
 }
