@@ -56,7 +56,7 @@ public class EnvPath {
 		return src;
 	}
 	
-	/**Convert uri to absolute path, according to env.
+	/**Decode URI - convert file records' uri into absolute path, according to env.
 	 * 
 	 * @see FilenameUtils#concat(String, String)
 	 * 
@@ -67,6 +67,11 @@ public class EnvPath {
 	public static String decodeUri(String root, String uri) {
 		root = root == null ? "" : root;
 		return FilenameUtils.concat(replaceEnv(root), replaceEnv(uri));
+	}
+
+	public static String decodeUri(String root, String subpath, String filename) {
+		root = root == null ? "" : root;
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
 	}
 
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>

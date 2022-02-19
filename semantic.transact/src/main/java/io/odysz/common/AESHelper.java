@@ -1,6 +1,8 @@
 package io.odysz.common;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -197,6 +199,30 @@ public class AESHelper {
 	public static String encode64(final byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
 	}
+
+	public static StringBuilder encode64(final InputStream ifs) throws IOException {
+//		int l = ifs.read(buff, start, len);
+		// IoUtils.readFully(ifs, buff, start, len);
+        // return Base64.getEncoder().encodeToString(buff);
+
+		int BUFFER_SIZE = 3 * 1024;
+
+		BufferedInputStream in = new BufferedInputStream(ifs, BUFFER_SIZE);
+		Base64.Encoder encoder = Base64.getEncoder();
+		StringBuilder result = new StringBuilder();
+		byte[] chunk = new byte[BUFFER_SIZE];
+
+		int len = 0;
+		while ( (len = in.read(chunk)) == BUFFER_SIZE ) {
+			 result.append( encoder.encodeToString(chunk) );
+		}
+		if ( len > 0 ) {
+			 chunk = Arrays.copyOf(chunk,len);
+			 result.append( encoder.encodeToString(chunk) );
+		}
+		return result;
+	}
+
 
 	public static byte[] decode64(String str) {
         return Base64.getDecoder().decode(str);
