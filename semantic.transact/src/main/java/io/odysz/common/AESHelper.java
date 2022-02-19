@@ -205,7 +205,7 @@ public class AESHelper {
 		// IoUtils.readFully(ifs, buff, start, len);
         // return Base64.getEncoder().encodeToString(buff);
 
-		int BUFFER_SIZE = 3 * 1024;
+		int BUFFER_SIZE = 3 * 128 * 1024;
 
 		BufferedInputStream in = new BufferedInputStream(ifs, BUFFER_SIZE);
 		Base64.Encoder encoder = Base64.getEncoder();
