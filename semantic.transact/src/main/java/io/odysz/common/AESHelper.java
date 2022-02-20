@@ -200,27 +200,28 @@ public class AESHelper {
         return Base64.getEncoder().encodeToString(bytes);
 	}
 
-	public static StringBuilder encode64(final InputStream ifs) throws IOException {
-//		int l = ifs.read(buff, start, len);
-		// IoUtils.readFully(ifs, buff, start, len);
-        // return Base64.getEncoder().encodeToString(buff);
+	/**
+	 * @param ifs
+	 * @param blockSize default 3 * 1024 * 1024;
+	 * @return
+	 * @throws IOException
+	 */
+	public static String encode64(final InputStream ifs, int blockSize) throws IOException {
+		blockSize = blockSize > 0 ? blockSize : 3 * 1024 * 1024;
 
-		int BUFFER_SIZE = 3 * 128 * 1024;
+		if ((blockSize % 12) != 0)
+			throw new IOException ("Block size must be multple of 12.");
 
-		BufferedInputStream in = new BufferedInputStream(ifs, BUFFER_SIZE);
+		BufferedInputStream in = new BufferedInputStream(ifs, blockSize);
 		Base64.Encoder encoder = Base64.getEncoder();
-		StringBuilder result = new StringBuilder();
-		byte[] chunk = new byte[BUFFER_SIZE];
+		// StringBuilder result = new StringBuilder();
+		byte[] chunk = new byte[blockSize];
 
-		int len = 0;
-		while ( (len = in.read(chunk)) == BUFFER_SIZE ) {
-			 result.append( encoder.encodeToString(chunk) );
-		}
-		if ( len > 0 ) {
-			 chunk = Arrays.copyOf(chunk,len);
-			 result.append( encoder.encodeToString(chunk) );
-		}
-		return result;
+		int len = in.read(chunk);
+
+		if (len >= 0)
+			return encoder.encodeToString(chunk);
+		else return null;
 	}
 
 
