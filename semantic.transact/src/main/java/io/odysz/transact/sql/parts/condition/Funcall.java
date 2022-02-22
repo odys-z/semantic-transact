@@ -36,7 +36,7 @@ public class Funcall extends ExprPart {
 	/**Use ms 2k sql server getutcdate() or getDate() */
 	public static boolean ms2kUseUTCtime = false;
 
-	public enum Func {
+	public static enum Func {
 		now("now()"),
 		max("max"),
 		count("count"),

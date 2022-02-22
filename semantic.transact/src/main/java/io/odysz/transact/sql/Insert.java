@@ -68,6 +68,11 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
+	public Insert nv(String n, ArrayList<String> lst) throws TransException {
+		nv(n, lst == null ? "null" : String.join(",", lst));
+		return this;
+	}
+
 	/**Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
 	 * This method is used to setup cols in the latter case.
 	 * @param col0
