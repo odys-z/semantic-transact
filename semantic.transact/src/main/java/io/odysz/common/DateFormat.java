@@ -31,6 +31,8 @@ public class DateFormat {
 	 */
 	static public String formatYYmm(Date d) { return d == null ? " - - " : yy_MM.format(d); }
 
+	static public String formatYYmm(FileTime d) { return d == null ? " - - " : yy_MM.format(new Date(d.toMillis())); }
+
 	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
 
 	static public String formatime(FileTime d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(new Date(d.toMillis())); }
