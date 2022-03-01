@@ -23,13 +23,6 @@ public class Delete extends Statement<Delete>  {
 		return null;
 	}
 
-//	public Delete commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-//		if ((where == null || where.isEmpty()))
-//			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletiong with conditions.");
-//
-//		return super.commit(cxt, sqls);
-//	}
-
 	public Delete commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
 		if ((where == null || where.isEmpty()))
 			throw new TransException("Empty conditions for deleting. io.odysz.transact.sql.Delete is enforcing deletion with conditions.");
@@ -42,10 +35,6 @@ public class Delete extends Statement<Delete>  {
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-//		if (sctx != null)
-//			sctx.onDelete(this, mainTabl, where);
-		
-		// if (where == null && inSelectCond == null)
 		if (where == null)
 			throw new TransException("semantic.transact doesn't allow any delete statement without conditions. table: %s", mainTabl);
 		
@@ -53,8 +42,6 @@ public class Delete extends Statement<Delete>  {
 		Stream<String> s = // Stream.concat(
 					Stream.of(  new ExprPart("delete from"),
 								mainTabl,
-//								new ExprPart("where"), 
-//								where == null ? inSelectCond : where
 								where == null ? null : new ExprPart("where"), 
 								where
 					).map(m -> {

@@ -177,6 +177,8 @@ public interface ISemantext {
 	 */
 	public String containerRoot();
 
+	void addOnOkOperate(IPostOperat op);
+
 	/** When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.
 	 * The operation's (instances of {@link IPostOperat} lambda expression
@@ -186,8 +188,6 @@ public interface ISemantext {
 	 * @throws SQLException 
 	 */
 	void onCommitted(ISemantext ctx) throws TransException, SQLException;
-
-	void addOnOkOperate(IPostOperat op);
 
 	/**On selected event handler, the chance that the resultset can be modified.
 	 * @param resultset any result object that can be understood by handler. e.g. SResultSet
