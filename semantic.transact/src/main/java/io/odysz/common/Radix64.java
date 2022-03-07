@@ -19,10 +19,10 @@ public class Radix64 {
 	 * @param v fix 6 bytes Base64 chars.
 	 * @return String representation in radix 64.
 	 */
-	public static String toString(int v) {
+	public static String toString(long v) {
 		char[] buf = new char[6];
 		for (int i = 0; i < 6; i++) {
-			int idx = v & 0x3f;
+			int idx = (int) (v & 0x3f);
 			char digit = radchar[idx];
 			buf[5 - i] = digit;
 			v = v >>> 6;
@@ -30,10 +30,10 @@ public class Radix64 {
 		return String.valueOf(buf);
 	}
 	
-	public static String toString(int v, int digits) {
+	public static String toString(long v, int digits) {
 		char[] buf = new char[digits];
 		for (int i = 0; i < digits; i++) {
-			int idx = v & 0x3f;
+			int idx = (int) (v & 0x3f);
 			char digit = radchar[idx];
 			buf[digits - 1 - i] = digit;
 			v = v >>> 6;
