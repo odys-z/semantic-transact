@@ -89,7 +89,7 @@ public class ExtFileUpdate extends ExprPart {
 
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
-		if (oldUri == null) throw new TransException("No uri (file) to move.");
+		if (oldUri == null) throw new TransException("No uri (file) to move. Called oldUri() ?");
 		
 		String relatvFn = ExtFileInsert.encodeUri(nameId, configRoot, prefix, filename);
 		String absoluteFn = ExtFileInsert.decodeUri(runtimePath, relatvFn);
@@ -102,6 +102,9 @@ public class ExtFileUpdate extends ExprPart {
 		
 		Path f = Paths.get(absoluteFn);
 		Path old = Paths.get(absoluteOld);
+
+		if (!Files.exists(old)) throw new TransException("Uri (file) doesn't exits - commit(sql) or update mulitple times?");
+
 		try {
 			while (Files.exists(f, LinkOption.NOFOLLOW_LINKS)) {
 				Random random = new Random();
