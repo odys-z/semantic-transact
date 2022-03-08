@@ -20,48 +20,50 @@ import io.odysz.transact.x.TransException;
  * An ExtFile can only been used as a setting value in update/insert statement.
  * <p>This class is only used for update and insert. For reading,
  * use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) Funcall.extFile(String)} </p>
+ * <h4>Note</h4>
+ * The {@link #sql(ISemantext)} method can be only used as insert mode. The DASemantics.ShExtFile only place this
+ * class in insert statement.
  * 
  * @author odys-z@github.com
  */
-public class ExtFile extends AbsPart {
+public class ExtFileInsert extends AbsPart {
 	private String b64;
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
 	private String configRoot;
 	private String runtimePath;
-//	private String[] presub;
 
 	/**
-	 * @param resulvingPath
-	 * @param configRoot
+	 * @param resulvingPath e.g. Id Resulve + client name.
+	 * @param configRoot root path in config.xml
 	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
 	 */
-	public ExtFile(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
+	public ExtFileInsert(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
 		this.resulv_const_path = resulvingPath;
 		this.configRoot = configRoot;
 		this.runtimePath = runtimeRoot;
 	}
 
-	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFile#prefixPath(String)}.<br>
+	/**Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFileInsert#prefixPath(String)}.<br>
 	 * The argument doesn't have to be absolute path if the runtime can access a file from a relative path.<br>
 	 * But servlet containers needing absolute paths to access file, so this must been set to the absolute path,
 	 * such as the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
 	 * @param fn file name to be resolved
-	 * @param configRoot
+	 * @param configRoot root path in config.xml
 	 * @param stx instance of run time context
 	 */
-	public ExtFile(Resulving fn, String configRoot, ISemantext stx) {
+	public ExtFileInsert(Resulving fn, String configRoot, ISemantext stx) {
 		this(fn, configRoot, stx.containerRoot());
 	}
 
-	/**@see #ExtFile(Resulving, String, ISemantext)
+	/**@see #ExtFileInsert(Resulving, String, ISemantext)
 	 * @param resulvingPath
-	 * @param configRoot
+	 * @param configRoot root path in config.xml
 	 * @param stx
 	 */
-	public ExtFile(ExprPart resulvingPath, String configRoot, ISemantext stx) {
+	public ExtFileInsert(ExprPart resulvingPath, String configRoot, ISemantext stx) {
 		this(resulvingPath, configRoot, stx.containerRoot());
 	}
 
@@ -71,17 +73,17 @@ public class ExtFile extends AbsPart {
 	 * @param subs
 	 * @return this
 	 */
-	public ExtFile prefixPath(String path, String...subs) {
+	public ExtFileInsert prefixPath(String path, String...subs) {
 		this.prefix = FilenameUtils.concat(path, subs);
 		return this;
 	}
 	
-	public ExtFile filename(String name) {
+	public ExtFileInsert filename(String name) {
 		this.filename = name;
 		return this;
 	}
 	
-	public ExtFile b64(String b64) {
+	public ExtFileInsert b64(String b64) {
 		this.b64 = b64;
 		return this;
 	}
@@ -89,6 +91,7 @@ public class ExtFile extends AbsPart {
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
 		// save file to pathname
+		/*
 		String relatvFn;
 		if (resulv_const_path instanceof Resulving) 
 			relatvFn = ((Resulving)resulv_const_path).resulved(ctx);
@@ -99,8 +102,13 @@ public class ExtFile extends AbsPart {
 			relatvFn += " " + filename;
 		
 		relatvFn = EnvPath.encodeUri(configRoot, prefix, relatvFn);
+		*/
+		
+		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
 
-		String absoluteFn = EnvPath.decodeUri(runtimePath, relatvFn);
+		// String absoluteFn = EnvPath.decodeUri(runtimePath, relatvFn);
+		String absoluteFn = decodeUri(runtimePath, relatvFn);
+
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
@@ -114,8 +122,48 @@ public class ExtFile extends AbsPart {
 			return "''";
 		}
 	}
+	
+	/**
+	 * @param resulv
+	 * @param cfgRoot
+	 * @param prefix
+	 * @param filename
+	 * @param ctx
+	 * @return cfgRoot[without-env]/prefix/resulved filename
+	 * @throws TransException
+	 */
+	public static String encodeUri(ExprPart resulv, String cfgRoot, String prefix, String filename, ISemantext ctx) throws TransException {
+		String relatvFn;
+		if (resulv instanceof Resulving) 
+			relatvFn = ((Resulving)resulv).resulved(ctx);
+		else
+			relatvFn = resulv.sql(ctx);
+		
+//		if (!LangExt.isblank(filename, "\\.", "\\*"))
+//			relatvFn += " " + filename;
+//		
+//		return EnvPath.encodeUri(cfgRoot, prefix, relatvFn);
+		return encodeUri(relatvFn, cfgRoot, prefix, filename);
+	}
+	
+	/**
+	 * @param nameId
+	 * @param cfgRoot
+	 * @param prefix
+	 * @param filename
+	 * @return cfgRoot(without-env)/prefix/nameId filename
+	 */
+	public static String encodeUri(String nameId, String cfgRoot, String prefix, String filename) {
+		if (!LangExt.isblank(filename, "\\.", "\\*"))
+			nameId += " " + filename;
+		return EnvPath.encodeUri(cfgRoot, prefix, nameId);
+	}
+	
+	public static String decodeUri(String runtimePath, String dbUri) {
+		 return EnvPath.decodeUri(runtimePath, dbUri);
+	}
 
-	protected void touchDir(String dir) {
+	public static void touchDir(String dir) {
 		File f = new File(dir);
 		if (f.isDirectory())
 			return;
