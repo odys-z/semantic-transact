@@ -5,9 +5,8 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io_odysz.FilenameUtils;
-
 import io.odysz.anson.Anson;
+import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
@@ -121,9 +120,9 @@ public interface IUser {
 	 * @param uid
 	 * @param folder
 	 * @param ssid
-	 * @return folder/uid/folder/ssid;
+	 * @return $root/folder/uid/folder/ssid;
 	 */
 	static String tempDir(String root, String uid, String folder, String ssid) {
-		return FilenameUtils.concat(folder, uid, folder, ssid);
+		return EnvPath.decodeUri(root, uid, folder, ssid);
 	}
 }

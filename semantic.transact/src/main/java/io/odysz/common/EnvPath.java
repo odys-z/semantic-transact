@@ -74,6 +74,11 @@ public class EnvPath {
 		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
 	}
 
+	public static String decodeUri(String root, String subpath, String folder2, String filename) {
+		root = root == null ? "" : root;
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), replaceEnv(folder2), filename);
+	}
+
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
 	 * E.g.<br>
 	 * configRoot: $VOLUME_HOME/shares, uri: f.jpg --&gt; /home/ody/volume/shares/f.jpg <br>
