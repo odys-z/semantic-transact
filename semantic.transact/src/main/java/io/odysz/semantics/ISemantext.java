@@ -87,7 +87,7 @@ public interface ISemantext {
 	 */
 	ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws TransException;
 
-	/**Called each time an <@link Update} statement found itself will composing an update-sql.
+	/**Called each time an {@link Update} statement found itself will composing an update-sql.
 	 * @param update
 	 * @param tabl
 	 * @param nvs
