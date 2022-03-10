@@ -76,7 +76,7 @@ public class DateFormat {
 	}
 
 	public static long getDayDiffInt(Date d2, Date d1) {
-			if (d2 == null || d1 == null)
+		if (d2 == null || d1 == null)
 			return -1;
 		long diff = d2.getTime() - d1.getTime();
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
