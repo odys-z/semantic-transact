@@ -21,6 +21,8 @@ import io.odysz.semantics.ISemantext;
  args: /home/ody/upload,uri,userId,cate,docName
  encoded: /home/ody/upload/admin/000003 f.txt
  decoded: /home/ody/upload/admin/000003 f.txt</pre>
+ 
+ * Since v1.4.2, system property has higher priority than environment variable.
  * @author Odys Zhou
  *
  */
@@ -43,8 +45,8 @@ public class EnvPath {
 			Map<String, String> sysenvs = System.getenv();
 
 			for (String env : envs) {
-				String v = sysenvs.get(env);
-				v = v == null ? System.getProperty(env) : v;
+				String v = System.getProperty(env);
+				v = v == null ? sysenvs.get(env) : v;
 				if (v != null) // still can be null
 					src = src.replaceAll("\\$" + env, v);
 				else
