@@ -214,7 +214,7 @@ public class AESHelper {
 
 		BufferedInputStream in = new BufferedInputStream(ifs, blockSize);
 		Base64.Encoder encoder = Base64.getEncoder();
-		// StringBuilder result = new StringBuilder();
+
 		byte[] chunk = new byte[blockSize];
 
 		int len = in.read(chunk);
