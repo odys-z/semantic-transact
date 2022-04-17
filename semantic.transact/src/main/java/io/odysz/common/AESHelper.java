@@ -101,6 +101,9 @@ public class AESHelper {
 
 	public static String encrypt(String plain, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
+		if (!plain.trim().equals(plain))
+			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
+
 		key = pad16_32(key);
 		plain = pad16_32(plain);
 		byte[] input = getUTF8Bytes(plain);
@@ -142,17 +145,15 @@ public class AESHelper {
 	public static String decrypt(String cypher, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
+		// FIXME should padding bytes, not string.
 		byte[] kb = getUTF8Bytes(pad16_32(key));
 		byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
-        //return p.trim();
-        return p.replace("-", "");
+        // return p.replace("-", "");
+        return depad16_32(p);
 	}
 	
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
-		//key = pad16_32(key);
-		//cypher = pad16_32(cypher);
-		//byte[] input = Base64.getDecoder().decode(cypher);
 
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
@@ -165,18 +166,33 @@ public class AESHelper {
         encipher.close();
         
         return Arrays.copyOf(output, finalBytes);
-        //return setUTF8Bytes(Arrays.copyOf(output, finalBytes));
 	}
 	
+	/**
+	 * @param s string of ASCII
+	 * @return 16 / 32 byte string
+	 * @throws GeneralSecurityException
+	 */
 	private static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
-			return String.format("%1$16s", s).replace(' ', '-');
+			return String.format("%1$16s", s).replaceAll(" ", "-");
 		else if (l <= 32)
-			return String.format("%1$32s", s).replace(' ', '-');
+			return String.format("%1$32s", s).replaceAll(" ", "-");
 		else
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
+
+	private static String depad16_32(String s) throws GeneralSecurityException {
+		int l = s.length();
+		if (l <= 16)
+			return s.replaceAll("-", " ").trim();
+		else if (l <= 32)
+			return s.replaceAll("-", " ").trim();
+		else
+			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
+	}
+
 	
     /**
      * Converts String to UTF8 bytes
