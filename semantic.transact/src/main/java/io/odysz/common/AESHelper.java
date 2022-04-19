@@ -90,10 +90,10 @@ public class AESHelper {
 			String encryptK) throws GeneralSecurityException, IOException {
 		byte[] iv = AESHelper.decode64(decryptIv);
 		byte[] input = AESHelper.decode64(cypher);
-		byte[] dkb = getUTF8Bytes(pad16_32(decryptK));
+		byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // FIXME won't work for non ASCII
 		byte[] plain = decryptEx(input, dkb, iv);
 		byte[] eiv = getRandom();
-		byte[] ekb = getUTF8Bytes(pad16_32(encryptK));
+		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
 		byte[] output = encryptEx(plain, ekb, eiv);
         String b64 = Base64.getEncoder().encodeToString(output);
         return new String[] {b64, AESHelper.encode64(eiv)};
@@ -104,8 +104,8 @@ public class AESHelper {
 		if (!plain.trim().equals(plain))
 			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
 
-		key = pad16_32(key);
-		plain = pad16_32(plain);
+		key = pad16_32(key); // FIXME won't work for non ASCII
+		plain = pad16_32(plain); // FIXME won't work for non ASCII
 		byte[] input = getUTF8Bytes(plain);
 		byte[] kb = getUTF8Bytes(key);
 		byte[] output = encryptEx(input, kb, iv);
@@ -146,7 +146,7 @@ public class AESHelper {
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
 		// FIXME should padding bytes, not string.
-		byte[] kb = getUTF8Bytes(pad16_32(key));
+		byte[] kb = getUTF8Bytes(pad16_32(key)); // FIXME won't work for non ASCII
 		byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
         // return p.replace("-", "");
