@@ -10,7 +10,7 @@ public class Logic {
 	public enum type { and, or, not, empty };
 
 	public enum op {eq,
-		/** not equal: lop <> rop */
+		/** not equal: lop &lt;&gt; rop */
 		ne, lt, le, gt, ge, mul, div, add, minus, like,
 		/** right like: lop like '[rop]%' */
 		rlike,

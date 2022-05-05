@@ -39,6 +39,13 @@ public class Insert extends Statement<Insert> {
 	 * TODO let's depcate this - all new nv are appended to last of valuesNv */
 	private ArrayList<Object[]> currentRowNv;
 
+	/** Insert statement intialization, not come with a post operation for committing SQL.
+	 * So don't confused with DATranscxt#Insert(String tabl, IUser usr), which will instert into 
+	 * DB when calling ins().
+	 * 
+	 * @param transc
+	 * @param tabl
+	 */
 	protected Insert(Transcxt transc, String tabl) {
 		super(transc, tabl, null);
 	}
@@ -61,7 +68,12 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Instead of using {@link #nv(String, Object)} to setup columns, sometimes we use insert tabl(col) select ...<br>
+	public Insert nv(String n, ArrayList<String> lst) throws TransException {
+		nv(n, lst == null ? "null" : String.join(",", lst));
+		return this;
+	}
+
+	/**Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
 	 * This method is used to setup cols in the latter case.
 	 * @param col0
 	 * @param cols
@@ -253,13 +265,13 @@ public class Insert extends Statement<Insert> {
 	 * <h3>Where is the sample code?</h3>
 	 * <p>To see how to extend {@link Transcxt}, see DATranscxt in project semantic-DA.<br>
 	 * To see how to use this method, see io.odysz.semantic.DASemantextTest in project sematic-DA.</p>
-	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList)}
+	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList, io.odysz.semantics.IUser...)}
 	 * because the inserting values will be handled / smirred in both methods.</p>
 	 * <p>If you can make sure the ISemantext instance provided to Transcxt is clean of data
 	 * invention, you can safely use both of these methods. But it's not guaranteed in the
 	 * future version.</p>
 	 * Also it's not recommended for the performance reason. The sql string is already generated
-	 * by {@link #commit(ArrayList, int...)} , don't generate it and travels AST again in this method, 
+	 * by {@link #commit(ArrayList, io.odysz.semantics.IUser...) commit()} , don't generate it and travels AST again in this method, 
 	 * use it directly.
 	 * @param ctx
 	 * @return results by resolving FK, etc.
@@ -307,7 +319,7 @@ public class Insert extends Statement<Insert> {
 	 * FIXME merge this to some where parsing JMessage<br>
 	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
 	 * @param stcx 
-	 * @throws SemanticException 
+	 * @throws TransException 
 	 */
 	public void postChildren(SemanticObject multireq, Transcxt stcx) throws TransException {
 		Delete del = (Delete) multireq.get("dels");

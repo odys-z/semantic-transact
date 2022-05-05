@@ -5,15 +5,23 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.anson.Anson;
+import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
-/**<p>Provide user e.g. servlet session information to modify some date in AST.</p>
+/**<p>Provide user e.g. servlet session information to modify some data in AST.</p>
+ * <h5>Usage</h5>
+ * <p>
+ * 1. Configure the implementations class name in config.xml.<br>
+ * 2. If the client needing logging in and responsed with a user object, the class must extend {@link SemanticObject}. <br>
+ * - For default implementation, see semantic.jserv/JUser. 
+ * </p> 
  * <p>This is not necessary if using semantic-transact directly. But if the caller
  * want to set user information like fingerpirnt for modified records, this can be used
  * to let semantic-transact providing user identity to the semantics handler.</p>
  * 
- * <p>In v1.1.1, sessionId is read only. If a new password bee updated,
+ * <p>In v1.1.1, sessionId is read only. If a new password have been updated,
  * just remove then re-login</p>
  * 
  * @author ody
@@ -48,14 +56,18 @@ public interface IUser {
 	 */
 	default boolean guessPswd(String pswdCypher64, String iv64) throws TransException, GeneralSecurityException, IOException { return false; }
 
+	default IUser sessionId(String rad64num) { return this; }
+
 	/**A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
-	 * @return
+	 * @return the session token
 	 */
 	default String sessionId() { return null; }
 
-	/**Update last touched time stamp.*/
-	default void touch() {}
+	/**Note: science v1.3.5, this requires users implement a touch function, and return the instance.
+	 * If the session object must been terminated when time out, this method must touch the current time.
+	 * Update last touched time stamp.*/
+	default IUser touch() { return this; };
 
 	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
 	 */
@@ -71,7 +83,7 @@ public interface IUser {
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
 	/**Add notifyings
-	 * @param n
+	 * @param note
 	 * @return this
 	 * @throws TransException 
 	 */
@@ -82,9 +94,35 @@ public interface IUser {
 	 */
 	public List<Object> notifies();
 
-	public IUser sessionKey(String string);
+	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
+	 * 
+	 * @param string
+	 * @return this
+	 */
+	public default IUser sessionKey(String string) { return this; }
 
-	public String sessionKey();
+	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
+	 * 
+	 * @return this
+	 */
+	public default String sessionKey() { return null; }
 
-	default IUser sessionId(String rad64num) { return this; }
+	/**
+	 * Since v1.3.5, user object has a change to initialize with login request, e.g. set client device Id.
+	 * @param sessionReqBody e.g. AnSessionReq
+	 * @return
+	 * @throws SsException 
+	 */
+	public default IUser onCreate(Anson sessionReqBody) throws GeneralSecurityException { return this; }
+
+	/**
+	 * @param folder
+	 * @param uid
+	 * @param folder
+	 * @param ssid
+	 * @return $root/folder/uid/folder/ssid;
+	 */
+	static String tempDir(String root, String uid, String folder, String ssid) {
+		return EnvPath.decodeUri(root, uid, folder, ssid);
+	}
 }

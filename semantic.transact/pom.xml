@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.4.3</version>
   <name>semantic sql builder</name>
   <description>semantic sql builder</description>
   <url>http://github.com/odys-z/semantic-transact</url>
@@ -46,15 +46,15 @@
     <dependency>
     	<groupId>io.github.odys-z</groupId>
     	<artifactId>antson</artifactId>
-    	<version>[0.9.10,)</version>
+    	<version>[0.9.14,)</version>
     </dependency>
 
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<version>4.13.1</version>
-  		<scope>test</scope>
-  	</dependency>
+    <dependency>
+  	<groupId>junit</groupId>
+  	<artifactId>junit</artifactId>
+  	<version>4.13.1</version>
+  	<scope>test</scope>
+    </dependency>
   </dependencies>
 
   <scm>
@@ -172,6 +172,10 @@
 	      </executions>
 	      <configuration>
 	      	<failOnError>false</failOnError>
+	      	<!-- https://stackoverflow.com/a/48511911/7362888
+				https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html
+	      	-->
+	      	<additionalJOption>-Xdoclint:none</additionalJOption>
 	      </configuration>
 	  </plugin>
 

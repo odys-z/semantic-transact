@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
+import io.odysz.semantics.ISemantext;
+
 /**<p>A helper to handler environment variable affected file path.</p>
  * Suppose $VOLUME_HOME = "/home/ody/volume"
  * <pre>
@@ -19,6 +21,8 @@ import org.apache.commons.io_odysz.FilenameUtils;
  args: /home/ody/upload,uri,userId,cate,docName
  encoded: /home/ody/upload/admin/000003 f.txt
  decoded: /home/ody/upload/admin/000003 f.txt</pre>
+ 
+ * Since v1.4.2, system property has higher priority than environment variable.
  * @author Odys Zhou
  *
  */
@@ -41,18 +45,20 @@ public class EnvPath {
 			Map<String, String> sysenvs = System.getenv();
 
 			for (String env : envs) {
-				String v = sysenvs.get(env);
-				v = v == null ? System.getProperty(env) : v;
+				String v = System.getProperty(env);
+				v = v == null ? sysenvs.get(env) : v;
 				if (v != null) // still can be null
 					src = src.replaceAll("\\$" + env, v);
 				else
 					src = src.replaceAll("\\$" + env, "");
 			}
 		}
+		if (src.startsWith("\\$"))
+			Utils.warn("Requried env variable may not parsed correctly: %s", src);
 		return src;
 	}
 	
-	/**Convert uri to absolute path, according to env.
+	/**Decode URI - convert file records' uri into absolute path, according to env.
 	 * 
 	 * @see FilenameUtils#concat(String, String)
 	 * 
@@ -62,7 +68,17 @@ public class EnvPath {
 	 */
 	public static String decodeUri(String root, String uri) {
 		root = root == null ? "" : root;
-		return FilenameUtils.concat(root, replaceEnv(uri));
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(uri));
+	}
+
+	public static String decodeUri(String root, String subpath, String filename) {
+		root = root == null ? "" : root;
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
+	}
+
+	public static String decodeUri(String root, String subpath, String folder2, String filename) {
+		root = root == null ? "" : root;
+		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), replaceEnv(folder2), filename);
 	}
 
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
@@ -75,6 +91,10 @@ public class EnvPath {
 	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
+	}
+
+	public static String decodeUri(ISemantext stx, String uri) {
+		return decodeUri(stx.containerRoot(), uri);
 	}
 
 }

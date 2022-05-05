@@ -1,6 +1,8 @@
 package io.odysz.common;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -88,10 +90,10 @@ public class AESHelper {
 			String encryptK) throws GeneralSecurityException, IOException {
 		byte[] iv = AESHelper.decode64(decryptIv);
 		byte[] input = AESHelper.decode64(cypher);
-		byte[] dkb = getUTF8Bytes(pad16_32(decryptK));
+		byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // FIXME won't work for non ASCII
 		byte[] plain = decryptEx(input, dkb, iv);
 		byte[] eiv = getRandom();
-		byte[] ekb = getUTF8Bytes(pad16_32(encryptK));
+		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
 		byte[] output = encryptEx(plain, ekb, eiv);
         String b64 = Base64.getEncoder().encodeToString(output);
         return new String[] {b64, AESHelper.encode64(eiv)};
@@ -99,8 +101,11 @@ public class AESHelper {
 
 	public static String encrypt(String plain, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
-		key = pad16_32(key);
-		plain = pad16_32(plain);
+		if (!plain.trim().equals(plain))
+			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
+
+		key = pad16_32(key); // FIXME won't work for non ASCII
+		plain = pad16_32(plain); // FIXME won't work for non ASCII
 		byte[] input = getUTF8Bytes(plain);
 		byte[] kb = getUTF8Bytes(key);
 		byte[] output = encryptEx(input, kb, iv);
@@ -140,17 +145,15 @@ public class AESHelper {
 	public static String decrypt(String cypher, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
-		byte[] kb = getUTF8Bytes(pad16_32(key));
+		// FIXME should padding bytes, not string.
+		byte[] kb = getUTF8Bytes(pad16_32(key)); // FIXME won't work for non ASCII
 		byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
-        //return p.trim();
-        return p.replace("-", "");
+        // return p.replace("-", "");
+        return depad16_32(p);
 	}
 	
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
-		//key = pad16_32(key);
-		//cypher = pad16_32(cypher);
-		//byte[] input = Base64.getDecoder().decode(cypher);
 
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
@@ -163,18 +166,33 @@ public class AESHelper {
         encipher.close();
         
         return Arrays.copyOf(output, finalBytes);
-        //return setUTF8Bytes(Arrays.copyOf(output, finalBytes));
 	}
 	
+	/**
+	 * @param s string of ASCII
+	 * @return 16 / 32 byte string
+	 * @throws GeneralSecurityException
+	 */
 	private static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
-			return String.format("%1$16s", s).replace(' ', '-');
+			return String.format("%1$16s", s).replaceAll(" ", "-");
 		else if (l <= 32)
-			return String.format("%1$32s", s).replace(' ', '-');
+			return String.format("%1$32s", s).replaceAll(" ", "-");
 		else
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
+
+	private static String depad16_32(String s) throws GeneralSecurityException {
+		int l = s.length();
+		if (l <= 16)
+			return s.replaceAll("-", " ").trim();
+		else if (l <= 32)
+			return s.replaceAll("-", " ").trim();
+		else
+			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
+	}
+
 	
     /**
      * Converts String to UTF8 bytes
@@ -197,6 +215,31 @@ public class AESHelper {
 	public static String encode64(final byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
 	}
+
+	/**
+	 * @param ifs
+	 * @param blockSize default 3 * 1024 * 1024;
+	 * @return
+	 * @throws IOException
+	 */
+	public static String encode64(final InputStream ifs, int blockSize) throws IOException {
+		blockSize = blockSize > 0 ? blockSize : 3 * 1024 * 1024;
+
+		if ((blockSize % 12) != 0)
+			throw new IOException ("Block size must be multple of 12.");
+
+		BufferedInputStream in = new BufferedInputStream(ifs, blockSize);
+		Base64.Encoder encoder = Base64.getEncoder();
+
+		byte[] chunk = new byte[blockSize];
+
+		int len = in.read(chunk);
+
+		if (len >= 0)
+			return encoder.encodeToString(chunk);
+		else return null;
+	}
+
 
 	public static byte[] decode64(String str) {
         return Base64.getDecoder().decode(str);

@@ -64,7 +64,7 @@ expression
     | bracket_expression
     | unary_operator_expression
     | expression op=('*' | '/' | '%') expression
-    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
+    | expression op=('+' | '-' | '&amp;' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     | expression assignment_operator expression
     ;

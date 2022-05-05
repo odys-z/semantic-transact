@@ -3,6 +3,7 @@ package io.odysz.transact.sql.parts.update;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.Colname;
@@ -21,7 +22,7 @@ import io.odysz.transact.x.TransException;
  * function_call: method_name '(' expression_list ')'
  * where {@link Funcall} can handle 'now' for different db, like
  * <pre>datetime('now'), strftime('%Y-%m-%d %H-%M-%f','now')</pre>
- * @see {@link io.odysz.transact.sql.parts.insert.ValueList}
+ * see {@link io.odysz.transact.sql.parts.insert.ValueList}
  * 
  * @author odys-z@github.com
  * */
@@ -40,6 +41,9 @@ public class SetValue extends ExprPart {
 			// rexp can be an expression here
 			// constValue = (String) rexp;
 			expr = ExprsVisitor.parse((String)rexp);
+		else 
+			Utils.warn("A set value must be Query, ExprPart or string: %s %s",
+					rexp.getClass().getName(), rexp.toString());
 	}
 	
 	@SuppressWarnings("unused")

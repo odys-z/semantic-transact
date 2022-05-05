@@ -1,10 +1,9 @@
 package io.odysz.transact.sql.parts.antlr;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.select.SelectElem;
 
 public class SelectElemVisitorTest {
