@@ -181,7 +181,7 @@ public class Funcall extends ExprPart {
 	
 	public static Funcall isnull(Object col, Object ifnull) {
 		Funcall f = new Funcall(Func.isnull);
-		f.args = new Object[] {col};
+		f.args = new Object[] {col, ifnull};
 		return f;
 	}
 
