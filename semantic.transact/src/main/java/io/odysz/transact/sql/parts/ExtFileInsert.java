@@ -106,10 +106,11 @@ public class ExtFileInsert extends AbsPart {
 		relatvFn = EnvPath.encodeUri(configRoot, prefix, relatvFn);
 		*/
 		
-		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
-
-		// String absoluteFn = EnvPath.decodeUri(runtimePath, relatvFn);
+		/*
 		String absoluteFn = decodeUri(runtimePath, relatvFn);
+		*/
+		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
+		String absoluteFn = absolutePath(ctx);
 
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
@@ -123,6 +124,11 @@ public class ExtFileInsert extends AbsPart {
 			e.printStackTrace();
 			return "''";
 		}
+	}
+	
+	public String absolutePath(ISemantext ctx) throws TransException {
+		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
+		return decodeUri(runtimePath, relatvFn);
 	}
 	
 	/**
@@ -141,9 +147,6 @@ public class ExtFileInsert extends AbsPart {
 		else
 			relatvFn = resulv.sql(ctx);
 		
-//		if (!LangExt.isblank(filename, "\\.", "\\*"))
-//			relatvFn += " " + filename;
-//		
 //		return EnvPath.encodeUri(cfgRoot, prefix, relatvFn);
 		return encodeUri(relatvFn, cfgRoot, prefix, filename);
 	}
