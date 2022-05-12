@@ -40,13 +40,13 @@
     <dependency>
     	<groupId>org.antlr</groupId>
     	<artifactId>antlr4-runtime</artifactId>
-    	<version>[4.9.2,)</version>
+    	<version>4.9.2</version>
     </dependency>
 
     <dependency>
     	<groupId>io.github.odys-z</groupId>
     	<artifactId>antson</artifactId>
-    	<version>[0.9.14,)</version>
+    	<version>[0.9.15,)</version>
     </dependency>
 
     <dependency>
