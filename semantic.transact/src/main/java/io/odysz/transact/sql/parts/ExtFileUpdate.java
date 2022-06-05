@@ -15,7 +15,8 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
-/**External file representation - mapping URI and file path back and forth.<br>
+/**
+ * External file representation - mapping URI and file path back and forth.<br>
  * @see ExtFileInsert
  * 
  * @author odys-z@github.com
@@ -30,17 +31,6 @@ public class ExtFileUpdate extends ExprPart {
 	private String oldUri;
 
 	/**
-	 * @param resulvingPath e.g. Id Resulve + client name.
-	 * @param configRoot root path in config.xml
-	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
-	 */
-//	public ExtFileUpdate(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
-//		this.resulv_const_path = resulvingPath;
-//		this.configRoot = configRoot;
-//		this.runtimePath = runtimeRoot;
-//	}
-
-	/**
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
 	 * @param recId
 	 * @param configRoot, root path in config.xml
@@ -52,15 +42,6 @@ public class ExtFileUpdate extends ExprPart {
 		this.configRoot = configRoot;
 		this.runtimePath = stx.containerRoot();
 	}
-
-	/**@see #ExtFileUpdate(Resulving, String, ISemantext)
-	 * @param resulvingPath
-	 * @param configRootnull, null);
-	 * @param stx
-	public ExtFileUpdate(ExprPart resulvingPath, String configRoot, ISemantext stx) {
-		this(resulvingPath, configRoot, stx.containerRoot());
-	}
-	 */
 
 	/**Set the sub-path of the file - semantically sub-path of uploading.
 	 * This part is saved in the replaced file path in database field.
@@ -103,7 +84,8 @@ public class ExtFileUpdate extends ExprPart {
 		Path f = Paths.get(absoluteFn);
 		Path old = Paths.get(absoluteOld);
 
-		if (!Files.exists(old)) throw new TransException("Uri (file) doesn't exits - commit(sql) or update mulitple times?");
+		if (!Files.exists(old))
+			throw new TransException("Uri (file) doesn't exits - commit(sql) or update mulitple times?");
 
 		try {
 			while (Files.exists(f, LinkOption.NOFOLLOW_LINKS)) {

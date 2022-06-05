@@ -221,6 +221,10 @@ public class SemanticObject extends Anson {
 		out.println("");
 	}
 
+	public String resulve(String tabl, String pk) {
+		return (String) ((SemanticObject) ((SemanticObject) get("resulved")).get(tabl)).get(pk);
+	}
+
 //	/**Helper for finding out auto key after new id generated.
 //	 * 
 //	 * <p>This method is tested in Sematic-DA.</p>
