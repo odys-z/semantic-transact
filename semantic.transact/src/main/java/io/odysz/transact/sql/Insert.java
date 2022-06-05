@@ -105,7 +105,7 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Append values (a row) after cols been set:<br>
+	/**Append values (a row) after cols been set (call {@link Insert#cols(String, String...) cols(...)} first):<br>
 	 * [[col1, val1], [col2, val2], ...]
 	 * @param val pairs of col-val
 	 * @return this
