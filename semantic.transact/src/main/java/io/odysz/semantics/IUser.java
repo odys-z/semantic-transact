@@ -2,6 +2,7 @@ package io.odysz.semantics;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,4 +126,15 @@ public interface IUser {
 	static String tempDir(String root, String uid, String folder, String ssid) {
 		return EnvPath.decodeUri(root, uid, folder, ssid);
 	}
+
+	/**
+	 * Validate user's password, e.g. is it changed since the initiall password been reset.
+	 * 
+	 * @return this
+	 * @throws TransException 
+	 * @throws SQLException 
+	 */
+	public default IUser validatePassword() throws GeneralSecurityException, SQLException, TransException {
+		return this;
+	};
 }

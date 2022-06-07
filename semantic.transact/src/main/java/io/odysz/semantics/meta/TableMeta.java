@@ -9,7 +9,10 @@ public class TableMeta {
 	private String conn;
 	private HashMap<String, ColMeta> types;
 
+	public String tbl;
+
 	public TableMeta(String tbl, String ... conn) {
+		this.tbl = tbl;
 		types = new HashMap<String, ColMeta>();
 		this.conn = conn != null && conn.length > 0 ? conn[0] : null;
 	}
