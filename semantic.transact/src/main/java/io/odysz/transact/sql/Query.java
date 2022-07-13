@@ -154,10 +154,10 @@ public class Query extends Statement<Query> {
 	private List<JoinTabl> joins;
 	private ArrayList<String[]> orderList;
 	private ArrayList<String> groupList;
-	private int pg;
-	public int page() { return pg; }
-	int pgSize;
-	public int size() { return pgSize; }
+	private long pg;
+	public long page() { return pg; }
+	long pgSize;
+	public long size() { return pgSize; }
 
 	protected Condit havings;
 
@@ -217,12 +217,17 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query page(int page, int pgSize) {
+	public Query page(long page, long pgSize) {
 		// paging
 		this.pg = page;
 		this.pgSize = pgSize;
 
 		return this;
+	}
+
+	public Query page(PageInf page) {
+		return page(page.page, page.size);
+//		return this;
 	}
 
 	public Query cols(String... colAliases) throws TransException {
