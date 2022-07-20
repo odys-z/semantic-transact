@@ -513,6 +513,9 @@ public class Query extends Statement<Query> {
 					orderList == null ? null : new OrderyList(orderList),
 					// limit
 					(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
+						// Query#limit() requires 2 arguments, e.g. limit(null, 5)
+						limit.length > 1 && isblank(limit[0]) ?
+						new ExprPart("limit " + limit[1]) :
 						new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
 			).filter(e -> e != null).map(m -> {
 				try {
