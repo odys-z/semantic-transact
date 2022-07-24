@@ -1,3 +1,4 @@
+[![Ukraine](https://cdn3.emoji.gg/emojis/6101-ukraine.gif)](https://emoji.gg/emoji/6101-ukraine)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantics.transact/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/semantics.transact/)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
