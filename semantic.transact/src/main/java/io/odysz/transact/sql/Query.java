@@ -229,7 +229,6 @@ public class Query extends Statement<Query> {
 		if (page != null)
 			return page(page.page, page.size);
 		else return page(0, -1);
-//		return this;
 	}
 
 	public Query cols(String... colAliases) throws TransException {
