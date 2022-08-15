@@ -226,7 +226,9 @@ public class Query extends Statement<Query> {
 	}
 
 	public Query page(PageInf page) {
-		return page(page.page, page.size);
+		if (page != null)
+			return page(page.page, page.size);
+		else return page(0, -1);
 //		return this;
 	}
 
