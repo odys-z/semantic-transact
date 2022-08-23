@@ -233,17 +233,20 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return whereIn(col, constvs.toArray(new String[0]));
 	}
 
-	/**Add post semantics after the parent statement,
-	 * like add children after insert new parent.<br>
+	/**
+	 * <p>Add post semantics after the parent statement,
+	 * like add children after insert new parent.</p>
 	 * <b>Side effect</b>: the added post statement's context is changed
 	 * - to referencing the same instance for resolving, etc.
 	 * @param postatement
 	 * @return the calling statement
 	 */
 	public T post(Statement<?> postatement) {
-		if (postate == null)
-			postate = new ArrayList<Statement<?>>();
-		this.postate.add(postatement);
+		if (postatement != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			this.postate.add(postatement);
+		}
 		return (T) this;
 	}
 
