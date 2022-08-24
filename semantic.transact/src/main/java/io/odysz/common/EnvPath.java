@@ -63,7 +63,7 @@ public class EnvPath {
 	 * @see FilenameUtils#concat(String, String)
 	 * 
 	 * @param root (optinal) runtiem root path 
-	 * @param uri saved path with env variables
+	 * @param db uri, the saved path with env variables. Make sure are ":" are cleaned.
 	 * @return decode then concatenated absolute path, for file accessing. 
 	 */
 	public static String decodeUri(String root, String uri) {
