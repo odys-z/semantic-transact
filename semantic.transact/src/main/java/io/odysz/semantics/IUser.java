@@ -136,5 +136,10 @@ public interface IUser {
 	 */
 	public default IUser validatePassword() throws GeneralSecurityException, SQLException, TransException {
 		return this;
-	};
+	}
+
+	public default String orgId() { return null; }
+
+	public default String roleId() { return null; }
+
 }

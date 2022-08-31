@@ -201,7 +201,8 @@ public class AESHelper {
      * @return UTF8 bytes
      */
     private static byte[] getUTF8Bytes(String input) {
-        return input.getBytes(StandardCharsets.UTF_8);
+        // return input.getBytes(StandardCharsets.UTF_8);
+        return input.getBytes(StandardCharsets.US_ASCII);
     }
     
     /**Converts UTF8 bytes to String
@@ -209,7 +210,8 @@ public class AESHelper {
      * @return converted result
      */
     private static String setUTF8Bytes(byte[] input) {
-    	return new String(input, StandardCharsets.UTF_8);
+    	// return new String(input, StandardCharsets.UTF_8);
+    	return new String(input, StandardCharsets.US_ASCII);
     }
 
 	public static String encode64(final byte[] bytes) {

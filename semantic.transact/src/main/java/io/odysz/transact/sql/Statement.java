@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -201,6 +203,41 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T whereEq(String col, String constv) {
 		return where_("=", col, constv);
+	}
+
+	public T whereEqOr(String col, String[] ors) {
+		// Temporary solution for API lack of precedence handling
+		String exp = null;
+		
+		exp = Stream.of(ors)
+				.map(m -> {
+					return String.format("%s = '%s'", col, m);
+				})
+				.collect(Collectors.joining("(", " or ", ")"));
+		return where_(exp, "", "");
+	}
+	
+	/**
+	 * Add where condition clause which is embedded in a pair of parentheses.
+	 * 
+	 * FIXME
+	 * FIXME
+	 * FIXME rewrite using Condit.or()
+	 * 
+	 * @param col
+	 * @param constv can not be col name
+	 * @param orConstvs can not be col names
+	 * @return (col = 'constv' or col = 'orConstvs[0]' ...) 
+	 */
+	public T whereEqOr(String col, String constv, String ... orConstvs) {
+		String exp = Stream.of(constv, orConstvs)
+				.map(m -> {
+					return m == null
+						? String.format("%s = null", col)
+						: String.format("%s = '%s'", col, m);
+				})
+				.collect(Collectors.joining("(", " or ", ")"));
+		return where_(exp, "", "");
 	}
 
 	/** where col like '%likev%'
