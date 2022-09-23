@@ -80,9 +80,6 @@ public class JoinTabl extends AbsPart {
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
-//		if (sctx != null && sctx.dbtype() == dbtype.oracle)
-//			return sql_orcl(sctx);
-		
 		if (jtype == join.main)
 			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias.sql(sctx));
 		

@@ -10,6 +10,8 @@ public class TableMeta {
 	private HashMap<String, ColMeta> types;
 
 	public String tbl;
+	public String pk;
+
 
 	public TableMeta(String tbl, String ... conn) {
 		this.tbl = tbl;

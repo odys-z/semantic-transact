@@ -10,6 +10,7 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -343,6 +344,22 @@ public class Query extends Statement<Query> {
 	 */
 	public Query j(String withTabl, String alias, String on, Object...args) {
 		return j(withTabl, alias, Sql.condt(on, args));
+	}
+
+	/**
+	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
+	 * @param mainTbl
+	 * @param withTbl
+	 * @param withAlias
+	 * @param colMaintbl
+	 * @param colWith
+	 * @return this
+	 */
+	public Query je(String mainTbl, String withTbl, String withAlias, String colMaintbl, String... colWith) {
+		return j(withTbl, withAlias, Sql.condt(
+				op.eq,
+				String.format("%s.%s", mainTbl, colMaintbl), 
+				String.format("%s.%s", withAlias, colWith == null || colWith.length == 0 ? colMaintbl : colWith[0])));
 	}
 	
 	public Query groupby(String expr) {

@@ -109,7 +109,9 @@ public interface IUser {
 	public default String sessionKey() { return null; }
 
 	/**
-	 * Since v1.3.5, user object has a change to initialize with login request, e.g. set client device Id.
+	 * <p>Since v1.4.11, user object has a chance to initialize with Semantic.DA AnResultset.
+	 * e.g. setting client device Id which is essential to doc synchronizing.</p>
+	 * <p>Since v1.3.5, user object has a chance to initialize with login request.</p>
 	 * @param sessionReqBody e.g. AnSessionReq
 	 * @return
 	 * @throws SsException 
