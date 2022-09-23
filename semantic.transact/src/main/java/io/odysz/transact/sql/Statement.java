@@ -162,7 +162,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return this
 	 */
 	public T where_(String op, String lcol, String rconst) {
-		return where(op, lcol, "'" + rconst + "'");
+		return where(op, lcol, rconst == null ? "null" : "'" + rconst + "'");
 	}
 
 	public T where_(String op, String lcol, Object rconst) {
