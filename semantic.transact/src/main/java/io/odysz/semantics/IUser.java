@@ -140,6 +140,8 @@ public interface IUser {
 		return this;
 	}
 
+	public default String deviceId() { return null; }
+
 	public default String orgId() { return null; }
 
 	public default String roleId() { return null; }
