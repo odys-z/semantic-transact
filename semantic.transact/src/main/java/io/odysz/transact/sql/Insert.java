@@ -139,7 +139,7 @@ public class Insert extends Statement<Insert> {
 		if (val.size() < insertCols.size())
 			appendings = new HashSet<String>(insertCols.keySet());
 
-		TableMeta mt = transc.tableMeta(mainTabl.name());
+		TableMeta mt = transc.tableMeta(transc.basictx.connId(), mainTabl.name());
 		for (int i = 0; i < val.size(); i++) {
 			Object[] nv = val.get(i);
 			

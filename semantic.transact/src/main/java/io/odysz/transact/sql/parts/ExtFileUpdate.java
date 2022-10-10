@@ -53,6 +53,13 @@ public class ExtFileUpdate extends ExprPart {
 		this.prefix = FilenameUtils.concat(path, subs);
 		return this;
 	}
+
+	public ExtFileUpdate appendSubFolder(Object sub) {
+		if (sub != null)
+			this.prefix = FilenameUtils
+				.concat(this.prefix == null ? "" : this.prefix, sub.toString());
+		return this;
+	}
 	
 	public ExtFileUpdate filename(String name) {
 		this.filename = name;
@@ -63,6 +70,11 @@ public class ExtFileUpdate extends ExprPart {
 		throw new TransException("ExtFileUpdate can only used for moving file. To update file content, use insert then delete.");
 	}
 	
+	/**
+	 * Set uri of old file to be changed / updated.
+	 * @param uri
+	 * @return this
+	 */
 	public ExtFileUpdate oldUri(String uri) {
 		this.oldUri = uri;
 		return this;

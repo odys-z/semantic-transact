@@ -4,12 +4,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.LangExt;
 import io.odysz.common.dbtype;
-import io.odysz.semantics.meta.ColMeta;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
@@ -19,14 +17,12 @@ import io.odysz.transact.sql.Statement.IPostSelectOperat;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
-import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**Basic semantic context (semantics instance) for resolving "AUTO" when generating sql.
  * @author odys-z@github.com
  */
-@SuppressWarnings("unused")
-class Semantext1 implements ISemantext {
+public class Semantext1 implements ISemantext {
 
 	private String tabl;
 	private HashMap<Object, Object> autoVals;

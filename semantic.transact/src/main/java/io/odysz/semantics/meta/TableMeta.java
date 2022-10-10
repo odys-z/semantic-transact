@@ -5,13 +5,17 @@ import java.util.HashMap;
 import io.odysz.semantics.meta.ColMeta.coltype;
 
 public class TableMeta {
-	@SuppressWarnings("unused")
-	private String conn;
 	private HashMap<String, ColMeta> types;
 
 	public String tbl;
 	public String pk;
 
+	protected String conn;
+	public String conn() { return conn; }
+	public TableMeta conn(String id) {
+		conn = id;
+		return this;
+	}
 
 	public TableMeta(String tbl, String ... conn) {
 		this.tbl = tbl;

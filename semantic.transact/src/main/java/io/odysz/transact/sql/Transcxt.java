@@ -6,7 +6,7 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
- * <p>A Transcxt is typically pluged in with ISemantext, which is the handler of semantics.</p>
+ * <p>A Transcxt is typically plugged in with ISemantext, which is the handler of semantics.</p>
  * <p>When building sql, events like onInserting, etc. are fired to ISemantext.
  * @author odys-z@github.com
  */
@@ -49,6 +49,11 @@ public class Transcxt {
 	}
 
 	public TableMeta tableMeta(String tabl) throws TransException {
-		return basictx == null ? null : basictx.colType(tabl);
+		return basictx == null ? null :
+			basictx.colType(tabl).conn(basictx.connId());
+	}
+
+	public TableMeta tableMeta(String conn, String tabl) throws TransException {
+		return tableMeta(tabl);
 	}
 }

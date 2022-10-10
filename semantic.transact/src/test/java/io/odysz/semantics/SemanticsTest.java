@@ -270,10 +270,12 @@ public class SemanticsTest {
 	}
 
 	@SuppressWarnings("serial")
-	static HashMap<String, TableMeta> fakeMetas() {
+	public static HashMap<String, TableMeta> fakeMetas() {
 		return new HashMap<String, TableMeta>() {
 			{put("a_functions", fakeFuncsMeta());}
 			{put("a_role_funcs", new TableMeta("a_role_funcs"));}
+			{put("a_roles", new TableMeta("a_roles"));}
+			{put("a_users", new TableMeta("a_users"));}
 		};
 	}
 

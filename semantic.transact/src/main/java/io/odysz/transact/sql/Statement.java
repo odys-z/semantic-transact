@@ -56,6 +56,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	
 	/**Conditions of where conditions */
 	protected Condit where;
+	public Condit where() { return where; }
 
 	protected Transcxt transc;
 	public Transcxt transc() { return transc; }
@@ -96,7 +97,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T nv(String n, String v) throws TransException {
-		TableMeta mt = transc.tableMeta(mainTabl.name());
+		String conn = transc.basictx == null ? null : transc.basictx.connId();
+		TableMeta mt = transc.tableMeta(conn, mainTabl.name())
+				.conn(conn);
 		return nv(n, composeVal(v, mt, n));
 	}
 
