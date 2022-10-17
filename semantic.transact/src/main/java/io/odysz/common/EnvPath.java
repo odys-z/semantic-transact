@@ -71,6 +71,10 @@ public class EnvPath {
 		return FilenameUtils.concat(replaceEnv(root), replaceEnv(uri));
 	}
 
+	public static String decodeUri(ISemantext stx, String uri) {
+		return decodeUri(stx.containerRoot(), uri);
+	}
+
 	public static String decodeUri(String root, String subpath, String filename) {
 		root = root == null ? "" : root;
 		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
@@ -83,18 +87,16 @@ public class EnvPath {
 
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
 	 * E.g.<br>
-	 * configRoot: $VOLUME_HOME/shares, uri: f.jpg --&gt; /home/ody/volume/shares/f.jpg <br>
-	 * configRoot: upload/a_users, uri: f.jpg --&gt; [webroot/]upload/a_users/f.jpg
+	 * configRoot: $VOLUME_HOME/shares, uri: f.jpg <br>
+	 * --&gt; /home/ody/volume/shares/f.jpg <br>
+	 * configRoot: upload/a_users, uri: f.jpg <br>
+	 * --&gt; [webroot/]upload/a_users/f.jpg
 	 * @param configRoot relative/absolute path with env variables
 	 * @param uri sub-path(s), file path, in concatenating order
 	 * @return encoded uri (with env variable) for DB persisting
 	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
-	}
-
-	public static String decodeUri(ISemantext stx, String uri) {
-		return decodeUri(stx.containerRoot(), uri);
 	}
 
 }
