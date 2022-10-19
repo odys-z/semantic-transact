@@ -446,6 +446,10 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	public Query limit(int i) {
+		return limit(null, String.valueOf(i));
+	}
+
 	/**Union query sepecification or expresion(s)<br>
 	 * grammar reference: <pre>sql_union
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
@@ -596,7 +600,6 @@ public class Query extends Statement<Query> {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
-			// return postOp.op(ctx.connId(), sqls);
 			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;
