@@ -103,6 +103,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return nv(n, composeVal(v, mt, n));
 	}
 
+	public T nv(String n, long v) throws TransException {
+		return nv(n, String.valueOf(v));
+	}
+
 	public T nv(String n, AbsPart v) throws TransException {
 		throw new TransException("Only Update and Insert can use nv() function.");
 	}
