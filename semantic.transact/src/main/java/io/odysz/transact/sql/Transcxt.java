@@ -54,6 +54,6 @@ public class Transcxt {
 	}
 
 	public TableMeta tableMeta(String conn, String tabl) throws TransException {
-		return tableMeta(tabl);
+		return tableMeta(tabl); // FIXME why conn is ignored?
 	}
 }
