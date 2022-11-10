@@ -10,4 +10,10 @@ public class TransException extends Exception {
 			: args != null && args.length > 0 ?
 					String.format(format, args) : format);
 	}
+	
+	@Override
+	public String getMessage() {
+		String s = super.getMessage();
+		return LangExt.isblank(s) ? super.getCause().getMessage() : s;
+	}
 }
