@@ -446,8 +446,10 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query limit(int i) {
-		return limit(null, String.valueOf(i));
+	public Query limit(long i) {
+		if (i >= 0)
+			return limit(null, String.valueOf(i));
+		else return this;
 	}
 
 	/**Union query sepecification or expresion(s)<br>
