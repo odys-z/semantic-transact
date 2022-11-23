@@ -274,7 +274,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T whereIn(String col, List<String> constvs) {
-		return whereIn(col, constvs.toArray(new String[0]));
+		if (isblank(constvs))
+			return (T) this;
+		else
+			return whereIn(col, constvs.toArray(new String[0]));
 	}
 
 	/**
