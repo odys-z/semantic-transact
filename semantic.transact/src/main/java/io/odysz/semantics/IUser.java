@@ -28,6 +28,10 @@ import io.odysz.transact.x.TransException;
  * @author ody
  */
 public interface IUser {
+	/**
+	 * Provide DB table meta for managing session by AnSession.
+	 * @return table meta
+	 */
 	TableMeta meta();
 
 	/**The sqls is committed to database, do something for logging. 
@@ -145,5 +149,13 @@ public interface IUser {
 	public default String orgId() { return null; }
 
 	public default String roleId() { return null; }
+
+	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	 * @param login
+	 * @return the session information
+	 */
+	public default SessionInf getClientSessionInf(IUser login) { 
+		return new SessionInf(login.sessionId(), login.uid(), login.roleId());
+	}
 
 }

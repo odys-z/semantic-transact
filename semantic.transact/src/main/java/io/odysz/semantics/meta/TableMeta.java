@@ -5,6 +5,7 @@ import java.util.HashMap;
 import io.odysz.semantics.meta.ColMeta.coltype;
 
 public class TableMeta {
+
 	private HashMap<String, ColMeta> types;
 
 	public String tbl;
