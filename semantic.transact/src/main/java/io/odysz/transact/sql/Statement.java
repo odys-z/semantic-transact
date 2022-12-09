@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -54,6 +56,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	
 	/**Conditions of where conditions */
 	protected Condit where;
+	public Condit where() { return where; }
 
 	protected Transcxt transc;
 	public Transcxt transc() { return transc; }
@@ -94,8 +97,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T nv(String n, String v) throws TransException {
-		TableMeta mt = transc.tableMeta(mainTabl.name());
+		String conn = transc.basictx == null ? null : transc.basictx.connId();
+		TableMeta mt = transc.tableMeta(conn, mainTabl.name())
+				.conn(conn);
 		return nv(n, composeVal(v, mt, n));
+	}
+
+	public T nv(String n, long v) throws TransException {
+		return nv(n, String.valueOf(v));
 	}
 
 	public T nv(String n, AbsPart v) throws TransException {
@@ -160,7 +169,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return this
 	 */
 	public T where_(String op, String lcol, String rconst) {
-		return where(op, lcol, "'" + rconst + "'");
+		return where(op, lcol, rconst == null ? "null" : "'" + rconst + "'");
 	}
 
 	public T where_(String op, String lcol, Object rconst) {
@@ -203,6 +212,41 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_("=", col, constv);
 	}
 
+	public T whereEqOr(String col, String[] ors) {
+		// Temporary solution for API lack of precedence handling
+		String exp = null;
+		
+		exp = Stream.of(ors)
+				.map(m -> {
+					return String.format("%s = '%s'", col, m);
+				})
+				.collect(Collectors.joining("(", " or ", ")"));
+		return where_(exp, "", "");
+	}
+	
+	/**
+	 * Add where condition clause which is embedded in a pair of parentheses.
+	 * 
+	 * FIXME
+	 * FIXME
+	 * FIXME rewrite using Condit.or()
+	 * 
+	 * @param col
+	 * @param constv can not be col name
+	 * @param orConstvs can not be col names
+	 * @return (col = 'constv' or col = 'orConstvs[0]' ...) 
+	 */
+	public T whereEqOr(String col, String constv, String ... orConstvs) {
+		String exp = Stream.of(constv, orConstvs)
+				.map(m -> {
+					return m == null
+						? String.format("%s = null", col)
+						: String.format("%s = '%s'", col, m);
+				})
+				.collect(Collectors.joining("(", " or ", ")"));
+		return where_(exp, "", "");
+	}
+
 	/** where col like '%likev%'
 	 * @param col
 	 * @param likev
@@ -230,20 +274,26 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T whereIn(String col, List<String> constvs) {
-		return whereIn(col, constvs.toArray(new String[0]));
+		if (isblank(constvs))
+			return (T) this;
+		else
+			return whereIn(col, constvs.toArray(new String[0]));
 	}
 
-	/**Add post semantics after the parent statement,
-	 * like add children after insert new parent.<br>
+	/**
+	 * <p>Add post semantics after the parent statement,
+	 * like add children after insert new parent.</p>
 	 * <b>Side effect</b>: the added post statement's context is changed
 	 * - to referencing the same instance for resolving, etc.
 	 * @param postatement
 	 * @return the calling statement
 	 */
 	public T post(Statement<?> postatement) {
-		if (postate == null)
-			postate = new ArrayList<Statement<?>>();
-		this.postate.add(postatement);
+		if (postatement != null) {
+			if (postate == null)
+				postate = new ArrayList<Statement<?>>();
+			this.postate.add(postatement);
+		}
 		return (T) this;
 	}
 

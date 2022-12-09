@@ -5,11 +5,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import io.odysz.common.Utils;
+import io.odysz.semantics.ISemantext;
+import io.odysz.semantics.Semantext2;
+import io.odysz.semantics.Semantics2;
+import io.odysz.semantics.SemanticsTest;
+import io.odysz.semantics.meta.ColMeta.coltype;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
@@ -26,8 +33,20 @@ public class TestTransc {
 	public void setUp() throws Exception {
 		Utils.printCaller(false);
 
+		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		user = new User("admin", "123456");
-		st = new Transcxt(null);
+		// st = new Transcxt(new Semantext1("",smtcfg, metas));
+		st = new Transcxt((ISemantext) new Semantext2("root", semantics, fakeMetas()));
+	}
+
+	private HashMap<String, TableMeta> fakeMetas() {
+		// TODO Auto-generated method stub
+		HashMap<String, TableMeta> m = SemanticsTest.fakeMetas();
+		m.put("a_roles", new TableMeta("a_roles").col("roleId", coltype.text));
+		m.put("a_funcs", new TableMeta("a_funcs").col("funcId", coltype.text));
+		m.put("a_users", new TableMeta("a_users").col("userId", coltype.text));
+		m.put("a_log", new TableMeta("a_log").col("logId", coltype.text));
+		return m;
 	}
 
 	@Test
@@ -35,14 +54,14 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_funcs", "f")
-			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
+			.j("a_role_funcs", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
 			.col("f.funcName", "func")
 			.col("f.funcId", "fid")
 			.where("=", "f.isUsed", "'Y'")
 			.where("%~", "f.funcName", "'bourgeoisie'")
 			.where("~%", "f.fullpath", "rf.funcId")
 			.commit(st.instancontxt(null, null), sqls);
-		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie' AND f.fullpath like concat(rf.funcId, '%')",
+		assertEquals("select f.funcName func, f.funcId fid from a_funcs f join a_role_funcs rf on f.funcId = rf.funcId AND rf.roleId like '123456%' where f.isUsed = 'Y' AND f.funcName like '%bourgeoisie' AND f.fullpath like rf.funcId || '%')",
 				sqls.get(0));
 
 		st.select("a_log", "lg")
@@ -139,7 +158,7 @@ public class TestTransc {
 	public void testFunc() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.select("a_funcs", "f")
-			.j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
+			.j("a_role_funcs", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId='%s'", user.userId()))
 			.col("f.funcName is not null", "checked")
 			.col("f.funcId", "fid")
 			.col("substring(notes, 1, 16)", "notes")
@@ -147,7 +166,7 @@ public class TestTransc {
 			.commit(st.instancontxt(null, null), sqls);
 
 		assertEquals("select f.funcName is not null checked, f.funcId fid, substring(notes, 1, 16) notes " +
-				"from a_funcs f join a_rolefunc rf on f.funcId = rf.funcId AND rf.roleId = '123456' where r.stamp > dateDiff(day, r.stamp, sysdate)",
+				"from a_funcs f join a_role_funcs rf on f.funcId = rf.funcId AND rf.roleId = '123456' where r.stamp > dateDiff(day, r.stamp, sysdate)",
 				sqls.get(0));
 	}
 	
@@ -165,7 +184,7 @@ public class TestTransc {
 		st.select("a_funcs", "f")
 			.col("STDEV(notes)", "notes")
 			.col("AVG(col1)", "avgcol")
-			.j("a_rolefunc", "rf", Sql.condt("COUNT(Orders.OrderID) > 5"))
+			.j("a_role_funcs", "rf", Sql.condt("COUNT(Orders.OrderID) > 5"))
 			.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)")
 			.groupby("max(col2) > 3")
 			.having("sum(Orders.OrderID) > 10")
@@ -173,7 +192,7 @@ public class TestTransc {
 
 		// Utils.logi(sqls.get(0));
 		assertEquals("select STDEV(notes) notes, AVG(col1) avgcol from a_funcs f "
-				+ "join a_rolefunc rf on COUNT(Orders.OrderID) > 5 "
+				+ "join a_role_funcs rf on COUNT(Orders.OrderID) > 5 "
 				+ "where r.stamp > dateDiff(day, r.stamp, sysdate) "
 				+ "group by max(col2) > 3 "
 				+ "having sum(Orders.OrderID) > 10",
@@ -433,13 +452,13 @@ public class TestTransc {
 	@Test
 	public void testInsertSelectPostUpdate() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
-		st.insert("a_rolefunc")
+		st.insert("a_role_funcs")
 			.select(st.select("a_functions", "f")
 					// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
 					.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
 					.j("a_roles", "r", "r.roleId='%s'", "admin"))
 			.post(st.update("a_roles")
-					.nv("funcount", st.select("a_rolefunc")
+					.nv("funcount", st.select("a_role_funcs")
 										.col("count(funcId)")
 										.where("=", "roleId", "'admin'"))
 					.nv("roleName", new ExprPart("roleName || 'abc'").escape(false))
@@ -447,10 +466,10 @@ public class TestTransc {
 			.commit(sqls);
 
 		Utils.logi(sqls);
-		assertEquals("insert into a_rolefunc   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
+		assertEquals("insert into a_role_funcs   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
 				sqls.get(0));
 
-		assertEquals("update  a_roles  set funcount=(select count(funcId) from a_rolefunc  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ",
+		assertEquals("update  a_roles  set funcount=(select count(funcId) from a_role_funcs  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ",
 				sqls.get(1));
 	}
 
@@ -461,7 +480,7 @@ public class TestTransc {
 			.nv("roleId", "AUTO")
 			.nv("roleName", "role-2")
 			.nv("funcount", "0")
-			.post(st.update("a_rolefunc")
+			.post(st.update("a_role_funcs")
 					.nv("funcId", "f-01")
 					.nv("roleId", "AUTO")
 					.where_("=", "roleId", "AUTO"))
@@ -471,20 +490,20 @@ public class TestTransc {
 			.nv("roleId", "AUTO")
 			.nv("roleName", "role-2")
 			.nv("funcount", "0")
-			.post(st.insert("a_rolefunc")
+			.post(st.insert("a_role_funcs")
 					.nv("funcId", "f-01")
 					.nv("roleId", "AUTO"))
 			.commit(sqls);
 
 		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 10:02:23', 'role-2', '0' )
-		// update a_rolefunc  set funcId='f-01', roleId='AUTO #2018-12-02 10:02:23'
+		// update a_role_funcs  set funcId='f-01', roleId='AUTO #2018-12-02 10:02:23'
 		// insert into a_roles  (roleId, roleName, funcount) values ( 'AUTO #2018-12-02 10:02:30', 'role-2', '0' )
-		// insert into a_rolefunc  (funcId, roleId) values ( 'f-01', 'AUTO #2018-12-02 10:02:30' )
+		// insert into a_role_funcs  (funcId, roleId) values ( 'f-01', 'AUTO #2018-12-02 10:02:30' )
 		// Utils.logi(sqls);
 		assertTrue(sqls.get(0).startsWith("insert into a_roles"));
-		assertTrue(sqls.get(1).startsWith("update  a_rolefunc"));
+		assertTrue(sqls.get(1).startsWith("update  a_role_funcs"));
 		assertTrue(sqls.get(2).startsWith("insert into a_roles"));
-		assertTrue(sqls.get(3).startsWith("insert into a_rolefunc"));
+		assertTrue(sqls.get(3).startsWith("insert into a_role_funcs"));
 	}
 	
 	@Test
@@ -493,17 +512,17 @@ public class TestTransc {
 		st.update("a_roles")
 			.nv("roleName", "role-21")
 			.where_("=", "roleId", "role 01")
-			.post(st.delete("a_rolefunc")
+			.post(st.delete("a_role_funcs")
 					.where_("=", "roleId", "role 01")
-					.post(st.insert("a_rolefunc")
+					.post(st.insert("a_role_funcs")
 							.nv("funcId", "f 001")
 							.nv("roleId", "role 01")))
 			.commit(sqls);
 		assertEquals("update  a_roles  set roleName='role-21' where roleId = 'role 01' ",
 				sqls.get(0));
-		assertEquals("delete from a_rolefunc where roleId = 'role 01'",
+		assertEquals("delete from a_role_funcs where roleId = 'role 01'",
 				sqls.get(1));
-		assertEquals("insert into a_rolefunc  (funcId, roleId) values ('f 001', 'role 01')",
+		assertEquals("insert into a_role_funcs  (funcId, roleId) values ('f 001', 'role 01')",
 				sqls.get(2));
 	}
 
@@ -517,7 +536,7 @@ public class TestTransc {
 			.nv("s2", "''")
 			.nv("s3", "%%")
 			.where_("=", "roleId", "role 01") // ignored safely
-			.post(st.update("a_rolefunc")
+			.post(st.update("a_role_funcs")
 					.nv("roleId", ExprsVisitor.parse("3 * 2"))
 
 					// where*() function generate a Predicate, which will default ignore escaping,
@@ -541,7 +560,7 @@ public class TestTransc {
 		
 		assertEquals("insert into a_roles  (roleName, roleId, s1, s2, s3) values ('roleName''-new', roleName + 3, '''s - %''x', '''''', '%%')",
 				sqls.get(0));
-		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
+		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
 				sqls.get(1));
 
 		st.update("a_roles")
@@ -557,12 +576,12 @@ public class TestTransc {
 	@Test
 	public void testWhereInArray() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
-		st.update("a_rolefunc")
+		st.update("a_role_funcs")
 			.nv("roleId", ExprsVisitor.parse("3 * 2"))
 			.whereIn("roleId", new String[] {"01", "bb"})
 			.commit(sqls);
 
-		assertEquals("update  a_rolefunc  set roleId=3 * 2 where roleId in ('01', 'bb') ",
+		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in ('01', 'bb') ",
 				sqls.get(0));
 	}
 }

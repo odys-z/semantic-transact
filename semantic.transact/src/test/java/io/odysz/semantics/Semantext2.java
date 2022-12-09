@@ -26,7 +26,7 @@ import io.odysz.transact.x.TransException;
  * @author odys-z@github.com
  *
  */
-class Semantext2 implements ISemantext {
+public class Semantext2 implements ISemantext {
 
 	private String tabl;
 	private HashMap<String, Semantics2> semantics;

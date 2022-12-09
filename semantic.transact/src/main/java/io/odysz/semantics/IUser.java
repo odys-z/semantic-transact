@@ -28,6 +28,10 @@ import io.odysz.transact.x.TransException;
  * @author ody
  */
 public interface IUser {
+	/**
+	 * Provide DB table meta for managing session by AnSession.
+	 * @return table meta
+	 */
 	TableMeta meta();
 
 	/**The sqls is committed to database, do something for logging. 
@@ -109,7 +113,9 @@ public interface IUser {
 	public default String sessionKey() { return null; }
 
 	/**
-	 * Since v1.3.5, user object has a change to initialize with login request, e.g. set client device Id.
+	 * <p>Since v1.4.11, user object has a chance to initialize with Semantic.DA AnResultset.
+	 * e.g. setting client device Id which is essential to doc synchronizing.</p>
+	 * <p>Since v1.3.5, user object has a chance to initialize with login request.</p>
 	 * @param sessionReqBody e.g. AnSessionReq
 	 * @return
 	 * @throws SsException 
@@ -136,5 +142,20 @@ public interface IUser {
 	 */
 	public default IUser validatePassword() throws GeneralSecurityException, SQLException, TransException {
 		return this;
-	};
+	}
+
+	public default String deviceId() { return null; }
+
+	public default String orgId() { return null; }
+
+	public default String roleId() { return null; }
+
+	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	 * @param login
+	 * @return the session information
+	 */
+	public default SessionInf getClientSessionInf(IUser login) { 
+		return new SessionInf(login.sessionId(), login.uid(), login.roleId());
+	}
+
 }

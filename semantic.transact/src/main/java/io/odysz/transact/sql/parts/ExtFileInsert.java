@@ -80,6 +80,13 @@ public class ExtFileInsert extends AbsPart {
 		return this;
 	}
 	
+	public ExtFileInsert appendSubFolder(Object sub) {
+		if (sub != null)
+			this.prefix = FilenameUtils
+				.concat(this.prefix == null ? "" : this.prefix, sub.toString());
+		return this;
+	}
+	
 	public ExtFileInsert filename(String name) {
 		this.filename = name;
 		return this;
@@ -90,25 +97,13 @@ public class ExtFileInsert extends AbsPart {
 		return this;
 	}
 
+	/**
+	 * Save file to pathname, generate sql.
+	 * 
+	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.ISemantext)
+	 */
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
-		// save file to pathname
-		/*
-		String relatvFn;
-		if (resulv_const_path instanceof Resulving) 
-			relatvFn = ((Resulving)resulv_const_path).resulved(ctx);
-		else
-			relatvFn = resulv_const_path.sql(ctx);
-		
-		if (!LangExt.isblank(filename, "\\.", "\\*"))
-			relatvFn += " " + filename;
-		
-		relatvFn = EnvPath.encodeUri(configRoot, prefix, relatvFn);
-		*/
-		
-		/*
-		String absoluteFn = decodeUri(runtimePath, relatvFn);
-		*/
 		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
 		String absoluteFn = absolutePath(ctx);
 

@@ -10,6 +10,7 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
@@ -226,10 +227,9 @@ public class Query extends Statement<Query> {
 	}
 
 	public Query page(PageInf page) {
-		if (page == null)
-			return page(0, -1);
-		else
+		if (page != null)
 			return page(page.page, page.size);
+		else return page(0, -1);
 	}
 
 	public Query cols(String... colAliases) throws TransException {
@@ -345,6 +345,22 @@ public class Query extends Statement<Query> {
 	public Query j(String withTabl, String alias, String on, Object...args) {
 		return j(withTabl, alias, Sql.condt(on, args));
 	}
+
+	/**
+	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
+	 * @param mainTbl
+	 * @param withTbl
+	 * @param withAlias
+	 * @param colMaintbl
+	 * @param colWith
+	 * @return this
+	 */
+	public Query je(String mainTbl, String withTbl, String withAlias, String colMaintbl, String... colWith) {
+		return j(withTbl, withAlias, Sql.condt(
+				op.eq,
+				String.format("%s.%s", mainTbl, colMaintbl), 
+				String.format("%s.%s", withAlias, colWith == null || colWith.length == 0 ? colMaintbl : colWith[0])));
+	}
 	
 	public Query groupby(String expr) {
 		if (groupList == null)
@@ -428,6 +444,12 @@ public class Query extends Statement<Query> {
 	public Query limit(String lmtExpr, String xpr2) {
 		this.limit = new String[] {lmtExpr, xpr2};
 		return this;
+	}
+
+	public Query limit(long i) {
+		if (i >= 0)
+			return limit(null, String.valueOf(i));
+		else return this;
 	}
 
 	/**Union query sepecification or expresion(s)<br>
@@ -580,7 +602,6 @@ public class Query extends Statement<Query> {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
 			commit(ctx, sqls);
-			// return postOp.op(ctx.connId(), sqls);
 			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;

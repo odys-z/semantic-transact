@@ -8,8 +8,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
-/**Date formatting and parsing helper.
- * @author ody */
+/**
+ * Date formatting and parsing helper.
+ * @author ody
+ */
 public class DateFormat {
 	/**yyyy-MM-dd or %Y-%M-%e*/
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
