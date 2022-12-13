@@ -161,12 +161,6 @@ expression
 		if (ctx.op != null) {
 			String op = ctx.op.getText();
 			if (op != null)
-				// FIXME [recursive expression parse]
-				// Problem: expression operands can also an expression.
-				// See test case: SemanticsTest#testFuncallOrcl(), function decode of select.
-				// This feature is only needed for oracle
-//				return new ExprPart(Logic.op(op), ctx.expression().get(0).getText(),
-//						ctx.expression().size() > 1 ? ctx.expression().get(1).getText() : null);
 				return new ExprPart(Logic.op(op),
 						parse(ctx.expression().get(0).getText()),
 						ctx.expression().size() > 1 ? parse(ctx.expression().get(1).getText()) : null);

@@ -40,7 +40,6 @@ public class AESHelper {
         // cipherProperties.setProperty(CryptoCipherFactory.CLASSES_KEY, CipherProvider.JCE.getClassName());
     	try {
 			encipher = Utils.getCipherInstance(transform, cipherProperties);
-	        //decipher = Utils.getCipherInstance(transform, properties);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -133,7 +132,6 @@ public class AESHelper {
 			int updateBytes = encipher.update(input, 0, input.length, output, 0);
 			//System.out.println("updateBytes " + updateBytes);
 			int finalBytes = encipher.doFinal(input, 0, 0, output, updateBytes);
-			//System.out.println("finalBytes " + finalBytes);
 			output = Arrays.copyOf(output, updateBytes + finalBytes);
 			encipher.close();
 			return output;
@@ -201,7 +199,6 @@ public class AESHelper {
      * @return UTF8 bytes
      */
     private static byte[] getUTF8Bytes(String input) {
-        // return input.getBytes(StandardCharsets.UTF_8);
         return input.getBytes(StandardCharsets.US_ASCII);
     }
     
@@ -210,7 +207,6 @@ public class AESHelper {
      * @return converted result
      */
     private static String setUTF8Bytes(byte[] input) {
-    	// return new String(input, StandardCharsets.UTF_8);
     	return new String(input, StandardCharsets.US_ASCII);
     }
 

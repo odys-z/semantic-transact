@@ -54,6 +54,7 @@ public class Transcxt {
 	}
 
 	public TableMeta tableMeta(String conn, String tabl) throws TransException {
-		return tableMeta(tabl); // FIXME why conn is ignored?
+		// return tableMeta(tabl);
+		throw new TransException("This method must be ovrriden by DA layser.");
 	}
 }

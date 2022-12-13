@@ -418,7 +418,6 @@ public class TestTransc {
 		try {
 			st.update("a_users")
 				.nv("userName", Funcall.concat("userName", "o.orgName"))
-				// TODO .j("a_org", "o", "o.orgId = a_users.orgId")
 				.commit(sqls);
 		} catch (Exception e) {
 			Utils.warn("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");

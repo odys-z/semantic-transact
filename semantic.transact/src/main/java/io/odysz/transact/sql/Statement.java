@@ -98,7 +98,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T nv(String n, String v) throws TransException {
 		String conn = transc.basictx == null ? null : transc.basictx.connId();
-		TableMeta mt = transc.tableMeta(conn, mainTabl.name())
+
+		// throw new TransException("verifiy this snippet"); 
+		/*
+		// TableMeta mt = transc.tableMeta(conn, mainTabl.name())
+		-->
+		*/
+		TableMeta mt = transc.tableMeta(mainTabl.name())
 				.conn(conn);
 		return nv(n, composeVal(v, mt, n));
 	}
@@ -227,9 +233,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	/**
 	 * Add where condition clause which is embedded in a pair of parentheses.
 	 * 
-	 * FIXME
-	 * FIXME
-	 * FIXME rewrite using Condit.or()
+	 * TODO rewrite using Condit.or()
 	 * 
 	 * @param col
 	 * @param constv can not be col name
