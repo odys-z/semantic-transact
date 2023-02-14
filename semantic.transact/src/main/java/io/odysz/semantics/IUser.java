@@ -40,9 +40,10 @@ public interface IUser {
 	 * If the parameter sqls is returned, it will be committed again because the semantic connection
 	 * is think it's the logging sql.</p>
 	 * @param sqls
-	 * @return SQLs for logging
+	 * @return SQLs for logging, null for nothing to do
+	 * @throws TransException 
 	 */
-	default ArrayList<String> dbLog(ArrayList<String> sqls) { return null; }
+	default ArrayList<String> dbLog(final ArrayList<String> sqls) throws TransException { return null; }
 
 	/**Check user log in (already has pswd, iv and user Id from db)
 	 * @param request request object. In sematic.jserv, it's SessionReq object.
