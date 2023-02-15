@@ -156,7 +156,7 @@ public class Semantext1 implements ISemantext {
 	public void onCommitted(ISemantext ctx) throws TransException, SQLException { }
 
 	@Override
-	public void addOnOkOperate(IPostOperat op) { }
+	public void addOnRowsCommitted(IPostOperat op) { }
 
 	@Override
 	public String containerRoot() { return null; }

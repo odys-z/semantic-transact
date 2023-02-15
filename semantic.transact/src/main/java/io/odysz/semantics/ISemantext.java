@@ -182,13 +182,24 @@ public interface ISemantext {
 	 */
 	public String containerRoot();
 
-	void addOnOkOperate(IPostOperat op);
+	void addOnRowsCommitted(IPostOperat op);
+
+	/**
+	 * Add table wise handler for successful commitment
+	 * - multiple rows in one table can only be called once.
+	 * @param tabl
+	 * @param op
+	 */
+	default void addOnTableCommitted(String tabl, IPostOperat op) { }
+
+	default IPostOperat onTableCommittedHandler(String tabl) { return null; }
 
 	/**
 	 * <p>When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.</p>
 	 * The operations which are (instances of {@link IPostOperat} lambda expression,
-	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(IPostOperat)}.  
+	 * are pushed into semantext while handling semantics, via {@link #addOnRowsCommitted(IPostOperat)}
+	 * &amp; {@link #addOnTableCommitted(String, IPostOperat)}.  
 	 * @param ctx
 	 * @throws TransException 
 	 * @throws SQLException 
