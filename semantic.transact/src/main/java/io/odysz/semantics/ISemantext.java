@@ -57,9 +57,10 @@ public interface ISemantext {
 	 */
 	public ISemantext connId(String conn);
 
-	/**Called when starting a insert transaction's sql composing.<br>
-	 * Create a context for the insert-sql composing process.<br>
-	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
+	/**
+	 * <p>Create a context for the insert-sql composing process.</p>
+	 * <p>Called when starting an inserting transaction's sql composing.</p>
+	 * <p>The parameter <i>usr</i> is optional if the semantics handler don't care about user's fingerprint.</p> 
 	 * @param insert
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
@@ -67,9 +68,10 @@ public interface ISemantext {
 	 */
 	public ISemantext insert(Insert insert, String mainTabl, IUser... usr);
 
-	/**Called when starting an update transaction sql composing.<br>
-	 * Create a context for the update-sql composing process.<br>
-	 * Parameter usr is optional if the semantics handler don't care about user's fingerprint. 
+	/**
+	 * <p>Create a context for the update-sql composing process.</p>
+	 * <p>Called when starting an update transaction sql composing.</p>
+	 * <p>The parameter usr is optional if the semantics handler don't care about user's fingerprint.</p>
 	 * @param update
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
@@ -77,8 +79,9 @@ public interface ISemantext {
 	 */
 	public ISemantext update(Update update, String mainTabl, IUser... usr);
 
-	/**Called each time an <@link Insert} statement found itself will composing a insert-sql ({@link Insert#sql(ISemantext)})<br>
-	 * Resolving inserting values, e.g an AUTO key is generated here.
+	/**
+	 * <p>Resolving inserting values, e.g an AUTO key is generated here.</p>
+	 * <p>Called each time an <@link Insert} statement found itself will composing a insert-sql ({@link Insert#sql(ISemantext)})</p>
 	 * @param insert
 	 * @param tabl 
 	 * @param rows [ list[Object[n, v], ... ], ... ]
@@ -87,7 +90,9 @@ public interface ISemantext {
 	 */
 	ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> rows) throws TransException;
 
-	/**Called each time an {@link Update} statement found itself will composing an update-sql.
+	/**
+	 * <p>Resolves values for updating.</p>
+	 * Called each time an {@link Update} statement found itself will composing an update-sql.
 	 * @param update
 	 * @param tabl
 	 * @param nvs
@@ -179,9 +184,10 @@ public interface ISemantext {
 
 	void addOnOkOperate(IPostOperat op);
 
-	/** When the commitment succeeded, there are still things must be done,
-	 * like deleting external files.
-	 * The operation's (instances of {@link IPostOperat} lambda expression
+	/**
+	 * <p>When the commitment succeeded, there are still things must be done,
+	 * like deleting external files.</p>
+	 * The operations which are (instances of {@link IPostOperat} lambda expression,
 	 * are pushed into semantext while handling semantics, via {@link #addOnOkOperate(IPostOperat)}.  
 	 * @param ctx
 	 * @throws TransException 
@@ -213,8 +219,9 @@ public interface ISemantext {
 	 */
 	void addOnSelectedHandler(String name, IPostSelectOperat op);
 
-	/**Compose the v provide by client into target table column's value represented in sql,
-	 * whether add single quote or not.<br>
+	/**
+	 * <p>Compose the v provide by client into target table column's value represented in sql,
+	 * whether add single quote or not.</p>
 	 * <p>If v is an instance of string, add "'" according to db type;
 	 * if it is an instance of {@link io.odysz.transact.sql.parts.AbsPart AbsPart}, return it directly.</p>
 	 * The null/empty values are handled differently according data meta.<br>

@@ -34,11 +34,12 @@ public interface IUser {
 	 */
 	TableMeta meta();
 
-	/**The sqls is committed to database, do something for logging. 
-	 * If there are some operation needing to update db, return those sql statements.
-	 * <p><b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
-	 * If the parameter sqls is returned, it will be committed again because the semantic connection
+	/**
+	 * <p>The sqls is committed to database, do something for logging. 
+	 * If there are some operation needing to update db, return those sql statements.</p>
+	 * <p>If the parameter sqls is returned, it will be committed again because the semantic connection
 	 * is think it's the logging sql.</p>
+	 * <b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
 	 * @param sqls
 	 * @return SQLs for logging, null for nothing to do
 	 * @throws TransException 
@@ -70,9 +71,13 @@ public interface IUser {
 	 */
 	default String sessionId() { return null; }
 
-	/**Note: science v1.3.5, this requires users implement a touch function, and return the instance.
-	 * If the session object must been terminated when time out, this method must touch the current time.
-	 * Update last touched time stamp.*/
+	/**
+	 * <p>Update last touched time stamp.</p>
+	 * <p>FYI, if the session object will be terminated when time is out,
+	 * this method must touch the current time to keep session alive.</p>
+	 * <p>Note: science v1.3.5, this requires users implement a touch function, and return the instance.<p>
+	 * @since 1.3.5
+	 * */
 	default IUser touch() { return this; };
 
 	/**Last touched time in milliseconds, set by {@link #touch()}.<br>
@@ -100,7 +105,8 @@ public interface IUser {
 	 */
 	public List<Object> notifies();
 
-	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
+	/**
+	 * @deprecated why this is needed if there is {@link #sessionId(String)} ?
 	 * 
 	 * @param string
 	 * @return this
