@@ -160,7 +160,7 @@ public class Semantext2 implements ISemantext {
 	}
 
 	@Override
-	public void onCommitted(ISemantext ctx) throws TransException, SQLException { }
+	public void onCommitted(ISemantext ctx, String tabl) throws TransException, SQLException { }
 
 	@Override
 	public void addOnRowsCommitted(IPostOperat op) { }

@@ -53,7 +53,8 @@ public interface IUser {
 	 */
 	default boolean login(Object request) throws TransException { return false; }
 
-	/** If a user is allowed to change password, this is used to verify old and must be overriden to check the old password cipher.
+	/** If a user is allowed to change password, this is used to verify old
+	 * and must be overriden to check the old password cipher.
 	 * @param pswdCypher64 decrypted with my token id
 	 * @param iv64
 	 * @return yes or no

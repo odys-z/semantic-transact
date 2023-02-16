@@ -27,7 +27,6 @@ public class Semantext1 implements ISemantext {
 	private String tabl;
 	private HashMap<Object, Object> autoVals;
 	private HashMap<String, Semantics2> semantics;
-	private Statement<?> callerStatement;
 	private HashMap<String, TableMeta> metas;
 
 	public Semantext1(String tabl, HashMap<String,Semantics2> semantics, HashMap<String, TableMeta> metas) {
@@ -42,7 +41,6 @@ public class Semantext1 implements ISemantext {
 	@Override
 	public ISemantext onInsert(Insert insert, String tabl, List<ArrayList<Object[]>> valuesNv) {
 		// This template implementation already showed the interface should be here
-		callerStatement = (Insert) insert;
 		if (valuesNv != null)
 			for (ArrayList<Object[]> value : valuesNv) {
 				for (Object[] nv : value)
@@ -153,7 +151,7 @@ public class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public void onCommitted(ISemantext ctx) throws TransException, SQLException { }
+	public void onCommitted(ISemantext ctx, String tabl) throws TransException, SQLException { }
 
 	@Override
 	public void addOnRowsCommitted(IPostOperat op) { }

@@ -201,10 +201,11 @@ public interface ISemantext {
 	 * are pushed into semantext while handling semantics, via {@link #addOnRowsCommitted(IPostOperat)}
 	 * &amp; {@link #addOnTableCommitted(String, IPostOperat)}.  
 	 * @param ctx
+	 * @param tabl 
 	 * @throws TransException 
 	 * @throws SQLException 
 	 */
-	void onCommitted(ISemantext ctx) throws TransException, SQLException;
+	void onCommitted(ISemantext ctx, String tabl) throws TransException, SQLException;
 
 	/**On selected event handler, the chance that the resultset can be modified.
 	 * @param resultset any result object that can be understood by handler. e.g. SResultSet

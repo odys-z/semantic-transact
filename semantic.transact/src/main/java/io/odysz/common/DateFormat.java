@@ -41,10 +41,28 @@ public class DateFormat {
 
 	/**yyyy-MM-dd
 	 * @param text
-	 * @return formatted string
+	 * @return formatted date ignoring time (text used as short form)
 	 * @throws ParseException
 	 */
 	public static Date parse(String text) throws ParseException { return sdf.parse(text); }
+
+	/**yyyy-MM-dd HH:mm:ss.0 or yyyy-MM-dd HH:mm:ss
+	 * @param text
+	 * @return date-time
+	 * @throws ParseException
+	 */
+	public static Date parseDateTime(String text)
+			throws ParseException {
+		try {
+			return sdflong_sqlite.parse(text);
+		}
+		catch (ParseException e) {
+			try {return sdflong_sqlite.parse(text + ".0");}
+			catch (ParseException ex) {
+				return sdflong_mysql.parse(text);
+			}
+		}
+	}
 
 	public static String incSeconds(dbtype drvType, String date0, int snds) throws ParseException {
 		Date d0 = parse(date0);

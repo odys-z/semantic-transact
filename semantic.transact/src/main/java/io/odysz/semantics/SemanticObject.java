@@ -119,6 +119,10 @@ public class SemanticObject extends Anson {
 		return (int)obj;
 	}
 	
+	public int total() {
+		return total(0);
+	}
+	
 	public SemanticObject total(int rsIdx, int total) throws TransException {
 		// the total(int) returned -1
 		if (total < 0) return this;

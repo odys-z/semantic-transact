@@ -5,7 +5,6 @@ import java.util.HashMap;
 import io.odysz.semantics.meta.ColMeta.coltype;
 
 public class TableMeta {
-
 	private HashMap<String, ColMeta> types;
 
 	public String tbl;
@@ -37,11 +36,6 @@ public class TableMeta {
 
 	public TableMeta col(String coln, String t, int len) {
 		ColMeta cm = new ColMeta(t);
-//		// weird maven behavior
-//		Utils.warn("weird weird weird  %s %s %s...............................", coln, t, len);
-//		if (types == null)
-//			// strange
-//			Utils.warn("That's so strange ...............................");
 		types.put(coln, cm.tlen(len));
 		return this;
 	}
