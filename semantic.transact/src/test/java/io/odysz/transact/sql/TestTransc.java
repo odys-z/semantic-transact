@@ -35,12 +35,10 @@ public class TestTransc {
 
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		user = new User("admin", "123456");
-		// st = new Transcxt(new Semantext1("",smtcfg, metas));
 		st = new Transcxt((ISemantext) new Semantext2("root", semantics, fakeMetas()));
 	}
 
 	private HashMap<String, TableMeta> fakeMetas() {
-		// TODO Auto-generated method stub
 		HashMap<String, TableMeta> m = SemanticsTest.fakeMetas();
 		m.put("a_roles", new TableMeta("a_roles").col("roleId", coltype.text));
 		m.put("a_funcs", new TableMeta("a_funcs").col("funcId", coltype.text));
@@ -69,7 +67,6 @@ public class TestTransc {
 			.col("lg.txt", "log")
 			.where(">=", "lg.stamp", "'1776-07-04'")
 			.where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'").escape(false))
-			// .where(Sql.condt("userId IN (%s)", "'ele1','ele2','ele3'"))
 			.groupby("lg.stamp")
 			.groupby("log")
 			.commit(sqls);
@@ -92,7 +89,7 @@ public class TestTransc {
 		assertEquals("select count(*) cnt, count cnt from a_log lg where userId = funders AND (userId = 'George' OR userId = 'Washington') AND stamp <= '1911-10-10' AND userId = 'Sun Yat-sen' order by cnt desc, stamp asc",
 				sqls.get(2));
 
-			// 2019.10.12
+		// 2019.10.12
 		st.select("Orders")
 			.col("Employees.LastName").col("COUNT(Orders.OrderID)", "NumberOfOrders")
 			.j("Employees", null, "Orders.EmployeeID = Employees.EmployeeID)")

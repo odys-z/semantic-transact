@@ -166,6 +166,11 @@ public interface ISemantext {
 	 */
 	public ISemantext clone(IUser usr);
 
+	/**
+	 * TODO rename as tableMeta()
+	 * @param tabl
+	 * @return meta
+	 */
 	public TableMeta colType(String tabl);
 
 	/**Concatenate the path for the file system (without file name) for the running environment

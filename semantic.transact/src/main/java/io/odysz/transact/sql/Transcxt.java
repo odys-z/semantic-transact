@@ -5,7 +5,7 @@ import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
-/**<p>Transaction Context, a Transaction / Batching SQL builder creator.</p>
+/**<p>Transaction Context, also can be take as a Transaction / Batching SQL builder creator.</p> 
  * <p>A Transcxt is typically plugged in with ISemantext, which is the handler of semantics.</p>
  * <p>When building sql, events like onInserting, etc. are fired to ISemantext.
  * @author odys-z@github.com
@@ -53,8 +53,14 @@ public class Transcxt {
 			basictx.colType(tabl).conn(basictx.connId());
 	}
 
+	/**
+	 * Get the connection's table meat.
+	 * @param conn
+	 * @param tabl
+	 * @return table meta
+	 * @throws TransException
+	 */
 	public TableMeta tableMeta(String conn, String tabl) throws TransException {
-		// return tableMeta(tabl);
 		throw new TransException("This method must be ovrriden by DA layser.");
 	}
 }
