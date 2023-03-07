@@ -8,26 +8,26 @@
 
 Semantic-transact is a sql builder providing structured API.
 
-Traditionally, relational database application based upon SQL formatting.
-It's not easy if the data became more and more complicate and more DB tables and
-their relationship / restriction envolved.
+Traditionally, relational database applications are based upon SQL formatting.
+It's not easy if the data becomes more and more complicated and more DB tables
+with their relationship / restriction involved.
 
 User, the programmer has to take care of the SQL string structure while appending,
 filling in data into a half structured string template. When some more abstracted
-SQL composition task must been fulfilled, it's extremly difficult to, if not
+SQL composition task must be fulfilled, it's extremely difficult to, if not
 impossible, take care of both data and SQL syntax.
 
 This is where a relational DB based application's bug pron module. Especially when
-the DB design are changed, even a little, the whole system will take a long time
-to became stable again.
+the DB design is changed, even a little, the whole system will take a long time
+to become stable again.
 
-Of course there already a lot of solution exist, e.g. hibernate if the debating
-on over engineering is not a concern. But the author likes the [SQLBuilder](https://openhms.sourceforge.io/sqlbuilder/)
+Of course there already a lot of solutions exist, e.g. Hibernate if the debating
+on over-engineering is not a concern. But the author likes the [SQLBuilder](https://openhms.sourceforge.io/sqlbuilder/)
 more before the idea of semantic-transact.
 
 Semantic-transact is another try to solve the problem by separating SQL syntax
-maintance from data manipulation. With a structured API, user don't have to worrying
-about the syntax in string.
+maintained from data manipulation. With a structured API, users don't have to
+worry about the syntax in the string.
 
 Here is a simple example:
 
@@ -46,14 +46,14 @@ Here is a simple example:
         sqls.get(0));
 ~~~
 
-All SQL string are accumulated in a list buffer. When this process completed, all
-SQL statements can be committed in a batch operation. That's why it's named as
+All SQL strings are accumulated in a list buffer. When this process is completed,
+all SQL statements can be committed in a batch operation. That's why it's named
 "transact".
 
-At first sight, you may dislike this approach because it's somehow anti intuitive - all
-programmers are already being comfort with SQL syntax. But when the SQL composing
-tasks became complicated, or have to be done according to data at runtime, remote
-request or data relationship, it's immediatly showing the advantages - you care
+At first sight, you may dislike this approach because it's somehow anti-intuitive -
+all programmers are already comfortable with SQL syntax. But when the SQL composing
+tasks become complicated, or have to be done according to data at runtime, remote
+request or data relationship, it's immediately showing the advantages - you care
 only about data, let semantic-transact handling SQL AST for you.
 
 # Quick Start
@@ -69,11 +69,10 @@ For maven project, to use the latest package, in pom.xml
         <version>[1.1.3,)</version>
     </dependency>
 ~~~
-For latest released version, see [releas notes](release-notes.md).
 
 For examples, see the test cases:
 
-- [Pure transaction buliding without semantics context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/transact/sql/TestTransc.java)
+- [Pure transaction building without semantics context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/transact/sql/TestTransc.java)
 
 - [With help of semantics context](https://github.com/odys-z/semantic-transact/blob/master/semantic.transact/src/test/java/io/odysz/semantics/SemanticsTest.java)
 
