@@ -80,4 +80,4 @@ For examples, see the test cases:
 
 - [javadoc](https://odys-z.github.io/javadoc/semantic.transact/index.html)
 
-- [Semantic-* Document](https://odys-z.github.io)
+- [Semantic-* Document (deprecated)](https://odys-z.github.io/archive)
