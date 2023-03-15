@@ -1,6 +1,7 @@
 package io.odysz.semantics;
 
 import java.io.PrintStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +23,20 @@ import io.odysz.transact.x.TransException;
  * @author odys-z@github.com
  */
 public class SemanticObject extends Anson {
+
+	/**
+	 * Object creator for converting an entity record to a user type instance.
+	 * 
+	 * @author odys-z@github.com
+	 *
+	 * @param <T> the user type
+	 * @param <RS> currently only AnResultset should be the case
+	 * @since 1.4.12
+	 */
+	@FunctionalInterface
+	public interface ObjCreator<T extends Object, RS extends Anson> {
+		T create(RS rs) throws SQLException;
+	}
 
 	protected HashMap<String, Object> props;
 	public HashMap<String, Object> props() { return props; }
@@ -104,6 +119,27 @@ public class SemanticObject extends Anson {
 
 	public Object rs(int i) {
 		return ((ArrayList<?>)get("rs")).get(i);
+	}
+	
+	/**
+	 * Iterating through the results and convert to hash map, like this:
+	 * <pre>
+	 HashMap<String, SynState> res = st
+		.select(met.tbl, "l")
+		.rs(st.instancontxt(conn, usr))
+		.&lt;AnResultset, UserType&gt;map((currow) -> {
+			// create instance according current row
+			return new UserType(currow.getString("id"));
+		}); 
+	 * </pre>
+	 * @param <T> the user type
+	 * @param <RS> currently only AnResultset should be the case
+	 * @param objCreator the call back
+	 * @return the hash map
+	 * @since 1.4.12
+	 */
+	public <RS extends Anson, T> HashMap<String, T> map(ObjCreator<T, RS> objCreator) {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
