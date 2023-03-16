@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import io.odysz.common.AESHelper;
 import io.odysz.common.DateFormat;
+import io.odysz.common.DocLocks;
 import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -293,8 +294,11 @@ public class Funcall extends ExprPart {
 								fn = EnvPath.decodeUri(stx.containerRoot(), fn);
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
-									byte[] fi = Files.readAllBytes(f);
-									row.set(c, AESHelper.encode64(fi));
+									try {
+										DocLocks.reading(f);
+										byte[] fi = Files.readAllBytes(f);
+										row.set(c, AESHelper.encode64(fi));
+									} finally { DocLocks.readed(f); }
 								}
 								else {
 									Utils.warn("Funcal (extFile) onSelected postOP(): Can't find file:\n%s", fn);

@@ -10,6 +10,7 @@ import java.util.Random;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
+import io.odysz.common.DocLocks;
 import io.odysz.common.Radix32;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
@@ -109,6 +110,7 @@ public class ExtFileUpdate extends ExprPart {
 				f = Paths.get(absoluteFn);
 			}
 
+			DocLocks.writing(f);
 			Files.move(old, f, StandardCopyOption.ATOMIC_MOVE);
 
 			// mysql doesn't like windows' path separator
@@ -117,17 +119,6 @@ public class ExtFileUpdate extends ExprPart {
 			e.printStackTrace();
 			return "''";
 		}
+		finally { DocLocks.writen(f); }
 	}
-
-//	protected void touchDir(String dir) {
-//		File f = new File(dir);
-//		if (f.isDirectory())
-//			return;
-//		else if (!f.exists())
-//			// create dir
-//			f.mkdirs();
-//		else
-//			// must be a file
-//			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
-//	}
 }

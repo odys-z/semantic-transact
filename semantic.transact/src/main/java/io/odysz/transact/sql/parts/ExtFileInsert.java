@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.apache.commons.io_odysz.FilenameUtils;
 
 import io.odysz.common.AESHelper;
+import io.odysz.common.DocLocks;
 import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
@@ -112,13 +113,17 @@ public class ExtFileInsert extends AbsPart {
 		Path f = Paths.get(absoluteFn);
 		try {
 			byte[] b = AESHelper.decode64(b64);
+
+			DocLocks.writing(f);;
 			Files.write(f, b);
+
 			// mysql doesn't like windows' path separator
 			return "'" + relatvFn.replaceAll("\\\\", "/") + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "''";
 		}
+		finally { DocLocks.writen(f); }
 	}
 	
 	public String absolutePath(ISemantext ctx) throws TransException {
