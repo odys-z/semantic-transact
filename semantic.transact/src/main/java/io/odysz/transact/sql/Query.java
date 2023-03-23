@@ -206,6 +206,18 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 	
+	/**
+	 * E.g. select [tbl].[col] as [alias]
+	 * @param tbl usually a table alias in like c in "select my_table c"
+	 * @param col the DB field name
+	 * @param alias expression's alias
+	 * @return this
+	 * @throws TransException
+	 */
+	public Query col(String tbl, String col, String alias) throws TransException {
+		return col(tbl + "." + col, alias);
+	}
+	
 	public Query col(ExprPart expr, String... alias) {
 		if (expr != null) {
 			if (selectList == null)

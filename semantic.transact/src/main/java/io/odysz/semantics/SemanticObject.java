@@ -132,13 +132,14 @@ public class SemanticObject extends Anson {
 			return new UserType(currow.getString("id"));
 		}); 
 	 * </pre>
+	 * @param value of the field name used for map's key
 	 * @param <T> the user type
 	 * @param <RS> currently only AnResultset should be the case
 	 * @param objCreator the call back
 	 * @return the hash map
 	 * @since 1.4.12
 	 */
-	public <RS extends Anson, T> HashMap<String, T> map(ObjCreator<T, RS> objCreator) {
+	public <RS extends Anson, T> HashMap<String, T> map(String keyName, ObjCreator<T, RS> objCreator) {
 		return null;
 	}
 
