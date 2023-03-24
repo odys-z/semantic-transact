@@ -24,20 +24,6 @@ import io.odysz.transact.x.TransException;
  */
 public class SemanticObject extends Anson {
 
-	/**
-	 * Object creator for converting an entity record to a user type instance.
-	 * 
-	 * @author odys-z@github.com
-	 *
-	 * @param <T> the user type
-	 * @param <RS> currently only AnResultset should be the case
-	 * @since 1.4.12
-	 */
-	@FunctionalInterface
-	public interface ObjCreator<T extends Object, RS extends Anson> {
-		T create(RS rs) throws SQLException;
-	}
-
 	protected HashMap<String, Object> props;
 	public HashMap<String, Object> props() { return props; }
 
@@ -105,8 +91,7 @@ public class SemanticObject extends Anson {
 			return put("msg", String.format(msg, args));
 	}
 
-	/**Put resultset (SResultset) into "rs".
-	 * Useing this should be careful as the rs is a 3d array.
+	/**Put result set (AnResultset) into "rs", which is a 3d array.
 	 * @param resultset
 	 * @param total 
 	 * @return this
@@ -121,28 +106,6 @@ public class SemanticObject extends Anson {
 		return ((ArrayList<?>)get("rs")).get(i);
 	}
 	
-	/**
-	 * Iterating through the results and convert to hash map, like this:
-	 * <pre>
-	 HashMap<String, SynState> res = st
-		.select(met.tbl, "l")
-		.rs(st.instancontxt(conn, usr))
-		.&lt;AnResultset, UserType&gt;map((currow) -> {
-			// create instance according current row
-			return new UserType(currow.getString("id"));
-		}); 
-	 * </pre>
-	 * @param value of the field name used for map's key
-	 * @param <T> the user type
-	 * @param <RS> currently only AnResultset should be the case
-	 * @param objCreator the call back
-	 * @return the hash map
-	 * @since 1.4.12
-	 */
-	public <RS extends Anson, T> HashMap<String, T> map(String keyName, ObjCreator<T, RS> objCreator) {
-		return null;
-	}
-
 	@SuppressWarnings("unchecked")
 	public int total(int i) {
 		if (get("total") == null)
