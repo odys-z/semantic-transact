@@ -9,8 +9,8 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
-import io.odysz.transact.sql.Statement.IPostOperat;
-import io.odysz.transact.sql.Statement.IPostSelectOperat;
+import io.odysz.transact.sql.Statement.IPostOptn;
+import io.odysz.transact.sql.Statement.IPostSelectOptn;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
@@ -131,7 +131,7 @@ public interface ISemantext {
 	 */
 
 	/**Get all the resolved results,
-	 * a.k.a return value of {@link Update#doneOp(io.odysz.transact.sql.Statement.IPostOperat)}.*/
+	 * a.k.a return value of {@link Update#doneOp(io.odysz.transact.sql.Statement.IPostOptn)}.*/
 	public SemanticObject resulves();
 	
 	/**Format special escaping string that will be resolve value later.
@@ -171,7 +171,7 @@ public interface ISemantext {
 	 * @param tabl
 	 * @return meta
 	 */
-	public TableMeta colType(String tabl);
+	public TableMeta tablType(String tabl);
 
 	/**Concatenate the path for the file system (without file name) for the running environment
 	 * - typically for resolving a relative path to the WEB-INF/sub[0]/sub[1]/...
@@ -187,7 +187,7 @@ public interface ISemantext {
 	 */
 	public String containerRoot();
 
-	void addOnRowsCommitted(IPostOperat op);
+	void addOnRowsCommitted(IPostOptn op);
 
 	/**
 	 * Add table wise handler for successful commitment
@@ -195,16 +195,16 @@ public interface ISemantext {
 	 * @param tabl
 	 * @param op
 	 */
-	default void addOnTableCommitted(String tabl, IPostOperat op) { }
+	default void addOnTableCommitted(String tabl, IPostOptn op) { }
 
-	default IPostOperat onTableCommittedHandler(String tabl) { return null; }
+	default IPostOptn onTableCommittedHandler(String tabl) { return null; }
 
 	/**
 	 * <p>When the commitment succeeded, there are still things must be done,
 	 * like deleting external files.</p>
-	 * The operations which are (instances of {@link IPostOperat} lambda expression,
-	 * are pushed into semantext while handling semantics, via {@link #addOnRowsCommitted(IPostOperat)}
-	 * &amp; {@link #addOnTableCommitted(String, IPostOperat)}.  
+	 * The operations which are (instances of {@link IPostOptn} lambda expression,
+	 * are pushed into semantext while handling semantics, via {@link #addOnRowsCommitted(IPostOptn)}
+	 * &amp; {@link #addOnTableCommitted(String, IPostOptn)}.  
 	 * @param ctx
 	 * @param tabl 
 	 * @throws TransException 
@@ -234,7 +234,7 @@ public interface ISemantext {
 	 * <p>For each row, operations are iterated in the order of been added.</p>
 	 * @param op
 	 */
-	void addOnSelectedHandler(String name, IPostSelectOperat op);
+	void addOnSelectedHandler(String name, IPostSelectOptn op);
 
 	/**
 	 * <p>Compose the v provide by client into target table column's value represented in sql,

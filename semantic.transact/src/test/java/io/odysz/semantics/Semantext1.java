@@ -12,8 +12,8 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
-import io.odysz.transact.sql.Statement.IPostOperat;
-import io.odysz.transact.sql.Statement.IPostSelectOperat;
+import io.odysz.transact.sql.Statement.IPostOptn;
+import io.odysz.transact.sql.Statement.IPostSelectOptn;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
@@ -120,7 +120,7 @@ public class Semantext1 implements ISemantext {
 	public SemanticObject resulves() { return null; }
 	
 	@Override
-	public TableMeta colType(String tabl) {
+	public TableMeta tablType(String tabl) {
 		return metas.get(tabl);
 	}
 
@@ -154,7 +154,7 @@ public class Semantext1 implements ISemantext {
 	public void onCommitted(ISemantext ctx, String tabl) throws TransException, SQLException { }
 
 	@Override
-	public void addOnRowsCommitted(IPostOperat op) { }
+	public void addOnRowsCommitted(IPostOptn op) { }
 
 	@Override
 	public String containerRoot() { return null; }
@@ -173,5 +173,5 @@ public class Semantext1 implements ISemantext {
 	}
 
 	@Override
-	public void addOnSelectedHandler(String name, IPostSelectOperat op) { }
+	public void addOnSelectedHandler(String name, IPostSelectOptn op) { }
 }

@@ -50,7 +50,7 @@ public class Transcxt {
 
 	public TableMeta tableMeta(String tabl) throws TransException {
 		return basictx == null ? null :
-			basictx.colType(tabl).conn(basictx.connId());
+			basictx.tablType(tabl).conn(basictx.connId());
 	}
 
 	/**

@@ -38,12 +38,20 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	public enum Type { select, insert, update, delete }
 
-	public interface IPostOperat {
+	/**
+	 * Callback of post commitment operation.
+	 * @since 1.4.12
+	 */
+	public interface IPostOptn {
 		SemanticObject onCommitOk (ISemantext ctx, ArrayList<String> sqls)
 				throws TransException, SQLException;
 	}
 	
-	public interface IPostSelectOperat {
+	/**
+	 * Callback of post query operation.
+	 * @since 1.4.12
+	 */
+	public interface IPostSelectOptn {
 		void onSelected (ISemantext ctx, ArrayList<Object> row,
 				HashMap<String, Object[]> cols) throws TransException, SQLException;
 	}
@@ -66,7 +74,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected ArrayList<Statement<?>> postate;
 
 	/**The committing to db operation callback */
-	protected IPostOperat postOp;
+	protected IPostOptn postOp;
 
 	protected ArrayList<Statement<?>> before;
 
@@ -367,7 +375,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * See {@link Query#rs(ISemantext)}
 	 * @param operatn
 	 */
-	public void doneOp(IPostOperat operatn) {
+	public void doneOp(IPostOptn operatn) {
 		postOp = operatn;
 	}
 

@@ -73,7 +73,7 @@ public class InsertValues extends AbsPart {
 						else
 							vs.v(idx, ExprsVisitor.parse(str));
 					else {
-						TableMeta cltyp = sctx.colType(tablName);
+						TableMeta cltyp = sctx.tablType(tablName);
 						if (cltyp == null || cltyp.isQuoted((String)nv[0]))
 							if (nv[1] == null)
 								vs.v(idx, new ExprPart("null"));
