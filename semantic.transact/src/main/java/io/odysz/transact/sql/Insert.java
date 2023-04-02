@@ -266,16 +266,10 @@ public class Insert extends Statement<Insert> {
 	 * <h3>Where is the sample code?</h3>
 	 * <p>To see how to extend {@link Transcxt}, see DATranscxt in project semantic-DA.<br>
 	 * To see how to use this method, see io.odysz.semantic.DASemantextTest in project sematic-DA.</p>
-	 * <p><b>Node:</b>This method shouldn't been used the same time with {@link #commit(ArrayList, io.odysz.semantics.IUser...)}
+	 * <p><b>Note:</b><br>This method shouldn't been used the same time with {@link #commit(ArrayList, io.odysz.semantics.IUser...)}
 	 * because the inserting values will be handled / smirred in both methods.</p>
-	 * <p>If you can make sure the ISemantext instance provided to Transcxt is clean of data
-	 * invention, you can safely use both of these methods. But it's not guaranteed in the
-	 * future version.</p>
-	 * Also it's not recommended for the performance reason. The sql string is already generated
-	 * by {@link #commit(ArrayList, io.odysz.semantics.IUser...) commit()} , don't generate it and travels AST again in this method, 
-	 * use it directly.
 	 * @param ctx
-	 * @return results by resolving FK, etc.
+	 * @return results for resolving FK, etc.
 	 * @throws TransException
 	 * @throws SQLException
 	 */
