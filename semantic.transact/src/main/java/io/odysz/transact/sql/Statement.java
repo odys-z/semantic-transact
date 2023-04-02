@@ -344,7 +344,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return commit(context, sqls);
 	}
 	
-	/**Generating sqls with running context ctx.
+	/**
+	 * Generating sqls with running context ctx.
 	 * @param cxt
 	 * @param sqls
 	 * @return the resulting statement.

@@ -84,7 +84,6 @@ public class SemanticsTest {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		Query q = st.select("a_functions", "f")
-			// .j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
 			.l(st.select("a_role_func", "rf")
 					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
 				"tf", "tf.funcId = f.funcId")
@@ -103,7 +102,6 @@ public class SemanticsTest {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		st.select("a_functions", "f")
-			// .j("a_rolefunc", "rf", Sql.condt("f.funcId=rf.funcId and rf.roleId~%%'%s'", user.userId()))
 			.l(st.select("a_role_func", "rf")
 					.col(Funcall.ifNullElse("rf.funcId", Boolean.TRUE, Boolean.FALSE)),
 					"tf", "tf.funcId = f.funcId")
@@ -220,7 +218,7 @@ public class SemanticsTest {
 		
 		assertEquals(
 			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
-							  "values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')",
+			"values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')",
 			sqls.get(0));
 
 		st.insert("a_functions")
@@ -233,7 +231,7 @@ public class SemanticsTest {
 		
 		assertEquals(
 			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
-								"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
+			"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
 			sqls.get(1));
 	}
 	
