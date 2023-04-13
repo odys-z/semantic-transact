@@ -221,6 +221,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_("=", col, constv);
 	}
 
+	public T whereEq(String tabl, String col, String constv) {
+		return where_("=", String.format("%s.%s", tabl, col), constv);
+	}
+
 	public T whereEqOr(String col, String[] ors) {
 		// Temporary solution for API lack of precedence handling
 		String exp = null;

@@ -360,17 +360,22 @@ public class Query extends Statement<Query> {
 
 	/**
 	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
-	 * @param mainTbl
+	 * 
+	 * <p>Example:</p>
+	 * <pre>sctx.select(usrMeta.tbl, "u")
+	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
+	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);</pre>
+	 * @param mainAlias
 	 * @param withTbl
 	 * @param withAlias
 	 * @param colMaintbl
 	 * @param colWith
 	 * @return this
 	 */
-	public Query je(String mainTbl, String withTbl, String withAlias, String colMaintbl, String... colWith) {
+	public Query je(String mainAlias, String withTbl, String withAlias, String colMaintbl, String... colWith) {
 		return j(withTbl, withAlias, Sql.condt(
 				op.eq,
-				String.format("%s.%s", mainTbl, colMaintbl), 
+				String.format("%s.%s", mainAlias, colMaintbl), 
 				String.format("%s.%s", withAlias, colWith == null || colWith.length == 0 ? colMaintbl : colWith[0])));
 	}
 	
