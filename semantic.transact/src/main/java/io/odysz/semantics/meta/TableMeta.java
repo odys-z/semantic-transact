@@ -1,10 +1,23 @@
 package io.odysz.semantics.meta;
 
+import java.io.IOException;
 import java.util.HashMap;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.meta.ColMeta.coltype;
 
 public class TableMeta {
+
+	protected static String sqlite;
+	public static String ddlSqlite () {
+		try {
+			return Utils.loadTxt(sqlite);
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private HashMap<String, ColMeta> types;
 
 	public String tbl;
