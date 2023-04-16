@@ -1,7 +1,6 @@
 package io.odysz.semantics;
 
 import java.io.PrintStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,13 +11,8 @@ import java.util.Map;
 import io.odysz.anson.Anson;
 import io.odysz.transact.x.TransException;
 
-/**<p>The semantics data used internally by semantic-DA to handle semantics configuration.</p>
- * <p>SemanticObject implement methods to write itself as a json value with a writer provided by the caller.
- * This can be used to write the object into other structured object.</p>
- * <p><b>Note:</b> The equivalent of JsonObject in a request is JMessage.
- * <p>Question: If a json request object is handled by a port, e.g. SQuery,
- * is their any property name not known by the port?</p>
- * <p>If no such properties, then there shouldn't be put() and get().</p>
+/**
+ * <p>The semantics data returned by transaction as the commitment result.</p>
  * 
  * @author odys-z@github.com
  */
