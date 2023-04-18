@@ -104,7 +104,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return this statement
 	 * @throws TransException
 	 */
-	public T nv(String n, String v) throws TransException {
+	public T nv(String n, String v) {
 		String conn = transc.basictx == null ? null : transc.basictx.connId();
 
 		TableMeta mt = transc.tableMeta(mainTabl.name())
@@ -112,12 +112,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return nv(n, composeVal(v, mt, n));
 	}
 
-	public T nv(String n, long v) throws TransException {
+	public T nv(String n, long v) {
 		return nv(n, String.valueOf(v));
 	}
 
-	public T nv(String n, AbsPart v) throws TransException {
-		throw new TransException("Only Update and Insert can use nv() function.");
+	public T nv(String n, AbsPart v) {
+		Utils.warn("Statement.nv(): Only Update and Insert can use nv() function.");
+		return (T) this;
 	}
 
 	public T where(String logic, String loperand, String roperand) {
@@ -167,6 +168,16 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		if (ands != null)
 			for (Condit and : ands)
 				where = where.and(and);
+		return (T) this;
+	}
+	
+	public T where(Condit ... andCondts ) {
+		if (where == null)
+			where = andCondts[0];
+
+		for (int i = 1; i < andCondts.length; i++)
+			where = where.and(andCondts[i]);
+
 		return (T) this;
 	}
 

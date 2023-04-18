@@ -48,7 +48,7 @@ public class Transcxt {
 		return new Delete(this, tabl);
 	}
 
-	public TableMeta tableMeta(String tabl) throws TransException {
+	public TableMeta tableMeta(String tabl) {
 		return basictx == null ? null :
 			basictx.tablType(tabl).conn(basictx.connId());
 	}
