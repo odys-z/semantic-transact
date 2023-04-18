@@ -144,13 +144,13 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 
 		ExpressionContext exp = ctx.expression();
 		// constant expression
-//		if (exp != null && exp.primitive_expression() != null
-//				&& exp.primitive_expression().constant() != null) {
-//			text = exp.primitive_expression().constant().getText();
+		// v4.7.1/2 -> 4.9.2
+//		if (exp != null && exp.constant() != null) {
+//			text = exp.constant().getText();
 //			ele = new SelectElem(ElemType.constant, text);
 //		}
-		if (exp != null && exp.constant() != null) {
-			text = exp.constant().getText();
+		if (exp != null && exp.constant_expression() != null) {
+			text = exp.constant_expression().getText();
 			ele = new SelectElem(ElemType.constant, text);
 		}
 		else if (exp != null)  {
@@ -158,7 +158,6 @@ public class SelectElemVisitor extends SelectPartsBaseVisitor<SelectElem> {
 			// function
 			Function_callContext f = exp.function_call();
 			if (f != null)  {
-				// text = f.getText();
 				// aggregation funcion
 				if (f.aggregate_windowed_function() != null) {
 					text = f.aggregate_windowed_function().getChild(0).getText();

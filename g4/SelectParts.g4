@@ -1,7 +1,7 @@
 /* Select parts, such as select_list_elem.
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * compile:
- * java -jar /home/ody/d/ubuntu/antlr4/antlr-4.7.1-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.select
+ * java -jar ~/antlr4/antlr-[###]-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.select
  */
 
 parser grammar SelectParts;
@@ -20,7 +20,7 @@ select_list_elem
     // | udt_elem
     // Odys-z function-call
     | function_call as_column_alias
-    
+
     // Modified
     // | expression_elem
     | expression as_column_alias?
@@ -30,7 +30,7 @@ select_list_elem
 as_column_alias
     : AS? column_alias
 	;
-	
+
 column_alias
     : id
     | STRING
@@ -46,4 +46,3 @@ asterisk
     : '*'
     | table_name '.' asterisk
     ;
-

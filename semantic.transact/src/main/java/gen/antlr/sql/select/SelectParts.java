@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.7.2
+// Generated from SelectParts.g4 by ANTLR 4.9.2
 package gen.antlr.sql.select;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SelectParts extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -1471,9 +1471,6 @@ public class SelectParts extends Parser {
 
 	public static class ExpressionContext extends ParserRuleContext {
 		public Token op;
-		public ConstantContext constant() {
-			return getRuleContext(ConstantContext.class,0);
-		}
 		public Function_callContext function_call() {
 			return getRuleContext(Function_callContext.class,0);
 		}
@@ -1485,6 +1482,9 @@ public class SelectParts extends Parser {
 		}
 		public Unary_operator_expressionContext unary_operator_expression() {
 			return getRuleContext(Unary_operator_expressionContext.class,0);
+		}
+		public Constant_expressionContext constant_expression() {
+			return getRuleContext(Constant_expressionContext.class,0);
 		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
@@ -1548,31 +1548,31 @@ public class SelectParts extends Parser {
 			case 1:
 				{
 				setState(160);
-				constant();
+				function_call();
 				}
 				break;
 			case 2:
 				{
 				setState(161);
-				function_call();
+				full_column_name();
 				}
 				break;
 			case 3:
 				{
 				setState(162);
-				full_column_name();
+				bracket_expression();
 				}
 				break;
 			case 4:
 				{
 				setState(163);
-				bracket_expression();
+				unary_operator_expression();
 				}
 				break;
 			case 5:
 				{
 				setState(164);
-				unary_operator_expression();
+				constant_expression();
 				}
 				break;
 			}
@@ -1593,7 +1593,7 @@ public class SelectParts extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(167);
-						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(168);
 						((ExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1606,7 +1606,7 @@ public class SelectParts extends Parser {
 							consume();
 						}
 						setState(169);
-						expression(5);
+						expression(6);
 						}
 						break;
 					case 2:
@@ -1614,7 +1614,7 @@ public class SelectParts extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(170);
-						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
+						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(171);
 						((ExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1627,7 +1627,7 @@ public class SelectParts extends Parser {
 							consume();
 						}
 						setState(172);
-						expression(4);
+						expression(5);
 						}
 						break;
 					case 3:
@@ -1635,11 +1635,11 @@ public class SelectParts extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(173);
-						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
+						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(174);
 						comparison_operator();
 						setState(175);
-						expression(3);
+						expression(4);
 						}
 						break;
 					case 4:
@@ -1647,11 +1647,11 @@ public class SelectParts extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(177);
-						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 						setState(178);
 						assignment_operator();
 						setState(179);
-						expression(2);
+						expression(3);
 						}
 						break;
 					}
@@ -1730,7 +1730,7 @@ public class SelectParts extends Parser {
 				setState(190);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==BLOCKING_HIERARCHY || _la==INIT || _la==ROWCOUNT || ((((_la - 396)) & ~0x3f) == 0 && ((1L << (_la - 396)) & ((1L << (AGGREGATE - 396)) | (1L << (AVG - 396)) | (1L << (BIGINT - 396)) | (1L << (BINARY_BASE64 - 396)) | (1L << (COUNT - 396)) | (1L << (COUNT_BIG - 396)) | (1L << (COUNTER - 396)))) != 0) || ((((_la - 460)) & ~0x3f) == 0 && ((1L << (_la - 460)) & ((1L << (DATEADD - 460)) | (1L << (DATEDIFF - 460)) | (1L << (DATENAME - 460)) | (1L << (DATEPART - 460)) | (1L << (DAYS - 460)) | (1L << (FIRST - 460)) | (1L << (FIRST_VALUE - 460)) | (1L << (FOLLOWING - 460)))) != 0) || ((((_la - 537)) & ~0x3f) == 0 && ((1L << (_la - 537)) & ((1L << (HOURS - 537)) | (1L << (IDENTITY_VALUE - 537)) | (1L << (INT - 537)) | (1L << (LAST - 537)) | (1L << (LAST_VALUE - 537)) | (1L << (LOW - 537)) | (1L << (MAX - 537)) | (1L << (MIN - 537)) | (1L << (MINUTES - 537)))) != 0) || _la==NUMBER || ((((_la - 697)) & ~0x3f) == 0 && ((1L << (_la - 697)) & ((1L << (ROW - 697)) | (1L << (ROW_NUMBER - 697)) | (1L << (STDEV - 697)) | (1L << (STDEVP - 697)) | (1L << (SUM - 697)) | (1L << (TIME - 697)))) != 0) || ((((_la - 773)) & ~0x3f) == 0 && ((1L << (_la - 773)) & ((1L << (VAR - 773)) | (1L << (VARP - 773)) | (1L << (DECIMAL - 773)) | (1L << (ID - 773)) | (1L << (STRING - 773)) | (1L << (BINARY - 773)) | (1L << (FLOAT - 773)) | (1L << (REAL - 773)) | (1L << (LR_BRACKET - 773)) | (1L << (PLUS - 773)) | (1L << (MINUS - 773)) | (1L << (BIT_NOT - 773)))) != 0)) {
+				if (_la==BLOCKING_HIERARCHY || _la==INIT || _la==NULL || _la==ROWCOUNT || ((((_la - 396)) & ~0x3f) == 0 && ((1L << (_la - 396)) & ((1L << (AGGREGATE - 396)) | (1L << (AVG - 396)) | (1L << (BIGINT - 396)) | (1L << (BINARY_BASE64 - 396)) | (1L << (COUNT - 396)) | (1L << (COUNT_BIG - 396)) | (1L << (COUNTER - 396)))) != 0) || ((((_la - 460)) & ~0x3f) == 0 && ((1L << (_la - 460)) & ((1L << (DATEADD - 460)) | (1L << (DATEDIFF - 460)) | (1L << (DATENAME - 460)) | (1L << (DATEPART - 460)) | (1L << (DAYS - 460)) | (1L << (FIRST - 460)) | (1L << (FIRST_VALUE - 460)) | (1L << (FOLLOWING - 460)))) != 0) || ((((_la - 537)) & ~0x3f) == 0 && ((1L << (_la - 537)) & ((1L << (HOURS - 537)) | (1L << (IDENTITY_VALUE - 537)) | (1L << (INT - 537)) | (1L << (LAST - 537)) | (1L << (LAST_VALUE - 537)) | (1L << (LOW - 537)) | (1L << (MAX - 537)) | (1L << (MIN - 537)) | (1L << (MINUTES - 537)))) != 0) || _la==NUMBER || ((((_la - 697)) & ~0x3f) == 0 && ((1L << (_la - 697)) & ((1L << (ROW - 697)) | (1L << (ROW_NUMBER - 697)) | (1L << (STDEV - 697)) | (1L << (STDEVP - 697)) | (1L << (SUM - 697)) | (1L << (TIME - 697)))) != 0) || ((((_la - 773)) & ~0x3f) == 0 && ((1L << (_la - 773)) & ((1L << (VAR - 773)) | (1L << (VARP - 773)) | (1L << (DECIMAL - 773)) | (1L << (ID - 773)) | (1L << (STRING - 773)) | (1L << (BINARY - 773)) | (1L << (FLOAT - 773)) | (1L << (REAL - 773)) | (1L << (LR_BRACKET - 773)) | (1L << (PLUS - 773)) | (1L << (MINUS - 773)) | (1L << (BIT_NOT - 773)))) != 0)) {
 					{
 					setState(189);
 					expression_list();
@@ -2912,13 +2912,13 @@ public class SelectParts extends Parser {
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 4);
+			return precpred(_ctx, 5);
 		case 1:
-			return precpred(_ctx, 3);
+			return precpred(_ctx, 4);
 		case 2:
-			return precpred(_ctx, 2);
+			return precpred(_ctx, 3);
 		case 3:
-			return precpred(_ctx, 1);
+			return precpred(_ctx, 2);
 		}
 		return true;
 	}
@@ -2986,14 +2986,14 @@ public class SelectParts extends Parser {
 		"\3\2\2\2\u0098\25\3\2\2\2\u0099\u009e\5\30\r\2\u009a\u009b\7\u0339\2\2"+
 		"\u009b\u009d\5\30\r\2\u009c\u009a\3\2\2\2\u009d\u00a0\3\2\2\2\u009e\u009c"+
 		"\3\2\2\2\u009e\u009f\3\2\2\2\u009f\27\3\2\2\2\u00a0\u009e\3\2\2\2\u00a1"+
-		"\u00a2\b\r\1\2\u00a2\u00a8\5\60\31\2\u00a3\u00a8\5\32\16\2\u00a4\u00a8"+
-		"\5 \21\2\u00a5\u00a8\5&\24\2\u00a6\u00a8\5$\23\2\u00a7\u00a1\3\2\2\2\u00a7"+
+		"\u00a2\b\r\1\2\u00a2\u00a8\5\32\16\2\u00a3\u00a8\5 \21\2\u00a4\u00a8\5"+
+		"&\24\2\u00a5\u00a8\5$\23\2\u00a6\u00a8\5(\25\2\u00a7\u00a1\3\2\2\2\u00a7"+
 		"\u00a3\3\2\2\2\u00a7\u00a4\3\2\2\2\u00a7\u00a5\3\2\2\2\u00a7\u00a6\3\2"+
-		"\2\2\u00a8\u00b9\3\2\2\2\u00a9\u00aa\f\6\2\2\u00aa\u00ab\t\2\2\2\u00ab"+
-		"\u00b8\5\30\r\7\u00ac\u00ad\f\5\2\2\u00ad\u00ae\t\3\2\2\u00ae\u00b8\5"+
-		"\30\r\6\u00af\u00b0\f\4\2\2\u00b0\u00b1\5*\26\2\u00b1\u00b2\5\30\r\5\u00b2"+
-		"\u00b8\3\2\2\2\u00b3\u00b4\f\3\2\2\u00b4\u00b5\5,\27\2\u00b5\u00b6\5\30"+
-		"\r\4\u00b6\u00b8\3\2\2\2\u00b7\u00a9\3\2\2\2\u00b7\u00ac\3\2\2\2\u00b7"+
+		"\2\2\u00a8\u00b9\3\2\2\2\u00a9\u00aa\f\7\2\2\u00aa\u00ab\t\2\2\2\u00ab"+
+		"\u00b8\5\30\r\b\u00ac\u00ad\f\6\2\2\u00ad\u00ae\t\3\2\2\u00ae\u00b8\5"+
+		"\30\r\7\u00af\u00b0\f\5\2\2\u00b0\u00b1\5*\26\2\u00b1\u00b2\5\30\r\6\u00b2"+
+		"\u00b8\3\2\2\2\u00b3\u00b4\f\4\2\2\u00b4\u00b5\5,\27\2\u00b5\u00b6\5\30"+
+		"\r\5\u00b6\u00b8\3\2\2\2\u00b7\u00a9\3\2\2\2\u00b7\u00ac\3\2\2\2\u00b7"+
 		"\u00af\3\2\2\2\u00b7\u00b3\3\2\2\2\u00b8\u00bb\3\2\2\2\u00b9\u00b7\3\2"+
 		"\2\2\u00b9\u00ba\3\2\2\2\u00ba\31\3\2\2\2\u00bb\u00b9\3\2\2\2\u00bc\u00c5"+
 		"\5\34\17\2\u00bd\u00be\5\36\20\2\u00be\u00c0\7\u0337\2\2\u00bf\u00c1\5"+

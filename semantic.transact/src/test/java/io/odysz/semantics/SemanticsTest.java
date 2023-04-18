@@ -211,7 +211,7 @@ public class SemanticsTest {
 			// ISSUE 2019.10.14 [Antlr4 visitor doesn't throw exception when parsing failed]
 			// For a quoted full column name like "r"."stamp", in
 			// .where(">", "decode(\"r\".\"stamp\", null, sysdate, r.stamp) - sysdate", "-0.1")
-			// Antlr4.7.1/2 only report an error in console error output:
+			// Antlr4.7.x/2 only report an error in console error output:
 			// line 1:7 no viable alternative at input 'decode("r"'
 			// This makes semantic-jserv won't report error until Oracle complain about sql error.
 			.commit(orclCxt, sqls);

@@ -1,0 +1,16 @@
+if [ -f dist ]; then
+	rm -r dist
+fi
+
+rm -r ../semantic.transact/src/main/java/gen/antlr/sql/exprs
+rm -r ../semantic.transact/src/main/java/gen/antlr/sql/select
+
+java -jar ./antlr-4.9.2-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs -o dist
+java -jar ./antlr-4.9.2-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs -o dist
+mkdir ../semantic.transact/src/main/java/gen/antlr/sql/exprs
+cp dist/*.java ../semantic.transact/src/main/java/gen/antlr/sql/exprs
+java -jar ./antlr-4.9.2-complete.jar SelectParts.g4 -visitor -package gen.antlr.sql.select -o dist
+mkdir ../semantic.transact/src/main/java/gen/antlr/sql/select
+cp dist/Select*.java ../semantic.transact/src/main/java/gen/antlr/sql/select
+rm -r dist
+echo "Ok!"

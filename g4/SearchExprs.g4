@@ -1,11 +1,11 @@
-/* Search condtion 
+/* Search condtion
  * see https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
  * section select_statement, seach_conditon_list and expression
  * compile:
- * java -jar ~/antlr4/antlr-4.7.1-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
- * java -jar ~/antlr4/antlr-4.7.1-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
+ * java -jar ~/antlr4/antlr-[###]-complete.jar TSqlLexer.g4 -package gen.antlr.sql.exprs
+ * java -jar ~/antlr4/antlr-[###]-complete.jar SearchExprs.g4 -visitor -package gen.antlr.sql.exprs
  */
- 
+
 
 parser grammar SearchExprs;
 options { tokenVocab=TSqlLexer; }
@@ -26,7 +26,7 @@ predicate
     // maybe replace subquery with sql-id?
     : expression comparison_operator expression
     | expression NOT? IN '(' expression_list ')'
-    | expression NOT? LIKE expression 
+    | expression NOT? LIKE expression
     | expression IS null_notnull
     | '(' search_condition ')'
     ;
@@ -90,7 +90,7 @@ unary_operator_expression
     ;
 
 bracket_expression
-    : '(' expression ')' 
+    : '(' expression ')'
     ;
 
 // Odys-z: Not Used?
@@ -107,7 +107,7 @@ constant_expression
 // https://msdn.microsoft.com/en-us/library/ms188074.aspx
 // Spaces are allowed for comparison operators.
 comparison_operator
-    : '=' | '>' | '<' | '<' '=' | '>' '=' | '<' '>' | '!' '=' | '!' '>' | '!' '<' | '%' '~' | '%' | '~' '%' 
+    : '=' | '>' | '<' | '<' '=' | '>' '=' | '<' '>' | '!' '=' | '!' '>' | '!' '<' | '%' '~' | '%' | '~' '%'
     // | '?' // isnull ... by odys-z
     // | '?' '!' | '!' '?' // is not null ... by odys-z
     ;
@@ -167,4 +167,3 @@ id
     | SUM
     | TIME
     ;
-
