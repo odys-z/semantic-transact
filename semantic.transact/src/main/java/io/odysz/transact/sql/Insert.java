@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
+import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
@@ -51,7 +52,7 @@ public class Insert extends Statement<Insert> {
 	}
 
 	@Override
-	public Insert nv(String n, AbsPart v) throws TransException {
+	public Insert nv(String n, AbsPart v) {
 		if (currentRowNv == null)
 			currentRowNv = new ArrayList<Object[]>();
 		
@@ -63,12 +64,13 @@ public class Insert extends Statement<Insert> {
 			currentRowNv.add(new Object[] {n, v});
 		}
 		else {
-			throw new TransException("n-v already exists. Duplicated rows? If using nv(), don't use cols() and value(); If using cols(), don't use nv().");
+			Utils.warn("Insert.nv(): n-v (%s - %s) already exists. Duplicated rows? If using nv(), don't use cols() and value(); If using cols(), don't use nv().",
+					n, v);
 		}
 		return this;
 	}
 
-	public Insert nv(String n, ArrayList<String> lst) throws TransException {
+	public Insert nv(String n, ArrayList<String> lst) {
 		nv(n, lst == null ? "null" : String.join(",", lst));
 		return this;
 	}
