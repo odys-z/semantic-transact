@@ -169,8 +169,6 @@ search_condition_not
 	public String sql(ISemantext sctx) throws TransException {
 		// handling with 3 grammar rule: search_condition, search_condition_and, search_condition_not
 		// 1. search_condition_not
-//		if (predict != null)
-//			return predict.sql(sctx); // TODO debug: no "not"?
 
 		// 2. search_condition_and
 		if (logitype == type.empty) {
@@ -208,11 +206,6 @@ search_condition_not
 				return sql;
 			}
 		}
-//		else if (predict == null && condts == null)
-//			return "";
-		// 4. search_condition - CAN'T reach here, it's Predicat's business.
-		// return super.sql(sctx);
-
 		return null;
 	}
 }

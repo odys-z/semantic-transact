@@ -40,6 +40,7 @@ public class Funcall extends ExprPart {
 	public static enum Func {
 		now("now()"),
 		max("max"),
+		min("min"),
 		count("count"),
 		sum("sum"), avg("avg"),
 		isnull("ifnull"),
@@ -63,16 +64,13 @@ public class Funcall extends ExprPart {
 
 		public static Func parse(String funcName) {
 			funcName = funcName.trim().toLowerCase();
-			if (now.fid.equals(funcName))
-				return now;
-			else if (max.fid.equals(funcName))
-				return max;
-			else if (count.fid.equals(funcName))
-				return count;
-			else if (sum.fid.equals(funcName))
-				return sum;
-			else if (avg.fid.equals(funcName))
-				return avg;
+			if (now.fid.equals(funcName)) return now;
+
+			else if (max.fid.equals(funcName)) return max;
+			else if (min.fid.equals(funcName)) return min;
+			else if (count.fid.equals(funcName)) return count;
+			else if (sum.fid.equals(funcName)) return sum;
+			else if (avg.fid.equals(funcName)) return avg;
 
 			else if (add.fid.equals(funcName))   return add;
 			else if (minus.fid.equals(funcName)) return minus;
@@ -146,9 +144,57 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	public static Funcall avg(Object... args) {
+	public static Funcall max(ExprPart... exp) {
+		Funcall f = new Funcall(Func.max);
+		f.args = exp == null ? new String[]{"*"} : new Object[] {exp};
+		return f;
+	}
+
+	public static Funcall min(String... args) {
+		Funcall f = new Funcall(Func.min);
+		f.args = args;
+		return f;
+	}
+
+	public static Funcall min(ExprPart... exp) {
+		Funcall f = new Funcall(Func.min);
+		f.args = exp == null ? new String[]{"*"} : new Object[] {exp};
+		return f;
+	}
+
+	public static Funcall avg(String... args) {
 		Funcall f = new Funcall(Func.avg);
 		f.args = args;
+		return f;
+	}
+	
+	public static Funcall avg(ExprPart... exp) {
+		Funcall f = new Funcall(Func.avg);
+		f.args = exp == null ? new String[]{"*"} : new Object[] {exp};
+		return f;
+	}
+	
+	public static Funcall add(Object l, Object r) {
+		Funcall f = new Funcall(Func.add);
+		f.args = new Object[] {l, r};
+		return f;
+	}
+	
+	public static Funcall minus(Object l, Object r) {
+		Funcall f = new Funcall(Func.minus);
+		f.args = new Object[] {l, r};
+		return f;
+	}
+	
+	public static Funcall mul(Object l, Object r) {
+		Funcall f = new Funcall(Func.mul);
+		f.args = new Object[] {l, r};
+		return f;
+	}
+	
+	public static Funcall div(Object l, Object r) {
+		Funcall f = new Funcall(Func.div);
+		f.args = new Object[] {l, r};
 		return f;
 	}
 
@@ -528,11 +574,11 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 	
-	public static Funcall divid(Object l, Object r) {
-		Funcall f = new Funcall(Func.div);
-		f.args = new Object[] {l, r};
-		return f;
-	}
+//	public static Funcall div(Object l, Object r) {
+//		Funcall f = new Funcall(Func.div);
+//		f.args = new Object[] {l, r};
+//		return f;
+//	}
 
 	public static AbsPart concat(String to, String... with) {
 		Funcall f = new Funcall(Func.concat);

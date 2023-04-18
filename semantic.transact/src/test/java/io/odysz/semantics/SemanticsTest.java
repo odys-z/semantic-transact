@@ -1,6 +1,7 @@
 package io.odysz.semantics;
 
 import static org.junit.Assert.assertEquals;
+import static io.odysz.transact.sql.parts.condition.Funcall.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,6 +158,27 @@ public class SemanticsTest {
 
 		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
 				sqls.get(0));
+	}
+	
+	@Test
+	public void testAvgCountSumMaxMinAlgorithm() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.select("a_roles")
+			.col(avg("roleName"))
+			.col(count("r"))
+			.col(sum("r"))
+			.col(max("r"))
+			.col(min("r"))
+			.col(add("l", "r"))
+			.col(minus("l", "r"))
+			.col(mul("l", "3"))
+			.col(div("r", "0"))
+			.where("=", "roleId", "'admin'")
+			.commit(st.instancontxt(null, null), sqls);
+
+		assertEquals("select avg(roleName), count(r), sum(r), max(r), min(r), (l + r), (l - r), (l * 3), (r / 0) from a_roles  where roleId = 'admin'",
+				sqls.get(0));
+		
 	}
 	
 	@Test
