@@ -172,11 +172,11 @@ public class SemanticsTest {
 			.col(add("l", "r"))
 			.col(minus("l", "r"))
 			.col(mul("l", "3"))
-			.col(div("r", "0"))
+			.col(div("r", "0"), "err")
 			.where("=", "roleId", "'admin'")
 			.commit(st.instancontxt(null, null), sqls);
 
-		assertEquals("select avg(roleName), count(r), sum(r), max(r), min(r), (l + r), (l - r), (l * 3), (r / 0) from a_roles  where roleId = 'admin'",
+		assertEquals("select avg(roleName), count(r), sum(r), max(r), min(r), (l + r), (l - r), (l * 3), (r / 0) err from a_roles  where roleId = 'admin'",
 				sqls.get(0));
 		
 	}
