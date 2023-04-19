@@ -171,7 +171,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
-	public T where(Condit ... andCondts ) {
+	public T whereAnds(Condit ... andCondts ) {
 		if (where == null)
 			where = andCondts[0];
 

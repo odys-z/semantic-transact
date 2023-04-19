@@ -243,6 +243,7 @@ public interface ISemantext {
 	 * if it is an instance of {@link io.odysz.transact.sql.parts.AbsPart AbsPart}, return it directly.</p>
 	 * The null/empty values are handled differently according data meta.<br>
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
+	 * which makes the method parameter complicate.
 	 * @param v
 	 * @param tabl
 	 * @param col
