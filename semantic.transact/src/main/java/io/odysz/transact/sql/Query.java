@@ -365,18 +365,25 @@ public class Query extends Statement<Query> {
 	 * <pre>sctx.select(usrMeta.tbl, "u")
 	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
 	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);</pre>
+	 *    
+	 * @since 1.5.0, additional columns can be append as AND predict in join clause. 
 	 * @param mainAlias
 	 * @param withTbl
 	 * @param withAlias
-	 * @param colMaintbl
 	 * @param colWith
 	 * @return this
 	 */
-	public Query je(String mainAlias, String withTbl, String withAlias, String colMaintbl, String... colWith) {
-		return j(withTbl, withAlias, Sql.condt(
-				op.eq,
-				String.format("%s.%s", mainAlias, colMaintbl), 
-				String.format("%s.%s", withAlias, colWith == null || colWith.length == 0 ? colMaintbl : colWith[0])));
+	public Query je(String mainAlias, String withTbl, String withAlias, String... colWith) {
+		Condit ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, colWith[0]),
+				String.format("%s.%s", withAlias, colWith.length > 1 ? colWith[1] : colWith[0]));
+
+		for (int i = 2; i < colWith.length; i+=2) {
+			ands.and(Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, colWith[i]),
+				String.format("%s.%s", withAlias, colWith.length > i+1 ? colWith[i+1] : colWith[i])));
+		}
+		return j(withTbl, withAlias, ands);
 	}
 	
 	public Query groupby(String expr) {
