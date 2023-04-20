@@ -251,10 +251,22 @@ public interface ISemantext {
 	 */
 	public AbsPart composeVal(Object v, String tabl, String col);
 
-	/**Reset resulves
+	/**
+	 * Reset resulves
 	 * @return this
 	 */
 	public ISemantext reset();
+
+	/**
+	 * Get table meta. The returned meta is a semantics extended meta.
+	 * E.g. the SyntityMeta will register itself for handling synchronizing semantics. 
+	 * 
+	 * All metas are managed by {@link io.odysz.semantic.DA.Connects}, so not usable
+	 * without a Semantic.DA layer.
+	 * @param tbl
+	 * @return meta
+	 */
+	public default TableMeta getTableMeta(String tbl) { return null; };
 
 	/**Set resultset's current row's column's value.<br>
 	 * The current row is actually iterated over by {@link #onSelected(Object)}.
