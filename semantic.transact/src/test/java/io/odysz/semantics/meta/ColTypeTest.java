@@ -49,6 +49,8 @@ public class ColTypeTest {
 		assertFalse(t.isQuoted("c0b"));
 		assertEquals(coltype.bin, t.coltype("c0c"));
 		assertFalse(t.isQuoted("c0c"));
+		
+		
 	}
 
 }

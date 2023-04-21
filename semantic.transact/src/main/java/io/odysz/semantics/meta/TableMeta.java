@@ -1,10 +1,12 @@
 package io.odysz.semantics.meta;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import io.odysz.common.Utils;
 import io.odysz.semantics.meta.ColMeta.coltype;
+import io.odysz.transact.x.TransException;
 
 import static io.odysz.common.LangExt.isNull;
 
@@ -74,19 +76,35 @@ public class TableMeta {
 
 	public coltype coltype(String col) {
 		return types != null && types.containsKey(col) ?
-				types.get(col).type() : coltype.text;
+				types.get(col).type() : null; //coltype.text;
 	}
 
 	/**
 	 * Clone information form DB. This method uses shallow copy - copy references.
 	 * @param from
 	 * @return this
+	 * @throws TransException 
 	 */
-	public TableMeta clone(TableMeta from) {
+	@SuppressWarnings("unchecked")
+	public TableMeta clone(TableMeta from) throws TransException {
 		types = from.types;
 		conn = from.conn;
 		tbl = from.tbl;
 		pk = from.pk;
+		
+		Class<? extends TableMeta> clazz = getClass();
+		Field[] fields = getClass().getDeclaredFields();
+
+	    while ( clazz != TableMeta.class ) {
+	    	for (Field f : fields) {
+	    		if (!types.containsKey(f.getName()))
+	    			throw new TransException("Filed %s#%s is not defined in table '%s'.",
+	    					clazz.getTypeName(), f.getName(), tbl);
+	    	}
+	    	clazz = (Class<? extends TableMeta>) clazz.getSuperclass();
+	    	fields = clazz.getDeclaredFields();
+	    }
+	
 		return this;
 	}
 }

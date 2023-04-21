@@ -238,6 +238,20 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
+	/**
+	 * Concatenate col values into a splitable text value
+	 * @param col
+	 * @param withs
+	 * @return
+	 */
+	public static Funcall compound(String col, String... withs) {
+		return null;
+	}
+
+	public static Funcall compound(String[] withs) {
+		return null;
+	}
+	
 	@Override
 	public String sql(ISemantext context) throws TransException {
 		// function parameters are handled before this AST node handling, making ExprPart's sql available.
@@ -367,8 +381,12 @@ public class Funcall extends ExprPart {
 		dbtype dt = ctx.dbtype();
 		if (dt != dbtype.mysql && dt != dbtype.oracle
 			&& dt != dbtype.sqlite && dt != dbtype.ms2k)
-			Utils.warn("Funcall#sql2datetime(): Using '%s' for unknown db type: %s", args[0], dt.name());
-		return Stream.of(args).collect(Collectors.joining(" || "));
+			Utils.warn("Funcall#sqlConcat(): concat() are not implemented for db type: %s", dt.name());
+		
+		if (dt == dbtype.sqlite)
+			return Stream.of(args).collect(Collectors.joining(" || "));
+		else 
+			throw new TransException("TODO ...");
 	}
 
 	/**<p>Convert string value to datatiem.</p>
@@ -574,12 +592,6 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 	
-//	public static Funcall div(Object l, Object r) {
-//		Funcall f = new Funcall(Func.div);
-//		f.args = new Object[] {l, r};
-//		return f;
-//	}
-
 	public static AbsPart concat(String to, String... with) {
 		Funcall f = new Funcall(Func.concat);
 		

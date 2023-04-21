@@ -31,8 +31,10 @@ public interface IUser {
 	/**
 	 * Provide DB table meta for managing session by AnSession.
 	 * @return table meta
+	 * @throws SQLException 
+	 * @throws SemanticException 
 	 */
-	TableMeta meta();
+	TableMeta meta(String... connId) throws TransException, SQLException;
 
 	/**
 	 * <p>The sqls is committed to database, do something for logging. 
