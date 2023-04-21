@@ -348,9 +348,6 @@ public class Funcall extends ExprPart {
 							c--; // in SResultset, column index start at 1
 							String fn = (String) row.get(c);
 							if (!LangExt.isblank(fn, "\\.", "\\*")) {
-								// to be continued: this is a design error: transact can't recover configured root path!
-								// fn = EnvHelper.isRelativePath(abspath) ?
-								// 		FilenameUtils.concat(stx.containerRoot(), fn) : fn;
 								fn = EnvPath.decodeUri(stx.containerRoot(), fn);
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
@@ -379,14 +376,12 @@ public class Funcall extends ExprPart {
 
 	protected static String sqlConcat(ISemantext ctx, String[] args) throws TransException {
 		dbtype dt = ctx.dbtype();
-		if (dt != dbtype.mysql && dt != dbtype.oracle
-			&& dt != dbtype.sqlite && dt != dbtype.ms2k)
-			Utils.warn("Funcall#sqlConcat(): concat() are not implemented for db type: %s", dt.name());
-		
-		if (dt == dbtype.sqlite)
+		if (dt == dbtype.sqlite || dt == dbtype.oracle)
 			return Stream.of(args).collect(Collectors.joining(" || "));
-		else 
-			throw new TransException("TODO ...");
+		else if (dt == dbtype.mysql || dt == dbtype.ms2k)
+			return Stream.of(args).collect(Collectors.joining("concat(", ", ", ")"));
+		else
+			throw new TransException ("Funcall#sqlConcat(): concat() are not implemented for db type: %s", dt.name());
 	}
 
 	/**<p>Convert string value to datatiem.</p>
