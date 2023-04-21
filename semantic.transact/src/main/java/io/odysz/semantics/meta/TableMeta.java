@@ -80,7 +80,9 @@ public class TableMeta {
 	}
 
 	/**
-	 * Clone information form DB. This method uses shallow copy - copy references.
+	 * Clone information form DB, and check subclass' fields with DB fields.
+	 * This method uses shallow copy - coping references.
+	 * 
 	 * @param from
 	 * @return this
 	 * @throws TransException 
