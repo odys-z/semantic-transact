@@ -109,4 +109,8 @@ public class TableMeta {
 	
 		return this;
 	}
+	
+//	public TableMeta clone(String conn) {
+//		return clone(Connects.getTableMeta(conn, tbl));
+//	}
 }
