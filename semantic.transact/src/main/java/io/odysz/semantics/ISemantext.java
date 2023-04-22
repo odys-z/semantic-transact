@@ -244,6 +244,7 @@ public interface ISemantext {
 	 * The null/empty values are handled differently according data meta.<br>
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
 	 * which makes the method parameter complicate.
+	 * @deprecated moved to {@link io.odysz.transact.sql.Transcxt}
 	 * @param v
 	 * @param tabl
 	 * @param col
