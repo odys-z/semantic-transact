@@ -248,7 +248,7 @@ public class Funcall extends ExprPart {
 		return null;
 	}
 
-	public static Funcall compound(String[] withs) {
+	public static Funcall compound(String[] cols) {
 		return null;
 	}
 	

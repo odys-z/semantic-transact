@@ -3,6 +3,7 @@ package io.odysz.transact.sql;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.x.TransException;
 
 /**<p>Transaction Context, also can be take as a Transaction / Batching SQL builder creator.</p> 
@@ -62,5 +63,9 @@ public class Transcxt {
 	 */
 	public TableMeta tableMeta(String conn, String tabl) throws TransException {
 		throw new TransException("This method must be ovrriden by DA layser.");
+	}
+
+	public AbsPart quotation(Object v, String conn, String tabl, String col) {
+		throw new NullPointerException("This method must be ovrriden by DA layser.");
 	}
 }

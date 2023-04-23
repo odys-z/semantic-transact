@@ -244,13 +244,16 @@ public interface ISemantext {
 	 * The null/empty values are handled differently according data meta.<br>
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
 	 * which makes the method parameter complicate.
-	 * @deprecated moved to {@link io.odysz.transact.sql.Transcxt}
+	 * @deprecated moved to {@link io.odysz.transact.sql.Transcxt#quotation()}
 	 * @param v
 	 * @param tabl
 	 * @param col
 	 * @return the composed value object
+	 * @throws TransException 
 	 */
-	public AbsPart composeVal(Object v, String tabl, String col);
+	public default AbsPart composeVal(Object v, String tabl, String col) throws NullPointerException {
+		throw new NullPointerException("This method is replaced by io.odysz.transact.sql.Transcxt#quotation().");
+	};
 
 	/**
 	 * Reset resulves
