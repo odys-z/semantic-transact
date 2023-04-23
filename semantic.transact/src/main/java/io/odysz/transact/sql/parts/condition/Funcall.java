@@ -252,6 +252,11 @@ public class Funcall extends ExprPart {
 		return null;
 	}
 	
+	public static String compoundVal(String ... vi) {
+		
+		return LangExt.join("\n", "\\\\n", vi);
+	}
+	
 	@Override
 	public String sql(ISemantext context) throws TransException {
 		// function parameters are handled before this AST node handling, making ExprPart's sql available.
