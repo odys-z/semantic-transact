@@ -1,6 +1,9 @@
 package io.odysz.semantics.meta;
 
-import java.io.IOException;
+import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.eqs;
+import static io.odysz.common.LangExt.isNull;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
@@ -8,23 +11,20 @@ import io.odysz.common.Utils;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.x.TransException;
 
-import static io.odysz.common.LangExt.isNull;
-
 public class TableMeta {
 
-	protected static String sqlite;
 	/**
-	 * A helper for test on sqlite.
+	 * <p>A helper for test on sqlite.</p>
+	 * 
+	 * Subclass must override this like:
+	 * <pre>static {
+	 * 	ddlSqlite = Utils.loadTxt(Subclass.class, \"file-path\")");
+	 * }</pre>
+	 * 
+	 * @throws TransException 
 	 * @since 1.5.0
 	 */
-	public static String ddlSqlite () {
-		try {
-			return Utils.loadTxt(sqlite);
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+	public static String ddlSqlite;
 
 	private HashMap<String, ColMeta> types;
 	/**
@@ -49,7 +49,6 @@ public class TableMeta {
 	public TableMeta(String tbl, String ... conn) {
 		this.tbl = tbl;
 		types = new HashMap<String, ColMeta>();
-		// this.conn = conn != null && conn.length > 0 ? conn[0] : null;
 		this.conn = isNull(conn) ? null : conn[0];
 	}
 
@@ -64,6 +63,13 @@ public class TableMeta {
 				: true;
 	}
 
+	/**
+	 * Set column type.
+	 * @param coln
+	 * @param t
+	 * @param len
+	 * @return this
+	 */
 	public TableMeta col(String coln, String t, int len) {
 		ColMeta cm = new ColMeta(t);
 		types.put(coln, cm.tlen(len));
@@ -89,19 +95,27 @@ public class TableMeta {
 	 */
 	@SuppressWarnings("unchecked")
 	public TableMeta clone(TableMeta from) throws TransException {
+		if (!eqs(conn, from.conn, tbl, from.tbl))
+			throw new TransException("Table name or connection Id are not identical");
+
 		types = from.types;
-		conn = from.conn;
-		tbl = from.tbl;
-		pk = from.pk;
 		
 		Class<? extends TableMeta> clazz = getClass();
 		Field[] fields = getClass().getDeclaredFields();
 
 	    while ( clazz != TableMeta.class ) {
 	    	for (Field f : fields) {
-	    		if (!types.containsKey(f.getName()))
-	    			throw new TransException("Filed %s#%s is not defined in table '%s'.",
-	    					clazz.getTypeName(), f.getName(), tbl);
+	    		f.setAccessible(true);
+	    		try {
+	    			if (String.class != f.getType())
+	    				continue;
+					String fv = (String) f.get(this);
+					if (!types.containsKey(fv))
+						Utils.warn("Filed %s#%s(%s) is not defined in table '%s'.",
+	    					clazz.getTypeName(), f.getName(), fv, tbl);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 	    	}
 	    	clazz = (Class<? extends TableMeta>) clazz.getSuperclass();
 	    	fields = clazz.getDeclaredFields();
@@ -109,8 +123,28 @@ public class TableMeta {
 	
 		return this;
 	}
-	
-//	public TableMeta clone(String conn) {
-//		return clone(Connects.getTableMeta(conn, tbl));
-//	}
+
+	/**
+	 * @since 1.5.0 Only sqlite is supported
+	 * @param col
+	 * @param ispk for sqlite, pk = 1
+	 * @return this
+	 */
+	public TableMeta constrain(String col, int ispk) {
+		if (ispk == 1)
+			this.pk = col;
+		return this;
+	}
+
+	/**
+	 * @since 1.5.0 only mysql is supported
+	 * @param col
+	 * @param key
+	 * @return
+	 */
+	public TableMeta constrain(String col, String key) {
+		if (eq(key, "PRI"))
+			this.pk = col;
+		return this;
+	}
 }

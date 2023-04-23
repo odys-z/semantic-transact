@@ -65,6 +65,18 @@ public class Transcxt {
 		throw new TransException("This method must be ovrriden by DA layser.");
 	}
 
+	/**
+	 * <p>If v is an instance of string, add "'" according to db type;
+	 * if it is an instance of {@link io.odysz.transact.sql.parts.AbsPart AbsPart}, return it directly.</p>
+	 * The null/empty values are handled differently according data meta.<br>
+	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
+	 * which makes the method parameter complicate.
+	 * @param v
+	 * @param conn
+	 * @param tabl
+	 * @param col
+	 * @return Sql AST node for generating sql.
+	 */
 	public AbsPart quotation(Object v, String conn, String tabl, String col) {
 		throw new NullPointerException("This method must be ovrriden by DA layser.");
 	}
