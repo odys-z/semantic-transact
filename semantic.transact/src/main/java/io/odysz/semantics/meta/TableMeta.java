@@ -96,7 +96,8 @@ public class TableMeta {
 	@SuppressWarnings("unchecked")
 	public TableMeta clone(TableMeta from) throws TransException {
 		if (!eqs(conn, from.conn, tbl, from.tbl))
-			throw new TransException("Table name or connection Id are not identical");
+			throw new TransException("Table name or connection Id are not identical, %s : %s; %s : %s",
+					conn, from.conn, tbl, from.tbl);
 
 		types = from.types;
 		
