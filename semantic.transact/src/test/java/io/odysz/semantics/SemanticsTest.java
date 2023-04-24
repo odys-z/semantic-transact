@@ -158,6 +158,13 @@ public class SemanticsTest {
 
 		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
 				sqls.get(0));
+		
+		st.select("a_roles")
+			.col(Funcall.compound("roleName", "orgName"), "comp")
+			.col("compound(col1, col2)", "rawsnippet")
+			.commit(st.instancontxt(null, null), sqls);
+		assertEquals("select roleName || '\n' || orgName comp, col1 || '\n' || col2 rawsnippet from a_roles ",
+				sqls.get(1));
 	}
 	
 	@Test
