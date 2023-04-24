@@ -112,7 +112,7 @@ public class TableMeta {
 	    				continue;
 					String fv = (String) f.get(this);
 					if (!types.containsKey(fv))
-						Utils.warn("Filed %s#%s(%s) is not defined in table '%s'.",
+						Utils.warn("Field %s#%s(v: %s) is not defined in table '%s'.",
 	    					clazz.getTypeName(), f.getName(), fv, tbl);
 				} catch (Exception e) {
 					e.printStackTrace();

@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts.condition;
 
 import static io.odysz.common.LangExt.ifnull;
+import static io.odysz.common.LangExt.join;
 import static io.odysz.common.LangExt.split;
 
 import java.io.IOException;
@@ -270,8 +271,7 @@ public class Funcall extends ExprPart {
 	}
 	
 	public static String compoundVal(String ... vi) {
-		
-		return LangExt.join("\n", "\\\\n", vi);
+		return join("\n", "\\\\n", vi);
 	}
 	
 	@Override
