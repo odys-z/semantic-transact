@@ -12,7 +12,6 @@ import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.x.TransException;
 
 public class TableMeta {
-
 	/**
 	 * <p>A helper for test on sqlite.</p>
 	 * 

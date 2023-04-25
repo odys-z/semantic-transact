@@ -247,6 +247,7 @@ public class Query extends Statement<Query> {
 	public Query cols(String... colAliases) throws TransException {
 		if (colAliases != null)
 			for (String colAlias : colAliases) {
+				if (colAlias == null) continue;
 				String[] cass = colAlias.split(" ([Aa][Ss] )?");
 				if (cass != null && cass.length > 1)
 					col(cass[0], cass[1]);
