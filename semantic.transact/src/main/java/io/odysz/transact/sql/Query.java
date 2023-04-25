@@ -244,11 +244,16 @@ public class Query extends Statement<Query> {
 		else return page(0, -1);
 	}
 
-	public Query cols(String... colAliases) throws TransException {
-		if (colAliases != null)
-			for (String colAlias : colAliases) {
-				if (colAlias == null) continue;
-				String[] cass = colAlias.split(" ([Aa][Ss] )?");
+	/**
+	 * @param col_ases 'col as alias' or 'col_name'
+	 * @return
+	 * @throws TransException
+	 */
+	public Query cols(String... col_ases) throws TransException {
+		if (col_ases != null)
+			for (String col_as : col_ases) {
+				if (col_as == null) continue;
+				String[] cass = col_as.split(" ([Aa][Ss] )?");
 				if (cass != null && cass.length > 1)
 					col(cass[0], cass[1]);
 				else if (cass != null)
