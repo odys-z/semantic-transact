@@ -76,12 +76,12 @@ public class Semantext1 implements ISemantext {
 	}
 	
 	@Override
-	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
+	public ISemantext insert(Insert insert, String tabl, IUser usr) {
 		return new Semantext1(tabl, semantics, metas);
 	}
 
 	@Override
-	public ISemantext update(Update update, String mainTabl, IUser... usr) {
+	public ISemantext update(Update update, String mainTabl, IUser usr) {
 		return null;
 	}
 

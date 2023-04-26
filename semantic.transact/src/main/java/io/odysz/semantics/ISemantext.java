@@ -65,8 +65,9 @@ public interface ISemantext {
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
 	 * @return the new ISemantext context instance for resolving semantics.
+	 * @throws SQLException 
 	 */
-	public ISemantext insert(Insert insert, String mainTabl, IUser... usr);
+	public ISemantext insert(Insert insert, String mainTabl, IUser usr) throws SQLException;
 
 	/**
 	 * <p>Create a context for the update-sql composing process.</p>
@@ -76,8 +77,9 @@ public interface ISemantext {
 	 * @param mainTabl
 	 * @param usr user information used for modify sql AST
 	 * @return new ISemantext for update statement
+	 * @throws SQLException 
 	 */
-	public ISemantext update(Update update, String mainTabl, IUser... usr);
+	public ISemantext update(Update update, String mainTabl, IUser usr) throws SQLException;
 
 	/**
 	 * <p>Resolving inserting values, e.g an AUTO key is generated here.</p>
