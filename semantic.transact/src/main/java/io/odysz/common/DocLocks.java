@@ -32,7 +32,12 @@ public class DocLocks {
 	}
 
 	public static void readed(String fullpath) {
-		locks.get(fullpath).readLock().unlock();
+		try {
+			locks.get(fullpath).readLock().unlock();
+		} catch (Throwable t) {
+			Utils.warn("Unlock error: %s", fullpath);
+			t.printStackTrace();
+		}
 	}
 
 	public static void readed(Path p) {
