@@ -19,7 +19,10 @@ import io.odysz.anson.Anson;
  * 2. Docsync.jserv/io.oz.jserv.dbsync.DBSyncReq.pageInf,<br>
  *    Anclient.java:<br>
  *    Docsync.jserv/io.oz.jserv.dbsync.DBWorker#syncTabl()<br>
- * 3. ...
+ *    
+ * 3. Sandbox, Album-jserv/Streetier.stree
+ * 
+ * 4. ...
  * @author odys-z@github.com
  *
  */
