@@ -1,5 +1,6 @@
 package io.odysz.common;
 
+import static io.odysz.common.LangExt.isNull;
 import java.util.List;
 import java.util.Map;
 
@@ -97,6 +98,36 @@ public class EnvPath {
 	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
+	}
+	
+	//// task 1.5.0
+	static String workdir = "";
+	static String web_inf = "WEB-INF";
+	
+	/**
+	 * Set working dir.
+	 * Must be called before initialize singleton or any configurations.
+	 * 
+	 * @since 1.5.0
+	 * @param absWorkDir
+	 */
+	public static void workDir(String absWorkDir) {
+	}
+	
+	/**
+	 * Get absolute dir to WEB-INF.
+	 * 
+	 * @since 1.5.0
+	 * @param webInf
+	 * @return abs path
+	 */
+	public static String webINF(String... webInf) {
+		web_inf = isNull(webInf) ? "WEB-INF" : webInf[0];
+		return FilenameUtils.concat(workdir, web_inf);
+	}
+	
+	public static String xml(String xml) {
+		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
 
 }

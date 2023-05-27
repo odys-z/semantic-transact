@@ -1,5 +1,7 @@
 package io.odysz.transact.sql;
 
+import static io.odysz.common.LangExt.isNull;
+
 import java.util.ArrayList;
 
 import io.odysz.anson.Anson;
@@ -32,4 +34,26 @@ public class PageInf extends Anson {
 	public long size;
 	public long total;
 	public ArrayList<String[]> condts;
+	
+	public PageInf() {
+		this.condts = new ArrayList<String[]>();
+	}
+	
+	public PageInf(long page, long size, String... condt) {
+		this.page = page;
+		this.size = size;
+		this.condts = new ArrayList<String[]>();
+		if (!isNull(condt))
+			condts.add(condt);
+	}
+
+	/**
+	 * condts = [[...arg0s], string[] other-args]
+	 * @param arg0s
+	 * @return this
+	 */
+	public PageInf insertCondt(String... arg0s) {
+		this.condts.add(0, arg0s);
+		return this;
+	}
 }
