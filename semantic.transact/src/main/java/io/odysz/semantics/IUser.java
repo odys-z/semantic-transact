@@ -161,11 +161,11 @@ public interface IUser {
 	public default String roleId() { return null; }
 
 	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
-	 * @param login
+	 * @param usr
 	 * @return the session information
 	 */
-	public default SessionInf getClientSessionInf(IUser login) { 
-		return new SessionInf(login.sessionId(), login.uid(), login.roleId());
+	public default SessionInf getClientSessionInf(IUser usr) { 
+		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId());
 	}
 
 }
