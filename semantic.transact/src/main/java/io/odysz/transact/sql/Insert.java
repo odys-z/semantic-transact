@@ -36,11 +36,15 @@ public class Insert extends Statement<Insert> {
 	/**list[ list[Object[n, v], ... ], ... ] */
 	protected List<ArrayList<Object[]>> valuesNv;
 	
-	/**current row's nv.<br>
-	 * TODO let's depcate this - all new nv are appended to last of valuesNv */
+	/**
+	 * Current row's nv.<br>
+	 * 
+	 * TODO let's deprecate this - all new nv are appended to last of valuesNv.
+	 */
 	private ArrayList<Object[]> currentRowNv;
 
-	/** Insert statement intialization, not come with a post operation for committing SQL.
+	/**
+	 * Insert statement intialization, not come with a post operation for committing SQL.
 	 * So don't confused with DATranscxt#Insert(String tabl, IUser usr), which will instert into 
 	 * DB when calling ins().
 	 * 
@@ -136,7 +140,7 @@ public class Insert extends Statement<Insert> {
 		
 		boolean notNull = false;
 
-		// remember cols should be appended
+		// remember cols to be appended
 		Set<String> appendings = null;
 		if (val.size() < insertCols.size())
 			appendings = new HashSet<String>(insertCols.keySet());

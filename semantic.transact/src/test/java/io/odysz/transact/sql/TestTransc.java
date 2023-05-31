@@ -38,7 +38,7 @@ public class TestTransc {
 		st = new Transcxt((ISemantext) new Semantext2("root", semantics, fakeMetas()));
 	}
 
-	private HashMap<String, TableMeta> fakeMetas() {
+	public static HashMap<String, TableMeta> fakeMetas() {
 		HashMap<String, TableMeta> m = SemanticsTest.fakeMetas();
 		m.put("a_roles", new TableMeta("a_roles").col("roleId", coltype.text));
 		m.put("a_funcs", new TableMeta("a_funcs").col("funcId", coltype.text));
