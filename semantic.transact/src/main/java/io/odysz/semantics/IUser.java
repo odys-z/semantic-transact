@@ -29,7 +29,7 @@ import io.odysz.transact.x.TransException;
  */
 public interface IUser {
 	/**
-	 * Provide DB table meta for managing session by AnSession.
+	 * Provide user table's meta for managing session by AnSession.
 	 * @return table meta
 	 * @throws SQLException 
 	 * @throws SemanticException 
