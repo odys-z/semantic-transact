@@ -168,4 +168,11 @@ public interface IUser {
 		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId());
 	}
 
+	/**
+	 * TODO release doc.
+	 * @since 1.5.0
+	 * @return profiles
+	 */
+	public default Anson profile() { return null; }
+
 }
