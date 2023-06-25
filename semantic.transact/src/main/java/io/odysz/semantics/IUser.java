@@ -43,6 +43,7 @@ public interface IUser {
 	 * is think it's the logging sql.</p>
 	 * <b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
 	 * @param sqls
+	 * @param logger
 	 * @return SQLs for logging, null for nothing to do
 	 * @throws TransException 
 	 */

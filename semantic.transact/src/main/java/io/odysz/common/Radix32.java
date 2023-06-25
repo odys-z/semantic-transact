@@ -1,5 +1,7 @@
 package io.odysz.common;
 
+import io.odysz.transact.x.TransException;
+
 /**For Windows file system not distinguish upper lower cases.
  * Radix 32 (String) v.s. int converter
  * @version '=' is replaced by '-' for easyui compatibility (last '=' in id makes trouble).
@@ -14,30 +16,29 @@ public class Radix32 {
 			'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'};
 
 	/**
-	 * convert v to Radix64 integer. Chars are same to Base64 except '/', which is replaced by '-'
+	 * convert v to Radix 32 integer. Chars are same to Base64 except '/', which is replaced by '-'
 	 * @param v fix 12 bytes Base32 chars.
 	 * @return String representation in radix 64.
 	 */
 	public static String toString(long v) {
-		char[] buf = new char[12];
-		for (int i = 0; i < 6; i++) {
-			int idx = (int) (v & 0x3f);
-			char digit = radchar[idx];
-			buf[5 - i] = digit;
-			v = v >>> 6;
-		}
-		return String.valueOf(buf);
+		return toString(v, 6);
 	}
 	
 	public static String toString(long v, int digits) {
-		char[] buf = new char[digits];
-		for (int i = 0; i < digits; i++) {
-			int idx = (int) (v & 0x1f);
-			char digit = radchar[idx];
-			buf[digits - 1 - i] = digit;
-			v = v >>> 5;
+		try {
+			return Radix64.toString(v, digits, 32, radchar);
+		} catch (TransException e) {
+			e.printStackTrace();
+			return null;
 		}
-		return String.valueOf(buf);
-	
 	}
+	
+	/**
+	 * @since 1.5.0
+	 * @return long
+	 * @throws TransException 
+	 */
+	public static long toLong(String r32) throws TransException {
+		return Radix64.toLong(r32, radchar, 32);
+	}	
 }

@@ -147,7 +147,6 @@ public class ExtFileInsert extends AbsPart {
 		else
 			relatvFn = resulv.sql(ctx);
 		
-//		return EnvPath.encodeUri(cfgRoot, prefix, relatvFn);
 		return encodeUri(relatvFn, cfgRoot, prefix, filename);
 	}
 	
