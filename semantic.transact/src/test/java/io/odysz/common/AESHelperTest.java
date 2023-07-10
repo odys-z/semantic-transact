@@ -72,4 +72,9 @@ public class AESHelperTest {
 		String decipher = AESHelper.decrypt(cipher, key, AESHelper.decode64(iv));
 		assertEquals(plain, decipher);
 	}
+	
+	@Test
+	public void testEncodeFile() {
+		
+	}
 }
