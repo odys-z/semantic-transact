@@ -241,6 +241,26 @@ public class AESHelper {
 		return encode64(chunk, ifs, 0, blockSize);
 	}
 
+	/**
+	 * Usage example: <pre> 
+	 * 
+	byte[] buf = new byte[n * 3];
+	int index = 0;
+	while (index < file_size) {
+		int readlen  = Math.min(buf.length, size - index);
+		String str64 = encode64(buf, ifs, index, readlen);
+		index += readlen;
+		// consumption of str64
+		...
+	}</pre>
+	 * @param buf
+	 * @param ifs file input stream
+	 * @param start
+	 * @param len
+	 * @return encoded string
+	 * @throws IOException
+	 * @throws TransException buffer length is not multiple of 3.
+	 */
 	public static String encode64(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
 		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
 		Base64.Encoder encoder = Base64.getEncoder();

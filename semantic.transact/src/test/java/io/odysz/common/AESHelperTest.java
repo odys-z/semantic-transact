@@ -2,11 +2,16 @@ package io.odysz.common;
 
 
 import static org.junit.Assert.*;
+import static io.odysz.common.AESHelper.*;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 
 import org.junit.Test;
+
+import io.odysz.transact.x.TransException;
 
 
 public class AESHelperTest {
@@ -74,7 +79,45 @@ public class AESHelperTest {
 	}
 	
 	@Test
-	public void testEncodeFile() {
+	public void testEncodeFile() throws Exception {
+		String s219b64 = "iVBORw0KGgoAAAANSUhEUgAAALYAAAB5CAMAAACjkCtXAAAAFVBMVEX+1QABW7sAW7sAUcGWnmj/2wABXLkr7EQMAAAAgUlEQVR4nO3SyQ3DAAgAQZyr/5JTgy15I6IZvjzQijlWmuNxYu5bPrk+v+52jdoltUtql9QuqV1Su6R2Se2S2iW1S2qX1C6pXVK7pHZJ7ZLaJbVLapfWnu1JOmqX1C6pXVK7pHZJ7ZLapfmsNM+V5rXSvFcaAAAAAAAAAAAAAP7XFzzwP8UnEJ9SAAAAAElFTkSuQmCC";
+		int size = 219;
 		
+		byte[] buf = new byte[201];
+		String s = buffer64(buf, size);
+		assertEquals(73 * 4, s.length());
+		assertEquals(s219b64, s);
+
+		buf = new byte[219];
+		s = buffer64(buf, size);
+		assertEquals(73 * 4, s.length());
+		assertEquals(s219b64, s);
+
+		buf = new byte[73 * 4 - 1];
+		s = buffer64(buf, size);
+		assertEquals(73 * 4, s.length());
+		assertEquals(s219b64, s);
+
+		buf = new byte[73 * 4 + 2];
+		s = buffer64(buf, size);
+		assertEquals(73 * 4, s.length());
+		assertEquals(s219b64, s);
+	}
+
+	private String buffer64(byte[] buf, int size) throws Exception {
+		if (buf == null || buf.length % 3 != 0)
+			throw new TransException("Buffer size must be multiple of 3.");
+		FileInputStream ifs = Utils.input(this.getClass(), "219.png");
+		StringBuffer b = new StringBuffer();
+		int index = 0;
+		while (index < size) {
+			int readlen  = Math.min(buf.length, size - index);
+			String str64 = encode64(buf, ifs, index, readlen);
+			b.append(str64);
+			index += readlen;
+		}
+		ifs.close();
+		
+		return b.toString();
 	}
 }

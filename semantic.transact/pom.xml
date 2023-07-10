@@ -77,6 +77,15 @@
   </distributionManagement>
 
   <build>
+  	<testResources>
+	  <testResource>
+		<directory>${project.basedir}/src/test/java</directory>
+		<includes>
+			<include>**/*.png</include>
+		</includes>
+	  </testResource>
+	</testResources>
+	
     <plugins>
       <plugin>
       	<artifactId>maven-compiler-plugin</artifactId>
