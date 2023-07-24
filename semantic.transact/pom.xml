@@ -17,7 +17,7 @@
 
   <developers>
     <developer>
-      <name>Odys Zhou</name>
+      <name>Ody Zhou</name>
       <email>odys.zhou@gmail.com</email>
       <organization>odys-z.github.io</organization>
       <organizationUrl>https://odys-z.github.io</organizationUrl>
@@ -46,7 +46,7 @@
     <dependency>
     	<groupId>io.github.odys-z</groupId>
     	<artifactId>antson</artifactId>
-    	<version>[0.9.33,)</version>
+    	<version>[0.9.37,)</version>
     </dependency>
 
     <dependency>
