@@ -56,7 +56,7 @@ public class AESHelper {
 
 			String cipher = encrypt(s, "infochange", iv);
 			System.out.println("cipher:\t\t" + cipher);
-			
+
 			String plain = decrypt(cipher, "infochange", iv);
 			System.out.println("plain-text:\t" + plain);
 		} catch (Exception e) {
@@ -111,7 +111,7 @@ public class AESHelper {
         String b64 = Base64.getEncoder().encodeToString(output);
         return b64;
 	}
-	
+
 	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 		//System.out.println("txt: " + plain);
 		//System.out.println("key: " + key);
@@ -139,7 +139,7 @@ public class AESHelper {
 			throw new GeneralSecurityException(e.getMessage());
 		}
 	}
-	
+
 	public static String decrypt(String cypher, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
@@ -150,7 +150,7 @@ public class AESHelper {
         // return p.replace("-", "");
         return depad16_32(p);
 	}
-	
+
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
@@ -162,10 +162,10 @@ public class AESHelper {
         int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 
         encipher.close();
-        
+
         return Arrays.copyOf(output, finalBytes);
 	}
-	
+
 	/**
 	 * @param s string of ASCII
 	 * @return 16 / 32 byte string
@@ -191,7 +191,7 @@ public class AESHelper {
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
 
-	
+
     /**
      * Converts String to UTF8 bytes
      *
@@ -201,7 +201,7 @@ public class AESHelper {
     private static byte[] getUTF8Bytes(String input) {
         return input.getBytes(StandardCharsets.US_ASCII);
     }
-    
+
     /**Converts UTF8 bytes to String
      * @param input
      * @return converted result
@@ -242,11 +242,11 @@ public class AESHelper {
 	}
 
 	/**
-	 * Usage example: <pre> 
-	 * 
+	 * Usage example: <pre>
+	 *
 	byte[] buf = new byte[n * 3];
 	int index = 0;
-	while (index < file_size) {
+	while (index &lt; file_size) {
 		int readlen  = Math.min(buf.length, size - index);
 		String str64 = encode64(buf, ifs, index, readlen);
 		index += readlen;
