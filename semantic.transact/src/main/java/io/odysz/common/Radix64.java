@@ -1,7 +1,7 @@
 package io.odysz.common;
 
-import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.indexOf;
+import static io.odysz.common.LangExt.len;
 
 import java.util.Arrays;
 
@@ -108,17 +108,28 @@ public class Radix64 {
 		return v;
 	}
 
+	public static boolean validate(String radixv) {
+		return validate(radixv, radchar);
+	}
+
 	/**
 	 * Is the value a validate radix64 number?
 	 * @since 1.5.0
-	 * @param r64
-	 * @return true if ok
+	 * @param radixVal
+	 * @return true if is valid
 	 */
-	public static boolean validate(String r64) {
-		try {
-			return toLong(r64) >= 0;
-		} catch (TransException e) {
-			return false;
-		}
+	public static boolean validate(String radixVal, char[] radchar) {
+		boolean isRad64 =len(radchar) == 32 ? false : true;
+		for (int i = 0; i < len(radixVal); i++)
+			if ((isRad64 ? number(radixVal.charAt(i)) : Radix32.number(radixVal.charAt(i))) < 0)
+				return false;
+		return true;
+	}
+
+	static int number(char digit) {
+		for (int i = 0; i < len(radchar); i++)
+			if (indexOf(radchar, digit) >= 0)
+				return i;
+		return -1;
 	}
 }

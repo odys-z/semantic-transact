@@ -1,5 +1,8 @@
 package io.odysz.common;
 
+import static io.odysz.common.LangExt.len;
+import static io.odysz.common.LangExt.indexOf;
+
 import io.odysz.transact.x.TransException;
 
 /**For Windows file system not distinguish upper lower cases.
@@ -40,5 +43,17 @@ public class Radix32 {
 	 */
 	public static long toLong(String r32) throws TransException {
 		return Radix64.toLong(r32, radchar, 32);
-	}	
+	}
+
+	public static boolean validate(String radixv) {
+		return Radix64.validate(radixv, radchar);
+	}
+
+	static int number(char digit) {
+		for (int i = 0; i < len(radchar); i++)
+			if (indexOf(radchar, digit) >= 0)
+				return i;
+		return -1;
+	}
+
 }
