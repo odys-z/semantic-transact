@@ -317,7 +317,6 @@ public class Insert extends Statement<Insert> {
 
 	/**Add multi del insert update for children table<br>
 	 * - a special frequently used case of CRUD, provided as a shortcut of API.
-	 * FIXME merge this to some where parsing JMessage<br>
 	 * @param multireq {dels: [condition-strings[]], ins: [nvs[]]}
 	 * @param stcx 
 	 * @throws TransException 

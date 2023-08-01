@@ -367,10 +367,13 @@ public class Query extends Statement<Query> {
 	/**
 	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
 	 * 
-	 * <p>Example:</p>
+	 * <p>Example</p>
 	 * <pre>sctx.select(usrMeta.tbl, "u")
 	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
-	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);</pre>
+	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);
+	 * //   
+	 * sctx.select(userMeta.tbl, "u")
+	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
 	 *    
 	 * @since 1.5.0, additional columns can be append as AND predict in join clause. 
 	 * @param mainAlias

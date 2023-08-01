@@ -46,7 +46,7 @@
     <dependency>
     	<groupId>io.github.odys-z</groupId>
     	<artifactId>antson</artifactId>
-    	<version>[0.9.37,)</version>
+    	<version>[0.9.39,)</version>
     </dependency>
 
     <dependency>
@@ -170,7 +170,7 @@
 	  <plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
 	      <artifactId>maven-javadoc-plugin</artifactId>
-	      <version>3.4.0</version>
+	      <version>3.5.0</version>
 	      <executions>
 	        <execution>
 	          <id>attach-javadocs</id>
