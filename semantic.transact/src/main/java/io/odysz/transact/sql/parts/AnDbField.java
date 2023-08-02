@@ -19,6 +19,8 @@ import io.odysz.transact.x.TransException;
  */
 public abstract class AnDbField extends ExprPart implements IJsonable {
 	
+	public static final JsonOpt jopt = new JsonOpt().escape4DB(true);
+
 	// public abstract <T> T get(String col);
 
 	@Override
@@ -35,7 +37,7 @@ public abstract class AnDbField extends ExprPart implements IJsonable {
 	public String sql(ISemantext context) throws TransException {
 		try {
 			// TODO new interface sql(stream, context) should optimize this performance.
-			return Stream.of(toBlock(new JsonOpt().escape4DB(true)))
+			return Stream.of(toBlock(jopt))
 						.collect(Collectors.joining(" ", "'", "'"));
 		} catch (AnsonException | IOException e) {
 			e.printStackTrace();
