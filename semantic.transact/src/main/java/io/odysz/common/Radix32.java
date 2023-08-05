@@ -37,7 +37,7 @@ public class Radix32 {
 	}
 	
 	/**
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @return long
 	 * @throws TransException 
 	 */

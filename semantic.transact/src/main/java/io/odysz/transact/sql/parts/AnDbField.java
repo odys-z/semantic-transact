@@ -14,14 +14,12 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**
- * @since 1.5.0
+ * @since 1.4.25
  * @author Ody Z
  */
 public abstract class AnDbField extends ExprPart implements IJsonable {
 	
 	public static final JsonOpt jopt = new JsonOpt().escape4DB(true);
-
-	// public abstract <T> T get(String col);
 
 	@Override
 	public IJsonable toBlock(OutputStream stream, JsonOpt... opts) throws AnsonException, IOException {

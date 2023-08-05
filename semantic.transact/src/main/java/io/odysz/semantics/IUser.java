@@ -171,7 +171,7 @@ public interface IUser {
 
 	/**
 	 * TODO release doc.
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @return profiles
 	 */
 	public default Anson profile() { return null; }

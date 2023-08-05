@@ -36,7 +36,7 @@ public class Radix64 {
 	}
 	
 	/**
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param v
 	 * @param digits max digits (Radix string length, fill higher with '0')
 	 * @return Radix 64/32 string
@@ -50,7 +50,7 @@ public class Radix64 {
 	}
 
 	/**
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param v
 	 * @param digits max digits (Radix string length, fill higher with '0')
 	 * @param radix 32 or 64 only
@@ -76,7 +76,7 @@ public class Radix64 {
 	}
 
 	/**
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @return long
 	 * @throws TransException 
 	 */
@@ -85,7 +85,7 @@ public class Radix64 {
 	}
 	
 	/**
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param rad
 	 * @param radchar
 	 * @param radix
@@ -114,7 +114,7 @@ public class Radix64 {
 
 	/**
 	 * Is the value a validate radix64 number?
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param radixVal
 	 * @return true if is valid
 	 */

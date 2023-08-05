@@ -108,7 +108,7 @@ public class EnvPath {
 	 * Set working dir.
 	 * Must be called before initialize singleton or any configurations.
 	 *
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param absWorkDir
 	 */
 	public static void workDir(String absWorkDir) {
@@ -117,7 +117,7 @@ public class EnvPath {
 	/**
 	 * Get absolute dir to WEB-INF.
 	 *
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @param webInf
 	 * @return abs path
 	 */

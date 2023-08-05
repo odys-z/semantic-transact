@@ -21,14 +21,14 @@ public class TableMeta {
 	 * }</pre>
 	 * 
 	 * @throws TransException 
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 */
 	public static String ddlSqlite;
 
 	private HashMap<String, ColMeta> types;
 	/**
 	 * Is the column types already loaded from DB?
-	 * @since 1.5.0
+	 * @since 1.4.25
 	 * @return true if there are some types
 	 */
 	public boolean typesInited() {
@@ -125,7 +125,7 @@ public class TableMeta {
 	}
 
 	/**
-	 * @since 1.5.0 Only sqlite is supported
+	 * @since 1.4.25 Only sqlite is supported
 	 * @param col
 	 * @param ispk for sqlite, pk = 1
 	 * @return this
@@ -137,7 +137,7 @@ public class TableMeta {
 	}
 
 	/**
-	 * @since 1.5.0 only mysql is supported
+	 * @since 1.4.25 only mysql is supported
 	 * @param col
 	 * @param key
 	 * @return

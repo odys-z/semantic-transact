@@ -375,7 +375,7 @@ public class Query extends Statement<Query> {
 	 * sctx.select(userMeta.tbl, "u")
 	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
 	 *    
-	 * @since 1.5.0, additional columns can be append as AND predict in join clause. 
+	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
 	 * @param mainAlias
 	 * @param withTbl
 	 * @param withAlias
