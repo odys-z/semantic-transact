@@ -45,7 +45,7 @@ public class AnsonFieldTest {
 			.commit(sqls);
 
 		assertEquals(
-		"insert into a_funcs  (funcId, funcName, uri) values ('a01', '{\"type\": \"io.odysz.transact.sql.parts.T_PhotoCSS\", \"size\": [4, 3]}\n', null)",
+		"insert into a_funcs  (funcId, funcName, uri) values ('a01', '{\"type\": \"io.odysz.transact.sql.parts.T_PhotoCSS\", \"size\": [4, 3]}', null)",
 		sqls.get(0));
 
 		st.update("a_funcs")
@@ -55,7 +55,7 @@ public class AnsonFieldTest {
 			.commit(sqls);
 
 		assertEquals(
-		"update  a_funcs  set funcName='{\"type\": \"io.odysz.transact.sql.parts.T_PhotoCSS\", \"size\": [4, 3]}\n', uri=null where funcId = 'a01' ",
+		"update  a_funcs  set funcName='{\"type\": \"io.odysz.transact.sql.parts.T_PhotoCSS\", \"size\": [4, 3]}', uri=null where funcId = 'a01' ",
 		sqls.get(1));
 	
 	}
