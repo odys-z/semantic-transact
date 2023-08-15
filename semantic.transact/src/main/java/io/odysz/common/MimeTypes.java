@@ -105,7 +105,19 @@ public enum MimeTypes {
         return _base;
     }
     
-    static public boolean isImgVideo(String t) {
-    	return t != null && (t.startsWith("image") || t.startsWith("video"));
+    public static boolean isImgVideo(String t) {
+    	return t != null && (t.startsWith(image.string()) || t.startsWith(video.string()));
     }
+
+	public static boolean isAudio(String t) {
+    	return t != null && t.startsWith(audio.string());
+	}
+
+	public static boolean isVideo(String t) {
+    	return t != null && t.startsWith(video.string());
+	}
+
+	public static boolean isPdf(String t) {
+    	return t != null && t.startsWith("application/pdf");
+	}
 }
