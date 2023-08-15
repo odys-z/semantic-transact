@@ -106,6 +106,6 @@ public enum MimeTypes {
     }
     
     static public boolean isImgVideo(String t) {
-    	return t != null && (t.startsWith("image/") || t.startsWith("video"));
+    	return t != null && (t.startsWith("image") || t.startsWith("video"));
     }
 }
