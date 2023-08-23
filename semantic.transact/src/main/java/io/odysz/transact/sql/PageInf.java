@@ -1,8 +1,10 @@
 package io.odysz.transact.sql;
 
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.len;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.odysz.anson.Anson;
 
@@ -33,18 +35,21 @@ public class PageInf extends Anson {
 	public long page;
 	public long size;
 	public long total;
-	public ArrayList<String[]> condts;
+	public ArrayList<String[]> arrCondts;
+	public HashMap<String, ?> mapCondts;
 	
 	public PageInf() {
-		this.condts = new ArrayList<String[]>();
+		this.arrCondts = new ArrayList<String[]>();
+		this.mapCondts = new HashMap<String, Object>();
 	}
 	
 	public PageInf(long page, long size, String... condt) {
 		this.page = page;
 		this.size = size;
-		this.condts = new ArrayList<String[]>();
+		this.arrCondts = new ArrayList<String[]>();
 		if (!isNull(condt))
-			condts.add(condt);
+			arrCondts.add(condt);
+		mapCondts = new HashMap<String, Object>();
 	}
 
 	/**
@@ -53,7 +58,13 @@ public class PageInf extends Anson {
 	 * @return this
 	 */
 	public PageInf insertCondt(String... arg0s) {
-		this.condts.add(0, arg0s);
+		this.arrCondts.add(0, arg0s);
 		return this;
+	}
+
+	public void mergeArgs() {
+		if (len(mapCondts) > 0)
+			for (String k : mapCondts.keySet())
+				arrCondts.add(new String[] {k, (String)mapCondts.get(k)});
 	}
 }
