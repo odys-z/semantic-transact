@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
@@ -27,7 +27,7 @@ public class TestTransc {
 	private User user;
 	private Transcxt st;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		Utils.printCaller(false);
 

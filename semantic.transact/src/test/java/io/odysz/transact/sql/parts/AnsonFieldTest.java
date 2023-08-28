@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.semantics.ISemantext;
@@ -21,7 +21,7 @@ import io.odysz.transact.x.TransException;
 public class AnsonFieldTest {
 	private Transcxt st;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		HashMap<String, Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		st = new Transcxt((ISemantext) new Semantext2("root", semantics, fakeMetas()));
