@@ -1,21 +1,23 @@
 package io.odysz.common;
 
 
-import static org.junit.Assert.*;
 import static io.odysz.common.AESHelper.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.x.TransException;
 
 
 public class AESHelperTest {
 
-	/**C# Debug Trace:<pre>
+	/**
+	 * C# Debug Trace:<pre>
 	Check this at server side:
 	Cypher:
 	4VGdDR9qJlq36bQGI+Sx3A==

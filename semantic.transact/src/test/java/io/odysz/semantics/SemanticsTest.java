@@ -1,13 +1,13 @@
 package io.odysz.semantics;
 
-import static org.junit.Assert.assertEquals;
 import static io.odysz.transact.sql.parts.condition.Funcall.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;

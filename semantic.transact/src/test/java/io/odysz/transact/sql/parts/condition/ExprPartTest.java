@@ -1,8 +1,9 @@
 package io.odysz.transact.sql.parts.condition;
 
-import static org.junit.Assert.*;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.x.TransException;

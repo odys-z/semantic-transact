@@ -1,12 +1,12 @@
 package io.odysz.transact.sql.parts;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.Semantext2;

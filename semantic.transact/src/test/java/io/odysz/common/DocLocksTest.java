@@ -1,14 +1,12 @@
 package io.odysz.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-
-import io.odysz.common.DocLocks;
+import org.junit.jupiter.api.Test;
 
 public class DocLocksTest {
 

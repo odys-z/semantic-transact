@@ -1,8 +1,8 @@
 package io.odysz.semantics.meta;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.x.TransException;
 

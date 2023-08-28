@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
-  <version>1.4.32</version>
+  <version>1.4.33</version>
   <name>semantic sql builder</name>
   <description>semantic sql builder</description>
   <url>http://github.com/odys-z/semantic-transact</url>
@@ -50,9 +50,9 @@
     </dependency>
 
     <dependency>
-  	<groupId>junit</groupId>
-  	<artifactId>junit</artifactId>
-  	<version>4.13.1</version>
+  	<groupId>org.junit.jupiter</groupId>
+  	<artifactId>junit-jupiter-engine</artifactId>
+  	<version>5.3.1</version>
   	<scope>test</scope>
     </dependency>
   </dependencies>
