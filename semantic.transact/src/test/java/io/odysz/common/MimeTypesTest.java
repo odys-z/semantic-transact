@@ -2,9 +2,9 @@ package io.odysz.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static io.odysz.common.MimeTypes.*;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static io.odysz.common.MimeTypes.*;
 
 public class MimeTypesTest {
 

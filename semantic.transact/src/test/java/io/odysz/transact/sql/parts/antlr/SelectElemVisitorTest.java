@@ -2,7 +2,7 @@ package io.odysz.transact.sql.parts.antlr;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.sql.parts.select.SelectElem;
 
