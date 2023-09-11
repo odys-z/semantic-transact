@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta.coltype;

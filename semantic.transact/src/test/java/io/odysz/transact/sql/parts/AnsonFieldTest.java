@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.Semantext2;
 import io.odysz.semantics.Semantics2;
