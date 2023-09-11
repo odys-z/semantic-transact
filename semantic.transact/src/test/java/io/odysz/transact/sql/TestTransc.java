@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
@@ -24,11 +24,11 @@ import io.odysz.transact.x.TransException;
 
 public class TestTransc {
 
-	private User user;
-	private Transcxt st;
+	private static User user;
+	private static Transcxt st;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeAll
+	public static void setUp() throws Exception {
 		Utils.printCaller(false);
 
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");

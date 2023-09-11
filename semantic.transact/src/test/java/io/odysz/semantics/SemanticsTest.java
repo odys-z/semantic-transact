@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
@@ -22,14 +22,14 @@ import io.odysz.transact.x.TransException;
 
 public class SemanticsTest {
 
-	private Transcxt st;
-	private Semantext2 mysqlCxt;
-	private Semantext2 sqlitCxt;
-	private Semantext2 ms2kCxt;
-	private Semantext2 orclCxt;
+	private static Transcxt st;
+	private static Semantext2 mysqlCxt;
+	private static Semantext2 sqlitCxt;
+	private static Semantext2 ms2kCxt;
+	private static Semantext2 orclCxt;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeAll
+	public static void setUp() throws Exception {
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		st = new Transcxt(new Semantext2("root", semantics, fakeMetas()));
 		mysqlCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.mysql);

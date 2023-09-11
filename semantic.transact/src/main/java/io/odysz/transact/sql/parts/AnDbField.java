@@ -14,6 +14,8 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**
+ * Db field using Anson supporting Non-sql.
+ * 
  * @since 1.4.25
  * @author Ody Z
  */
