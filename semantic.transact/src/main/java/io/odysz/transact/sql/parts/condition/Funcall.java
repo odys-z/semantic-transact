@@ -1,5 +1,9 @@
 package io.odysz.transact.sql.parts.condition;
 
+import static io.odysz.common.LangExt.ifnull;
+import static io.odysz.common.LangExt.join;
+import static io.odysz.common.LangExt.split;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +16,6 @@ import io.odysz.common.AESHelper;
 import io.odysz.common.DateFormat;
 import io.odysz.common.DocLocks;
 import io.odysz.common.EnvPath;
-import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
@@ -48,6 +51,11 @@ public class Funcall extends ExprPart {
 		ifNullElse("ifNullElse"),
 		datetime("datetime"),
 		concat("concat"),
+		/**
+		 * Concatenate multiple (string) columns in a "\n" separated string.
+		 * The result can be splited by {@link LangExt#uncombine(String)}
+		 */
+		compound("compound"),
 
 		div("div"), add("add"), minus("minus"), mul("mul"),
 
@@ -56,8 +64,10 @@ public class Funcall extends ExprPart {
 		 * which will replace the uri with content of external file. 
 		 */
 		extFile("extfile"),
+
 		/** such as max, probably are the same for various DB */
 		dbSame("func");
+
 		private final String fid;
 		private Func(String fid) { this.fid = fid; }
 		public String fid() { return fid; }
@@ -89,6 +99,10 @@ public class Funcall extends ExprPart {
 				return extFile;
 			else if (concat.fid.equals(funcName))
 				return concat;
+			
+			else if (compound.fid.equals(funcName))
+				return compound;
+
 			return dbSame; // max etc. are db same
 		}
 	}
@@ -245,11 +259,19 @@ public class Funcall extends ExprPart {
 	 * @return
 	 */
 	public static Funcall compound(String col, String... withs) {
-		return null;
+		Funcall f = new Funcall(Func.compound);
+		f.args = Stream.concat(Stream.of(col), Stream.of(withs)).toArray();
+		return f;
 	}
 
-	public static Funcall compound(String[] withs) {
-		return null;
+	public static Funcall compound(String[] cols) {
+		Funcall f = new Funcall(Func.compound);
+		f.args = cols;
+		return f;
+	}
+	
+	public static String compoundVal(String ... vi) {
+		return join("\n", "\\\\n", vi);
 	}
 	
 	@Override
@@ -279,6 +301,9 @@ public class Funcall extends ExprPart {
 			return sqlMul(context, args);
 		else if (func == Func.div)
 			return sqlDiv(context, args);
+		
+		else if (func == Func.compound)
+			return sqlCompound(context, args);
 		else
 			try {
 				return dbSame(context, args);
@@ -302,6 +327,19 @@ public class Funcall extends ExprPart {
 
 	protected String sqlDiv(ISemantext context, String[] args) {
 		return Stream.of(args).collect(Collectors.joining(" / ", "(", ")"));
+	}
+
+	protected String sqlCompound(ISemantext context, String[] args) throws TransException {
+		return sqlConcat(context, Stream.concat(
+				Stream.of(args[0]),
+				Stream.of(args).skip(1)
+				.filter(v -> !isblank(v))
+				.map(c -> {
+					Colname colname = Colname.parseFullname(c);
+					return new Object[] { "'\n'", ifnull(colname, c) };
+				})
+				.flatMap(e -> Stream.of(e)))
+				.toArray());
 	}
 
 	/**Get function string that the database can understand, e.g. ["f," "arg1", "arg2"] =&gt; "f(arg1, arg2)".
@@ -330,11 +368,11 @@ public class Funcall extends ExprPart {
 	 * @return sql for the SelectElem, a.k.a. args[0]
 	 */
 	private String sqlExtFile(ISemantext context, String[] args) {
-		if (args == null || args.length != 1 || LangExt.isblank(args[0], "'\\s*'"))
+		if (args == null || args.length != 1 || isblank(args[0], "'\\s*'"))
 			Utils.warn("Function extFile() only accept 1 arguments. (And do not confused with class ExtFile)");
 		else {
-			if (LangExt.isblank(resultAlias)) {
-				String ss[] = LangExt.split(args[0], "\\.");
+			if (isblank(resultAlias)) {
+				String ss[] = split(args[0], "\\.");
 				resultAlias = new Alias(ss[ss.length - 1]);
 			}
 
@@ -347,7 +385,7 @@ public class Funcall extends ExprPart {
 							int c = (Integer) cols.get(resultAlias.toUpperCase())[0];
 							c--; // in SResultset, column index start at 1
 							String fn = (String) row.get(c);
-							if (!LangExt.isblank(fn, "\\.", "\\*")) {
+							if (!isblank(fn, "\\.", "\\*")) {
 								fn = EnvPath.decodeUri(stx.containerRoot(), fn);
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
@@ -374,12 +412,12 @@ public class Funcall extends ExprPart {
 		this.resultAlias = alias;
 	}
 
-	protected static String sqlConcat(ISemantext ctx, String[] args) throws TransException {
+	protected static String sqlConcat(ISemantext ctx, Object[] args) throws TransException {
 		dbtype dt = ctx.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.oracle)
-			return Stream.of(args).collect(Collectors.joining(" || "));
+			return Stream.of(args).map(v -> v.toString()).collect(Collectors.joining(" || "));
 		else if (dt == dbtype.mysql || dt == dbtype.ms2k)
-			return Stream.of(args).collect(Collectors.joining("concat(", ", ", ")"));
+			return Stream.of(args).map(v -> v.toString()).collect(Collectors.joining("concat(", ", ", ")"));
 		else
 			throw new TransException ("Funcall#sqlConcat(): concat() are not implemented for db type: %s", dt.name());
 	}
@@ -590,18 +628,13 @@ public class Funcall extends ExprPart {
 	public static AbsPart concat(String to, String... with) {
 		Funcall f = new Funcall(Func.concat);
 		
-		Colname argTo = Colname.parseFullname(to);
-		if (with == null)
-			f.args = new Object[] {argTo == null ? to : argTo};
-		else {
-			f.args = new Object[with.length + 1];
-			f.args[0] = argTo == null ? to : argTo;
-			for (int ix = 0; ix < with.length; ix++) {
-				// f.args[ix + 1] = with[ix];
-				Colname argWith = Colname.parseFullname(with[ix]);
-				f.args[ix + 1] = argWith == null ? with[ix] : argWith;
-			}
-		}
+		f.args = Stream
+				.concat(Stream.of(to), Stream.of(with))
+				.map(c -> {
+					Colname colname = Colname.parseFullname(c);
+					return ifnull(colname, c);  
+				})
+				.toArray();
 		return f;
 	}
 }

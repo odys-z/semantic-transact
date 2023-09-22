@@ -9,7 +9,7 @@ import java.util.Map;
 
 import io.odysz.common.DateFormat;
 import io.odysz.common.dbtype;
-import io.odysz.semantics.Semantics2.smtype;
+import io.odysz.semantics.Semantics2.T_smtype;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
 import io.odysz.transact.sql.Insert;
@@ -49,13 +49,13 @@ public class Semantext2 implements ISemantext {
 				if (s == null)
 					continue;
 				Map<String, Integer> cols = insert.getColumns();
-				if (s.is(smtype.autoPk)) {
+				if (s.is(T_smtype.autoPk)) {
 					String pk = s.autoPk();
 					String n = (String) value.get(cols.get(pk))[0];
 					if (n.equals(pk))
 						value.get(cols.get(pk))[1] = "TEST-" + DateFormat.format(new Date());
 				}
-				if (s.is(smtype.fullpath)) {
+				if (s.is(T_smtype.fullpath)) {
 					String n = s.getFullpathField();
 					Object fp = s.genFullpath(value, cols);
 					Object[] nv = null;
@@ -118,12 +118,12 @@ public class Semantext2 implements ISemantext {
 	public ISemantext onDelete(Delete delete, String tabl, Condit condt) { return this; }
 
 	@Override
-	public ISemantext insert(Insert insert, String tabl, IUser... usr) {
+	public ISemantext insert(Insert insert, String tabl, IUser usr) {
 		return new Semantext2(tabl, semantics, metas);
 	}
 
 	@Override
-	public ISemantext update(Update update, String mainTabl, IUser... usr) { return null; }
+	public ISemantext update(Update update, String mainTabl, IUser usr) { return null; }
 
 	@Override
 	public Object resulvedVal(String tabl, String col) { return null; }

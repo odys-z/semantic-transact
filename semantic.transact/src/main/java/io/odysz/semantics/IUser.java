@@ -29,7 +29,7 @@ import io.odysz.transact.x.TransException;
  */
 public interface IUser {
 	/**
-	 * Provide DB table meta for managing session by AnSession.
+	 * Provide user table's meta for managing session by AnSession.
 	 * @return table meta
 	 * @throws SQLException 
 	 * @throws SemanticException 
@@ -43,6 +43,7 @@ public interface IUser {
 	 * is think it's the logging sql.</p>
 	 * <b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
 	 * @param sqls
+	 * @param logger
 	 * @return SQLs for logging, null for nothing to do
 	 * @throws TransException 
 	 */
@@ -161,11 +162,18 @@ public interface IUser {
 	public default String roleId() { return null; }
 
 	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
-	 * @param login
+	 * @param usr
 	 * @return the session information
 	 */
-	public default SessionInf getClientSessionInf(IUser login) { 
-		return new SessionInf(login.sessionId(), login.uid(), login.roleId());
+	public default SessionInf getClientSessionInf(IUser usr) { 
+		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId());
 	}
+
+	/**
+	 * TODO release doc.
+	 * @since 1.4.25
+	 * @return profiles
+	 */
+	public default Anson profile() { return null; }
 
 }

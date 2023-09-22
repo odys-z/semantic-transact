@@ -1,8 +1,8 @@
 package io.odysz.semantics.meta;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.x.TransException;
 
@@ -10,12 +10,12 @@ public class TableMetaTest {
 
 	@Test
 	public void testClone() {
-		TableMeta tabl = new TableMeta("base")
+		TableMeta tabl = new TableMeta("tab1")
 			.col("c01", "text")
 			.col("c02", "varchar")
 			;
 
-		T_SyntityMeta sub1 = new T_SyntityMeta("sub1");
+		T_SyntityMeta sub1 = new T_SyntityMeta("tab1");
 		try {
 			sub1.clone(tabl);
 		} catch (TransException e) {
@@ -26,7 +26,6 @@ public class TableMetaTest {
 				fail("should found the field");
 			}
 		}
-		
 	}
 
 }

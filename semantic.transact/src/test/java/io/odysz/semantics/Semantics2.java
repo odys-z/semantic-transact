@@ -26,7 +26,7 @@ import io.odysz.transact.x.TransException;
  * a transact/batch operation, with the second transact as check-then-delete.</p>
  * <p>In this case, you will find the FK relationship can be handled in a generalized operation, through
  * parameterizing some variables like table name, child referencing column name and parent ID.</p>
- * <p>Take the {@link Semantics2.smtype#parentChildrenOnDel} for example, it's automatically support
+ * <p>Take the {@link Semantics2.T_smtype#parentChildrenOnDel} for example, it's automatically support
  * "deleting all children when deleting parent" semantics. What the user (application developer) need to
  * do is configure a semantics item then delete the parent directly.</p>
  * <p>Now you (a developer) will definitely understand what's the "parentChildrenOnDel" for. Semantic-transact
@@ -38,7 +38,7 @@ import io.odysz.transact.x.TransException;
  * 2. Set the configured semantics as context of {@link io.odysz.transact.sql.Statement}. See example in
  * {@link io.odysz.transact.SemanticsTest}. Then use Statement's subclass's commit() method to generate SQLs</p>
  * <h3>Is this Enough?</h3>
- * <p>The 9 to 10 types of semantics defined in {@link Semantics2.smtype} is enough for some enterprise projects.
+ * <p>The 9 to 10 types of semantics defined in {@link Semantics2.T_smtype} is enough for some enterprise projects.
  * It depends on how abstract the semantics we want to support.</p>
  * </p>Another consideration is that semantic-transact never take supporting all semantics logic as it's goal.
  * It only trying to release burden of daily repeated tasks. Fortunately, such tasks' logic is simple, and the
@@ -74,7 +74,7 @@ public class Semantics2 {
 	 * up stamp will be ignored if down stamp presented. (use case of down stamp updating by synchronizer).<br>
 	 * <b>x. orclob</b>: the field must saved as clob when driver type is orcl;
 	 */
-	public enum smtype {
+	public enum T_smtype {
 		/**"auto" | "pk" | "a-k": Generate auto pk for the field when inserting */
 		autoPk,
 		/** "f-p" | "fp" | "fullpath": when updating, auto update fullpath field according to parent-id and current record id */
@@ -98,7 +98,7 @@ public class Semantics2 {
 		/** "clob" | "orclob": the column is a CLOB field, semantic-transact will read/write separately in stream and get final results.*/
 		orclob;
 
-		public static smtype parse(String type) throws TransException {
+		public static T_smtype parse(String type) throws TransException {
 			if (type == null) throw new TransException("semantics is null");
 			type = type.toLowerCase().trim();
 			if ("auto".equals(type) || "pk".equals(type) || "a-k".equals(type) || "autopk".equals(type))
@@ -221,41 +221,41 @@ public class Semantics2 {
 	 * @param args
 	 * @throws TransException 
 	 */
-	public Semantics2(smtype semantic, String tabl, String recId, String args) throws TransException {
+	public Semantics2(T_smtype semantic, String tabl, String recId, String args) throws TransException {
 		addSemantics(semantic, tabl, recId, args);
 	}
 	public Semantics2(String semantic, String tabl, String recId, String args) throws TransException {
-		addSemantics(smtype.parse(semantic), tabl, recId, args);
+		addSemantics(T_smtype.parse(semantic), tabl, recId, args);
 	}
 	
-	/**@see {@link Semantics2#Semantics(smtype, String[])}
+	/**@see {@link Semantics2#Semantics(T_smtype, String[])}
 	 * @param semantic
 	 * @param tabl
 	 * @param args
 	 * @throws SQLException
 	 */
-	public void addSemantics(smtype semantic, String tabl, String recId, String args) throws TransException {
+	public void addSemantics(T_smtype semantic, String tabl, String recId, String args) throws TransException {
 		checkParas(tabl, recId, args);
 		String[] argss = args.split(",");
-		if (smtype.autoPk == semantic)
+		if (T_smtype.autoPk == semantic)
 			addAutoPk(tabl, recId, argss);
-		if (smtype.fullpath == semantic)
+		if (T_smtype.fullpath == semantic)
 			addFullpath(tabl, recId, argss);
-		else if (smtype.parentChildrenOnDel == semantic)
+		else if (T_smtype.parentChildrenOnDel == semantic)
 			addParentChildren(tabl, recId, argss);
-		else if (smtype.dencrypt == semantic)
+		else if (T_smtype.dencrypt == semantic)
 			addDencrypt(tabl, recId, argss);
-		else if (smtype.orclob == semantic)
+		else if (T_smtype.orclob == semantic)
 			addClob(tabl, recId, argss);
-		else if (smtype.opTime == semantic)
+		else if (T_smtype.opTime == semantic)
 			addOperTime(tabl, recId, argss);
-		else if (smtype.checkSqlCountOnDel == semantic)
+		else if (T_smtype.checkSqlCountOnDel == semantic)
 			addCheckSqlCountOnDel(tabl, recId, argss);
-		else if (smtype.checkSqlCountOnInsert == semantic)
+		else if (T_smtype.checkSqlCountOnInsert == semantic)
 			addCheckSqlCountOnInsert(tabl, recId, argss);
-		else if (smtype.composingCol == semantic)
+		else if (T_smtype.composingCol == semantic)
 			addComposings(tabl, recId, argss);
-		else if (smtype.stamp1MoreThanRefee == semantic)
+		else if (T_smtype.stamp1MoreThanRefee == semantic)
 			addUpDownStamp(tabl, recId, argss);
 		else throw new TransException("Unsuppported semantics: " + semantic);
 	}
@@ -264,7 +264,7 @@ public class Semantics2 {
 		autoPk = recId;
 	}
 	private void addSemantics(String type, String tabl, String recId, String args) throws TransException {
-		smtype st = smtype.parse(type);
+		T_smtype st = T_smtype.parse(type);
 		addSemantics(st, tabl, recId, args);
 	}
 
@@ -421,10 +421,10 @@ public class Semantics2 {
 		return idField != null && idField.equals(f);
 	}
 
-	public String getDesc(smtype semantic) {
-		if (smtype.parentChildrenOnDel == semantic)
+	public String getDesc(T_smtype semantic) {
+		if (T_smtype.parentChildrenOnDel == semantic)
 			return descPC;
-		else if (smtype.checkSqlCountOnInsert == semantic)
+		else if (T_smtype.checkSqlCountOnInsert == semantic)
 			return deschkIns;
 		else return descFullpath;
 	}
@@ -468,7 +468,7 @@ public class Semantics2 {
 		}
 	}
 
-	public boolean is(smtype type) {
+	public boolean is(T_smtype type) {
 		switch (type) {
 		case autoPk:
 			return autoPk != null;

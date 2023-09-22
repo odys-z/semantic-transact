@@ -1,15 +1,12 @@
 package io.odysz.transact.sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.Semantext2;
@@ -26,11 +23,11 @@ import io.odysz.transact.x.TransException;
 
 public class TestTransc {
 
-	private User user;
-	private Transcxt st;
+	private static User user;
+	private static Transcxt st;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeAll
+	public static void setUp() throws Exception {
 		Utils.printCaller(false);
 
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
@@ -38,7 +35,7 @@ public class TestTransc {
 		st = new Transcxt((ISemantext) new Semantext2("root", semantics, fakeMetas()));
 	}
 
-	private HashMap<String, TableMeta> fakeMetas() {
+	public static HashMap<String, TableMeta> fakeMetas() {
 		HashMap<String, TableMeta> m = SemanticsTest.fakeMetas();
 		m.put("a_roles", new TableMeta("a_roles").col("roleId", coltype.text));
 		m.put("a_funcs", new TableMeta("a_funcs").col("funcId", coltype.text));

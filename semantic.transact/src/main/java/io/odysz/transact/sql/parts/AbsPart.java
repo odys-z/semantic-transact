@@ -1,5 +1,7 @@
 package io.odysz.transact.sql.parts;
 
+import java.io.OutputStream;
+
 import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.x.TransException;
@@ -28,6 +30,15 @@ abstract public class AbsPart {
 	 */
 	public abstract String sql(ISemantext context) throws TransException;
 	
+	/**
+	 * This should optimize performance. {@link #sql(ISemantext, OutputStream) will be replaced by this.
+	 * @since 1.6.0
+	 * @param context
+	 * @param os
+	 * @throws TransException
+	 */
+	public void sql(ISemantext context, OutputStream os) throws TransException { }
+
 	public static boolean isblank(Object obj, String... takeAsNull) {
 		if (obj instanceof AbsPart)
 			return LangExt.isblank(obj.toString(), "null");

@@ -1,5 +1,6 @@
 package io.odysz.common;
 
+import static io.odysz.common.LangExt.isNull;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ import io.odysz.semantics.ISemantext;
  args: /home/ody/upload,uri,userId,cate,docName
  encoded: /home/ody/upload/admin/000003 f.txt
  decoded: /home/ody/upload/admin/000003 f.txt</pre>
- 
+
  * Since v1.4.2, system property has higher priority than environment variable.
  * @author Odys Zhou
  *
@@ -34,7 +35,7 @@ public class EnvPath {
 	 * <h6>FYI.</h6>
 	 * Semantic-* will be used in the future mainly in docker container.
 	 * In docker, volume can not mounted to tomcat/webapp's sub folder - will prevent war unpacking.
-	 * See <a href='https://stackoverflow.com/q/15113700'>this problem</a>. 
+	 * See <a href='https://stackoverflow.com/q/15113700'>this problem</a>.
 	 * So it's necessary have file paths not only relative, but also can be parsed for replacing environment variables.
 	 * @param src string have bash style variable to be replaced, e.g. $HOME/volume.sqlite
 	 * @return string replaced with environment variables
@@ -57,14 +58,14 @@ public class EnvPath {
 			Utils.warn("Requried env variable may not parsed correctly: %s", src);
 		return src;
 	}
-	
+
 	/**Decode URI - convert file records' uri into absolute path, according to env.
-	 * 
+	 *
 	 * @see FilenameUtils#concat(String, String)
-	 * 
-	 * @param root (optinal) runtiem root path 
-	 * @param db uri, the saved path with env variables. Make sure are ":" are cleaned.
-	 * @return decode then concatenated absolute path, for file accessing. 
+	 *
+	 * @param root (optinal) runtiem root path
+	 * @param uri, the saved path with env variables. Make sure are ":" are cleaned.
+	 * @return decode then concatenated absolute path, for file accessing.
 	 */
 	public static String decodeUri(String root, String uri) {
 		root = root == null ? "" : root;
@@ -97,6 +98,36 @@ public class EnvPath {
 	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
+	}
+
+	//// task 1.5.0
+	static String workdir = "";
+	static String web_inf = "WEB-INF";
+
+	/**
+	 * Set working dir.
+	 * Must be called before initialize singleton or any configurations.
+	 *
+	 * @since 1.4.25
+	 * @param absWorkDir
+	 */
+	public static void workDir(String absWorkDir) {
+	}
+
+	/**
+	 * Get absolute dir to WEB-INF.
+	 *
+	 * @since 1.4.25
+	 * @param webInf
+	 * @return abs path
+	 */
+	public static String webINF(String... webInf) {
+		web_inf = isNull(webInf) ? "WEB-INF" : webInf[0];
+		return FilenameUtils.concat(workdir, web_inf);
+	}
+
+	public static String xml(String xml) {
+		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
 
 }

@@ -1,10 +1,9 @@
 package org.apache.commons.io_odysz;
 
-import static org.junit.Assert.*;
-
 import static org.apache.commons.io_odysz.FilenameUtils.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FilenameUtilsTest {
 

@@ -56,7 +56,7 @@ public class AESHelper {
 
 			String cipher = encrypt(s, "infochange", iv);
 			System.out.println("cipher:\t\t" + cipher);
-			
+
 			String plain = decrypt(cipher, "infochange", iv);
 			System.out.println("plain-text:\t" + plain);
 		} catch (Exception e) {
@@ -111,7 +111,7 @@ public class AESHelper {
         String b64 = Base64.getEncoder().encodeToString(output);
         return b64;
 	}
-	
+
 	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 		//System.out.println("txt: " + plain);
 		//System.out.println("key: " + key);
@@ -139,7 +139,7 @@ public class AESHelper {
 			throw new GeneralSecurityException(e.getMessage());
 		}
 	}
-	
+
 	public static String decrypt(String cypher, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
@@ -150,7 +150,7 @@ public class AESHelper {
         // return p.replace("-", "");
         return depad16_32(p);
 	}
-	
+
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
@@ -162,10 +162,10 @@ public class AESHelper {
         int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 
         encipher.close();
-        
+
         return Arrays.copyOf(output, finalBytes);
 	}
-	
+
 	/**
 	 * @param s string of ASCII
 	 * @return 16 / 32 byte string
@@ -191,7 +191,7 @@ public class AESHelper {
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
 
-	
+
     /**
      * Converts String to UTF8 bytes
      *
@@ -201,7 +201,7 @@ public class AESHelper {
     private static byte[] getUTF8Bytes(String input) {
         return input.getBytes(StandardCharsets.US_ASCII);
     }
-    
+
     /**Converts UTF8 bytes to String
      * @param input
      * @return converted result
@@ -226,18 +226,54 @@ public class AESHelper {
 		if ((blockSize % 12) != 0)
 			throw new IOException ("Block size must be multple of 12.");
 
+		byte[] chunk = new byte[blockSize];
+		/*
 		BufferedInputStream in = new BufferedInputStream(ifs, blockSize);
 		Base64.Encoder encoder = Base64.getEncoder();
 
-		byte[] chunk = new byte[blockSize];
 
 		int len = in.read(chunk);
 
 		if (len >= 0)
 			return encoder.encodeToString(chunk);
 		else return null;
+		*/
+		return encode64(chunk, ifs, 0, blockSize);
 	}
 
+	/**
+	 * Usage example: <pre>
+	 *
+	byte[] buf = new byte[n * 3];
+	int index = 0;
+	while (index &lt; file_size) {
+		int readlen  = Math.min(buf.length, size - index);
+		String str64 = encode64(buf, ifs, index, readlen);
+		index += readlen;
+		// consumption of str64
+		...
+	}</pre>
+	 * @param buf
+	 * @param ifs file input stream
+	 * @param start
+	 * @param len
+	 * @return encoded string
+	 * @throws IOException
+	 * @throws TransException buffer length is not multiple of 3.
+	 */
+	public static String encode64(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
+		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
+		Base64.Encoder encoder = Base64.getEncoder();
+
+		int readLen = in.read(buf);
+
+		if (readLen <= 0)
+			return null;
+		else if (readLen == buf.length)
+			return encoder.encodeToString(buf);
+		else // (readLen < buf.length)
+			return encoder.encodeToString(Arrays.copyOf(buf, readLen));
+	}
 
 	public static byte[] decode64(String str) {
         return Base64.getDecoder().decode(str);

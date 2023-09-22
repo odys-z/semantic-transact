@@ -1,14 +1,13 @@
 package io.odysz.semantics;
 
-import static org.junit.Assert.assertEquals;
 import static io.odysz.transact.sql.parts.condition.Funcall.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta.coltype;
@@ -22,14 +21,14 @@ import io.odysz.transact.x.TransException;
 
 public class SemanticsTest {
 
-	private Transcxt st;
-	private Semantext2 mysqlCxt;
-	private Semantext2 sqlitCxt;
-	private Semantext2 ms2kCxt;
-	private Semantext2 orclCxt;
+	private static Transcxt st;
+	private static Semantext2 mysqlCxt;
+	private static Semantext2 sqlitCxt;
+	private static Semantext2 ms2kCxt;
+	private static Semantext2 orclCxt;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeAll
+	public static void setUp() throws Exception {
 		HashMap<String,Semantics2> semantics = Semantics2.init("src/test/resources/semantics.xml");
 		st = new Transcxt(new Semantext2("root", semantics, fakeMetas()));
 		mysqlCxt = new Semantext3("root", semantics, fakeMetas()).dbtype(dbtype.mysql);
@@ -158,6 +157,13 @@ public class SemanticsTest {
 
 		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
 				sqls.get(0));
+		
+		st.select("a_roles")
+			.col(Funcall.compound("roleName", "orgName"), "comp")
+			.col("compound(col1, col2)", "rawsnippet")
+			.commit(st.instancontxt(null, null), sqls);
+		assertEquals("select roleName || '\n' || orgName comp, col1 || '\n' || col2 rawsnippet from a_roles ",
+				sqls.get(1));
 	}
 	
 	@Test
