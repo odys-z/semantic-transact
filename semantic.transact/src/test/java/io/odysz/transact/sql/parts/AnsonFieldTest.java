@@ -56,7 +56,6 @@ public class AnsonFieldTest {
 		assertEquals(
 		"update  a_funcs  set funcName='{\"type\": \"io.odysz.transact.sql.parts.T_PhotoCSS\", \"size\": [4, 3]}', uri=null where funcId = 'a01' ",
 		sqls.get(1));
-	
 	}
 
 }
