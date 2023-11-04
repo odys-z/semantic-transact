@@ -166,8 +166,16 @@ public interface IUser {
 	 * @return the session information
 	 */
 	public default SessionInf getClientSessionInf(IUser usr) { 
-		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId());
+		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())
+				.device(usr.deviceId())
+				.userName(usr.userName());
 	}
+
+	/**
+	 * @since 1.4.36
+	 * @return
+	 */
+	public default String userName() { return uid(); }
 
 	/**
 	 * TODO release doc.
