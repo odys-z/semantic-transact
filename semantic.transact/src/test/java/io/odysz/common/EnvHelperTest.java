@@ -33,25 +33,35 @@ public class EnvHelperTest {
 		String extroot = args[0];
 
 		String encoded = EnvPath.encodeUri(extroot, "ody", "000001 f.txt");
-		assertEquals("$VOLUME_HOME/shares/ody/000001 f.txt", encoded);
+		
+		assertPathEquals("$VOLUME_HOME/shares/ody/000001 f.txt", encoded);
 
 		String abspath = EnvPath.decodeUri("", encoded);
-		assertEquals("/home/ody/volume/shares/ody/000001 f.txt", abspath);
+		assertPathEquals("/home/ody/volume/shares/ody/000001 f.txt", abspath);
 		
 		args = "upload,uri,userId,cate,docName".split(",");
 		encoded = EnvPath.encodeUri(extroot, "admin", "000002 f.txt");
-		assertEquals("$VOLUME_HOME/shares/admin/000002 f.txt", encoded);
+		assertPathEquals("$VOLUME_HOME/shares/admin/000002 f.txt", encoded);
 
 		abspath = EnvPath.decodeUri(rtroot, encoded);
 		// assertEquals("/home/ody/upload/admin/000003 f.txt", abspath);
-		assertEquals("/home/ody/volume/shares/admin/000002 f.txt", abspath);
+		assertPathEquals("/home/ody/volume/shares/admin/000002 f.txt", abspath);
 		
 		// Override
 		System.setProperty("VOLUME_HOME", "/home/alice/vol");
 		abspath = EnvPath.decodeUri(rtroot, encoded);
-		assertEquals("/home/alice/vol/shares/admin/000002 f.txt", abspath);
+		assertPathEquals("/home/alice/vol/shares/admin/000002 f.txt", abspath);
 	}
 	
+	private void assertPathEquals(String expect, String actual) {
+		try {
+			assertEquals(expect, actual);
+		} catch (AssertionError e) {
+			assertEquals(expect.replaceAll("/", "\\"), actual);
+		}
+		
+	}
+
 	/**Only Linux/MacOs
 	 * https://stackoverflow.com/a/40682052/7362888
 	 * @param newenv
