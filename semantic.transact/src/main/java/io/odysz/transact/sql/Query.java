@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
 import io.odysz.transact.sql.parts.select.SqlUnion;
+import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -179,9 +181,30 @@ public class Query extends Statement<Query> {
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre> */
 	private ArrayList<SqlUnion> union_except_intersect;
-	
+
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
+	}
+
+	/**
+	 * with-expressions
+	 * 
+	 * This is supposed to move to somewhere else as {@link Query} is a grammar equivalent
+	 * to "query_expression".
+	 */
+	ArrayList<Query> withs;
+	/**
+	 * <h5>With Clause</h5>
+	 * <p>This shouldn't be public because it is not supposed to be called by user.
+	 * Use st.select(transc, with-query, tabl, ...) instead.</p>
+	 * @see Transcxt#select(String, String...)
+	 * @since 1.4.36
+	 * @param qi
+	 * @return this
+	 */
+	protected Query with(ArrayList<Query> qi) {
+		this.withs = qi;
+		return this;
 	}
 
 	/**
@@ -379,18 +402,18 @@ public class Query extends Statement<Query> {
 	 * @param mainAlias
 	 * @param withTbl
 	 * @param withAlias
-	 * @param colWith
+	 * @param onCols
 	 * @return this
 	 */
-	public Query je(String mainAlias, String withTbl, String withAlias, String... colWith) {
+	public Query je(String mainAlias, String withTbl, String withAlias, String... onCols) {
 		Condit ands = Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, colWith[0]),
-				String.format("%s.%s", withAlias, colWith.length > 1 ? colWith[1] : colWith[0]));
+				String.format("%s.%s", mainAlias, onCols[0]),
+				String.format("%s.%s", withAlias, onCols.length > 1 ? onCols[1] : onCols[0]));
 
-		for (int i = 2; i < colWith.length; i+=2) {
+		for (int i = 2; i < onCols.length; i+=2) {
 			ands.and(Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, colWith[i]),
-				String.format("%s.%s", withAlias, colWith.length > i+1 ? colWith[i+1] : colWith[i])));
+				String.format("%s.%s", mainAlias, onCols[i]),
+				String.format("%s.%s", withAlias, onCols.length > i+1 ? onCols[i+1] : onCols[i])));
 		}
 		return j(withTbl, withAlias, ands);
 	}
@@ -549,6 +572,7 @@ public class Query extends Statement<Query> {
 	public String sql(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
+					withs == null ? null : new WithClause(withs),
 					// select ...
 					new ExprPart("select"),
 					// top(expr) with ties

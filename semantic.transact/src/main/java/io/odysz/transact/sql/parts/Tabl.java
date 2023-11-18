@@ -16,7 +16,7 @@ public class Tabl extends AbsPart {
 	public String sql(ISemantext ctx) throws TransException {
 		if (ctx != null && ctx.dbtype() == dbtype.oracle)
 			return "\"" + tbl + "\"";
-		return tbl;
+		return tbl == null ? "" : tbl;
 	}
 
 	public String name() {

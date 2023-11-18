@@ -94,7 +94,7 @@ public class TestTransc {
 			.having("COUNT(Orders.OrderID) > 10")
 			.commit(sqls);
 		assertEquals("select Employees.LastName, COUNT(Orders.OrderID) NumberOfOrders "
-				+ "from Orders  join Employees null on Orders.EmployeeID = Employees.EmployeeID "
+				+ "from Orders  join Employees  on Orders.EmployeeID = Employees.EmployeeID "
 				+ "group by LastName "
 				+ "having COUNT(Orders.OrderID) > 10",
 				sqls.get(3));
@@ -191,6 +191,48 @@ public class TestTransc {
 				+ "group by max(col2) > 3 "
 				+ "having sum(Orders.OrderID) > 10",
 				sqls.get(0));
+	}
+	
+	@Test
+	public void testWithSelect() {
+		try {
+			ArrayList<String> sqls = new ArrayList<String>();
+			st.with(st.select("a_users", "u")
+						.j("h_photo_org", "ho", "ho.oid=u.orgId")
+						.whereEq("u.userId", "ody"))
+				.select("h_photos", "p")
+				.col(Funcall.avg("filesize"), "notes")
+				.je("p", null, "u", "shareby", "userId")
+				.commit(st.instancontxt(null, null), sqls);
+
+			// Utils.logi(sqls.get(0));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId",
+					sqls.get(0));
+
+			st.with(st.select("a_users", "u")
+					.j("h_photo_org", "ho", "ho.oid=u.orgId")
+					.whereEq("u.userId", "ody"),
+					st.select("h_coll_phot", "c")
+					.j("h_photo_org", "ho", "ho.pid=c.pid")
+					.whereEq("ho.oid", "zsu"))
+				.select("h_photos", "p")
+				.col(Funcall.avg("filesize"), "notes")
+				.je("p", null, "u", "shareby", "userId")
+				.je("p", null, "c", "pid", "cid")
+				.commit(st.instancontxt(null, null), sqls);
+			// Utils.logi(sqls.get(1));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody'), " +
+					"c as (select * from h_coll_phot c join h_photo_org ho on ho.pid = c.pid where ho.oid = 'zsu') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId join  c on p.pid = c.cid",
+					sqls.get(1));
+					
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e);
+		}
 	}
 	
 	@Test
