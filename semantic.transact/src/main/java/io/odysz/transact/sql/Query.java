@@ -191,21 +191,27 @@ public class Query extends Statement<Query> {
 	 * 
 	 * This is supposed to move to somewhere else as {@link Query} is a grammar equivalent
 	 * to "query_expression".
+	ArrayList<AbsPart[]> withs;
+	
+	boolean recursiveWith;
 	 */
-	ArrayList<Query> withs;
+	WithClause withs;
+
+
 	/**
 	 * <h5>With Clause</h5>
 	 * <p>This shouldn't be public because it is not supposed to be called by user.
 	 * Use st.select(transc, with-query, tabl, ...) instead.</p>
 	 * @see Transcxt#select(String, String...)
 	 * @since 1.4.36
-	 * @param qi
+	 * @param withs
 	 * @return this
-	 */
-	protected Query with(ArrayList<Query> qi) {
-		this.withs = qi;
+	protected Query with(boolean recursive, ArrayList<AbsPart[]> withs) {
+		this.recursiveWith = recursive;
+		this.withs = withs;
 		return this;
 	}
+	 */
 
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
@@ -572,7 +578,7 @@ public class Query extends Statement<Query> {
 	public String sql(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
-					withs == null ? null : new WithClause(withs),
+					withs,
 					// select ...
 					new ExprPart("select"),
 					// top(expr) with ties
@@ -662,5 +668,10 @@ public class Query extends Statement<Query> {
 			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;
+	}
+
+	public Query with(WithClause withClause) {
+		this.withs = withClause;
+		return this;
 	}
 }

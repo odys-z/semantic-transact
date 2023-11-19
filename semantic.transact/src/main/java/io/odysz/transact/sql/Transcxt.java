@@ -1,15 +1,10 @@
 package io.odysz.transact.sql;
 
-import static io.odysz.common.LangExt.isNull;
-import static io.odysz.common.LangExt.isblank;
-
-import java.util.ArrayList;
-
-import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -43,8 +38,8 @@ public class Transcxt {
 	}
 	
 	public Query select(String tabl, String ... alias) {
-		Query q = new Query(this, tabl, alias).with(withs);
-		this.withs = null;
+		Query q = new Query(this, tabl, alias).with(withClause);
+		this.withClause = null;
 		return q;
 	}
 	
@@ -93,12 +88,22 @@ public class Transcxt {
 	}
 
 	/**
+	 * [[with clause' as-tabl-name, {@link Query}]]
+	 * 
+	 * @since 1.4.36
+	protected ArrayList<AbsPart[]> withs;
+	protected boolean withRecursive;
+	 */
+
+	/**
+	 * [[with clause' as-tabl-name, {@link Query}]]
 	 * 
 	 * @since 1.4.36
 	 */
-	protected ArrayList<Query> withs;
+	private WithClause withClause;
+
 	/**
-	 * <h5>With Clause</h5>
+	 * <h5>With clause for multiple tables without recursive query.</h5>
 	 * <ol>
 	 * 	<li><a href='https://www.sqlite.org/lang_with.html'>SQLite, The WITH Clause</a></li>
 	 * 	<li><a href='https://dev.mysql.com/doc/refman/8.0/en/with.html'>
@@ -114,18 +119,41 @@ public class Transcxt {
 	 * @return this
 	 */
 	public Transcxt with(Query q0, Query... qi) {
-		this.withs = new ArrayList<Query>();
-		if (!isNull(q0)) {
-			if (isblank(q0.alias()))
-					Utils.warn("Adding with-table without alias? %s", q0.sql(null));;
-			this.withs.add(q0);
-		}
-		if (!isNull(qi))
-			for (Query q : qi) {
-				if (isblank(q.alias()))
-						Utils.warn("Adding with-table without alias? %s", q.sql(null));;
-				this.withs.add(q);
-			}
+//		this.withRecursive = false;
+//		if (this.withs == null)
+//			this.withs = new ArrayList<AbsPart[]>();
+//
+//		if (!isNull(q0)) {
+//			if (isblank(q0.alias()))
+//					Utils.warn("Adding with-table without alias? %s", q0.sql(null));;
+//			this.withs.add(new AbsPart[] {null, q0});
+//		}
+//		if (!isNull(qi))
+//			for (Query q : qi) {
+//				if (isblank(q.alias()))
+//						Utils.warn("Adding with-table without alias? %s", q.sql(null));;
+//				this.withs.add(new AbsPart[] {null, q});
+//			}
+		
+		if (this.withClause == null)
+			this.withClause = new WithClause(false);
+		this.withClause.with(q0, qi);
+		return this;
+	}
+
+	/**
+	 * For adding a recursive table.
+	 * 
+	 * @param recursive
+	 * @param recurTabl
+	 * @param rootValue
+	 * @param q
+	 * @return
+	 */
+	public Transcxt with(boolean recursive, String recurTabl, String rootValue, Query q) {
+		if (withClause == null)
+			this.withClause = new WithClause(recursive);
+		withClause.with(recurTabl, rootValue, q);
 		return this;
 	}
 }

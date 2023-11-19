@@ -13,7 +13,7 @@ public class Tabl extends AbsPart {
 	}
 
 	@Override
-	public String sql(ISemantext ctx) throws TransException {
+	public String sql(ISemantext ctx) {
 		if (ctx != null && ctx.dbtype() == dbtype.oracle)
 			return "\"" + tbl + "\"";
 		return tbl == null ? "" : tbl;
