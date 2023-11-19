@@ -189,29 +189,9 @@ public class Query extends Statement<Query> {
 	/**
 	 * with-expressions
 	 * 
-	 * This is supposed to move to somewhere else as {@link Query} is a grammar equivalent
-	 * to "query_expression".
-	ArrayList<AbsPart[]> withs;
-	
-	boolean recursiveWith;
+	 * for temporary storage when composing query. 
 	 */
 	WithClause withs;
-
-
-	/**
-	 * <h5>With Clause</h5>
-	 * <p>This shouldn't be public because it is not supposed to be called by user.
-	 * Use st.select(transc, with-query, tabl, ...) instead.</p>
-	 * @see Transcxt#select(String, String...)
-	 * @since 1.4.36
-	 * @param withs
-	 * @return this
-	protected Query with(boolean recursive, ArrayList<AbsPart[]> withs) {
-		this.recursiveWith = recursive;
-		this.withs = withs;
-		return this;
-	}
-	 */
 
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')

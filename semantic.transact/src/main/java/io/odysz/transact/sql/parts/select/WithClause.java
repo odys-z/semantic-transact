@@ -14,9 +14,22 @@ import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.select.SelectElem.ElemType;
 import io.odysz.transact.x.TransException;
 
+/**
+ * https://github.com/antlr/grammars-v4/blob/master/tsql/TSqlParser.g4
+ * <pre>with_expression
+    : WITH (XMLNAMESPACES ',')? common_table_expression (',' common_table_expression)*
+    | WITH BLOCKING_HIERARCHY ('(' full_column_name_list ')')? AS '(' select_statement ')'
+    ;</pre>
+ * @since 1.4.36
+ * @author Ody
+ *
+ */
 public class WithClause extends AbsPart {
 
 	boolean recursive;
+	/**
+	 * [[with clause' as-tabl-name, {@link Query}]]
+	 */
 	ArrayList<AbsPart[]> withs;
 	
 	public WithClause(boolean recursive, ArrayList<AbsPart[]> withs) {
@@ -94,7 +107,5 @@ public class WithClause extends AbsPart {
 			}
 
 		return this;
-
 	}
-
 }

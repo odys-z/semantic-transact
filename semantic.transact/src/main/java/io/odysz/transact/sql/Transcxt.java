@@ -88,16 +88,6 @@ public class Transcxt {
 	}
 
 	/**
-	 * [[with clause' as-tabl-name, {@link Query}]]
-	 * 
-	 * @since 1.4.36
-	protected ArrayList<AbsPart[]> withs;
-	protected boolean withRecursive;
-	 */
-
-	/**
-	 * [[with clause' as-tabl-name, {@link Query}]]
-	 * 
 	 * @since 1.4.36
 	 */
 	private WithClause withClause;
@@ -119,22 +109,6 @@ public class Transcxt {
 	 * @return this
 	 */
 	public Transcxt with(Query q0, Query... qi) {
-//		this.withRecursive = false;
-//		if (this.withs == null)
-//			this.withs = new ArrayList<AbsPart[]>();
-//
-//		if (!isNull(q0)) {
-//			if (isblank(q0.alias()))
-//					Utils.warn("Adding with-table without alias? %s", q0.sql(null));;
-//			this.withs.add(new AbsPart[] {null, q0});
-//		}
-//		if (!isNull(qi))
-//			for (Query q : qi) {
-//				if (isblank(q.alias()))
-//						Utils.warn("Adding with-table without alias? %s", q.sql(null));;
-//				this.withs.add(new AbsPart[] {null, q});
-//			}
-		
 		if (this.withClause == null)
 			this.withClause = new WithClause(false);
 		this.withClause.with(q0, qi);
