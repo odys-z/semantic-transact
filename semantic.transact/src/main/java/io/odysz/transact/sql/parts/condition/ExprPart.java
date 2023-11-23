@@ -192,11 +192,22 @@ public class ExprPart extends AbsPart {
 		this.isNull = true;
 	}
 
-	/**Use this to add "' '" over a string value. Don't confused with {@link #constVal(String)}.
+	/**
+	 * @deprecated since 1.4.36 replaced with {@link #constr(String)}
 	 * @param v
-	 * @return expr instance
+	 * @return constant expr
 	 */
 	public static ExprPart constStr(String v) {
+		return constr(v);
+	}
+
+	/**
+	 * Use this to add "' '" over a string value. Don't confused with {@link #constVal(String)}.
+	 * @param v
+	 * @return expr instance
+	 * @since 1.4.36
+	 */
+	public static ExprPart constr(String v) {
 		if (v != null)
 			return new ExprPart("'" + v + "'");
 		else return new ExprPart();
