@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.9.2
+// Generated from ./SelectParts.g4 by ANTLR 4.13.1
 package gen.antlr.sql.select;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param <T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+@SuppressWarnings("CheckReturnValue")
 public class SelectPartsBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements SelectPartsVisitor<T> {
 	/**
 	 * {@inheritDoc}
