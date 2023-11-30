@@ -67,4 +67,17 @@ public class PageInf extends Anson {
 			for (String k : mapCondts.keySet())
 				arrCondts.add(new String[] {k, (String)mapCondts.get(k)});
 	}
+
+	/**
+	 * Reshape 2D array of n-v pairs to string array for string.format().
+	 * 
+	 * @return args array
+	 */
+	public String[] arrCondts2args() {
+		ArrayList<String> args = new ArrayList<String>(arrCondts.size());
+		for (String[] arg : arrCondts) {
+			args.add(isNull(arg) ? "" : arg[arg.length - 1]);
+		}
+		return args.toArray(new String[0]);
+	}
 }

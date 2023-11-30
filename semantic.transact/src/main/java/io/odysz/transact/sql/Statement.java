@@ -412,7 +412,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public static ExprPart composeVal(Object v, TableMeta mt, String col) {
 		boolean isQuoted = mt == null || mt.isQuoted(col);
 		if (mt == null || isQuoted)
-			return ExprPart.constStr((String)v);
+			return ExprPart.constr((String)v);
 		else if (mt != null && !isQuoted && v == null)
 			return ExprPart.constVal(null);
 		else if (mt != null && !isQuoted && LangExt.isblank(v, "''", "null"))

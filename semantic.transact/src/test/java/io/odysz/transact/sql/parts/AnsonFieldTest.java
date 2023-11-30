@@ -40,7 +40,7 @@ public class AnsonFieldTest {
 		st.insert("a_funcs")
 			.nv("funcId", "a01")
 			.nv("funcName", anson)
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 
 		assertEquals(
@@ -49,7 +49,7 @@ public class AnsonFieldTest {
 
 		st.update("a_funcs")
 			.nv("funcName", anson)
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.whereEq("funcId", "a01")
 			.commit(sqls);
 

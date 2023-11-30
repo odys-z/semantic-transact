@@ -398,7 +398,7 @@ public class Semantics2 {
 
 		recId = value.get(colIx.get(idField))[1];
 
-		return ExprPart.constStr(String.format("fullpath %s.%s %s", parentId, sibling, recId));
+		return ExprPart.constr(String.format("fullpath %s.%s %s", parentId, sibling, recId));
 	}
 
 	public boolean isFullpath(String f) {

@@ -258,7 +258,7 @@ public class TestTransc {
 			.nv("funcId", "a01")
 			.nv("funcName", "")
 			// because of no semantext, null is handled as constant string, resulting 'null'
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 		assertEquals(sqls.get(0),
 				"insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)");
@@ -308,7 +308,7 @@ public class TestTransc {
 		st.insert("a_funcs")
 			.nv("funcName", "pp")
 			.nv("funcId", "a01")
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 		assertEquals("insert into a_funcs  (funcName, funcId, uri) values ('pp', 'a01', null)",
 				sqls.get(0));

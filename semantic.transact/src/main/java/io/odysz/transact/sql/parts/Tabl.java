@@ -2,7 +2,6 @@ package io.odysz.transact.sql.parts;
 
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
-import io.odysz.transact.x.TransException;
 
 public class Tabl extends AbsPart {
 

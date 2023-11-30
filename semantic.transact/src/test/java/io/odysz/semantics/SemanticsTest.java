@@ -239,9 +239,9 @@ public class SemanticsTest {
 		st.insert("a_functions")
 			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
 			.nv("funcName", "")						// type text,		blank 		=> ''
-			.nv("sibling", ExprPart.constStr(null))	// type number,		null 		=> null
+			.nv("sibling", ExprPart.constr(null))	// type number,		null 		=> null
 			.nv("someDat", "")						// type datetime,	blank 		=> ''
-			.nv("parentId", ExprPart.constStr(null))// type text,		null		=> null
+			.nv("parentId", ExprPart.constr(null))	// type text,		null		=> null
 			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
@@ -251,9 +251,9 @@ public class SemanticsTest {
 
 		st.insert("a_functions")
 			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
-			.nv("funcName", ExprPart.constStr(null))// type text,		null 		=> null
+			.nv("funcName", ExprPart.constr(null))	// type text,		null 		=> null
 			.nv("sibling", "")						// type number,		blank 		=> 0
-			.nv("someDat", ExprPart.constStr(null))	// type datetime,	null 		=> null
+			.nv("someDat", ExprPart.constr(null))	// type datetime,	null 		=> null
 			.nv("parentId", "")						// type text,		blank		=> ''
 			.commit(st.instancontxt(null, null), sqls);
 		

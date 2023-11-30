@@ -117,12 +117,30 @@ public class Transcxt {
 
 	/**
 	 * For adding a recursive table.
+	 * <pre>
+    st.with(true,
+        "orgrec(orgId, parent, deep)", 
+        "values('kerson', 'ur-zsu', 0)",
+        st.select("a_orgs", "p")
+            .col("p.orgId").col("p.parent").col(Funcall.add("ch.deep", 1))
+            .je("p", "orgrec", "ch", "orgId", "parent"))
+      .select("a_orgs", "o")
+      .cols("orgName", "deep")
+      .je("o", null, "orgrec", "orgId")
+      .orderby("deep")
+      .commit(st.instancontxt(null, null), sqls);
+        
+    assertEquals("with recursive "
+      + "orgrec(orgId, parent, deep) as (values('kerson', 'ur-zsu', 0) union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
+      + "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
+        sqls.get(0));
+     * </pre>
 	 * 
 	 * @param recursive
-	 * @param recurTabl
-	 * @param rootValue
-	 * @param q
-	 * @return
+	 * @param recurTabl recursive table name, e. g. orgrec
+	 * @param rootValue starting value, e. g. "values('kerson', 'ur-zsu', 0)"
+	 * @param q the query used to union within this recursive table
+	 * @return this
 	 */
 	public Transcxt with(boolean recursive, String recurTabl, String rootValue, Query q) {
 		if (withClause == null)
