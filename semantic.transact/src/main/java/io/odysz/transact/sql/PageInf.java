@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
 
@@ -62,10 +63,12 @@ public class PageInf extends Anson {
 		return this;
 	}
 
-	public void mergeArgs() {
+	public PageInf mergeArgs() {
 		if (len(mapCondts) > 0)
 			for (String k : mapCondts.keySet())
 				arrCondts.add(new String[] {k, (String)mapCondts.get(k)});
+		mapCondts.clear();
+		return this;
 	}
 
 	/**
@@ -79,5 +82,16 @@ public class PageInf extends Anson {
 			args.add(isNull(arg) ? "" : arg[arg.length - 1]);
 		}
 		return args.toArray(new String[0]);
+	}
+	
+	public String getArg(String argName) {
+		if (mapCondts != null && mapCondts.containsKey(argName))
+			return (String)mapCondts.get(argName);
+		else if (arrCondts != null) {
+			for (String[] nv : arrCondts)
+				if (eq(nv[0], argName))
+					return nv[1];
+		}
+		return null;
 	}
 }
