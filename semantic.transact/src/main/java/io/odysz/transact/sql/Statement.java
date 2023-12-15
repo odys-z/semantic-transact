@@ -285,10 +285,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
 	}
 	
-	/**Tag: v1.3.0
+	/**
 	 * @param col
 	 * @param constv
 	 * @return this
+	 * @since v1.3.0
 	 */
 	public T whereIn(String col, String[] constv) {
 		ExprPart inOp = new ExprPart(constv);

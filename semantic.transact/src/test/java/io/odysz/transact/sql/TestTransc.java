@@ -505,7 +505,6 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_role_funcs")
 			.select(st.select("a_functions", "f")
-					// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
 					.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
 					.j("a_roles", "r", "r.roleId='%s'", "admin"))
 			.post(st.update("a_roles")

@@ -49,7 +49,8 @@ public interface IUser {
 	 */
 	default ArrayList<String> dbLog(final ArrayList<String> sqls) throws TransException { return null; }
 
-	/**Check user log in (already has pswd, iv and user Id from db)
+	/**
+	 * Check user log in (already has pswd, iv and user Id from db)
 	 * @param request request object. In sematic.jserv, it's SessionReq object.
 	 * @return true: ok; false: failed
 	 * @throws TransException Checking login information failed
@@ -57,10 +58,10 @@ public interface IUser {
 	default boolean login(Object request) throws TransException { return false; }
 
 	/** If a user is allowed to change password, this is used to verify old
-	 * and must be overriden to check the old password cipher.
+	 * and must be overridden to check the old password cipher.
 	 * @param pswdCypher64 decrypted with my token id
 	 * @param iv64
-	 * @return yes or no
+	 * @return yes or no the old password is working
 	 * @throws TransException
 	 * @throws IOException 
 	 * @throws GeneralSecurityException 
@@ -69,7 +70,8 @@ public interface IUser {
 
 	default IUser sessionId(String rad64num) { return this; }
 
-	/**A session Id can never be changed.
+	/**
+	 * A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
 	 * @return the session token
 	 */

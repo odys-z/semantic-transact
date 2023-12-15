@@ -88,7 +88,7 @@ public class Transcxt {
 	}
 
 	/**
-	 * @since 1.4.36
+	 * @since 1.4.36 tested with SQLite.
 	 */
 	private WithClause withClause;
 
@@ -141,6 +141,7 @@ public class Transcxt {
 	 * @param rootValue starting value, e. g. "values('kerson', 'ur-zsu', 0)"
 	 * @param q the query used to union within this recursive table
 	 * @return this
+	 * @since 1.4.36 tested with SQLite.
 	 */
 	public Transcxt with(boolean recursive, String recurTabl, String rootValue, Query q) {
 		if (withClause == null)
