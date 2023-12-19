@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
@@ -192,6 +193,8 @@ public class Query extends Statement<Query> {
 	 * for temporary storage when composing query. 
 	 */
 	WithClause withs;
+
+	boolean distinct;
 
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
@@ -561,6 +564,7 @@ public class Query extends Statement<Query> {
 					withs,
 					// select ...
 					new ExprPart("select"),
+					this.distinct ? new ExprPart("distinct") : null,
 					// top(expr) with ties
 					dbtp == dbtype.ms2k && limit != null ?
 						new ExprPart("top(" + limit[0] + ") " + (limit.length > 1 ? limit[1] : "")) : null,
@@ -652,6 +656,16 @@ public class Query extends Statement<Query> {
 
 	public Query with(WithClause withClause) {
 		this.withs = withClause;
+		return this;
+	}
+
+	/** 
+	 * Whether use distinct or not, to generate "select distinct ... "
+	 * @param dist
+	 * @return this
+	 */
+	public Query distinct(boolean... dist) {
+		this.distinct = LangExt.is(dist, true);
 		return this;
 	}
 }

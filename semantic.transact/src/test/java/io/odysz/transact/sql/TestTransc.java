@@ -634,4 +634,16 @@ public class TestTransc {
 		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in ('01', 'bb') ",
 				sqls.get(0));
 	}
+
+	@Test
+	public void testWhereInSelect() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_funcs")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.whereIn("roleId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.commit(sqls);
+
+		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in (select distinct roleId from a_roles  where roleId = 'a') ",
+				sqls.get(0));
+	}
 }

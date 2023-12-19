@@ -304,12 +304,23 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	/**
+	 * where clause for "In Select".
+	 * @param col
+	 * @param q the static query - query can't be generated with context.
+	 * @return this
+	 * @since 1.4.36
+	 */
+	public T whereIn(String col, Query q) {
+		return where(Sql.condt(Logic.op("in"), col, q.sql(null)));
+	}
+
+	/**
 	 * <p>Add post semantics after the parent statement,
 	 * like add children after insert new parent.</p>
 	 * <b>Side effect</b>: the added post statement's context is changed
 	 * - to referencing the same instance for resolving, etc.
 	 * @param postatement
-	 * @return the calling statement
+	 * @return this
 	 */
 	public T post(Statement<?> postatement) {
 		if (postatement != null) {
@@ -320,9 +331,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**Add setaments before this statement'sql been generated.<br>
+	/**
+	 * Add setaments before this statement'sql been generated.<br>
 	 * @param postatement
-	 * @return the calling statement
+	 * @return this
 	 */
 	public T before(Statement<?> postatement) {
 		if (before == null)
