@@ -663,6 +663,7 @@ public class Query extends Statement<Query> {
 	 * Whether use distinct or not, to generate "select distinct ... "
 	 * @param dist
 	 * @return this
+	 * @since 1.4.36
 	 */
 	public Query distinct(boolean... dist) {
 		this.distinct = LangExt.is(dist, true);
