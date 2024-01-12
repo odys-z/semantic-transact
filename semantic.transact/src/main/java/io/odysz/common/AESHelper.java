@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -31,6 +32,8 @@ public class AESHelper {
     static final String transform = "AES/CBC/NoPadding";
     static CryptoCipher encipher;
 
+    static ReentrantLock lock;
+
     static {
     	randomProperties.put(CryptoRandomFactory.CLASSES_KEY,
     			CryptoRandomFactory.RandomProvider.JAVA.getClassName());
@@ -43,6 +46,10 @@ public class AESHelper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	// experiment 10 Dec 2024
+    	// solving crash happened outside the Java Virtual Machine in native code.
+        lock = new ReentrantLock();
     }
 
 	/**TODO move to test
@@ -75,7 +82,8 @@ public class AESHelper {
 	    }
 	}
 
-	/**Decrypt then encrypt.
+	/**
+	 * Decrypt then encrypt.
 	 * @param cypher Base64
 	 * @param decryptK plain key string
 	 * @param decryptIv Base64
@@ -112,32 +120,45 @@ public class AESHelper {
         return b64;
 	}
 
+	/**
+	 * 10 Dec 2024:<br>
+	 * This line causes trouble in JDK 15, Open JDK x64.
+	 * 
+	 * @param input
+	 * @param key
+	 * @param iv
+	 * @return result bytes
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
-		//System.out.println("txt: " + plain);
-		//System.out.println("key: " + key);
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         //Initializes the cipher with ENCRYPT_MODE, key and iv.
         try {
+        	lock.lock();
+
 			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
-			byte[] output = new byte[((input.length)/16 + 2) * 16]; // + 1 will throw exception
-
+			byte[] output = new byte[((input.length)/16 + 2) * 16];
 			// int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 			// above code is incorrect (not working with PKCS#7 padding),
 			// check Apache Common Crypto User Guide:
 			// https://commons.apache.org/proper/commons-crypto/userguide.html
 			// Usage of Byte Array Encryption/Decryption, CipherByteArrayExample.java
 			int updateBytes = encipher.update(input, 0, input.length, output, 0);
-			//System.out.println("updateBytes " + updateBytes);
-			int finalBytes = encipher.doFinal(input, 0, 0, output, updateBytes);
+			int finalBytes  = encipher.doFinal(input, 0, 0, output, updateBytes);
+
 			output = Arrays.copyOf(output, updateBytes + finalBytes);
 			encipher.close();
 			return output;
 		} catch (GeneralSecurityException e) {
 			throw new GeneralSecurityException(e.getMessage());
 		}
+        finally {
+        	lock.unlock();
+        }
 	}
 
 	public static String decrypt(String cypher, String key, byte[] iv)
