@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.anson.Anson;
+import io.odysz.common.AESHelper;
 import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
@@ -112,15 +113,25 @@ public interface IUser {
 	public List<Object> notifies();
 
 	/**
-	 * @deprecated why this is needed if there is {@link #sessionId(String)} ?
-	 * 
-	 * @param string
+	 * Set session key, not session-id.
+	 * @deprecated replaced by {@link #sessionKey(byte[]).
+	 * @since 1.4.37
+	 * @param ssid
 	 * @return this
 	 */
-	public default IUser sessionKey(String string) { return this; }
+	public default IUser sessionKey(String ssid) { return this; }
 
-	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
-	 * 
+	/**
+	 * Set session knowledge for token verification.
+	 * @see AESHelper#packSessionKey(String)
+	 * @since 1.4.37
+	 * @param knowledge
+	 * @return this
+	 */
+	public default IUser sessionKey(byte[] knowledge) { return this; }
+
+	/**
+	 * Get session key
 	 * @return this
 	 */
 	public default String sessionKey() { return null; }
@@ -163,15 +174,35 @@ public interface IUser {
 
 	public default String roleId() { return null; }
 
-	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	/**
+	 * Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	 * 
 	 * @param usr
 	 * @return the session information
+	 * @throws Exception 
 	 */
-	public default SessionInf getClientSessionInf(IUser usr) { 
+	public default SessionInf getClientSessionInf(IUser usr) throws Exception { 
+		Object[] session = AESHelper.packSessionKey(usr.pswd());
+		usr.sessionKey((byte[])session[1]);
+
 		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())
 				.device(usr.deviceId())
-				.userName(usr.userName());
+				.userName(usr.userName())
+				.ssToken((String)session[0]);
 	}
+
+	/**
+	 * Sign and encrypt session-key for login reply. The sskey is used for verifying jserv requests' headers.
+	 * 
+	 * @since 1.4.37
+	 * @param sskey
+	 * @return encrypt(sskey, pswd)
+	 * @throws Exception 
+	default String signSessionKey(String sskey)
+			throws GeneralSecurityException, IOException {
+		return sskey;
+	}
+	 */
 
 	/**
 	 * @since 1.4.36
@@ -185,5 +216,11 @@ public interface IUser {
 	 * @return profiles
 	 */
 	public default Anson profile() { return null; }
+
+	/**
+	 * @since 1.4.37, verifying token by AnSession needs this.
+	 * @return
+	 */
+	public default String pswd() { return null; }
 
 }

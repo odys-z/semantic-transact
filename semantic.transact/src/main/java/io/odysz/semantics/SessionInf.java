@@ -7,7 +7,19 @@ public class SessionInf extends Anson {
 	String uid;
 	String roleId;
 	String userName;
-	String roleName; 
+	String roleName;
+	
+	/**
+	 * Session Token
+	 * @since 1.4.37
+	 */
+	public String ssToken;
+
+	/**
+	 * Last Sequence
+	 * @since 1.4.37
+	 */
+	int seq;
 
 	public String device;
 	public SessionInf device(String dev) { this.device = dev; return this; }
@@ -48,6 +60,11 @@ public class SessionInf extends Anson {
 	public String roleName() { return roleName; }
 	public SessionInf roleName(String name) {
 		this.roleName = name;
+		return this;
+	}
+
+	public SessionInf ssToken(String sessionKey) {
+		this.ssToken = sessionKey;
 		return this;
 	}
 }

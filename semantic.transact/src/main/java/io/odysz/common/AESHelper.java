@@ -1,5 +1,7 @@
 package io.odysz.common;
 
+import static io.odysz.common.LangExt.eq;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,6 +73,9 @@ public class AESHelper {
 		}
 	}
 
+	/**
+	 * @return 16 random bytes
+	 */
 	public static byte[] getRandom() {
 		byte[] iv = new byte[16];
 	    try (CryptoRandom random = CryptoRandomFactory.getCryptoRandom(randomProperties)) {
@@ -106,13 +111,23 @@ public class AESHelper {
         return new String[] {b64, AESHelper.encode64(eiv)};
 	}
 
+	/**
+	 * Encrypt plain text to cipher of base 64.
+	 * 
+	 * @param plain
+	 * @param key
+	 * @param iv
+	 * @return
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	public static String encrypt(String plain, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		if (!plain.trim().equals(plain))
 			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
 
-		key = pad16_32(key); // FIXME won't work for non ASCII
-		plain = pad16_32(plain); // FIXME won't work for non ASCII
+		key = pad16_32(key);
+		plain = pad16_32(plain);
 		byte[] input = getUTF8Bytes(plain);
 		byte[] kb = getUTF8Bytes(key);
 		byte[] output = encryptEx(input, kb, iv);
@@ -300,17 +315,63 @@ public class AESHelper {
         return Base64.getDecoder().decode(str);
 	}
 
-	/**Is encrypt(plain, k, v) == cipher?
-	 * @param plain
-	 * @param cipher
-	 * @param k
-	 * @param iv
+	/**
+	 * Is encrypt(plain, k, v) == cipher?
+	 * i.e. encrypt(uid:random, k, iv) == token ? where uid:random = clientoken
+	 * 
 	 * @return true: yes the same
 	 * @throws Exception
 	 */
-	public static boolean isSame(String cipher, String plain, String k, String iv) throws Exception {
-		String enciphered = encrypt(plain, k, decode64(iv));
-		return enciphered.equals(cipher);
+	public static boolean verifyToken(String requestoken, String myKnowledge, String uid, String key)
+			throws Exception {
+		String[] sstoken = requestoken.split(":");
+		String enciphered = encrypt(pad16_32(uid) + ":" + myKnowledge, key, decode64(sstoken[1]));
+		return eq(enciphered, sstoken[0]);
 	}
 
+	/**
+	 * <pre>
+	 * ssToken = cipher : iv, len(cipher) = 16
+	 * plain = decrypt(cipher, key, iv)
+	 * token = encrypt(pad(uid) : plain, key, iv2)
+	 * return token : iv2
+	 * </pre>
+	 * 
+	 * @return token for managed session requests
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
+	public static String repackSessionToken(String ssToken, String key, String uid)
+			throws GeneralSecurityException, IOException {
+//		if (isblank(uid) || uid.length() > 16)
+//			throw new GeneralSecurityException(String.format("uid %s mus less or equal to 16 bytes", uid));
+		String[] ss = ssToken.split(":");
+		String plain = decrypt(ss[0], key, decode64(ss[1]));
+
+		byte[] iv = getRandom();
+		String cipher = encrypt(uid + ":" + plain, key, iv);
+		return cipher + ":" + encode64(iv);
+	}
+
+	/**
+	 * <pre>
+	 * iv = random(16)
+	 * token = encrypt(random, key, iv), len(random) = 16
+	 * return token : iv
+	 * </pre>
+	 * 
+	 * @param key
+	 * @return 0: string(token : iv), 1: byte[16] of knowledge (random token)
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 * @since 1.4.37
+	 * @see AESHelperTest#testSessionToken() source
+	 */
+	public static String[] packSessionKey(String key) 
+			throws GeneralSecurityException, IOException {
+		byte[] iv = AESHelper.getRandom();
+		byte[] knows = AESHelper.getRandom();
+		String token = AESHelper.encode64(knows);
+		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), new String(knows)};
+	}
 }
