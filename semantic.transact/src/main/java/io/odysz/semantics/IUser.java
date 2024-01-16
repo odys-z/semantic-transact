@@ -114,7 +114,6 @@ public interface IUser {
 
 	/**
 	 * Set session key, not session-id.
-	 * @deprecated replaced by {@link #sessionKey(byte[]).
 	 * @since 1.4.37
 	 * @param ssid
 	 * @return this
@@ -124,6 +123,7 @@ public interface IUser {
 	/**
 	 * Set session knowledge for token verification.
 	 * @see AESHelper#packSessionKey(String)
+	 * @deprecated for experiment
 	 * @since 1.4.37
 	 * @param knowledge
 	 * @return this
@@ -183,7 +183,7 @@ public interface IUser {
 	 */
 	public default SessionInf getClientSessionInf(IUser usr) throws Exception { 
 		Object[] session = AESHelper.packSessionKey(usr.pswd());
-		usr.sessionKey((byte[])session[1]);
+		usr.sessionKey((String) session[1]);
 
 		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())
 				.device(usr.deviceId())
@@ -192,7 +192,8 @@ public interface IUser {
 	}
 
 	/**
-	 * Sign and encrypt session-key for login reply. The sskey is used for verifying jserv requests' headers.
+	 * Sign and encrypt session-key for login reply. The sskey is used for
+	 * verifying jserv requests' headers.
 	 * 
 	 * @since 1.4.37
 	 * @param sskey

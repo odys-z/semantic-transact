@@ -127,9 +127,10 @@ public class AESHelperTest {
 	public void testSessionToken() throws Exception {
 		String uid = "ody", pswd = "io.github.odys-z";
 		String[] response = AESHelper.packSessionKey(pswd);
+		String knowledge = response[1];
 		
 		String request = AESHelper.repackSessionToken((String) response[0], pswd, uid);
 		
-		assertTrue(AESHelper.verifyToken(request, response[1], uid, pswd));
+		assertTrue(AESHelper.verifyToken(request, knowledge, uid, pswd));
 	}
 }

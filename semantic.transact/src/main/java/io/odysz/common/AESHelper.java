@@ -135,6 +135,8 @@ public class AESHelper {
         return b64;
 	}
 
+	//-------------ody:io.github.odys-z
+
 	/**
 	 * 10 Dec 2024:<br>
 	 * This line causes trouble in JDK 15, Open JDK x64.
@@ -207,7 +209,7 @@ public class AESHelper {
 	 * @return 16 / 32 byte string
 	 * @throws GeneralSecurityException
 	 */
-	private static String pad16_32(String s) throws GeneralSecurityException {
+	public static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
 			return String.format("%1$16s", s).replaceAll(" ", "-");
@@ -325,7 +327,7 @@ public class AESHelper {
 	public static boolean verifyToken(String requestoken, String myKnowledge, String uid, String key)
 			throws Exception {
 		String[] sstoken = requestoken.split(":");
-		String enciphered = encrypt(pad16_32(uid) + ":" + myKnowledge, key, decode64(sstoken[1]));
+		String enciphered = encrypt(pad16_32(uid + ":" + myKnowledge), key, decode64(sstoken[1]));
 		return eq(enciphered, sstoken[0]);
 	}
 
@@ -343,8 +345,6 @@ public class AESHelper {
 	 */
 	public static String repackSessionToken(String ssToken, String key, String uid)
 			throws GeneralSecurityException, IOException {
-//		if (isblank(uid) || uid.length() > 16)
-//			throw new GeneralSecurityException(String.format("uid %s mus less or equal to 16 bytes", uid));
 		String[] ss = ssToken.split(":");
 		String plain = decrypt(ss[0], key, decode64(ss[1]));
 
@@ -361,7 +361,7 @@ public class AESHelper {
 	 * </pre>
 	 * 
 	 * @param key
-	 * @return 0: string(token : iv), 1: byte[16] of knowledge (random token)
+	 * @return 0: string(token : iv), 1: knowledge in base 64 (random token)
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 * @since 1.4.37
@@ -372,6 +372,6 @@ public class AESHelper {
 		byte[] iv = AESHelper.getRandom();
 		byte[] knows = AESHelper.getRandom();
 		String token = AESHelper.encode64(knows);
-		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), new String(knows)};
+		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
 	}
 }
