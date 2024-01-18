@@ -128,6 +128,8 @@ public class AESHelperTest {
 		String uid = "ody", pswd = "io.github.odys-z";
 		String[] response = AESHelper.packSessionKey(pswd);
 		String knowledge = response[1];
+		assertEquals(24, knowledge.length());
+		assertEquals(69, response[0].length()); // 44 + 1 + 24
 		
 		String request = AESHelper.repackSessionToken((String) response[0], pswd, uid);
 		

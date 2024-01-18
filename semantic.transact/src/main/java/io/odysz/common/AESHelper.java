@@ -333,13 +333,13 @@ public class AESHelper {
 
 	/**
 	 * <pre>
-	 * ssToken = cipher : iv, len(cipher) = 16
+	 * ssToken = cipher : iv, len(cipher) = 44
 	 * plain = decrypt(cipher, key, iv)
 	 * token = encrypt(pad(uid) : plain, key, iv2)
-	 * return token : iv2
+	 * return token : iv2, if cipher.length == 44, len(token : iv2) = 44 + 1 + 24 = 69
 	 * </pre>
 	 * 
-	 * @return token for managed session requests
+	 * @return token for managed session requests, token:iv2, len = 69 for ssToken.len = 69
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 */
@@ -356,8 +356,9 @@ public class AESHelper {
 	/**
 	 * <pre>
 	 * iv = random(16)
-	 * token = encrypt(random, key, iv), len(random) = 16
-	 * return token : iv
+	 * token = encrypt(random, key, iv), len(random) = 24
+	 * return token : iv,
+	 * where len(token) = [(24 + 15) / 16] * 16 * [4/3] = 32 * [4/3] = 44
 	 * </pre>
 	 * 
 	 * @param key
