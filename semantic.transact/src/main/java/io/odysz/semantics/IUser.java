@@ -219,9 +219,10 @@ public interface IUser {
 	public default Anson profile() { return null; }
 
 	/**
-	 * @since 1.4.37, verifying token by AnSession needs this.
-	 * @return
+	 * @since 1.4.38, verifying token by AnSession needs this.
+	 * @return pswd
+	 * @throws TransException 
 	 */
-	public default String pswd() { return null; }
+	public default String pswd() throws TransException { throw new TransException("Must be overriden by subclass."); }
 
 }
