@@ -222,4 +222,8 @@ public class SemanticObject extends Anson {
 	public String resulve(String tabl, String pk) {
 		return (String) ((SemanticObject) ((SemanticObject) get("resulved")).get(tabl)).get(pk);
 	}
+
+	public int getInt(String n) {
+		return Integer.valueOf(getString(n));
+	}
 }
