@@ -33,11 +33,14 @@ public class DocLocks {
 
 	public static void readed(String fullpath) {
 		try {
-			locks.get(fullpath).readLock().unlock();
+			if (locks.containsKey(fullpath))
+				locks.get(fullpath).readLock().unlock();
 		} catch (Throwable t) {
 			Utils.warn("Unlock error: %s", fullpath);
 			t.printStackTrace();
 		}
+		try { locks.remove(fullpath); }
+		catch (Throwable t) {}
 	}
 
 	public static void readed(Path p) {
