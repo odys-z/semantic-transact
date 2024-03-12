@@ -137,11 +137,11 @@ public interface IUser {
 	public default String sessionKey() { return null; }
 
 	/**
-	 * <p>Since v1.4.11, user object has a chance to initialize with Semantic.DA AnResultset.
+	 * <p>Since v1.4.11, user object has this chance to initialize with Semantic.DA AnResultset.
 	 * e.g. setting client device Id which is essential to doc synchronizing.</p>
-	 * <p>Since v1.3.5, user object has a chance to initialize with login request.</p>
+	 * <p>Since v1.3.5, user object has this chance to initialize with login request.</p>
 	 * @param sessionReqBody e.g. AnSessionReq
-	 * @return
+	 * @return this
 	 * @throws SsException 
 	 */
 	public default IUser onCreate(Anson sessionReqBody) throws GeneralSecurityException { return this; }

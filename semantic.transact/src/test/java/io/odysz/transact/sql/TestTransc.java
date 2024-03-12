@@ -2,6 +2,8 @@ package io.odysz.transact.sql;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static io.odysz.transact.sql.parts.condition.Funcall.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,7 +20,6 @@ import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
 public class TestTransc {
@@ -201,7 +202,7 @@ public class TestTransc {
 						.j("h_photo_org", "ho", "ho.oid=u.orgId")
 						.whereEq("u.userId", "ody"))
 				.select("h_photos", "p")
-				.col(Funcall.avg("filesize"), "notes")
+				.col(avg("filesize"), "notes")
 				.je("p", null, "u", "shareby", "userId")
 				.commit(st.instancontxt(null, null), sqls);
 
@@ -218,7 +219,7 @@ public class TestTransc {
 					.j("h_photo_org", "ho", "ho.pid=c.pid")
 					.whereEq("ho.oid", "zsu"))
 				.select("h_photos", "p")
-				.col(Funcall.avg("filesize"), "notes")
+				.col(avg("filesize"), "notes")
 				.je("p", null, "u", "shareby", "userId")
 				.je("p", null, "c", "pid", "cid")
 				.commit(st.instancontxt(null, null), sqls);
@@ -233,7 +234,7 @@ public class TestTransc {
 					"orgrec(orgId, parent, deep)", 
 					"values('kerson', 'ur-zsu', 0)",
 					st.select("a_orgs", "p")
-						.col("p.orgId").col("p.parent").col(Funcall.add("ch.deep", 1))
+						.col("p.orgId").col("p.parent").col(add("ch.deep", 1))
 						.je("p", "orgrec", "ch", "orgId", "parent"))
 				.select("a_orgs", "o")
 				.cols("orgName", "deep")
@@ -245,6 +246,21 @@ public class TestTransc {
 					+ "orgrec(orgId, parent, deep) as (values('kerson', 'ur-zsu', 0) union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
 					+ "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
 					sqls.get(2));
+			
+			st.with(st.select("a_users", "u")
+					.j("h_photo_org", "ho", "ho.oid=u.orgId")
+					.whereEq("u.userId", "ody"))
+			.select("h_photos", "p")
+			.col(avg("filesize"), "notes")
+			.je("p", null, "u", "shareby", constr("ody"), "oid", concat("'--'", "u.orgId"))
+			.commit(st.instancontxt(null, null), sqls);
+
+			// Utils.logi(sqls.get(0));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = 'ody' AND p.oid = '--' || u.orgId",
+					sqls.get(3));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);
@@ -469,7 +485,7 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		try {
 			st.update("a_users")
-				.nv("userName", Funcall.concat("userName", "o.orgName"))
+				.nv("userName", concat("userName", "o.orgName"))
 				.commit(sqls);
 		} catch (Exception e) {
 			Utils.warn("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
@@ -489,6 +505,22 @@ public class TestTransc {
 				sqls.get(0));
 
 		st.select("a_users", "u")
+			.je("u", "a_org", "o", "orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+			.commit(sqls);
+
+		// it's u.orgName
+		assertEquals("select * from a_users u join a_org o on u.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+				sqls.get(1));
+	
+		st.select("a_users", "u")
+			.je("u", "a_org", "o", "o.orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+			.commit(sqls);
+
+		// it's o.orgName
+		assertEquals("select * from a_users u join a_org o on o.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+				sqls.get(2));
+	
+		st.select("a_users", "u")
 			.j("a_org", "o", Sql.condt("u.orgId = o.orgId or (u.orgId = '%s' and (u.name <> '%s' or u.name <> '%s'))",
 					"ChaoYang People", "James Bond", "007"))
 			.commit(sqls);
@@ -497,7 +529,16 @@ public class TestTransc {
 		// join a_org o on u.orgId = o.orgId OR
 		// (u.orgId = 'ChaoYang People' AND (u.name <> 'admin' OR u.name <> '007'))
 		assertEquals("select * from a_users u join a_org o on u.orgId = o.orgId OR (u.orgId = 'ChaoYang People' AND (u.name <> 'James Bond' OR u.name <> '007'))",
-				sqls.get(1));
+				sqls.get(3));
+
+		st.select("a_users", "u")
+			.je("u", "a_org", "o", "oid", "orgId", "userId", "market")
+			.commit(sqls);
+
+		// it's o.orgName
+		assertEquals("select * from a_users u join a_org o on u.oid = o.orgId AND u.userId = o.market",
+				sqls.get(4));
+	
 	}
 	
 	@Test

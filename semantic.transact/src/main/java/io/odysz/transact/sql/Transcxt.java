@@ -8,9 +8,12 @@ import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**
- * <p>Transaction Context, also can be take as a Transaction / Batching SQL builder creator.</p> 
+ * <p>Transaction builder, also can be take as a Transaction / Batching SQL builder,
+ * with semantics context's creator.</p> 
  * <p>A Transcxt is typically plugged in with ISemantext, which is the handler of semantics.</p>
  * <p>When building sql, events like onInserting, etc. are fired to ISemantext.
+ * TODO this is supposed to be renamed as TransBuilder in the future.
+ * 
  * @author odys-z@github.com
  */
 public class Transcxt {

@@ -388,12 +388,11 @@ public class Query extends Statement<Query> {
 	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
 	 *    
 	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
-	 * @param mainAlias
-	 * @param withTbl
+	 * @param mainAlias e.g. u
+	 * @param withTbl e.g. r
 	 * @param withAlias
-	 * @param onCols
+	 * @param onCols, in pairs, e.g. if a, b, c, d, where have condition u.a = r.b and u.c = r.d
 	 * @return this
-	 */
 	public Query je(String mainAlias, String withTbl, String withAlias, String... onCols) {
 		Condit ands = Sql.condt(op.eq,
 				String.format("%s.%s", mainAlias, onCols[0]),
@@ -403,6 +402,74 @@ public class Query extends Statement<Query> {
 			ands.and(Sql.condt(op.eq,
 				String.format("%s.%s", mainAlias, onCols[i]),
 				String.format("%s.%s", withAlias, onCols.length > i+1 ? onCols[i+1] : onCols[i])));
+		}
+		return j(withTbl, withAlias, ands);
+	}
+	 */
+
+	/**
+	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
+	 * 
+	 * <p>Example</p>
+	 * <pre>sctx.select(usrMeta.tbl, "u")
+	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
+	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);
+	 * //   
+	 * sctx.select(userMeta.tbl, "u")
+	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
+	 *    
+	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
+
+	 * Since 1.4.40 the right operand can be a function expression, e.g.
+	 * <pre>
+	 * je("ent", chgm.tbl, "ch", chgm.uids, Funcall.concat(trsb.synode + chgm.UIDsep + chgm.pk), chgm.uids, chgm.synoder, trsb.synode)
+	 * </pre>
+	 * 
+	 * Example of column name handling:
+	 * <pre>
+	 * 1. example: override table alias
+	 * 	st.select("a_users", "u")
+	 *      .je("u", "a_org", "o", "o.orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+	 *      .commit(sqls);
+	 *  // it's o.orgName
+	 *  assertEquals("select * from a_users u join a_org o on o.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+	 *  sqls.get(1))
+	 *  
+	 * 2. example: regular align table alias
+	 * 	st.select("a_users", "u")
+	 *      .je("u", "a_org", "o", "orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+	 *      .commit(sqls);
+	 *  // it's u.orgName
+	 *  assertEquals("select * from a_users u join a_org o on u.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+	 *  sqls.get(2))
+	 * </pre>
+	 * @param mainAlias
+	 * @param withTbl
+	 * @param withAlias
+	 * @param onCols equals condition pairs, if column name come with table alias, will override it, see the first example.
+	 * @return this
+	 */
+	public Query je(String mainAlias, String withTbl, String withAlias, Object... onCols) {
+		Object rop = onCols.length > 1 ? onCols[1] : onCols[0];
+
+		Condit ands = null; 
+		if (rop instanceof ExprPart)
+			ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[0]), (ExprPart)rop);
+		else
+			ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[0]),
+				String.format("%s.%s", withAlias, rop));
+
+		for (int i = 2; i < onCols.length; i+=2) {
+			rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
+			if (rop instanceof ExprPart)
+				ands = ands.and(Sql.condt(op.eq,
+					String.format("%s.%s", mainAlias, onCols[i]), (ExprPart)rop));
+			else
+				ands = ands.and(Sql.condt(op.eq,
+					String.format("%s.%s", mainAlias, onCols[i]),
+					String.format("%s.%s", withAlias, rop)));
 		}
 		return j(withTbl, withAlias, ands);
 	}

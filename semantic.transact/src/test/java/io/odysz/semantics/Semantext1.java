@@ -106,7 +106,7 @@ public class Semantext1 implements ISemantext {
 	public String connId() { return conn; }
 	
 	@Override
-	public String genId(String tabl, String col) throws SQLException, TransException {
+	public String genId(String conn, String tabl, String col) throws SQLException, TransException {
 		return "";
 	}
 

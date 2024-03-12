@@ -2,10 +2,12 @@ package io.odysz.transact.sql.parts;
 
 
 import io.odysz.common.LangExt;
+import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.x.TransException;
 
 /**Logic expression etc's helper */
 public class Sql {
@@ -37,6 +39,10 @@ public class Sql {
 
 	public static Condit condt(op op, String loperand, ExprPart part) {
 		return new Condit(op, loperand, part);
+	}
+
+	public static Condit condt(op op, String loperand, Query q) throws TransException {
+		return new Condit(op, loperand, q);
 	}
 	
 	/**Filtering out "'", replaced with "''".

@@ -26,7 +26,8 @@ import org.apache.commons.crypto.utils.Utils;
  */
 public class AESHelper {
     static Properties randomProperties = new Properties();
-    /**Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
+    /**
+     * Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
      * Apache Common Crypto only support PKCS#5 padding, but most js lib support PKCS#7 padding,
      * This makes trouble when negotiation with those API.
      * Solution: using no padding here, round the text to 16 or 32 ASCII bytes.
@@ -49,7 +50,7 @@ public class AESHelper {
 			e.printStackTrace();
 		}
     	
-    	// experiment 10 Dec 2024
+    	// experiment 10 Dec 2023
     	// solving crash happened outside the Java Virtual Machine in native code.
         lock = new ReentrantLock();
     }

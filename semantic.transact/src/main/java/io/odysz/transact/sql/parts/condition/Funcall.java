@@ -592,7 +592,8 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	/**Create a funcall, generating sql for<br>
+	/**
+	 * Create a funcall, generating sql for<br>
 	 * <a href='https://dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_str-to-date'>mysq:</a><br>
 	 * str_to_date(str-val, '%Y-%m-%d %H:%i:%s')<br>
 	 * <a href='https://www.sqlite.org/lang_datefunc.html'>sqlite</a><br>
@@ -625,7 +626,13 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 	
-	public static AbsPart concat(String to, String... with) {
+	/**
+	 * Concatenate column names.
+	 * @param to
+	 * @param with
+	 * @return function expression, e.g. in sqlite, to || with[0] || with[1] ... 
+	 */
+	public static Funcall concat(String to, String... with) {
 		Funcall f = new Funcall(Func.concat);
 		
 		f.args = Stream
@@ -637,4 +644,25 @@ public class Funcall extends ExprPart {
 				.toArray();
 		return f;
 	}
+
+	/**
+	 * Concatenate constant strings.
+	 * @param v
+	 * @param with
+	 * @return function expression, e.g. in sqlite, 'v' || 'with[0]' || 'with[1]' ... 
+	 * @since 1.4.40
+	 */
+	public static Funcall concatstr(String v, String... with) {
+		Funcall f = new Funcall(Func.concat);
+		
+		f.args = Stream
+				.concat(Stream.of(v), Stream.of(with))
+				.filter(c -> !isblank(c))
+				.map(c -> {
+					return constr(c);
+				})
+				.toArray();
+		return f;
+	}
+
 }

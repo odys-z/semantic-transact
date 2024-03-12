@@ -116,6 +116,17 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return nv(n, String.valueOf(v));
 	}
 
+	public T nv(String n, int v) {
+		return nv(n, String.valueOf(v));
+	}
+
+	public T nv(String n, String[] v) {
+		return (T) nv(n, Stream
+					.of(v)
+					.filter(m -> !isblank(m))
+					.collect(Collectors.joining(",")));
+	}
+
 	public T nv(String n, AbsPart v) {
 		Utils.warn("Statement.nv(): Only Update and Insert can use nv() function.");
 		return (T) this;
@@ -197,8 +208,24 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_(op, lcol, (String)rconst);
 	}
 	
-	public Statement<?> where(String logic, String loperand, ExprPart resulving) {
-		return where(Sql.condt(Logic.op(logic), loperand, resulving));
+	public Statement<?> where(String logic, String loperand, ExprPart roperand) {
+		return where(Logic.op(logic), loperand, roperand);
+	}
+
+	public Statement<?> where(Logic.op op, String loperand, ExprPart roperand) {
+		return where(Sql.condt(op, loperand, roperand));
+	}
+
+	/**
+	 * E.g. where t.id in select id from tab. 
+	 * @param logic
+	 * @param loperand
+	 * @param q
+	 * @return this
+	 * @throws TransException
+	 */
+	public Statement<?> where(Logic.op logic, String loperand, Query q) throws TransException {
+		return where(Sql.condt(logic, loperand, q));
 	}
 
 	/**This is a wraper of {@link #where(String, String, String)} for convenient
@@ -210,6 +237,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T where(Logic.op op, String loperand, String roperand) {
 		return where(Sql.condt(op, loperand, roperand));
+	}
+
+	public T where(Logic.op op, String loperand, Long roperand) {
+		return where(Sql.condt(op, loperand, roperand.toString()));
+	}
+
+	public T where(Logic.op op, String loperand, Integer roperand) {
+		return where(Sql.condt(op, loperand, roperand.toString()));
 	}
 
 	/**This is a wraper of {@link #where(String, String, String)} for convenient

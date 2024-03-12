@@ -160,7 +160,7 @@ public interface ISemantext {
 	 * @throws SQLException
 	 * @throws TransException
 	 */
-	String genId(String tabl, String col) throws SQLException, TransException;
+	String genId(String conn, String tabl, String col) throws SQLException, TransException;
 
 	/**Create a new instance for a semantics processing.
 	 * @param usr
