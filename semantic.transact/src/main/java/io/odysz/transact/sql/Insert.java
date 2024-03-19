@@ -233,7 +233,11 @@ public class Insert extends Statement<Insert> {
 				&& valuesNv.size() > 0
 				&& valuesNv.get(0) != null
 				&& valuesNv.get(0).size() > 0;
-		if (!hasVals && selectValues == null) return "";
+		if (!hasVals && selectValues == null) {
+			Utils.warn("[Insert#sql()] Trying to stream a Insert statement without values, table %s, conn %s.",
+					this.mainTabl.name(), sctx.connId());
+			return "";
+		}
 
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(

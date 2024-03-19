@@ -25,7 +25,9 @@ public class TableMeta {
 	 */
 	public String ddlSqlite;
 
-	private HashMap<String, ColMeta> ftypes;
+	/** {col-name: {@link ColMeta}} */
+	protected HashMap<String, ColMeta> ftypes;
+
 	/**
 	 * Is the column types already loaded from DB?
 	 * @since 1.4.25

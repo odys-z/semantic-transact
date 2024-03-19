@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import io.odysz.common.Regex;
 
+/** DB column information, i.e. type &amp; length. */
 public class ColMeta {
 	/** 0: text, 1: datetime, 2: number, 3: clob, 4: bin */
 	static Regex regtext = new Regex("(varchar.?|text|char)?(.*time.*|date.*)?(int.*|float|decimal)?(clob)?(b?lob|bin|binary)?");
