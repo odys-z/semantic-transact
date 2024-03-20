@@ -470,7 +470,8 @@ public class TestTransc {
 
 	}
 	
-	/** Sqlite tested case
+	/**
+	 * Sqlite tested case
 	 *<pre>with backtrace (indId, parent, fullpath) as (
 	select indId indId, parent parent, fullpath fullpath from ind_emotion where indId = 'C' 
 	union all 
@@ -687,4 +688,24 @@ public class TestTransc {
 		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in (select distinct roleId from a_roles  where roleId = 'a') ",
 				sqls.get(0));
 	}
+	
+	@Test
+	public void testWhereNeeInNotinSelect() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_func")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.whereEq("funcId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.where(op.ge, "3", st.select("a_roles").col(count("roleId")).whereEq("roleId", "b"))
+			.where(op.in, "roleId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "b"))
+			.where(op.notin, "funcId", st.select("a_roles").col(count("roleId")).whereEq("roleId", "b"))
+			.commit(sqls);
+
+		assertEquals("update  a_role_func  set roleId=3 * 2 "
+				+ "where funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
+				+ "AND 3 >=  ( select count(roleId) from a_roles  where roleId = 'b' ) "
+				+ "AND roleId in  ( select distinct roleId from a_roles  where roleId = 'b' ) "
+				+ "AND funcId not in  ( select count(roleId) from a_roles  where roleId = 'b' ) ",
+				sqls.get(0));
+	}
+
 }

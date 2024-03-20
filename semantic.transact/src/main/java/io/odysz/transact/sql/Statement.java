@@ -320,6 +320,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
 	}
 	
+	public T whereEq(String col, Query q) throws TransException {
+		return where(Sql.condt(Logic.op.eq, col, q));
+	}
+
 	/**
 	 * @param col
 	 * @param constv

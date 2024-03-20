@@ -31,7 +31,7 @@ search_condition_not
 	 */
 
 	public Condit(op op, String lop, String rop) {
-		super(op, lop, rop);
+		super(op, lop, rop); // FIXME op = eq, lop = e.pid, rop = ch.entfk, line 1:8 mismatched input '<EOF>' expecting '.'
 		this.logitype = Logic.type.empty;
 	}
 

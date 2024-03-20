@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.parts.AbsPart;
@@ -21,8 +19,8 @@ public class Predicate extends AbsPart {
 	protected boolean empty = false;
 	public boolean empty() { return empty; }
 	
-	private boolean negative = false;
-	public boolean negative() { return negative; }
+	// private boolean negative = false;
+	// public boolean negative() { return negative; }
 
 	private Logic.op op;
 	public Logic.op logic() { return op; }
@@ -105,26 +103,29 @@ public class Predicate extends AbsPart {
 		this.search_condit = search_condit;
 	}
 
-	public Predicate(Logic.op in, String col, Query s) throws TransException {
+	public Predicate(Logic.op in, String col, Query q) throws TransException {
 		this.op = in;
+		/* 2024-03-19, it's valid for where clause like where 1 >= (select (count(*) form ...))
 		if (in != Logic.op.in && in != Logic.op.notin)
 			throw new TransException("Currently only '(not) in' operator is supported for select condition. select:\n %s", s.sql(null));
+		*/
 		// this.l = new ExprPart(col);
 		this.l = col == null ? null : ExprsVisitor.parse(col);
-		this.inSelect = s;
+		this.inSelect = q;
 	}
 
-	public void not(TerminalNode not) {
-		negative = not != null && not.getText() != null && not.getText().length() > 0;
-	}
+	// 2024-03-19
+//	public void not(TerminalNode not) {
+//		negative = not != null && not.getText() != null && not.getText().length() > 0;
+//	}
 
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
 		if (empty) return "";
-		else if ((op == Logic.op.in || op == Logic.op.notin) && inSelect != null)
-			return Stream.of(l,
-					op == Logic.op.notin ? new ExprPart("not") : null,
-					new ExprPart("in ("), inSelect, new ExprPart(")"))
+		// else if ((op == Logic.op.in || op == Logic.op.notin) && inSelect != null)
+		else if (inSelect != null) {
+			return this.l == null && r != null
+				? Stream.of(new ExprPart("("), inSelect, new ExprPart(")"), new ExprPart(op.sql(sctx, op, r)))
 					.map(e -> {
 						try {
 							return e == null ? "" : e.sql(sctx);
@@ -133,7 +134,20 @@ public class Predicate extends AbsPart {
 							return "";
 						}
 					})
-					.collect(Collectors.joining(" "));
+					.collect(Collectors.joining(" "))
+				: this.l != null
+				? Stream.of(l, new ExprPart(op.sql(sctx, op, new ExprPart(""))), new ExprPart("("), inSelect, new ExprPart(")"))
+					.map(e -> {
+						try {
+							return e == null ? "" : e.sql(sctx);
+						} catch (TransException e1) {
+							e1.printStackTrace();
+							return "";
+						}
+					})
+					.collect(Collectors.joining(" "))
+				: inSelect.sql(sctx);
+		}
 
 		if (brace && search_condit != null)
 			return String.format("(%s)", search_condit.sql(sctx));
@@ -144,7 +158,7 @@ public class Predicate extends AbsPart {
 			if (l == null) throw new TransException(
 					"Predictat sql can't built with null left operand. op: %s", op.name());
 			return String.format("%s %s", l.escape(escape).sql(sctx),
-					op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx), negative));
+					op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx)));
 		}
 	}
 

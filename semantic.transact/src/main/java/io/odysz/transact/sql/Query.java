@@ -273,6 +273,26 @@ public class Query extends Statement<Query> {
 			}
 		return this;
 	}
+
+	/**
+	 * @since 1.4.40
+	 * @param tblAlias
+	 * @param col_ases
+	 * @return
+	 * @throws TransException
+	 */
+	public Query cols_byAlias(String tblAlias, String[] col_ases) throws TransException {
+		if (col_ases != null)
+			for (String col_as : col_ases) {
+				if (col_as == null) continue;
+				String[] cass = col_as.split(" ([Aa][Ss] )?");
+				if (cass != null && cass.length > 1)
+					col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
+				else if (cass != null)
+					col(String.format("%s.%s", tblAlias, cass[0]));
+			}
+		return this;
+	}
 	
 	public Query l(String withTabl, String alias, String onCondit) throws TransException {
 		return j(join.l, withTabl, alias, onCondit);

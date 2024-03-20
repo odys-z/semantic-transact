@@ -27,6 +27,7 @@ public class TableMeta {
 
 	/** {col-name: {@link ColMeta}} */
 	protected HashMap<String, ColMeta> ftypes;
+	public HashMap<String, ColMeta> ftypes() { return ftypes; }
 
 	/**
 	 * Is the column types already loaded from DB?
