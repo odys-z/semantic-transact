@@ -68,15 +68,18 @@ func_proc_name
     : procedure=id
     ;
 
-/*  There are some RESERVED WORDS that can be column names */
 full_column_name
     : (table_name '.')? column_name=id
     ;
 
+// get ride of "line 1:10 mismatched input '<EOF>' expecting '.'"
 table_name
-    : (database=id '.' (schema=id)? '.' | schema=id '.')? table=id
-    | (database=id '.' (schema=id)? '.' | schema=id '.')? BLOCKING_HIERARCHY
+    : table=id
+    | schema=id '.' table=id
+    | database=id '.' schema=id '.' table=id
     ;
+    // By Ody
+    // | (database=id '.' (schema=id)? '.' | schema=id '.')? BLOCKING_HIERARCHY
 
 
 // By odys-z
