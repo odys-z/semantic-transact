@@ -73,6 +73,7 @@ full_column_name
     ;
 
 // get ride of "line 1:10 mismatched input '<EOF>' expecting '.'"
+// this won't work: ((database=id '.')? schema=id '.' )? table=id
 table_name
     : table=id
     | schema=id '.' table=id
@@ -80,7 +81,6 @@ table_name
     ;
     // By Ody
     // | (database=id '.' (schema=id)? '.' | schema=id '.')? BLOCKING_HIERARCHY
-
 
 // By odys-z
 // primitive_expression
