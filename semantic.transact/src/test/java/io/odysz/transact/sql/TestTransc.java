@@ -707,5 +707,21 @@ public class TestTransc {
 				+ "AND funcId not in  ( select count(roleId) from a_roles  where roleId = 'b' ) ",
 				sqls.get(0));
 	}
-
+	
+	@Test
+	public void testWhereExists() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_func")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.where(op.exists, null, st.select("changes", "c")
+					.whereEq("c.entity", new ExprPart("a_role_func.roleId")))
+			.whereEq("funcId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.commit(sqls);
+	
+		assertEquals("update  a_role_func  set roleId=3 * 2 "
+				+ "where exists ( select * from changes c where c.entity = a_role_func.roleId ) "
+				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
+				+ "",
+				sqls.get(0));
+	}
 }

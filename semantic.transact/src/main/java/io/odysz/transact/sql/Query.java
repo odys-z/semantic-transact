@@ -501,7 +501,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query groupby(String[] groups) {
+	public Query groupby(String... groups) {
 		if (groups != null && groups.length > 0)
 			for (String g : groups)
 				groupby(g);

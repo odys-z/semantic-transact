@@ -181,6 +181,11 @@ public class ExprPart extends AbsPart {
 		this.isNull = false;
 	}
 
+	/** @since 1.4.40 */
+	public ExprPart(long n) {
+		this(String.valueOf(n));
+	}
+
 	// TAG: v1.3.0
 	public ExprPart(String[] constvs) {
 		this.logic = null;

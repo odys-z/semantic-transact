@@ -17,7 +17,23 @@ public class Logic {
 		/** right like: lop like '[rop]%' */
 		rlike,
 		/** left like: lop like '%[rop]' */
-		llike, notlike, in, notin, isnull, isNotnull;
+		llike, notlike, in, notin, isnull, isNotnull,
+		/**
+		 * <ul>
+		 * <li><a href="https://dev.mysql.com/doc/refman/8.0/en/exists-and-not-exists-subqueries.html">
+		 * Subqueries with EXISTS or NOT EXISTS</a></li>
+		 * <li><a href="https://www.sqlite.org/lang_expr.html">sqlite: SQL Language Expressions</a></li>
+		 * <li><a href="https://docs.oracle.com/en/database/other-databases/nosql-database/23.3/sqlreferencefornosql/exists-operator.html#GUID-E390CDFF-EC05-4735-95BE-967EC07BBAD6">
+		 * Oracle Exists Operator</a></li>
+		 * </ul>
+		 * @since 1.4.40
+		 */
+		exists,
+		/**
+		 * @see #exists
+		 * @since 1.4.40
+		 */
+		notexists;
 
 		public String sql(ISemantext sctx, op oper, Object r) {
 			String rop;
@@ -77,6 +93,10 @@ public class Logic {
 					return "is null";
 			else if (oper == op.isNotnull)
 				return "is not null";
+			else if (oper == op.exists)
+				return "exists";
+			else if (oper == op.notexists)
+				return "not exists";
 			else
 				return " TODO ";
 		}
@@ -151,6 +171,8 @@ public class Logic {
    		   	   		 : "?0".equals(oper) || "is null".equals(oper) ? op.isnull
    		   	   		 : "!?0".equals(oper) || "?!0".equals(oper) || "!0".equals(oper) || "?!".equals(oper) ? op.isNotnull
    		   	   		 : "<>".equals(oper) || "!=".equals(oper) ? op.ne //; // <> !=
+   		   	   		 : "exists".equals(oper) ? op.exists
+   		   	   		 : "notexists".equals(oper) || "nonexists".equals(oper) ? op.notexists
    		   	   		 : null; // unknown
 		if (withNot != null && withNot.length > 0 && withNot[0] == true) {
 			jc  = jc == op.like ? op.notlike

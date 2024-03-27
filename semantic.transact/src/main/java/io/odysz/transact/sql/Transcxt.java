@@ -106,6 +106,20 @@ public class Transcxt {
 	 * 	<li><a href='https://learn.microsoft.com/en-us/sql/t-sql/queries/with-common-table-expression-transact-sql?view=sql-server-ver16'>
 	 * WITH common_table_expression (Transact-SQL)</a></li>
 	 * </ol>
+	 * <pre>
+	 *  st.with(st
+	 *       .select("a_users", "u")
+	 *       .j("h_photo_org", "ho", "ho.oid=u.orgId")
+	 *       .whereEq("u.userId", "ody"))
+	 *   .select("h_photos", "p")
+	 *   .col(avg("filesize"), "notes")
+	 *   .je("p", null, "u", "shareby", "userId")
+	 *   .commit(st.instancontxt(null, null), sqls);
+	 *
+	 *   assertEquals("with " +
+	 *       "u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+	 *       "select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId",
+	 *       sqls.get(0));</pre>
 	 * @since 1.4.36
 	 * @param q0
 	 * @param qi

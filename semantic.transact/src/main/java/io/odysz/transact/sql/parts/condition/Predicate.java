@@ -146,7 +146,15 @@ public class Predicate extends AbsPart {
 						}
 					})
 					.collect(Collectors.joining(" "))
-				: inSelect.sql(sctx);
+				: Stream.of(new ExprPart(op.sql(sctx, op, new ExprPart(""))), new ExprPart("("), inSelect, new ExprPart(")"))
+					.map( (e) -> {
+						try { return e.sql(sctx); }
+						catch (TransException e1) {
+							e1.printStackTrace();
+							return op.sql(sctx, op, "");
+						}})
+					.collect(Collectors.joining(" "));
+					// inSelect.sql(sctx);
 		}
 
 		if (brace && search_condit != null)
