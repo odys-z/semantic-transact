@@ -278,6 +278,19 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_("=", String.format("%s.%s", tabl, col), constv);
 	}
 
+	/**
+	 * where tablA.colA = tblB.colB
+	 * @param tblA
+	 * @param colA
+	 * @param tblB
+	 * @param colB
+	 * @return this
+	 * @since 1.4.40
+	 */
+	public T whereEq(String tblA, String colA, String tblB, String colB) {
+		return where("=", String.format("%s.%s", tblA, colA), String.format("%s.%s", tblB, colB));
+	}
+
 	public T whereEqOr(String col, String[] ors) {
 		// Temporary solution for API lack of precedence handling
 		String exp = null;
