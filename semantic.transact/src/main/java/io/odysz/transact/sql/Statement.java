@@ -208,11 +208,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_(op, lcol, (String)rconst);
 	}
 	
-	public Statement<?> where(String logic, String loperand, ExprPart roperand) {
+	public T where(String logic, String loperand, ExprPart roperand) {
 		return where(Logic.op(logic), loperand, roperand);
 	}
 
-	public Statement<?> where(Logic.op op, String loperand, ExprPart roperand) {
+	public T where(Logic.op op, String loperand, ExprPart roperand) {
 		return where(Sql.condt(op, loperand, roperand));
 	}
 
@@ -224,8 +224,15 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @return this
 	 * @throws TransException
 	 */
-	public Statement<?> where(Logic.op logic, String loperand, Query q) throws TransException {
+	public T where(Logic.op logic, String loperand, Query q) throws TransException {
 		return where(Sql.condt(logic, loperand, q));
+	}
+
+	public T where(Logic.op op, String lop, Statement<?> statement) throws TransException {
+		if (statement instanceof Query)
+			return (T) where(op, lop, (Query)statement);
+		else
+			throw new TransException("Don't use this way. (statement must be a Query object)");
 	}
 
 	/**This is a wraper of {@link #where(String, String, String)} for convenient

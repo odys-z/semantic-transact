@@ -18,6 +18,7 @@ import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.Havings;
 import io.odysz.transact.sql.parts.select.JoinTabl;
@@ -494,6 +495,30 @@ public class Query extends Statement<Query> {
 		return j(withTbl, withAlias, ands);
 	}
 	
+	public Query je2(String withTbl, String withAlias, Object ... onCols ) throws TransException {
+		Condit ands = null;
+		Condit and = null;
+
+		for (int i = 0; i < onCols.length; i+=2) {
+			Object rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
+			String lop = onCols[i] instanceof ExprPart
+					? ((ExprPart) onCols[i]).sql(null)
+					: isblank(mainAlias) ? onCols[i].toString() : String.format("%s.%s", mainAlias.sql(null), onCols[i]);
+
+			if (rop instanceof ExprPart)
+				and = Sql.condt(op.eq, lop, (ExprPart)rop);
+			else
+				and = Sql.condt(op.eq, lop,
+					String.format("%s.%s", withAlias, rop));
+
+			if (ands != null)
+				ands = ands.and(and);
+			else ands = and;
+		}
+
+		return j(withTbl, withAlias, ands);
+	}
+	
 	public Query groupby(String expr) {
 		if (groupList == null)
 			groupList = new ArrayList<String>();
@@ -542,7 +567,8 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	/**<p>Update Limited Rows.</p>
+	/**
+	 * <p>Update Limited Rows.</p>
 	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
 	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
 	 * 		Transact-SQL Syntax</a><br>
@@ -566,7 +592,8 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	/**For sqlite only, set limit expr OFFSET expr2 clause.<br>
+	/**
+	 * For sqlite only, set limit expr OFFSET expr2 clause.<br>
 	 * see <a href='https://www.sqlite.org/lang_select.html'>SQL As Understood By SQLite - SELECT</a>
 	 * @see #limit(String, int)
 	 * @param lmtExpr
@@ -584,7 +611,8 @@ public class Query extends Statement<Query> {
 		else return this;
 	}
 
-	/**Union query sepecification or expresion(s)<br>
+	/**
+	 * Union query sepecification or expresion(s)<br>
 	 * grammar reference: <pre>sql_union
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre>

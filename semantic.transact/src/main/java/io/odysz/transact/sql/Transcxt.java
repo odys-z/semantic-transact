@@ -91,6 +91,8 @@ public class Transcxt {
 	}
 
 	/**
+	 * With clausse for query. Will be cleared when consumed by select().
+	 * 
 	 * @since 1.4.36 tested with SQLite.
 	 */
 	private WithClause withClause;
@@ -152,6 +154,8 @@ public class Transcxt {
       + "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
         sqls.get(0));
      * </pre>
+     * 
+     * The generated clause will be cleared after calling {@link #select(String, String...)}.
 	 * 
 	 * @param recursive
 	 * @param recurTabl recursive table name, e. g. orgrec

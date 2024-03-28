@@ -480,7 +480,6 @@ public class TestTransc {
 	select fullpath from backtrace t where ind_emotion.indId = t.indId) where indId in (select indId from backtrace)
 	</pre>
 	 * @throws TransException
-	 */
 	@Test
 	public void testUpdateJoin() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
@@ -489,8 +488,45 @@ public class TestTransc {
 				.nv("userName", concat("userName", "o.orgName"))
 				.commit(sqls);
 		} catch (Exception e) {
-			Utils.warn("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
+			fail("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
 		}
+	}
+	 */
+	
+	@Test
+	public void testDeleteWith( ) throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.with(st.select("syn_change", "cl")
+				.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+				.whereEq("nyquence", new ExprPart(1)))
+		  .delete("syn_change")
+		  .where(op.exists, null,
+			st.select("cl")
+			.whereEq("cl.org", new ExprPart("org"))
+			.whereEq("cl.tabl", new ExprPart("syn_change.tabl"))
+			.whereEq("cl.uids", new ExprPart("syn_change.uids")))
+			.commit(sqls);
+
+		assertEquals("delete from syn_change where exists "
+				+ "( with cl as (select * from syn_change cl join syn_subscribe ss on 'X' = ss.synodee AND cl.org = ss.org where nyquence = 1) "
+				+ "select * from cl  where cl.org = org AND cl.tabl = syn_change.tabl AND cl.uids = syn_change.uids )",
+			sqls.get(0));
+		
+		st.delete("syn_change")
+		  .where(op.exists, null,
+			st.with(st.select("syn_change", "cl")
+					.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+					.whereEq("nyquence", new ExprPart(1)))
+			  .select("cl")
+				.whereEq("cl.org", new ExprPart("org"))
+				.whereEq("cl.tabl", new ExprPart("syn_change.tabl"))
+				.whereEq("cl.uids", new ExprPart("syn_change.uids")))
+		  .commit(sqls);
+
+		assertEquals("delete from syn_change where exists "
+				+ "( with cl as (select * from syn_change cl join syn_subscribe ss on 'X' = ss.synodee AND cl.org = ss.org where nyquence = 1) "
+				+ "select * from cl  where cl.org = org AND cl.tabl = syn_change.tabl AND cl.uids = syn_change.uids )",
+			sqls.get(1));
 	}
 
 	@Test

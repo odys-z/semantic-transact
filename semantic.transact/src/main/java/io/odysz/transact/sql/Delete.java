@@ -54,5 +54,4 @@ public class Delete extends Statement<Delete>  {
 				});
 		return s.collect(Collectors.joining(" "));
 	}
-
 }
