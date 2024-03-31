@@ -113,9 +113,13 @@ public class TableMeta {
 	    			if (String.class != f.getType())
 	    				continue;
 					String fv = (String) f.get(this);
-					if (!ftypes.containsKey(fv))
-						Utils.warn("[TableMeta#clone()] Meta field %s#%s(value: %s) is not defined in table '%s' (conn %s).",
+					if (!ftypes.containsKey(fv)) {
+						Semantation ann = f.getAnnotation(Semantation.class);
+						if (ann == null || !ann.noDBExists())
+						Utils.warn("[TableMeta#clone()] Meta field %s#%s(value: %s) is not defined in table '%s' (conn %s)."
+								+ "\nTo suppress this warning, add @Semantation (notDBExists = true) to the field.",
 	    					clazz.getTypeName(), f.getName(), fv, tbl, conn);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
