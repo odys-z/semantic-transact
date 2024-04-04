@@ -402,7 +402,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**Wrapper of {@link #post(Statement)}.
+	/**
+	 * Wrapper of {@link #post(Statement)}.
+	 * 
 	 * @param posts
 	 * @return this
 	 */
@@ -413,7 +415,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
-	/**Generate all sqls, put into list, with a semantext created from usrInfo.
+	/**
+	 * Generate all sqls, put into list, with a semantext created from usrInfo.
+	 * 
 	 * This method is a wrapper of {@link #commit(ISemantext, ArrayList)}.
 	 * @param sqls
 	 * @param usrInfo
