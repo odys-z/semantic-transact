@@ -12,6 +12,7 @@ import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
@@ -48,7 +49,7 @@ public class SemanticsTest {
 			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
+			"insert into a_functions (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
 			sqls.get(0));
 		
 		ArrayList<ArrayList<Object[]>> vals = new ArrayList<ArrayList<Object[]>>();
@@ -68,7 +69,7 @@ public class SemanticsTest {
 			.value(r2)
 			.commit(st.instancontxt(null, null), sqls);
 
-		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
+		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
 				sqls.get(1));
 		Utils.logi(sqls);
 	}
@@ -128,7 +129,7 @@ public class SemanticsTest {
 			.value(row1)
 			.commit(orclCxt, sqls);
 
-		assertEquals("insert into \"a_functions\"  (\"funcName\", \"funcId\", \"fullpath\") select 'oracle 01', 'orcl-01', 'fullpath null.sibling orcl-01' from dual union select 'oracle 02', 'orcl-02', 'fullpath null.sibling orcl-02' from dual",
+		assertEquals("insert into \"a_functions\" (\"funcName\", \"funcId\", \"fullpath\") select 'oracle 01', 'orcl-01', 'fullpath null.sibling orcl-01' from dual union select 'oracle 02', 'orcl-02', 'fullpath null.sibling orcl-02' from dual",
 				sqls.get(0));
 		
 		ArrayList<Object[]> user = new ArrayList<Object[]>(2);
@@ -140,7 +141,7 @@ public class SemanticsTest {
 			.value(user)
 			.commit(orclCxt, sqls);
 
-		assertEquals("insert into \"a_users\"  (\"userName\", \"userId\") values ('user 01', 'u-01')",
+		assertEquals("insert into \"a_users\" (\"userName\", \"userId\") values ('user 01', 'u-01')",
 				sqls.get(1));
 	}
 
@@ -244,10 +245,10 @@ public class SemanticsTest {
 			.nv("parentId", ExprPart.constr(null))	// type text,		null		=> null
 			.commit(st.instancontxt(null, null), sqls);
 		
-		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
-			"values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')",
-			sqls.get(0));
+		String expected_1 = "insert into a_functions (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+							"values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')";
+		assertEquals(expected_1.length(), sqls.get(0).length());
+		assertEquals(expected_1, sqls.get(0));
 
 		st.insert("a_functions")
 			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
@@ -258,7 +259,7 @@ public class SemanticsTest {
 			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+			"insert into a_functions (funcId, funcName, sibling, someDat, parentId, fullpath) " +
 			"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
 			sqls.get(1));
 	}
@@ -310,5 +311,31 @@ public class SemanticsTest {
 				.col("sibling", coltype.number)
 				.col("someDat", coltype.datetime)
 				.col("parentId", coltype.text);
+	}
+	
+	
+	@Test
+	public void testUpsert() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+
+		Insert upd = st.insert("a_users")
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
+				.onDuplicate("userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.where("=", "userId", "'admin'");
+		upd.commit(mysqlCxt, sqls);
+		
+		// mysql
+		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on duplicate key update userName='Zelenskyy', orgId='URA'",
+				sqls.get(0));
+
+		upd = st.insert("a_users")
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
+				.onConflict("userId", "userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.where("=", "userId", "'admin'");
+		upd.commit(sqlitCxt, sqls);
+		
+		// sqlite
+		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on conflict(userId) do update set userName='Zelenskyy', orgId='URA'",
+				sqls.get(1));
 	}
 }

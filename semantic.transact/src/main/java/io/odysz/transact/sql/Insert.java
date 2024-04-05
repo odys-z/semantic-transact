@@ -21,6 +21,7 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
 import io.odysz.transact.sql.parts.insert.InsertValuesOrcl;
+import io.odysz.transact.sql.parts.update.SetList;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -44,6 +45,20 @@ public class Insert extends Statement<Insert> {
 	 * TODO let's deprecate this - all new nv are appended to last of valuesNv.
 	 */
 	private ArrayList<Object[]> currentRowNv;
+
+	/**
+	 * Is Upsert.
+	 * @since 1.4.40
+	 */
+	protected boolean upsert;
+	
+	protected String onConflictField;
+
+	/**
+	 * Updating nvs for Upsert.
+	 * @since 1.4.40
+	 */
+	protected ArrayList<Object[]> updateNvs;
 
 	/**
 	 * Insert statement intialization, not come with a post operation for committing SQL.
@@ -199,6 +214,25 @@ public class Insert extends Statement<Insert> {
 
 		return this;
 	}
+	
+	/**
+	 * @param nvs a row's n-v pairs, e.g. col-A, val-A, col-B, val-B, ...
+	 * @return
+	 * @throws TransException 
+	 */
+	public Insert value(Object ... nvs) throws TransException {
+		if (nvs != null) {
+			ArrayList<Object[]> row = new ArrayList<Object[]>(nvs.length / 2);
+			ArrayList<String> cols = new ArrayList<String>(nvs.length / 2);
+			for (int i = 0; i < nvs.length; i += 2) {
+				row.add(new Object[] {nvs[i], nvs[i + 1]});
+				cols.add((String) nvs[i]);
+			}
+			cols(cols.toArray(new String[0]));
+			return value(row);
+		}
+		return this;
+	}
 
 	@SuppressWarnings("unchecked")
 	public Insert values(ArrayList<ArrayList<Object[]>> arrayList) throws TransException {
@@ -234,9 +268,9 @@ public class Insert extends Statement<Insert> {
 	 * <p>Solution for UPSERT.</p>
 	 * <h5>NOTE:</h5>
 	 * <p>UPSERT is not a standard SQL syntax (April 2024), and currently only sql for
-	 *  Sqlite3 are verified. For MS Sql Server, use * {@link #onDuplicate(Query)},
-	 *  and for Oracle, not implemented yet. For MySql, not verified. Open an issue at
-	 *  <a href="https://github.com/odys-z/semantic-transact/issues">Github</a>
+	 *  Sqlite3 are verified (call {@link #onConflict(String, Object...)}, not this).
+	 *  For MS Sql Server, must use {@link #onDuplicate(Query)}.
+	 *  Open an issue at <a href="https://github.com/odys-z/semantic-transact/issues">Github</a>
 	 * if the features are needed.</p>
 	 * <h5>References:</h5>
 	 * <ul>
@@ -275,6 +309,17 @@ public class Insert extends Statement<Insert> {
 	 * @return this
 	 */
 	public Insert onDuplicate(ArrayList<Object[]> unvs) {
+		this.upsert = true;
+		this.updateNvs = unvs;
+		return this;
+	}
+	
+	public Insert onDuplicate(Object... unv) {
+		this.upsert = true;
+		this.updateNvs = new ArrayList<Object[]>();
+		for (int i = 0; unv != null && i < unv.length; i += 2) {
+			updateNvs.add(new Object[] {unv[i], unv[i+1]});
+		}
 		return this;
 	}
 
@@ -286,6 +331,17 @@ public class Insert extends Statement<Insert> {
 	 */
 	public Insert onDuplicate(Query select) {
 		return this;
+	}
+
+	/**
+	 * For Sqlite' UPSERT only.
+	 * @see #onDuplicate(ArrayList)
+	 * @param select
+	 * @return this
+	 */
+	public Insert onConflict(String field, Object ... nvs) {
+		this.onConflictField = field;
+		return onDuplicate(nvs);
 	}
 
 	/**sql: insert into tabl(...) values(...) / select ...
@@ -303,10 +359,13 @@ public class Insert extends Statement<Insert> {
 			return "";
 		}
 
+		/*
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(
 			// insert into tabl(...)
-			Stream.of(new ExprPart("insert into"), mainTabl, mainAlias,
+			Stream.of(upsert && sctx.dbtype() == dbtype.oracle ?
+					new ExprPart("upsert into") : new ExprPart("insert into"),
+					mainTabl, mainAlias,
 					// (...)
 					new ColumnList(insertCols)
 			   // values(...) / select ...
@@ -321,7 +380,27 @@ public class Insert extends Statement<Insert> {
 				).filter(w -> hasVals),
 				// select ...
 				Stream.of(selectValues).filter(w -> selectValues != null))
-			).map(m -> {
+			)
+			*/
+		Stream<String> s = Stream.of(upsert && sctx.dbtype() == dbtype.oracle ?
+				new ExprPart("upsert into") : new ExprPart("insert into"),
+				mainTabl, mainAlias,
+				// (...)
+				new ColumnList(insertCols),
+				// values(...)
+				hasVals
+					? sctx != null && sctx.dbtype() == dbtype.oracle ?
+						new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
+						new InsertValues(mainTabl.name(), insertCols, valuesNv)
+					: null,
+				selectValues,
+
+				// ON DUPLICATE KEY UPDATE 
+				upsert && sctx.dbtype() == dbtype.sqlite ? new ExprPart(String.format("on conflict(%s) do update set", onConflictField)) : null,
+				upsert && sctx.dbtype() == dbtype.mysql ? new ExprPart("on duplicate key update") : null,
+				upsert && (sctx.dbtype() == dbtype.sqlite || sctx.dbtype() == dbtype.mysql) && updateNvs != null ? new SetList(updateNvs) : null
+		).filter(w -> w != null)
+		.map(m -> {
 				try {
 					return m == null ? "" : m.sql(sctx);
 				} catch (TransException e) {

@@ -277,7 +277,7 @@ public class TestTransc {
 			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 		assertEquals(sqls.get(0),
-				"insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)");
+				"insert into a_funcs (funcId, funcName, uri) values ('a01', '', null)");
 		
 		ArrayList<Object[]> vals = new ArrayList<Object[]>(3);
 		vals.add(new String[]{ "logId", "b01"});
@@ -288,7 +288,7 @@ public class TestTransc {
 			.cols("logId", "stamp", "txt")
 			.value(vals)
 			.commit(sqls);
-		assertEquals("insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')",
+		assertEquals("insert into a_log (logId, stamp, txt) values ('b01', null, 'log .... 01')",
 					sqls.get(1));
 		
 		
@@ -303,7 +303,7 @@ public class TestTransc {
 			.value(nullrow)
 			.value(vals)
 			.commit(sqls);
-		assertEquals("insert into a_log  (logId, stamp, txt) values ('b01', null, 'log .... 01')",
+		assertEquals("insert into a_log (logId, stamp, txt) values ('b01', null, 'log .... 01')",
 					sqls.get(0));
 	}
 
@@ -326,14 +326,14 @@ public class TestTransc {
 			.nv("funcId", "a01")
 			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
-		assertEquals("insert into a_funcs  (funcName, funcId, uri) values ('pp', 'a01', null)",
+		assertEquals("insert into a_funcs (funcName, funcId, uri) values ('pp', 'a01', null)",
 				sqls.get(0));
 
 		st.insert("a_funcs")
 			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
 			.value(row1)
 			.commit(sqls);
-		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) values "
+		assertEquals("insert into a_funcs (funcId, funcName, uri, css, ext1, ext2) values "
 				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01')",
 				sqls.get(1));
 
@@ -366,7 +366,7 @@ public class TestTransc {
 			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
 			.value(row2)
 			.commit(sqls);
-		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) "
+		assertEquals("insert into a_funcs (funcId, funcName, uri, css, ext1, ext2) "
 				+ "values ('f02', 'f02-name', null, '.cls {color: red;}', null, null)",
 				sqls.get(2));
 
@@ -376,7 +376,7 @@ public class TestTransc {
 			.cols(cols)	// "funcId", "funcName", "uri", "css", "ext1", "ext2"
 			.value(row2)
 			.commit(sqls);
-		assertEquals("insert into a_funcs  (funcId, funcName, uri, css, ext1, ext2) "
+		assertEquals("insert into a_funcs (funcId, funcName, uri, css, ext1, ext2) "
 				+ "values ('f02', 'f02-name', null, '.cls {color: red;}', null, null)",
 				sqls.get(3));
 
@@ -421,7 +421,7 @@ public class TestTransc {
 			.values(rows)
 			.value(row1)
 			.commit(sqls);
-		assertEquals("insert into a_funcs  "
+		assertEquals("insert into a_funcs "
 				+ "(funcId, funcName, uri, css, ext1, ext2) values "
 				+ "('f02', 'f02-name', null, '.cls {color: red;}', null, null), "
 				+ "('f01', 'f01-name', '/pp/aa', null, 'extra 1/f01', 'extra 2/f01'), "
@@ -594,7 +594,7 @@ public class TestTransc {
 			.commit(sqls);
 
 		Utils.logi(sqls);
-		assertEquals("insert into a_role_funcs   select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
+		assertEquals("insert into a_role_funcs  select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
 				sqls.get(0));
 
 		assertEquals("update  a_roles  set funcount=(select count(funcId) from a_role_funcs  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ",
@@ -650,7 +650,7 @@ public class TestTransc {
 				sqls.get(0));
 		assertEquals("delete from a_role_funcs where roleId = 'role 01'",
 				sqls.get(1));
-		assertEquals("insert into a_role_funcs  (funcId, roleId) values ('f 001', 'role 01')",
+		assertEquals("insert into a_role_funcs (funcId, roleId) values ('f 001', 'role 01')",
 				sqls.get(2));
 	}
 
@@ -686,7 +686,7 @@ public class TestTransc {
 					.where_("=", "roleId", "role 01"))
 			.commit(sqls);
 		
-		assertEquals("insert into a_roles  (roleName, roleId, s1, s2, s3) values ('roleName''-new', roleName + 3, '''s - %''x', '''''', '%%')",
+		assertEquals("insert into a_roles (roleName, roleId, s1, s2, s3) values ('roleName''-new', roleName + 3, '''s - %''x', '''''', '%%')",
 				sqls.get(0));
 		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
 				sqls.get(1));
