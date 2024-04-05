@@ -23,7 +23,9 @@ import io.odysz.transact.sql.parts.insert.InsertValues;
 import io.odysz.transact.sql.parts.insert.InsertValuesOrcl;
 import io.odysz.transact.x.TransException;
 
-/**sql: insert into tabl(...) values(...) / select ...
+/**
+ * sql: insert into tabl(...) values(...) / select ...
+ * 
  * @author ody
  *
  */
@@ -79,8 +81,10 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
+	/**
+	 * Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
 	 * This method is used to setup cols in the latter case.
+	 * 
 	 * @param col0
 	 * @param cols
 	 * @return this
@@ -111,8 +115,10 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Append values (a row) after cols been set (call {@link Insert#cols(String, String...) cols(...)} first):<br>
+	/**
+	 * Append values (a row) after cols been set (call {@link Insert#cols(String, String...) cols(...)} first):<br>
 	 * [[col1, val1], [col2, val2], ...]
+	 * 
 	 * @param val pairs of col-val
 	 * @return this
 	 * @throws TransException
@@ -211,6 +217,64 @@ public class Insert extends Statement<Insert> {
 		if (valuesNv != null && valuesNv.size() > 0)
 			throw new TransException("Semantic-Transact only support one of insert-select or insert-values.");
 		selectValues = values;
+		return this;
+	}
+
+	/**
+	 * <p>Solution for UPSERT.</p>
+	 * <h5>NOTE:</h5>
+	 * <p>UPSERT is not a standard SQL syntax (April 2024), and currently only sql for
+	 *  Sqlite3 are verified. For MS Sql Server, use * {@link #onDuplicate(Query)},
+	 *  and for Oracle, not implemented yet. For MySql, not verified. Open an issue at
+	 *  <a href="https://github.com/odys-z/semantic-transact/issues">Github</a>
+	 * if the features are needed.</p>
+	 * <h5>References:</h5>
+	 * <ul>
+	 * <li><a href="https://sqlite.org/lang_upsert.html">Sqlite UPSERT</a><br>
+	 * INSERT INTO ... VALUES('jovial') ON CONFLICT(word) DO UPDATE SET count=count+1</li>
+	 * <li><a href="https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html">
+	 * 15.2.7.2 INSERT ... ON DUPLICATE KEY UPDATE Statement, MySql Documentation</a> and
+	 * <a href="https://blog.devart.com/mysql-upsert.html">
+	 * MySQL UPSERT: Comprehensive Examples and Use Cases</a><br>
+	 * INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...)
+	 * ON DUPLICATE KEY UPDATE column1 = value1, column2 = value2, ...;
+	 * </li>
+	 * <li><a href="https://stackoverflow.com/a/27989832/7362888">
+	 * StackOverflow: How to upsert (update or insert) in SQL Server 2005</a><br>
+	 * IF NOT EXISTS (SELECT * FROM dbo.Employee WHERE ID = @SomeID)
+	 * INSERT INTO dbo.Employee(Col1, ..., ColN)
+	 * VALUES(Val1, .., ValN)
+	 * ELSE UPDATE dbo.Employee
+	 * SET Col1 = Val1, Col2 = Val2, ...., ColN = ValN
+	 * WHERE ID = @SomeID
+	 * </li>
+	 * <li><a href="https://docs.oracle.com/en/database/other-databases/nosql-database/23.3/sqlreferencefornosql/upsert-statement.html">
+	 * Upsert statement, Oracle Help Center</a><br>
+	 * <pre>upsert_statement ::=
+	 * [variable_declaration]
+	 * UPSERT INTO table_name 
+	 * [AS] table_alias]
+	 * ["(" id ("," id)* ")"]
+	 * VALUES "(" insert_clause ("," insert_clause)* ")"
+	 * [SET TTL ttl_clause ]
+	 * [returning_clause]</pre>
+	 * </li>
+	 * </ul>
+	 * @param unvs updating name-value pairs, if null, use all values set by
+	 * {@link #nv(String, AbsPart) nv()} or {@link Update#nvs(ArrayList) nvs()} for insert statement.
+	 * @return this
+	 */
+	public Insert onDuplicate(ArrayList<Object[]> unvs) {
+		return this;
+	}
+
+	/**
+	 * For MS Sql Server only. Not implemented.
+	 * @see #onDuplicate(ArrayList)
+	 * @param select
+	 * @return this
+	 */
+	public Insert onDuplicate(Query select) {
 		return this;
 	}
 
