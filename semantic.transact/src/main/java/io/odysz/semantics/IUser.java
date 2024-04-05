@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.anson.Anson;
+import io.odysz.common.AESHelper;
 import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
@@ -49,7 +50,8 @@ public interface IUser {
 	 */
 	default ArrayList<String> dbLog(final ArrayList<String> sqls) throws TransException { return null; }
 
-	/**Check user log in (already has pswd, iv and user Id from db)
+	/**
+	 * Check user log in (already has pswd, iv and user Id from db)
 	 * @param request request object. In sematic.jserv, it's SessionReq object.
 	 * @return true: ok; false: failed
 	 * @throws TransException Checking login information failed
@@ -57,10 +59,10 @@ public interface IUser {
 	default boolean login(Object request) throws TransException { return false; }
 
 	/** If a user is allowed to change password, this is used to verify old
-	 * and must be overriden to check the old password cipher.
+	 * and must be overridden to check the old password cipher.
 	 * @param pswdCypher64 decrypted with my token id
 	 * @param iv64
-	 * @return yes or no
+	 * @return yes or no the old password is working
 	 * @throws TransException
 	 * @throws IOException 
 	 * @throws GeneralSecurityException 
@@ -69,7 +71,8 @@ public interface IUser {
 
 	default IUser sessionId(String rad64num) { return this; }
 
-	/**A session Id can never be changed.
+	/**
+	 * A session Id can never be changed.
 	 * If a new password been updated, just remove the session and re-login.
 	 * @return the session token
 	 */
@@ -110,25 +113,35 @@ public interface IUser {
 	public List<Object> notifies();
 
 	/**
-	 * @deprecated why this is needed if there is {@link #sessionId(String)} ?
-	 * 
-	 * @param string
+	 * Set session key, not session-id.
+	 * @since 1.4.37
+	 * @param ssid
 	 * @return this
 	 */
-	public default IUser sessionKey(String string) { return this; }
+	public default IUser sessionKey(String ssid) { return this; }
 
-	/** @deprecated why this is needed if there is {@link #sessionId(String)} ?
-	 * 
+	/**
+	 * Set session knowledge for token verification.
+	 * @see AESHelper#packSessionKey(String)
+	 * @deprecated for experiment
+	 * @since 1.4.37
+	 * @param knowledge
+	 * @return this
+	 */
+	public default IUser sessionKey(byte[] knowledge) { return this; }
+
+	/**
+	 * Get session key
 	 * @return this
 	 */
 	public default String sessionKey() { return null; }
 
 	/**
-	 * <p>Since v1.4.11, user object has a chance to initialize with Semantic.DA AnResultset.
+	 * <p>Since v1.4.11, user object has this chance to initialize with Semantic.DA AnResultset.
 	 * e.g. setting client device Id which is essential to doc synchronizing.</p>
-	 * <p>Since v1.3.5, user object has a chance to initialize with login request.</p>
+	 * <p>Since v1.3.5, user object has this chance to initialize with login request.</p>
 	 * @param sessionReqBody e.g. AnSessionReq
-	 * @return
+	 * @return this
 	 * @throws SsException 
 	 */
 	public default IUser onCreate(Anson sessionReqBody) throws GeneralSecurityException { return this; }
@@ -161,13 +174,42 @@ public interface IUser {
 
 	public default String roleId() { return null; }
 
-	/**Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	/**
+	 * Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	 * 
 	 * @param usr
 	 * @return the session information
+	 * @throws Exception 
 	 */
-	public default SessionInf getClientSessionInf(IUser usr) { 
-		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId());
+	public default SessionInf getClientSessionInf(IUser usr) throws Exception { 
+		Object[] session = AESHelper.packSessionKey(usr.pswd());
+		usr.sessionKey((String) session[1]);
+
+		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())
+				.device(usr.deviceId())
+				.userName(usr.userName())
+				.ssToken((String)session[0]);
 	}
+
+	/**
+	 * Sign and encrypt session-key for login reply. The sskey is used for
+	 * verifying jserv requests' headers.
+	 * 
+	 * @since 1.4.37
+	 * @param sskey
+	 * @return encrypt(sskey, pswd)
+	 * @throws Exception 
+	default String signSessionKey(String sskey)
+			throws GeneralSecurityException, IOException {
+		return sskey;
+	}
+	 */
+
+	/**
+	 * @since 1.4.36
+	 * @return
+	 */
+	public default String userName() { return uid(); }
 
 	/**
 	 * TODO release doc.
@@ -175,5 +217,12 @@ public interface IUser {
 	 * @return profiles
 	 */
 	public default Anson profile() { return null; }
+
+	/**
+	 * @since 1.4.38, verifying token by AnSession needs this.
+	 * @return pswd
+	 * @throws TransException 
+	 */
+	public default String pswd() throws TransException { throw new TransException("Must be overriden by subclass."); }
 
 }

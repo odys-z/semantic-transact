@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +83,17 @@ public class Update extends Statement<Update> {
 					nv((String)nv[Ix.nvn], ExprPart.constVal(v));
 			}
 		return this;
+	}
+	
+	public Update nvs(Object... nvs) throws TransException {
+		if (nvs == null || nvs.length == 0)
+			return this;
+
+		ArrayList<Object[]> l = new ArrayList<Object[]>(nvs.length / 2);
+		for (int i = 0; i < nvs.length; i += 2)
+			l.add(new Object[] {nvs[i], nvs[i + 1]});
+
+		return nvs(l);
 	}
 	
 	/**<p>Update Limited Rows.</p>

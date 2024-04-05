@@ -2,6 +2,8 @@ package io.odysz.transact.sql;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static io.odysz.transact.sql.parts.condition.Funcall.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,7 +20,6 @@ import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
 public class TestTransc {
@@ -94,7 +95,7 @@ public class TestTransc {
 			.having("COUNT(Orders.OrderID) > 10")
 			.commit(sqls);
 		assertEquals("select Employees.LastName, COUNT(Orders.OrderID) NumberOfOrders "
-				+ "from Orders  join Employees null on Orders.EmployeeID = Employees.EmployeeID "
+				+ "from Orders  join Employees  on Orders.EmployeeID = Employees.EmployeeID "
 				+ "group by LastName "
 				+ "having COUNT(Orders.OrderID) > 10",
 				sqls.get(3));
@@ -194,13 +195,86 @@ public class TestTransc {
 	}
 	
 	@Test
+	public void testWithSelect() {
+		try {
+			ArrayList<String> sqls = new ArrayList<String>();
+			st.with(st.select("a_users", "u")
+						.j("h_photo_org", "ho", "ho.oid=u.orgId")
+						.whereEq("u.userId", "ody"))
+				.select("h_photos", "p")
+				.col(avg("filesize"), "notes")
+				.je("p", null, "u", "shareby", "userId")
+				.commit(st.instancontxt(null, null), sqls);
+
+			// Utils.logi(sqls.get(0));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId",
+					sqls.get(0));
+
+			st.with(st.select("a_users", "u")
+					.j("h_photo_org", "ho", "ho.oid=u.orgId")
+					.whereEq("u.userId", "ody"),
+					st.select("h_coll_phot", "c")
+					.j("h_photo_org", "ho", "ho.pid=c.pid")
+					.whereEq("ho.oid", "zsu"))
+				.select("h_photos", "p")
+				.col(avg("filesize"), "notes")
+				.je("p", null, "u", "shareby", "userId")
+				.je("p", null, "c", "pid", "cid")
+				.commit(st.instancontxt(null, null), sqls);
+			// Utils.logi(sqls.get(1));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody'), " +
+					"c as (select * from h_coll_phot c join h_photo_org ho on ho.pid = c.pid where ho.oid = 'zsu') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId join  c on p.pid = c.cid",
+					sqls.get(1));
+
+			st.with(true,
+					"orgrec(orgId, parent, deep)", 
+					"values('kerson', 'ur-zsu', 0)",
+					st.select("a_orgs", "p")
+						.col("p.orgId").col("p.parent").col(add("ch.deep", 1))
+						.je("p", "orgrec", "ch", "orgId", "parent"))
+				.select("a_orgs", "o")
+				.cols("orgName", "deep")
+				.je("o", null, "orgrec", "orgId")
+				.orderby("deep")
+				.commit(st.instancontxt(null, null), sqls);
+					
+			assertEquals("with recursive "
+					+ "orgrec(orgId, parent, deep) as (values('kerson', 'ur-zsu', 0) union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
+					+ "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
+					sqls.get(2));
+			
+			st.with(st.select("a_users", "u")
+					.j("h_photo_org", "ho", "ho.oid=u.orgId")
+					.whereEq("u.userId", "ody"))
+			.select("h_photos", "p")
+			.col(avg("filesize"), "notes")
+			.je("p", null, "u", "shareby", constr("ody"), "oid", concat("'--'", "u.orgId"))
+			.commit(st.instancontxt(null, null), sqls);
+
+			// Utils.logi(sqls.get(0));
+			assertEquals("with " +
+					"u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+					"select avg(filesize) notes from h_photos p join  u on p.shareby = 'ody' AND p.oid = '--' || u.orgId",
+					sqls.get(3));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+	
+	@Test
 	public void testInsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_funcs")
 			.nv("funcId", "a01")
 			.nv("funcName", "")
 			// because of no semantext, null is handled as constant string, resulting 'null'
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 		assertEquals(sqls.get(0),
 				"insert into a_funcs  (funcId, funcName, uri) values ('a01', '', null)");
@@ -250,7 +324,7 @@ public class TestTransc {
 		st.insert("a_funcs")
 			.nv("funcName", "pp")
 			.nv("funcId", "a01")
-			.nv("uri", ExprPart.constStr(null))
+			.nv("uri", ExprPart.constr(null))
 			.commit(sqls);
 		assertEquals("insert into a_funcs  (funcName, funcId, uri) values ('pp', 'a01', null)",
 				sqls.get(0));
@@ -396,7 +470,8 @@ public class TestTransc {
 
 	}
 	
-	/** Sqlite tested case
+	/**
+	 * Sqlite tested case
 	 *<pre>with backtrace (indId, parent, fullpath) as (
 	select indId indId, parent parent, fullpath fullpath from ind_emotion where indId = 'C' 
 	union all 
@@ -405,17 +480,53 @@ public class TestTransc {
 	select fullpath from backtrace t where ind_emotion.indId = t.indId) where indId in (select indId from backtrace)
 	</pre>
 	 * @throws TransException
-	 */
 	@Test
 	public void testUpdateJoin() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		try {
 			st.update("a_users")
-				.nv("userName", Funcall.concat("userName", "o.orgName"))
+				.nv("userName", concat("userName", "o.orgName"))
 				.commit(sqls);
 		} catch (Exception e) {
-			Utils.warn("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
+			fail("Call for features: with clause(recursive for sqlite 13.12.5, mysql v8, oracle 11gr2) & update from select...");
 		}
+	}
+	 */
+	
+	@Test
+	public void testDeleteWith( ) throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.with(st.select("syn_change", "cl")
+				.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+				.whereEq("nyquence", new ExprPart(1)))
+		  .delete("syn_change")
+		  .where(op.exists, null,
+			st.select("cl")
+			.whereEq("cl.org", new ExprPart("org"))
+			.whereEq("cl.tabl", new ExprPart("syn_change.tabl"))
+			.whereEq("cl.uids", new ExprPart("syn_change.uids")))
+			.commit(sqls);
+
+		assertEquals("delete from syn_change where exists "
+				+ "( with cl as (select * from syn_change cl join syn_subscribe ss on 'X' = ss.synodee AND cl.org = ss.org where nyquence = 1) "
+				+ "select * from cl  where cl.org = org AND cl.tabl = syn_change.tabl AND cl.uids = syn_change.uids )",
+			sqls.get(0));
+		
+		st.delete("syn_change")
+		  .where(op.exists, null,
+			st.with(st.select("syn_change", "cl")
+					.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+					.whereEq("nyquence", new ExprPart(1)))
+			  .select("cl")
+				.whereEq("cl.org", new ExprPart("org"))
+				.whereEq("cl.tabl", new ExprPart("syn_change.tabl"))
+				.whereEq("cl.uids", new ExprPart("syn_change.uids")))
+		  .commit(sqls);
+
+		assertEquals("delete from syn_change where exists "
+				+ "( with cl as (select * from syn_change cl join syn_subscribe ss on 'X' = ss.synodee AND cl.org = ss.org where nyquence = 1) "
+				+ "select * from cl  where cl.org = org AND cl.tabl = syn_change.tabl AND cl.uids = syn_change.uids )",
+			sqls.get(1));
 	}
 
 	@Test
@@ -431,6 +542,22 @@ public class TestTransc {
 				sqls.get(0));
 
 		st.select("a_users", "u")
+			.je("u", "a_org", "o", "orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+			.commit(sqls);
+
+		// it's u.orgName
+		assertEquals("select * from a_users u join a_org o on u.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+				sqls.get(1));
+	
+		st.select("a_users", "u")
+			.je("u", "a_org", "o", "o.orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+			.commit(sqls);
+
+		// it's o.orgName
+		assertEquals("select * from a_users u join a_org o on o.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+				sqls.get(2));
+	
+		st.select("a_users", "u")
 			.j("a_org", "o", Sql.condt("u.orgId = o.orgId or (u.orgId = '%s' and (u.name <> '%s' or u.name <> '%s'))",
 					"ChaoYang People", "James Bond", "007"))
 			.commit(sqls);
@@ -439,7 +566,16 @@ public class TestTransc {
 		// join a_org o on u.orgId = o.orgId OR
 		// (u.orgId = 'ChaoYang People' AND (u.name <> 'admin' OR u.name <> '007'))
 		assertEquals("select * from a_users u join a_org o on u.orgId = o.orgId OR (u.orgId = 'ChaoYang People' AND (u.name <> 'James Bond' OR u.name <> '007'))",
-				sqls.get(1));
+				sqls.get(3));
+
+		st.select("a_users", "u")
+			.je("u", "a_org", "o", "oid", "orgId", "userId", "market")
+			.commit(sqls);
+
+		// it's o.orgName
+		assertEquals("select * from a_users u join a_org o on u.oid = o.orgId AND u.userId = o.market",
+				sqls.get(4));
+	
 	}
 	
 	@Test
@@ -447,7 +583,6 @@ public class TestTransc {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.insert("a_role_funcs")
 			.select(st.select("a_functions", "f")
-					// .col("f.funcId").col("'admin'").col("'c,r,u,d'")
 					.cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
 					.j("a_roles", "r", "r.roleId='%s'", "admin"))
 			.post(st.update("a_roles")
@@ -575,6 +710,54 @@ public class TestTransc {
 			.commit(sqls);
 
 		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in ('01', 'bb') ",
+				sqls.get(0));
+	}
+
+	@Test
+	public void testWhereInSelect() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_funcs")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.whereIn("roleId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.commit(sqls);
+
+		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in (select distinct roleId from a_roles  where roleId = 'a') ",
+				sqls.get(0));
+	}
+	
+	@Test
+	public void testWhereNeeInNotinSelect() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_func")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.whereEq("funcId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.where(op.ge, "3", st.select("a_roles").col(count("roleId")).whereEq("roleId", "b"))
+			.where(op.in, "roleId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "b"))
+			.where(op.notin, "funcId", st.select("a_roles").col(count("roleId")).whereEq("roleId", "b"))
+			.commit(sqls);
+
+		assertEquals("update  a_role_func  set roleId=3 * 2 "
+				+ "where funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
+				+ "AND 3 >=  ( select count(roleId) from a_roles  where roleId = 'b' ) "
+				+ "AND roleId in  ( select distinct roleId from a_roles  where roleId = 'b' ) "
+				+ "AND funcId not in  ( select count(roleId) from a_roles  where roleId = 'b' ) ",
+				sqls.get(0));
+	}
+	
+	@Test
+	public void testWhereExists() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		st.update("a_role_func")
+			.nv("roleId", ExprsVisitor.parse("3 * 2"))
+			.where(op.exists, null, st.select("changes", "c")
+					.whereEq("c.entity", new ExprPart("a_role_func.roleId")))
+			.whereEq("funcId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
+			.commit(sqls);
+	
+		assertEquals("update  a_role_func  set roleId=3 * 2 "
+				+ "where exists ( select * from changes c where c.entity = a_role_func.roleId ) "
+				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
+				+ "",
 				sqls.get(0));
 	}
 }

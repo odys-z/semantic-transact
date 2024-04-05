@@ -3,6 +3,8 @@ package io.odysz.transact.sql.parts;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
+import io.odysz.transact.sql.Query;
+import io.odysz.transact.x.TransException;
 
 public class Logic {
 	/** empty type is used to subclass {@link io.odysz.transact.sql.parts.condition.Predicate}
@@ -15,9 +17,37 @@ public class Logic {
 		/** right like: lop like '[rop]%' */
 		rlike,
 		/** left like: lop like '%[rop]' */
-		llike, notlike, in, notin, isnull, isNotnull;
+		llike, notlike, in, notin, isnull, isNotnull,
+		/**
+		 * <ul>
+		 * <li><a href="https://dev.mysql.com/doc/refman/8.0/en/exists-and-not-exists-subqueries.html">
+		 * Subqueries with EXISTS or NOT EXISTS</a></li>
+		 * <li><a href="https://www.sqlite.org/lang_expr.html">sqlite: SQL Language Expressions</a></li>
+		 * <li><a href="https://docs.oracle.com/en/database/other-databases/nosql-database/23.3/sqlreferencefornosql/exists-operator.html#GUID-E390CDFF-EC05-4735-95BE-967EC07BBAD6">
+		 * Oracle Exists Operator</a></li>
+		 * </ul>
+		 * @since 1.4.40
+		 */
+		exists,
+		/**
+		 * @see #exists
+		 * @since 1.4.40
+		 */
+		notexists;
 
-		public String sql(ISemantext sctx, op oper, String rop, boolean... negative) {
+		public String sql(ISemantext sctx, op oper, Object r) {
+			String rop;
+			try {
+				rop = r instanceof Query
+						? "(" + ((Query)r).sql(sctx) + ")"
+						: r instanceof AbsPart 
+						? ((AbsPart)r).sql(sctx)
+						: r.toString();
+			} catch (TransException e) {
+				e.printStackTrace();
+				rop = r.toString();
+			}
+
 			if (oper == op.eq)
 				return "= " + rop;
 			else if (oper == op.ne)
@@ -39,32 +69,34 @@ public class Logic {
 			else if (oper == op.minus)
 				return "- " + (rop == null ? "" : rop);
 			else if (oper == op.like)
-				if (negative != null && negative.length > 0 && negative[0])
-					return "not like " + likeOp(sctx, rop);
-				else
-					return "like " + likeOp(sctx, rop);
+				return "like " + likeOp(sctx, rop);
+			else if (oper == op.notlike)
+				return "not like " + likeOp(sctx, rop);
 			else if (oper == op.rlike)
-				if (negative != null && negative.length > 0 && negative[0])
-					return "not like " + rlikeOp(sctx, rop);
-				else
-					return "like " + rlikeOp(sctx, rop);
+//				if (negative != null && negative.length > 0 && negative[0])
+//					return "not like " + rlikeOp(sctx, rop);
+//				else
+				return "like " + rlikeOp(sctx, rop);
 			else if (oper == op.llike)
-				if (negative != null && negative.length > 0 && negative[0])
-					return "not like " + llikeOp(sctx, rop);
-				else
-					return "like " + llikeOp(sctx, rop);
+//				if (negative != null && negative.length > 0 && negative[0])
+//					return "not like " + llikeOp(sctx, rop);
+//				else
+				return "like " + llikeOp(sctx, rop);
 			else if (oper == op.in)
-				if (negative != null && negative.length > 0 && negative[0])
-					return "not in (" + rop + ")";
-				else
-					return "in (" + rop + ")";
+				return r instanceof String ? "in (" + rop.toString() + ")" : "in " + rop;
+			else if (oper == op.notin)
+				return r instanceof String ? "not in (" + rop.toString() + ")" : "not in " + rop;
 			else if (oper == op.isnull)
-				if (negative != null && negative.length > 0 && negative[0])
-					return "is null";
-				else
+//				if (negative != null && negative.length > 0 && negative[0])
+//					return "is null";
+//				else
 					return "is null";
 			else if (oper == op.isNotnull)
 				return "is not null";
+			else if (oper == op.exists)
+				return "exists";
+			else if (oper == op.notexists)
+				return "not exists";
 			else
 				return " TODO ";
 		}
@@ -125,6 +157,9 @@ public class Logic {
 					 : "+".equals(oper) ? op.add
 					 : "-".equals(oper) ? op.minus
 	   				 : "%".equals(oper) || "like".equals(oper) ? op.like
+	   				 // FIXME modify SearchExprs.g4
+	   				 // : "!%".equals(oper) || "not like".equals(oper) ? op.notlike
+	   				 : "not %".equals(oper) || "not like".equals(oper) ? op.notlike
 	   				 : "~%".equals(oper) || "rlike".equals(oper) ? op.rlike // =% is not correct
 	   				 : "%~".equals(oper) || "llike".equals(oper) ? op.llike // %= is assignment operator
    					 : "<=".equals(oper) || "le".equals(oper) ? op.le
@@ -136,6 +171,8 @@ public class Logic {
    		   	   		 : "?0".equals(oper) || "is null".equals(oper) ? op.isnull
    		   	   		 : "!?0".equals(oper) || "?!0".equals(oper) || "!0".equals(oper) || "?!".equals(oper) ? op.isNotnull
    		   	   		 : "<>".equals(oper) || "!=".equals(oper) ? op.ne //; // <> !=
+   		   	   		 : "exists".equals(oper) ? op.exists
+   		   	   		 : "notexists".equals(oper) || "nonexists".equals(oper) ? op.notexists
    		   	   		 : null; // unknown
 		if (withNot != null && withNot.length > 0 && withNot[0] == true) {
 			jc  = jc == op.like ? op.notlike

@@ -208,7 +208,17 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**select clause in sql: insert into tabl() <b>select ...</b>
+	/**
+	 * select clause in sql: insert into tabl() <b>select ...</b>
+	 * <pre>e. g.
+	st.insert("a_role_funcs")
+	  .select(st.select("a_functions", "f")
+	    .cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
+	    .j("a_roles", "r", "r.roleId='%s'", "admin"))
+	// insert into a_role_funcs  
+	// select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'"
+	 * </pre>
+	 * @see {@link TestTransc#testInsertSelectPostUpdate()}
 	 * @param values
 	 * @return this
 	 * @throws TransException
@@ -287,7 +297,11 @@ public class Insert extends Statement<Insert> {
 				&& valuesNv.size() > 0
 				&& valuesNv.get(0) != null
 				&& valuesNv.get(0).size() > 0;
-		if (!hasVals && selectValues == null) return "";
+		if (!hasVals && selectValues == null) {
+			Utils.warn("[Insert#sql()] Trying to stream a Insert statement without values, table %s, conn %s.",
+					this.mainTabl.name(), sctx.connId());
+			return "";
+		}
 
 		// insert into tabl(...) values(...) / select ...
 		Stream<String> s = Stream.concat(

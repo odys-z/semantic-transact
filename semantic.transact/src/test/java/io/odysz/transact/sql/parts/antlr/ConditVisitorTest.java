@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import io.odysz.common.Utils;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
 
@@ -13,6 +12,9 @@ public class ConditVisitorTest {
 	public void testLike() throws TransException {
 		String expr = "f.col LIKE 'abc'";
 		test("f.col like '%abc%'", expr);
+
+		expr = "f.col not like 'abc'";
+		test("f.col not like '%abc%'", expr);
 
 		expr = "f.col % 'abc'";
 		test("f.col like '%abc%'", expr);
@@ -30,6 +32,9 @@ public class ConditVisitorTest {
 		test("i.nodeId = n.nodeId AND n.isFinish = false", expr);
 		expr = "i.nodeId = n.nodeId and i.handlingCmd is null and n.isFinish = false";
 		test("i.nodeId = n.nodeId AND i.handlingCmd is null AND n.isFinish = false", expr);
+
+		expr = "i.nodeId = n.nodeId and i.handlingCmd is not null and n.isFinish = false";
+		test("i.nodeId = n.nodeId AND i.handlingCmd is not null AND n.isFinish = false", expr);
 	}
 
 	@Test
@@ -38,7 +43,12 @@ public class ConditVisitorTest {
 		String expect = "userId in ('1', '2')";
 		Condit condt = ConditVisitor.parse(strExpr);
 		String sql = condt.sql(null);
-		Utils.logi(sql);
+		assertEquals(sql, expect);
+
+		strExpr = "userId not in ('1', '2')";
+		expect = "userId not in ('1', '2')";
+		condt = ConditVisitor.parse(strExpr);
+		sql = condt.sql(null);
 		assertEquals(sql, expect);
 	}
 	

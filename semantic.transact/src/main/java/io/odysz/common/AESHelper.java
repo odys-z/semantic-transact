@@ -1,5 +1,7 @@
 package io.odysz.common;
 
+import static io.odysz.common.LangExt.eq;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -23,13 +26,16 @@ import org.apache.commons.crypto.utils.Utils;
  */
 public class AESHelper {
     static Properties randomProperties = new Properties();
-    /**Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
+    /**
+     * Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
      * Apache Common Crypto only support PKCS#5 padding, but most js lib support PKCS#7 padding,
      * This makes trouble when negotiation with those API.
      * Solution: using no padding here, round the text to 16 or 32 ASCII bytes.
      */
     static final String transform = "AES/CBC/NoPadding";
     static CryptoCipher encipher;
+
+    static ReentrantLock lock;
 
     static {
     	randomProperties.put(CryptoRandomFactory.CLASSES_KEY,
@@ -43,6 +49,10 @@ public class AESHelper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	
+    	// experiment 10 Dec 2023
+    	// solving crash happened outside the Java Virtual Machine in native code.
+        lock = new ReentrantLock();
     }
 
 	/**TODO move to test
@@ -64,6 +74,9 @@ public class AESHelper {
 		}
 	}
 
+	/**
+	 * @return 16 random bytes
+	 */
 	public static byte[] getRandom() {
 		byte[] iv = new byte[16];
 	    try (CryptoRandom random = CryptoRandomFactory.getCryptoRandom(randomProperties)) {
@@ -75,7 +88,8 @@ public class AESHelper {
 	    }
 	}
 
-	/**Decrypt then encrypt.
+	/**
+	 * Decrypt then encrypt.
 	 * @param cypher Base64
 	 * @param decryptK plain key string
 	 * @param decryptIv Base64
@@ -98,13 +112,23 @@ public class AESHelper {
         return new String[] {b64, AESHelper.encode64(eiv)};
 	}
 
+	/**
+	 * Encrypt plain text to cipher of base 64.
+	 * 
+	 * @param plain
+	 * @param key
+	 * @param iv
+	 * @return
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	public static String encrypt(String plain, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		if (!plain.trim().equals(plain))
 			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
 
-		key = pad16_32(key); // FIXME won't work for non ASCII
-		plain = pad16_32(plain); // FIXME won't work for non ASCII
+		key = pad16_32(key);
+		plain = pad16_32(plain);
 		byte[] input = getUTF8Bytes(plain);
 		byte[] kb = getUTF8Bytes(key);
 		byte[] output = encryptEx(input, kb, iv);
@@ -112,32 +136,47 @@ public class AESHelper {
         return b64;
 	}
 
+	//-------------ody:io.github.odys-z
+
+	/**
+	 * 10 Dec 2024:<br>
+	 * This line causes trouble in JDK 15, Open JDK x64.
+	 * 
+	 * @param input
+	 * @param key
+	 * @param iv
+	 * @return result bytes
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
 	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
-		//System.out.println("txt: " + plain);
-		//System.out.println("key: " + key);
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         //Initializes the cipher with ENCRYPT_MODE, key and iv.
         try {
+        	lock.lock();
+
 			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
-			byte[] output = new byte[((input.length)/16 + 2) * 16]; // + 1 will throw exception
-
+			byte[] output = new byte[((input.length)/16 + 2) * 16];
 			// int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 			// above code is incorrect (not working with PKCS#7 padding),
 			// check Apache Common Crypto User Guide:
 			// https://commons.apache.org/proper/commons-crypto/userguide.html
 			// Usage of Byte Array Encryption/Decryption, CipherByteArrayExample.java
 			int updateBytes = encipher.update(input, 0, input.length, output, 0);
-			//System.out.println("updateBytes " + updateBytes);
-			int finalBytes = encipher.doFinal(input, 0, 0, output, updateBytes);
+			int finalBytes  = encipher.doFinal(input, 0, 0, output, updateBytes);
+
 			output = Arrays.copyOf(output, updateBytes + finalBytes);
 			encipher.close();
 			return output;
 		} catch (GeneralSecurityException e) {
 			throw new GeneralSecurityException(e.getMessage());
 		}
+        finally {
+        	lock.unlock();
+        }
 	}
 
 	public static String decrypt(String cypher, String key, byte[] iv)
@@ -171,7 +210,7 @@ public class AESHelper {
 	 * @return 16 / 32 byte string
 	 * @throws GeneralSecurityException
 	 */
-	private static String pad16_32(String s) throws GeneralSecurityException {
+	public static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
 			return String.format("%1$16s", s).replaceAll(" ", "-");
@@ -279,17 +318,62 @@ public class AESHelper {
         return Base64.getDecoder().decode(str);
 	}
 
-	/**Is encrypt(plain, k, v) == cipher?
-	 * @param plain
-	 * @param cipher
-	 * @param k
-	 * @param iv
+	/**
+	 * Is encrypt(plain, k, v) == cipher?
+	 * i.e. encrypt(uid:random, k, iv) == token ? where uid:random = clientoken
+	 * 
 	 * @return true: yes the same
 	 * @throws Exception
 	 */
-	public static boolean isSame(String cipher, String plain, String k, String iv) throws Exception {
-		String enciphered = encrypt(plain, k, decode64(iv));
-		return enciphered.equals(cipher);
+	public static boolean verifyToken(String requestoken, String myKnowledge, String uid, String key)
+			throws Exception {
+		String[] sstoken = requestoken.split(":");
+		String enciphered = encrypt(pad16_32(uid + ":" + myKnowledge), key, decode64(sstoken[1]));
+		return eq(enciphered, sstoken[0]);
 	}
 
+	/**
+	 * <pre>
+	 * ssToken = cipher : iv, len(cipher) = 44
+	 * plain = decrypt(cipher, key, iv)
+	 * token = encrypt(pad(uid) : plain, key, iv2)
+	 * return token : iv2, if cipher.length == 44, len(token : iv2) = 44 + 1 + 24 = 69
+	 * </pre>
+	 * 
+	 * @return token for managed session requests, token:iv2, len = 69 for ssToken.len = 69
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
+	public static String repackSessionToken(String ssToken, String key, String uid)
+			throws GeneralSecurityException, IOException {
+		String[] ss = ssToken.split(":");
+		String plain = decrypt(ss[0], key, decode64(ss[1]));
+
+		byte[] iv = getRandom();
+		String cipher = encrypt(uid + ":" + plain, key, iv);
+		return cipher + ":" + encode64(iv);
+	}
+
+	/**
+	 * <pre>
+	 * iv = random(16)
+	 * token = encrypt(random, key, iv), len(random) = 24
+	 * return token : iv,
+	 * where len(token) = [(24 + 15) / 16] * 16 * [4/3] = 32 * [4/3] = 44
+	 * </pre>
+	 * 
+	 * @param key
+	 * @return 0: string(token : iv), 1: knowledge in base 64 (random token)
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 * @since 1.4.37
+	 * @see AESHelperTest#testSessionToken() source
+	 */
+	public static String[] packSessionKey(String key) 
+			throws GeneralSecurityException, IOException {
+		byte[] iv = AESHelper.getRandom();
+		byte[] knows = AESHelper.getRandom();
+		String token = AESHelper.encode64(knows);
+		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
+	}
 }

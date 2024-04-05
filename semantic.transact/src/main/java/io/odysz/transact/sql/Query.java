@@ -1,11 +1,13 @@
 package io.odysz.transact.sql;
 
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
@@ -16,6 +18,7 @@ import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.Havings;
 import io.odysz.transact.sql.parts.select.JoinTabl;
@@ -24,6 +27,7 @@ import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
 import io.odysz.transact.sql.parts.select.SqlUnion;
+import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -179,10 +183,19 @@ public class Query extends Statement<Query> {
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre> */
 	private ArrayList<SqlUnion> union_except_intersect;
-	
+
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
 	}
+
+	/**
+	 * with-expressions
+	 * 
+	 * for temporary storage when composing query. 
+	 */
+	WithClause withs;
+
+	boolean distinct;
 
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
@@ -258,6 +271,26 @@ public class Query extends Statement<Query> {
 					col(cass[0], cass[1]);
 				else if (cass != null)
 					col(cass[0]);
+			}
+		return this;
+	}
+
+	/**
+	 * @since 1.4.40
+	 * @param tblAlias
+	 * @param col_ases
+	 * @return
+	 * @throws TransException
+	 */
+	public Query cols_byAlias(String tblAlias, String[] col_ases) throws TransException {
+		if (col_ases != null)
+			for (String col_as : col_ases) {
+				if (col_as == null) continue;
+				String[] cass = col_as.split(" ([Aa][Ss] )?");
+				if (cass != null && cass.length > 1)
+					col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
+				else if (cass != null)
+					col(String.format("%s.%s", tblAlias, cass[0]));
 			}
 		return this;
 	}
@@ -376,22 +409,113 @@ public class Query extends Statement<Query> {
 	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
 	 *    
 	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
+	 * @param mainAlias e.g. u
+	 * @param withTbl e.g. r
+	 * @param withAlias
+	 * @param onCols, in pairs, e.g. if a, b, c, d, where have condition u.a = r.b and u.c = r.d
+	 * @return this
+	public Query je(String mainAlias, String withTbl, String withAlias, String... onCols) {
+		Condit ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[0]),
+				String.format("%s.%s", withAlias, onCols.length > 1 ? onCols[1] : onCols[0]));
+
+		for (int i = 2; i < onCols.length; i+=2) {
+			ands.and(Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[i]),
+				String.format("%s.%s", withAlias, onCols.length > i+1 ? onCols[i+1] : onCols[i])));
+		}
+		return j(withTbl, withAlias, ands);
+	}
+	 */
+
+	/**
+	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
+	 * 
+	 * <p>Example</p>
+	 * <pre>sctx.select(usrMeta.tbl, "u")
+	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
+	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);
+	 * //   
+	 * sctx.select(userMeta.tbl, "u")
+	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
+	 *    
+	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
+
+	 * Since 1.4.40 the right operand can be a function expression, e.g.
+	 * <pre>
+	 * je("ent", chgm.tbl, "ch", chgm.uids, Funcall.concat(trsb.synode + chgm.UIDsep + chgm.pk), chgm.uids, chgm.synoder, trsb.synode)
+	 * </pre>
+	 * 
+	 * Example of column name handling:
+	 * <pre>
+	 * 1. example: override table alias
+	 * 	st.select("a_users", "u")
+	 *      .je("u", "a_org", "o", "o.orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+	 *      .commit(sqls);
+	 *  // it's o.orgName
+	 *  assertEquals("select * from a_users u join a_org o on o.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+	 *  sqls.get(1))
+	 *  
+	 * 2. example: regular align table alias
+	 * 	st.select("a_users", "u")
+	 *      .je("u", "a_org", "o", "orgName", constr("ChaoYang People"), "userName", constr("James Bond"))
+	 *      .commit(sqls);
+	 *  // it's u.orgName
+	 *  assertEquals("select * from a_users u join a_org o on u.orgName = 'ChaoYang People' AND u.userName = 'James Bond'",
+	 *  sqls.get(2))
+	 * </pre>
 	 * @param mainAlias
 	 * @param withTbl
 	 * @param withAlias
-	 * @param colWith
+	 * @param onCols equals condition pairs, if column name come with table alias, will override it, see the first example.
 	 * @return this
 	 */
-	public Query je(String mainAlias, String withTbl, String withAlias, String... colWith) {
-		Condit ands = Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, colWith[0]),
-				String.format("%s.%s", withAlias, colWith.length > 1 ? colWith[1] : colWith[0]));
+	public Query je(String mainAlias, String withTbl, String withAlias, Object... onCols) {
+		Object rop = onCols.length > 1 ? onCols[1] : onCols[0];
 
-		for (int i = 2; i < colWith.length; i+=2) {
-			ands.and(Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, colWith[i]),
-				String.format("%s.%s", withAlias, colWith.length > i+1 ? colWith[i+1] : colWith[i])));
+		Condit ands = null; 
+		if (rop instanceof ExprPart)
+			ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[0]), (ExprPart)rop);
+		else
+			ands = Sql.condt(op.eq,
+				String.format("%s.%s", mainAlias, onCols[0]),
+				String.format("%s.%s", withAlias, rop));
+
+		for (int i = 2; i < onCols.length; i+=2) {
+			rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
+			if (rop instanceof ExprPart)
+				ands = ands.and(Sql.condt(op.eq,
+					String.format("%s.%s", mainAlias, onCols[i]), (ExprPart)rop));
+			else
+				ands = ands.and(Sql.condt(op.eq,
+					String.format("%s.%s", mainAlias, onCols[i]),
+					String.format("%s.%s", withAlias, rop)));
 		}
+		return j(withTbl, withAlias, ands);
+	}
+	
+	public Query je2(String withTbl, String withAlias, Object ... onCols ) throws TransException {
+		Condit ands = null;
+		Condit and = null;
+
+		for (int i = 0; i < onCols.length; i+=2) {
+			Object rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
+			String lop = onCols[i] instanceof ExprPart
+					? ((ExprPart) onCols[i]).sql(null)
+					: isblank(mainAlias) ? onCols[i].toString() : String.format("%s.%s", mainAlias.sql(null), onCols[i]);
+
+			if (rop instanceof ExprPart)
+				and = Sql.condt(op.eq, lop, (ExprPart)rop);
+			else
+				and = Sql.condt(op.eq, lop,
+					String.format("%s.%s", withAlias, rop));
+
+			if (ands != null)
+				ands = ands.and(and);
+			else ands = and;
+		}
+
 		return j(withTbl, withAlias, ands);
 	}
 	
@@ -402,7 +526,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query groupby(String[] groups) {
+	public Query groupby(String... groups) {
 		if (groups != null && groups.length > 0)
 			for (String g : groups)
 				groupby(g);
@@ -443,7 +567,8 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	/**<p>Update Limited Rows.</p>
+	/**
+	 * <p>Update Limited Rows.</p>
 	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
 	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
 	 * 		Transact-SQL Syntax</a><br>
@@ -467,7 +592,8 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	/**For sqlite only, set limit expr OFFSET expr2 clause.<br>
+	/**
+	 * For sqlite only, set limit expr OFFSET expr2 clause.<br>
 	 * see <a href='https://www.sqlite.org/lang_select.html'>SQL As Understood By SQLite - SELECT</a>
 	 * @see #limit(String, int)
 	 * @param lmtExpr
@@ -485,7 +611,8 @@ public class Query extends Statement<Query> {
 		else return this;
 	}
 
-	/**Union query sepecification or expresion(s)<br>
+	/**
+	 * Union query sepecification or expresion(s)<br>
 	 * grammar reference: <pre>sql_union
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre>
@@ -549,8 +676,10 @@ public class Query extends Statement<Query> {
 	public String sql(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
+					withs,
 					// select ...
 					new ExprPart("select"),
+					this.distinct ? new ExprPart("distinct") : null,
 					// top(expr) with ties
 					dbtp == dbtype.ms2k && limit != null ?
 						new ExprPart("top(" + limit[0] + ") " + (limit.length > 1 ? limit[1] : "")) : null,
@@ -638,5 +767,21 @@ public class Query extends Statement<Query> {
 			return postOp.onCommitOk(ctx, sqls);
 		}
 		return null;
+	}
+
+	public Query with(WithClause withClause) {
+		this.withs = withClause;
+		return this;
+	}
+
+	/** 
+	 * Whether use distinct or not, to generate "select distinct ... "
+	 * @param dist
+	 * @return this
+	 * @since 1.4.36
+	 */
+	public Query distinct(boolean... dist) {
+		this.distinct = LangExt.is(dist, true);
+		return this;
 	}
 }

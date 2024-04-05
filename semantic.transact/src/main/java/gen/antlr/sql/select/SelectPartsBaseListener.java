@@ -1,4 +1,4 @@
-// Generated from SelectParts.g4 by ANTLR 4.9.2
+// Generated from ./SelectParts.g4 by ANTLR 4.13.1
 package gen.antlr.sql.select;
 
 import org.antlr.v4.runtime.ParserRuleContext;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.odysz.anson.Anson;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -221,5 +222,20 @@ public class SemanticObject extends Anson {
 
 	public String resulve(String tabl, String pk) {
 		return (String) ((SemanticObject) ((SemanticObject) get("resulved")).get(tabl)).get(pk);
+	}
+
+	public int getInt(String n) {
+		return Integer.valueOf(getString(n));
+	}
+
+	/**
+	 * Find results for entm.pk in table etnm.tbl.
+	 * @see #resulve(String, String)
+	 * @param entm
+	 * @return resolved resource
+	 * @since 1.4.40
+	 */
+	public String resulve(TableMeta entm) {
+		return resulve(entm.tbl, entm.pk);
 	}
 }

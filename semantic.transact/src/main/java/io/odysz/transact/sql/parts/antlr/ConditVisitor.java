@@ -86,7 +86,7 @@ public class ConditVisitor extends SearchExprsBaseVisitor<Condit> {
 	public Condit visitSearch_condition_not(Search_condition_notContext ctx) {
 		// Predicate predicate = ctx.predicate().accept(new PredicatVisitor());
 		Predicate predicate = predVist.visit(ctx.predicate());
-		predicate.not(ctx.NOT());
+		// predicate.not(ctx.NOT());
 		return new Condit(predicate);
 	}
 

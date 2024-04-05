@@ -116,6 +116,17 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return nv(n, String.valueOf(v));
 	}
 
+	public T nv(String n, int v) {
+		return nv(n, String.valueOf(v));
+	}
+
+	public T nv(String n, String[] v) {
+		return (T) nv(n, Stream
+					.of(v)
+					.filter(m -> !isblank(m))
+					.collect(Collectors.joining(",")));
+	}
+
 	public T nv(String n, AbsPart v) {
 		Utils.warn("Statement.nv(): Only Update and Insert can use nv() function.");
 		return (T) this;
@@ -197,8 +208,31 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where_(op, lcol, (String)rconst);
 	}
 	
-	public Statement<?> where(String logic, String loperand, ExprPart resulving) {
-		return where(Sql.condt(Logic.op(logic), loperand, resulving));
+	public T where(String logic, String loperand, ExprPart roperand) {
+		return where(Logic.op(logic), loperand, roperand);
+	}
+
+	public T where(Logic.op op, String loperand, ExprPart roperand) {
+		return where(Sql.condt(op, loperand, roperand));
+	}
+
+	/**
+	 * E.g. where t.id in select id from tab. 
+	 * @param logic
+	 * @param loperand
+	 * @param q
+	 * @return this
+	 * @throws TransException
+	 */
+	public T where(Logic.op logic, String loperand, Query q) throws TransException {
+		return where(Sql.condt(logic, loperand, q));
+	}
+
+	public T where(Logic.op op, String lop, Statement<?> statement) throws TransException {
+		if (statement instanceof Query)
+			return (T) where(op, lop, (Query)statement);
+		else
+			throw new TransException("Don't use this way. (statement must be a Query object)");
 	}
 
 	/**This is a wraper of {@link #where(String, String, String)} for convenient
@@ -210,6 +244,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public T where(Logic.op op, String loperand, String roperand) {
 		return where(Sql.condt(op, loperand, roperand));
+	}
+
+	public T where(Logic.op op, String loperand, Long roperand) {
+		return where(Sql.condt(op, loperand, roperand.toString()));
+	}
+
+	public T where(Logic.op op, String loperand, Integer roperand) {
+		return where(Sql.condt(op, loperand, roperand.toString()));
 	}
 
 	/**This is a wraper of {@link #where(String, String, String)} for convenient
@@ -234,6 +276,19 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 
 	public T whereEq(String tabl, String col, String constv) {
 		return where_("=", String.format("%s.%s", tabl, col), constv);
+	}
+
+	/**
+	 * where tablA.colA = tblB.colB
+	 * @param tblA
+	 * @param colA
+	 * @param tblB
+	 * @param colB
+	 * @return this
+	 * @since 1.4.40
+	 */
+	public T whereEq(String tblA, String colA, String tblB, String colB) {
+		return where("=", String.format("%s.%s", tblA, colA), String.format("%s.%s", tblB, colB));
 	}
 
 	public T whereEqOr(String col, String[] ors) {
@@ -285,12 +340,17 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
 	}
 	
-	/**Tag: v1.3.0
+	public T whereEq(String col, Query q) throws TransException {
+		return where(Sql.condt(Logic.op.eq, col, q));
+	}
+
+	/**
 	 * @param col
 	 * @param constv
 	 * @return this
+	 * @since v1.3.0
 	 */
-	public T whereIn(String col, String[] constv) {
+	public T whereIn(String col, String... constv) {
 		ExprPart inOp = new ExprPart(constv);
 		return where(Sql.condt(Logic.op.in, col, inOp));
 	}
@@ -303,12 +363,23 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	/**
+	 * where clause for "In Select".
+	 * @param col
+	 * @param q the static query - query can't be generated with context.
+	 * @return this
+	 * @since 1.4.36
+	 */
+	public T whereIn(String col, Query q) {
+		return where(Sql.condt(Logic.op("in"), col, q.sql(null)));
+	}
+
+	/**
 	 * <p>Add post semantics after the parent statement,
 	 * like add children after insert new parent.</p>
 	 * <b>Side effect</b>: the added post statement's context is changed
 	 * - to referencing the same instance for resolving, etc.
 	 * @param postatement
-	 * @return the calling statement
+	 * @return this
 	 */
 	public T post(Statement<?> postatement) {
 		if (postatement != null) {
@@ -319,9 +390,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**Add setaments before this statement'sql been generated.<br>
+	/**
+	 * Add setaments before this statement'sql been generated.<br>
 	 * @param postatement
-	 * @return the calling statement
+	 * @return this
 	 */
 	public T before(Statement<?> postatement) {
 		if (before == null)
@@ -330,7 +402,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**Wrapper of {@link #post(Statement)}.
+	/**
+	 * Wrapper of {@link #post(Statement)}.
+	 * 
 	 * @param posts
 	 * @return this
 	 */
@@ -341,7 +415,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 	
-	/**Generate all sqls, put into list, with a semantext created from usrInfo.
+	/**
+	 * Generate all sqls, put into list, with a semantext created from usrInfo.
+	 * 
 	 * This method is a wrapper of {@link #commit(ISemantext, ArrayList)}.
 	 * @param sqls
 	 * @param usrInfo
@@ -412,7 +488,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public static ExprPart composeVal(Object v, TableMeta mt, String col) {
 		boolean isQuoted = mt == null || mt.isQuoted(col);
 		if (mt == null || isQuoted)
-			return ExprPart.constStr((String)v);
+			return ExprPart.constr((String)v);
 		else if (mt != null && !isQuoted && v == null)
 			return ExprPart.constVal(null);
 		else if (mt != null && !isQuoted && LangExt.isblank(v, "''", "null"))
