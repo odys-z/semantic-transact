@@ -32,7 +32,7 @@ public class Resulving extends ExprPart {
 	public String sql(ISemantext context) throws TransException {
 		Object o = context.resulvedVal(tabl, autok);
 		if (o == null)
-			throw new TransException("Can't resolve auto Id - %s.%s. Possible error: wrong configure; empty row (not insertion triggered)", tabl, autok);
+			throw new TransException("Can't resolve auto Id - %s.%s. Possible error: wrong configure; empty row (no insertion triggered)", tabl, autok);
 		if (o instanceof AbsPart)
 			try {
 				return ((AbsPart) o).sql(context);
