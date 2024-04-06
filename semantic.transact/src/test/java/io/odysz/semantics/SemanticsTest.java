@@ -313,15 +313,14 @@ public class SemanticsTest {
 				.col("parentId", coltype.text);
 	}
 	
-	
 	@Test
 	public void testUpsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
 		// mysql
-		Insert upd = st.insert("a_users")
-				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
+		Insert upd = st.insertExp("a_users")
 				.onDuplicate("userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
 				.where("=", "userId", "'admin'");
 		upd.commit(mysqlCxt, sqls);
 		
@@ -329,17 +328,17 @@ public class SemanticsTest {
 				sqls.get(0));
 
 		// sqlite
-		upd = st.insert("a_users")
-				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
-				.onConflict(new String[] {"userId"}, "userName", constr("Zelenskyy"), "orgId", constr("URA"));
+		upd = st.insertExp("a_users")
+				.onConflict(new String[] {"userId"}, "userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people");
 		upd.commit(sqlitCxt, sqls);
 		
 		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on conflict(userId) do update set userName='Zelenskyy', orgId='URA'",
 				sqls.get(1));
 
-		upd = st.insert("a_role_funcs")
-				.value("roleId", "r01", "funcId", "f001-del")
-				.onConflict(new String[] {"roleId", "funcId"}, "funcId", constr("8964"));
+		upd = st.insertExp("a_role_funcs")
+				.onConflict(new String[] {"roleId", "funcId"}, "funcId", constr("8964"))
+				.value("roleId", "r01", "funcId", "f001-del");
 		upd.commit(sqlitCxt, sqls);
 		
 		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f001-del') on conflict(roleId, funcId) do update set funcId='8964'",

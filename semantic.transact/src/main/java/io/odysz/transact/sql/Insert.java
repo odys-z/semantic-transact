@@ -17,11 +17,11 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
 import io.odysz.transact.sql.parts.insert.InsertValuesOrcl;
-import io.odysz.transact.sql.parts.update.SetList;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -50,15 +50,17 @@ public class Insert extends Statement<Insert> {
 	 * Is Upsert.
 	 * @since 1.4.40
 	 */
-	protected boolean upsert;
+	protected boolean orUpdate;
 	
-	protected String[] onConflictFields;
+	protected String[] orUpdateFields;
 
 	/**
 	 * Updating nvs for Upsert.
 	 * @since 1.4.40
 	 */
-	protected ArrayList<Object[]> updateNvs;
+	protected Object[] orUpdateNvs;
+	
+	protected Query existsQuery;
 
 	/**
 	 * Insert statement intialization, not come with a post operation for committing SQL.
@@ -265,95 +267,60 @@ public class Insert extends Statement<Insert> {
 	}
 
 	/**
-	 * <p>Solution for UPSERT.</p>
-	 * <h5>NOTE:</h5>
-	 * <p>UPSERT is not a standard SQL syntax (April 2024), and currently only sql for
-	 *  Sqlite3 are verified (call {@link #onConflict(String, Object...)}, not this).
-	 *  For MS Sql Server, must use {@link #onDuplicate(Query)}.
-	 *  Open an issue at <a href="https://github.com/odys-z/semantic-transact/issues">Github</a>
-	 * if the features are needed.</p>
-	 * <h5>References:</h5>
-	 * <ul>
-	 * <li><a href="https://sqlite.org/lang_upsert.html">Sqlite UPSERT</a><br>
-	 * INSERT INTO ... VALUES('jovial') ON CONFLICT(word) DO UPDATE SET count=count+1</li>
-	 * <li><a href="https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html">
-	 * 15.2.7.2 INSERT ... ON DUPLICATE KEY UPDATE Statement, MySql Documentation</a> and
-	 * <a href="https://blog.devart.com/mysql-upsert.html">
-	 * MySQL UPSERT: Comprehensive Examples and Use Cases</a><br>
-	 * INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...)
-	 * ON DUPLICATE KEY UPDATE column1 = value1, column2 = value2, ...;
-	 * </li>
-	 * <li><a href="https://stackoverflow.com/a/27989832/7362888">
-	 * StackOverflow: How to upsert (update or insert) in SQL Server 2005</a><br>
-	 * IF NOT EXISTS (SELECT * FROM dbo.Employee WHERE ID = @SomeID)
-	 * INSERT INTO dbo.Employee(Col1, ..., ColN)
-	 * VALUES(Val1, .., ValN)
-	 * ELSE UPDATE dbo.Employee
-	 * SET Col1 = Val1, Col2 = Val2, ...., ColN = ValN
-	 * WHERE ID = @SomeID
-	 * </li>
-	 * <li><a href="https://docs.oracle.com/en/database/other-databases/nosql-database/23.3/sqlreferencefornosql/upsert-statement.html">
-	 * Upsert statement, Oracle Help Center</a><br>
-	 * <pre>upsert_statement ::=
-	 * [variable_declaration]
-	 * UPSERT INTO table_name 
-	 * [AS] table_alias]
-	 * ["(" id ("," id)* ")"]
-	 * VALUES "(" insert_clause ("," insert_clause)* ")"
-	 * [SET TTL ttl_clause ]
-	 * [returning_clause]</pre>
-	 * </li>
-	 * </ul>
-	 * @param unvs updating name-value pairs, if null, use all values set by
-	 * {@link #nv(String, AbsPart) nv()} or {@link Update#nvs(ArrayList) nvs()} for insert statement.
-	 * @return this
-	 */
-	public Insert onDuplicate(ArrayList<Object[]> unvs) {
-		this.upsert = true;
-		this.updateNvs = unvs;
-		return this;
-	}
-	
-	public Insert onDuplicate(Object... unv) {
-		this.upsert = true;
-		this.updateNvs = new ArrayList<Object[]>();
-		for (int i = 0; unv != null && i < unv.length; i += 2) {
-			updateNvs.add(new Object[] {unv[i], unv[i+1]});
-		}
-		return this;
-	}
-
-	/**
-	 * For MS Sql Server only. Not implemented.
-	 * @see #onDuplicate(ArrayList)
+	 * <p>Sql for Oracle:</p>
+	 * <pre> update maintbl set ... where exists (select * from maintbl where ...) and and-wheres;
+	 * insert into maintbl (email, campaign_id)
+	 *   select 'mom@cox.net',100 from dual where not exists
+	 *   (select * from maintbl where ...);</pre>
+	 * See <a href="https://stackoverflow.com/a/16639922/7362888">
+	 * StackOverflow: Oracle insert if not exists statement</a>.
+	 * 
+	 * <p>Sql for MySql:</p>
+	 * <pre> update maintbl set ... where exists (select * from maintbl where ...) and and-wheres;
+	 * insert into maintbl (name, address, tele)
+	 *   select * from (select 'john', 'doe', '022') as tmp
+	 *   where not exists (select name from maintbl where ...);
+	 * </pre>
+	 * See <a href="https://stackoverflow.com/a/3164741/7362888">
+	 * StackOverflow: MySQL: Insert record if not exists in table [duplicate]</a>.
+	 * 
+	 * <p>Sql for sqlite</p>
+	 * <pre> update maintbl set ... where ...(and-wheres) and exists (select 1 from maintbl where ...);
+	 * insert into memos(id,text) 
+	 *   select 5, 'text to insert'
+	 *   where not exists (select 1 from maintbl where ...);</pre>
+	 * 
+	 * <p>Sql for ms sql server</p>
+	 * <pre> update maintbl ...
+	 * insert  maintbl (SoftwareName, SoftwareSystemType)
+	 *   select  @SoftwareName, @SoftwareType wherenot exists 
+	 *   select  1 from    tblSoftwareTitles
+	 *   where   softwarename = @softwarename
+	 *   and     SoftwareSystemType = @Softwaretype);</pre>
+	 *
+	 * <h5>NOTE</h5>
+	 * <ol>
+	 * <li>The Update statement is not generated by this statement. It's user's responsibility to append this
+	 * Insert to the Update statement.</li>  
+	 * <li>It's users' responsibility to make sure the Select query for updating returns 1 row if exists.</li>
+	 * <li>Open an issue if supporting {@code Merge} is necessary. But after tried Upsert by {@link InsertExp}</li>
+	 * </ol>
+	 * 
+	 * <h5>Reference</h5>
+	 * A performance experiment: <a href='https://cc.davelozinski.com/sql/fastest-way-to-insert-new-records-where-one-doesnt-already-exist'>
+	 * SQL: Fastest way to insert new records where one doesn’t already exist</a>
 	 * @param select
+	 * @param nvs
 	 * @return this
+	 * @throws TransException
 	 */
-	public Insert onDuplicate(Query select) {
+	public Insert notExists(Query select, Object ... nvs) throws TransException {
+		if (orUpdate)
+			throw new TransException("This method can only be called once.");
+		orUpdate    = true;
+		orUpdateNvs = nvs;
+		existsQuery = select;
 		return this;
-	}
-
-	/**
-	 * For Sqlite's UPSERT only.
-	 * @see #onDuplicate(ArrayList)
-	 * @param select
-	 * @return this
-	 * @since 1.4.40
-	 */
-	public Insert onConflict(String[] fields, ArrayList<Object[]> nvs) {
-		this.onConflictFields = fields;
-		return onDuplicate(nvs);
-	}
-	
-	/**
-	 * For Sqlite' UPSERT only.
-	 * @see #onDuplicate(ArrayList)
-	 * @param select
-	 * @return this
-	 */
-	public Insert onConflict(String[] fields, Object ... nvs) {
-		this.onConflictFields = fields;
-		return onDuplicate(nvs);
 	}
 
 	/**
@@ -373,55 +340,27 @@ public class Insert extends Statement<Insert> {
 			return "";
 		}
 
-		/*
-		// insert into tabl(...) values(...) / select ...
-		Stream<String> s = Stream.concat(
-			// insert into tabl(...)
-			Stream.of(upsert && sctx.dbtype() == dbtype.oracle ?
-					new ExprPart("upsert into") : new ExprPart("insert into"),
-					mainTabl, mainAlias,
-					// (...)
-					new ColumnList(insertCols)
-			   // values(...) / select ...
-			), Stream.concat(
-				// values (...)
-				// whether 'values()' appears or not is the same as value valuesNv
-				Stream.of(// new ExprPart("values"),
-						// 'v1', 'v2', ...)
-					sctx != null && sctx.dbtype() == dbtype.oracle ?
-							new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
-							new InsertValues(mainTabl.name(), insertCols, valuesNv)
-				).filter(w -> hasVals),
-				// select ...
-				Stream.of(selectValues).filter(w -> selectValues != null))
-			)
-			*/
-		Stream<String> s = Stream.of(upsert && sctx.dbtype() == dbtype.oracle ?
-				new ExprPart("upsert into") : new ExprPart("insert into"),
-				mainTabl, mainAlias,
-				// (...)
-				new ColumnList(insertCols),
-				// values(...)
-				hasVals
-					? sctx != null && sctx.dbtype() == dbtype.oracle ?
-						new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
-						new InsertValues(mainTabl.name(), insertCols, valuesNv)
-					: null,
-				selectValues,
-
-				// ON DUPLICATE KEY UPDATE 
-				upsert && sctx.dbtype() == dbtype.sqlite ? new ExprPart(String.format("on conflict(%s) do update set", Stream.of(onConflictFields).filter(f -> f != null).collect(Collectors.joining(", ")))) : null,
-				upsert && sctx.dbtype() == dbtype.mysql ? new ExprPart("on duplicate key update") : null,
-				upsert && (sctx.dbtype() == dbtype.sqlite || sctx.dbtype() == dbtype.mysql) && updateNvs != null ? new SetList(updateNvs) : null
+		Stream<String> s = Stream.of(
+			new ExprPart("insert into"),
+			mainTabl, mainAlias,
+			// (...)
+			new ColumnList(insertCols),
+			// values(...)
+			hasVals
+				? sctx != null && sctx.dbtype() == dbtype.oracle ?
+					new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
+					new InsertValues(mainTabl.name(), insertCols, valuesNv)
+				: null,
+			selectValues
 		).filter(w -> w != null)
 		.map(m -> {
-				try {
-					return m == null ? "" : m.sql(sctx);
-				} catch (TransException e) {
-					e.printStackTrace();
-					return "";
-				}
-			});
+			try {
+				return m == null ? "" : m.sql(sctx);
+			} catch (TransException e) {
+				e.printStackTrace();
+				return "";
+			}
+		});
 
 		return s.collect(Collectors.joining(" "));
 	}

@@ -49,6 +49,10 @@ public class Transcxt {
 	public Insert insert(String tabl) {
 		return new Insert(this, tabl);
 	}
+
+	public InsertExp insertExp(String tbl) {
+		return new InsertExp(this, tbl);
+	}
 	
 	public Update update(String tabl) {
 		return new Update(this, tabl);
