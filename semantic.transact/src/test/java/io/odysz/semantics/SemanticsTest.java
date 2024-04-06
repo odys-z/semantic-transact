@@ -318,24 +318,31 @@ public class SemanticsTest {
 	public void testUpsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 
+		// mysql
 		Insert upd = st.insert("a_users")
 				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
 				.onDuplicate("userName", constr("Zelenskyy"), "orgId", constr("URA"))
 				.where("=", "userId", "'admin'");
 		upd.commit(mysqlCxt, sqls);
 		
-		// mysql
 		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on duplicate key update userName='Zelenskyy', orgId='URA'",
 				sqls.get(0));
 
+		// sqlite
 		upd = st.insert("a_users")
 				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
-				.onConflict("userId", "userName", constr("Zelenskyy"), "orgId", constr("URA"))
-				.where("=", "userId", "'admin'");
+				.onConflict(new String[] {"userId"}, "userName", constr("Zelenskyy"), "orgId", constr("URA"));
 		upd.commit(sqlitCxt, sqls);
 		
-		// sqlite
 		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on conflict(userId) do update set userName='Zelenskyy', orgId='URA'",
 				sqls.get(1));
+
+		upd = st.insert("a_role_funcs")
+				.value("roleId", "r01", "funcId", "f001-del")
+				.onConflict(new String[] {"roleId", "funcId"}, "funcId", constr("8964"));
+		upd.commit(sqlitCxt, sqls);
+		
+		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f001-del') on conflict(roleId, funcId) do update set funcId='8964'",
+				sqls.get(2));
 	}
 }
