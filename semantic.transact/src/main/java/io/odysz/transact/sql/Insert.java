@@ -17,7 +17,6 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
-import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.insert.ColumnList;
 import io.odysz.transact.sql.parts.insert.InsertValues;
@@ -45,20 +44,6 @@ public class Insert extends Statement<Insert> {
 	 * TODO let's deprecate this - all new nv are appended to last of valuesNv.
 	 */
 	private ArrayList<Object[]> currentRowNv;
-
-	/**
-	 * Is Upsert.
-	 * @since 1.4.40
-	 */
-	protected boolean orUpdate;
-	
-	protected String[] orUpdateFields;
-
-	/**
-	 * Updating nvs for Upsert.
-	 * @since 1.4.40
-	 */
-	protected Object[] orUpdateNvs;
 	
 	protected Query existsQuery;
 
@@ -310,15 +295,13 @@ public class Insert extends Statement<Insert> {
 	 * A performance experiment: <a href='https://cc.davelozinski.com/sql/fastest-way-to-insert-new-records-where-one-doesnt-already-exist'>
 	 * SQL: Fastest way to insert new records where one doesn’t already exist</a>
 	 * @param select
-	 * @param nvs
 	 * @return this
-	 * @throws TransException
 	 */
-	public Insert notExists(Query select, Object ... nvs) throws TransException {
-		if (orUpdate)
-			throw new TransException("This method can only be called once.");
-		orUpdate    = true;
-		orUpdateNvs = nvs;
+	public Insert notExists(Query select) {
+//		if (orUpdate)
+//			throw new TransException("This method can only be called once.");
+//		orUpdate    = true;
+//		orUpdateNvs = nvs;
 		existsQuery = select;
 		return this;
 	}
@@ -351,7 +334,10 @@ public class Insert extends Statement<Insert> {
 					new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
 					new InsertValues(mainTabl.name(), insertCols, valuesNv)
 				: null,
-			selectValues
+			selectValues,
+			
+			where == null ? null : new ExprPart("where"),
+			where
 		).filter(w -> w != null)
 		.map(m -> {
 			try {

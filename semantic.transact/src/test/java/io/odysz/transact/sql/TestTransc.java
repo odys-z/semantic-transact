@@ -663,7 +663,7 @@ public class TestTransc {
 			.nv("s1", "'s - %'x")
 			.nv("s2", "''")
 			.nv("s3", "%%")
-			.where_("=", "roleId", "role 01") // ignored safely
+			//.where_("=", "roleId", "role 01") // ignored safely
 			.post(st.update("a_role_funcs")
 					.nv("roleId", ExprsVisitor.parse("3 * 2"))
 

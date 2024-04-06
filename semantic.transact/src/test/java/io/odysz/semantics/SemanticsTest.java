@@ -16,6 +16,7 @@ import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
@@ -342,6 +343,30 @@ public class SemanticsTest {
 		upd.commit(sqlitCxt, sqls);
 		
 		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f001-del') on conflict(roleId, funcId) do update set funcId='8964'",
+				sqls.get(2));
+	}
+	
+	@Test
+	public void testInsertWhereExists() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Insert i = st.insert("a_users")
+		.cols("userName", "userId")
+		.select(st.select(null).cols("'Ody'", "'odyz'"))
+		.where(op.notexists, null,
+			st.select("a_users")
+				.whereEq("userId", "odyz")
+				.limit(1));
+
+		i.commit(mysqlCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+				sqls.get(0));
+
+		i.commit(sqlitCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+				sqls.get(1));
+
+		i.commit(ms2kCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select top(1)  * from a_users  where userId = 'odyz' )",
 				sqls.get(2));
 	}
 }

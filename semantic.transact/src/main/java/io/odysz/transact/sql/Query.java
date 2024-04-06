@@ -12,17 +12,16 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.JoinTabl;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.JoinTabl.join;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
-import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.Havings;
-import io.odysz.transact.sql.parts.select.JoinTabl;
-import io.odysz.transact.sql.parts.select.JoinTabl.join;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectList;
@@ -208,7 +207,7 @@ public class Query extends Statement<Query> {
 			throw new TransException("col is null");
 		SelectElem colElem = SelectElemVisitor.parse(col) ;
 		if (colElem == null)
-			throw new TransException("column %s can't been parsed.", col);
+			throw new TransException("column %s can't be parsed.", col);
 
 		if (alias != null && alias.length > 0 && alias[0] != null)
 			colElem.as(alias[0]);
@@ -676,33 +675,36 @@ public class Query extends Statement<Query> {
 	public String sql(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
-					withs,
-					// select ...
-					new ExprPart("select"),
-					this.distinct ? new ExprPart("distinct") : null,
-					// top(expr) with ties
-					dbtp == dbtype.ms2k && limit != null ?
-						new ExprPart("top(" + limit[0] + ") " + (limit.length > 1 ? limit[1] : "")) : null,
-					new SelectList(selectList),
-					// from ... join ...
-					new JoinTabl(join.main, mainTabl, mainAlias),
-					// join can be null
-					joins != null && joins.size() > 0 ? new JoinList(joins) : null,
-					// where ... group by ... order by ...
-					where == null ? null : new ExprPart("where"),
-					where,
-					// group by
-					groupList == null ? null : new GroupbyList(groupList),
-					// having
-					havings == null ? null : new Havings(havings),
-					// order by
-					orderList == null ? null : new OrderyList(orderList),
-					// limit
-					(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
-						// Query#limit() requires 2 arguments, e.g. limit(null, 5)
-						limit.length > 1 && isblank(limit[0]) ?
-						new ExprPart("limit " + limit[1]) :
-						new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
+				withs,
+				// select ...
+				new ExprPart("select"),
+				this.distinct ? new ExprPart("distinct") : null,
+				// top(expr) with ties
+				dbtp == dbtype.ms2k && limit != null 
+					? limit.length <= 1 || isblank(limit[0]) 
+						? new ExprPart("top(" + limit[1] + ") ")
+						: new ExprPart("top(" + limit[0] + ") " + (isblank(limit[1]) ? "" : limit[1]))
+					: null,
+				new SelectList(selectList),
+				// from ... join ...
+				new JoinTabl(join.main, mainTabl, mainAlias),
+				// join can be null
+				joins != null && joins.size() > 0 ? new JoinList(joins) : null,
+				// where ... group by ... order by ...
+				where == null ? null : new ExprPart("where"),
+				where,
+				// group by
+				groupList == null ? null : new GroupbyList(groupList),
+				// having
+				havings == null ? null : new Havings(havings),
+				// order by
+				orderList == null ? null : new OrderyList(orderList),
+				// limit
+				(dbtp == dbtype.mysql || dbtp == dbtype.sqlite) && limit != null ?
+					// Query#limit() requires 2 arguments, e.g. limit(null, 5)
+					limit.length > 1 && isblank(limit[0]) ?
+					new ExprPart("limit " + limit[1]) :
+					new ExprPart("limit " + limit[0] + (limit.length > 1 ? ", " + limit[1] : "")) : null
 			).filter(e -> e != null).map(m -> {
 				try {
 					return m == null ? "" : m.sql(sctx);

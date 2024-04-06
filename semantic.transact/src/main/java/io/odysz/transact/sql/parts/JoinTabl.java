@@ -1,4 +1,4 @@
-package io.odysz.transact.sql.parts.select;
+package io.odysz.transact.sql.parts;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -6,10 +6,6 @@ import java.util.stream.Stream;
 import io.odysz.common.LangExt;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Query;
-import io.odysz.transact.sql.parts.AbsPart;
-import io.odysz.transact.sql.parts.Alias;
-import io.odysz.transact.sql.parts.Sql;
-import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.x.TransException;
@@ -81,7 +77,8 @@ public class JoinTabl extends AbsPart {
 	@Override
 	public String sql(ISemantext sctx) throws TransException {
 		if (jtype == join.main)
-			return String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias.sql(sctx));
+			return jtabl == null || (jtabl instanceof Tabl && ((Tabl)jtabl).tbl == null) ? "" :
+				String.format("from %s %s", jtabl.sql(sctx), jtablias == null ? "" : jtablias.sql(sctx));
 		
 		Stream<String> s = Stream.of(
 				sql(jtype),

@@ -165,7 +165,7 @@ search_condition_not
 	}
 
 	/**<p>Sometimes conditions's table name or alias are ignored by client.
-	 * This method can be called by {@link io.odysz.transact.sql.parts.select.JoinTabl}
+	 * This method can be called by {@link io.odysz.transact.sql.parts.JoinTabl}
 	 * to supply additional information when generating sql.<p>
 	 * <p><b>TODO DESIGN MEMO</b><br>
 	 * {@link Condit}s are parsed from sometimes from where clause, sometimes from join-on clause,
