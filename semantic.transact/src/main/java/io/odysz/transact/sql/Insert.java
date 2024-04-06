@@ -52,7 +52,7 @@ public class Insert extends Statement<Insert> {
 	 */
 	protected boolean upsert;
 	
-	protected String onConflictField;
+	protected String[] onConflictFields;
 
 	/**
 	 * Updating nvs for Upsert.
@@ -334,17 +334,31 @@ public class Insert extends Statement<Insert> {
 	}
 
 	/**
+	 * For Sqlite's UPSERT only.
+	 * @see #onDuplicate(ArrayList)
+	 * @param select
+	 * @return this
+	 * @since 1.4.40
+	 */
+	public Insert onConflict(String[] fields, ArrayList<Object[]> nvs) {
+		this.onConflictFields = fields;
+		return onDuplicate(nvs);
+	}
+	
+	/**
 	 * For Sqlite' UPSERT only.
 	 * @see #onDuplicate(ArrayList)
 	 * @param select
 	 * @return this
 	 */
-	public Insert onConflict(String field, Object ... nvs) {
-		this.onConflictField = field;
+	public Insert onConflict(String[] fields, Object ... nvs) {
+		this.onConflictFields = fields;
 		return onDuplicate(nvs);
 	}
 
-	/**sql: insert into tabl(...) values(...) / select ...
+	/**
+	 * sql: insert into tabl(...) values(...) / select ...
+	 * 
 	 * @see io.odysz.transact.sql.parts.AbsPart#sql(ISemantext)
 	 */
 	@Override
@@ -396,7 +410,7 @@ public class Insert extends Statement<Insert> {
 				selectValues,
 
 				// ON DUPLICATE KEY UPDATE 
-				upsert && sctx.dbtype() == dbtype.sqlite ? new ExprPart(String.format("on conflict(%s) do update set", onConflictField)) : null,
+				upsert && sctx.dbtype() == dbtype.sqlite ? new ExprPart(String.format("on conflict(%s) do update set", Stream.of(onConflictFields).filter(f -> f != null).collect(Collectors.joining(", ")))) : null,
 				upsert && sctx.dbtype() == dbtype.mysql ? new ExprPart("on duplicate key update") : null,
 				upsert && (sctx.dbtype() == dbtype.sqlite || sctx.dbtype() == dbtype.mysql) && updateNvs != null ? new SetList(updateNvs) : null
 		).filter(w -> w != null)
