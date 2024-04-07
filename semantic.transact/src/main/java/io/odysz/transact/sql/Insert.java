@@ -26,6 +26,9 @@ import io.odysz.transact.x.TransException;
 /**
  * sql: insert into tabl(...) values(...) / select ...
  * 
+ * @since 1.4.40, this class support where clause, which can be helpful when insert or
+ * update a record. (Not the same usage for different DB) 
+ * 
  * @author ody
  *
  */
