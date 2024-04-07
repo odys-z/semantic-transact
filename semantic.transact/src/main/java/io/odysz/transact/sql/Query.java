@@ -1,5 +1,7 @@
 package io.odysz.transact.sql;
 
+import static io.odysz.common.LangExt.eq;
+import static io.odysz.transact.sql.parts.condition.ExprPart.constr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,9 +15,9 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.JoinTabl;
+import io.odysz.transact.sql.parts.JoinTabl.join;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
-import io.odysz.transact.sql.parts.JoinTabl.join;
 import io.odysz.transact.sql.parts.antlr.ConditVisitor;
 import io.odysz.transact.sql.parts.antlr.SelectElemVisitor;
 import io.odysz.transact.sql.parts.condition.Condit;
@@ -24,6 +26,7 @@ import io.odysz.transact.sql.parts.select.GroupbyList;
 import io.odysz.transact.sql.parts.select.Havings;
 import io.odysz.transact.sql.parts.select.OrderyList;
 import io.odysz.transact.sql.parts.select.SelectElem;
+import io.odysz.transact.sql.parts.select.SelectElem.ElemType;
 import io.odysz.transact.sql.parts.select.SelectList;
 import io.odysz.transact.sql.parts.select.SqlUnion;
 import io.odysz.transact.sql.parts.select.WithClause;
@@ -201,20 +204,27 @@ public class Query extends Statement<Query> {
 	 * @param alias
 	 * @return current query object
 	 * @throws TransException 
+	 * @since 1.4.40, {@code col} can be null or empty, and will be used as "null" or "''".
 	 */
 	public Query col(String col, String... alias) throws TransException {
-		if (col == null)
-			throw new TransException("col is null");
-		SelectElem colElem = SelectElemVisitor.parse(col) ;
-		if (colElem == null)
-			throw new TransException("column %s can't be parsed.", col);
+//		if (col == null)
+//			throw new TransException("col is null");
+		if (col == null || eq("null", col))
+			selectList.add(new SelectElem(ElemType.expr, "null"));
+		else if (isblank(col))
+			selectList.add(new SelectElem(constr("")));
+		else {
+			SelectElem colElem = SelectElemVisitor.parse(col) ;
+			if (colElem == null)
+				throw new TransException("column '%s' can't be parsed.", col);
 
-		if (alias != null && alias.length > 0 && alias[0] != null)
-			colElem.as(alias[0]);
-		if (selectList == null)
-			selectList = new ArrayList<SelectElem>();
+			if (alias != null && alias.length > 0 && alias[0] != null)
+				colElem.as(alias[0]);
+			if (selectList == null)
+				selectList = new ArrayList<SelectElem>();
 
-		selectList.add(colElem);
+			selectList.add(colElem);
+		}
 		return this;
 	}
 	
@@ -258,18 +268,34 @@ public class Query extends Statement<Query> {
 
 	/**
 	 * @param col_ases 'col as alias' or 'col_name'
-	 * @return
+	 * @return this
 	 * @throws TransException
+	 * 
+	 * @since 1.4.40, this method will have {@link SelectElem} generate null and '' for null or empty columns.
+	 * <pre> Insert i = st.insert("a_users")
+	 *  .cols("userName", "orgId", "pswd", "userId")
+	 *  .select(st.select(null).cols("'Ody'", null, "", "'odyz'"))
+	 *  .where(op.notexists, null,
+	 *  	st.select("a_users")
+	 *  	.whereEq("userId", "odyz"));
+	 *  
+	 * i.commit(mysqlCxt, sqls);
+	 * assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' )",
+	 *		sqls.get(0));</pre>
 	 */
 	public Query cols(String... col_ases) throws TransException {
 		if (col_ases != null)
 			for (String col_as : col_ases) {
-				if (col_as == null) continue;
-				String[] cass = col_as.split(" ([Aa][Ss] )?");
-				if (cass != null && cass.length > 1)
-					col(cass[0], cass[1]);
-				else if (cass != null)
-					col(cass[0]);
+				if (col_as == null)
+					// continue;
+					col("null");
+				else {
+					String[] cass = col_as.split(" ([Aa][Ss] )?");
+					if (cass != null && cass.length > 1)
+						col(cass[0], cass[1]);
+					else if (cass != null)
+						col(cass[0]);
+				}
 			}
 		return this;
 	}

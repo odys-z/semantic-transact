@@ -1,5 +1,6 @@
 package io.odysz.transact.sql;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.anson.Anson;
+import io.odysz.anson.JsonOpt;
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
@@ -120,16 +124,33 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return nv(n, String.valueOf(v));
 	}
 
-	public T nv(String n, String[] v) {
+	public T nv(String n, Object[] v) {
+		JsonOpt opt = new JsonOpt().escape4DB(true);
 		return (T) nv(n, Stream
-					.of(v)
-					.filter(m -> !isblank(m))
-					.collect(Collectors.joining(",")));
+			.of(v)
+			.filter(m -> !isblank(m))
+			.map(m -> {
+				try {
+					return m instanceof AbsPart
+						? ((AbsPart)m).sql(null)
+						: m instanceof Anson
+						? ((Anson)m).toBlock(opt)
+						: m.toString();
+				} catch (TransException | AnsonException | IOException e) {
+					e.printStackTrace();
+					return m.toString();
+				}
+			})
+			.collect(Collectors.joining(",")));
 	}
 
 	public T nv(String n, AbsPart v) {
-		Utils.warn("Statement.nv(): Only Update and Insert can use nv() function.");
+		Utils.warn("Statement.nv(): Only Update and Insert can use nv(String, AbsPart) function.");
 		return (T) this;
+	}
+
+	public T nv(String n, Anson v) throws AnsonException, IOException {
+		return nv(n, v.toBlock(new JsonOpt().escape4DB(true)));
 	}
 
 	public T where(String logic, String loperand, String roperand) {

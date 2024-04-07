@@ -530,7 +530,7 @@ public class Funcall extends ExprPart {
 	}
 
 	protected static String sqlNow(ISemantext context, String[] args) {
-		dbtype dt = context.dbtype();
+		dbtype dt = context == null ? null : context.dbtype();
 		if (dt == dbtype.mysql)
 			return "now()";
 		else  if (dt == dbtype.sqlite)

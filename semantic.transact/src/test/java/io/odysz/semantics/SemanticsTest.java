@@ -347,15 +347,30 @@ public class SemanticsTest {
 	}
 	
 	@Test
+	public void testInsertSelectConstr() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Insert i = st.insert("a_users")
+			.cols("userName", "orgId", "pswd", "userId")
+			.select(st.select(null).cols("'Ody'", null, "", "'odyz'"))
+			.where(op.notexists, null,
+				st.select("a_users")
+					.whereEq("userId", "odyz"));
+
+		i.commit(mysqlCxt, sqls);
+		assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' )",
+				sqls.get(0));
+	}
+	
+	@Test
 	public void testInsertWhereExists() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		Insert i = st.insert("a_users")
-		.cols("userName", "userId")
-		.select(st.select(null).cols("'Ody'", "'odyz'"))
-		.where(op.notexists, null,
-			st.select("a_users")
-				.whereEq("userId", "odyz")
-				.limit(1));
+			.cols("userName", "userId")
+			.select(st.select(null).cols("'Ody'", "'odyz'"))
+			.where(op.notexists, null,
+				st.select("a_users")
+					.whereEq("userId", "odyz")
+					.limit(1));
 
 		i.commit(mysqlCxt, sqls);
 		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
