@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.LangExt;
+import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
@@ -206,24 +207,33 @@ public class Query extends Statement<Query> {
 	 * @throws TransException 
 	 * @since 1.4.40, {@code col} can be null or empty, and will be used as "null" or "''".
 	 */
-	public Query col(String col, String... alias) throws TransException {
+	public Query col(Object col, String... alias) throws TransException {
 //		if (col == null)
 //			throw new TransException("col is null");
-		if (col == null || eq("null", col))
-			selectList.add(new SelectElem(ElemType.expr, "null"));
-		else if (isblank(col))
-			selectList.add(new SelectElem(constr("")));
+		if (selectList == null)
+			selectList = new ArrayList<SelectElem>();
+
+		if (col instanceof String) {
+			if (col == null || eq("null", (String)col))
+				selectList.add(new SelectElem(ElemType.expr, "null"));
+			else if (isblank(col))
+				selectList.add(new SelectElem(constr("")));
+			else {
+				SelectElem colElem = SelectElemVisitor.parse((String) col) ;
+				if (colElem == null)
+					throw new TransException("column '%s' can't be parsed.", col);
+
+				if (alias != null && alias.length > 0 && alias[0] != null)
+					colElem.as(alias[0]);
+
+				selectList.add(colElem);
+			}
+		}
 		else {
-			SelectElem colElem = SelectElemVisitor.parse(col) ;
-			if (colElem == null)
-				throw new TransException("column '%s' can't be parsed.", col);
-
-			if (alias != null && alias.length > 0 && alias[0] != null)
-				colElem.as(alias[0]);
-			if (selectList == null)
-				selectList = new ArrayList<SelectElem>();
-
-			selectList.add(colElem);
+			try {selectList.add(new SelectElem((ExprPart) col));}
+			catch (Exception e) {
+				Utils.warn("Col %s is not understandable", col == null ? "null" : col.toString());
+			}
 		}
 		return this;
 	}
@@ -283,19 +293,20 @@ public class Query extends Statement<Query> {
 	 * assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' )",
 	 *		sqls.get(0));</pre>
 	 */
-	public Query cols(String... col_ases) throws TransException {
+	public Query cols(Object ... col_ases) throws TransException {
 		if (col_ases != null)
-			for (String col_as : col_ases) {
+			for (Object col_as : col_ases) {
 				if (col_as == null)
-					// continue;
 					col("null");
-				else {
-					String[] cass = col_as.split(" ([Aa][Ss] )?");
+
+				else if (col_as instanceof String) {
+					String[] cass = ((String)col_as).split(" ([Aa][Ss] )?");
 					if (cass != null && cass.length > 1)
 						col(cass[0], cass[1]);
 					else if (cass != null)
 						col(cass[0]);
 				}
+				else col(col_as);
 			}
 		return this;
 	}
