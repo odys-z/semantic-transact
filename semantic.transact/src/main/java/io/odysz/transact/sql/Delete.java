@@ -14,6 +14,14 @@ public class Delete extends Statement<Delete>  {
 		super(transc, tabl, null);
 	}
 
+	/**
+	 * Commit delete statements.
+	 * @param stx
+	 * @return results of postOp.onCommitOk. For Delete created by DATrasct#delete(), should be
+	 * SemanticObject with {"total", rows, "resulved" sctx.resulves()}.
+	 * @throws TransException
+	 * @throws SQLException
+	 */
 	public Object d(ISemantext stx) throws TransException, SQLException {
 		if (postOp != null) {
 			ArrayList<String> sqls = new ArrayList<String>(); 
