@@ -492,7 +492,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		postOp = operatn;
 	}
 
-	/**Called when starting preparing sql, works like preparing auto generated key etc. should go here.
+	/**
+	 * Called when starting preparing sql, works like preparing auto generated key etc. should go here.
+	 * 
 	 * @param ctx
 	 */
 	void prepare(ISemantext ctx) { }
@@ -500,7 +502,9 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	@Override
 	public abstract String sql(ISemantext context) throws TransException;
 
-	/** Get columns to be set / insert values.
+	/**
+	 * Get columns to be set / insert values.
+	 * 
 	 * <p>{@link Delete} an {@link Insert} should override this method.</p>
 	 * @return columns
 	 */

@@ -132,7 +132,7 @@ public class Semantext2 implements ISemantext {
 	public dbtype dbtype() { return dbtype.sqlite; }
 
 	@Override
-	public String genId(String conn, String tabl, String col) throws SQLException, TransException {
+	public String genId(String conn, String tabl, String col, String...precol) throws SQLException, TransException {
 		return "";
 	}
 
