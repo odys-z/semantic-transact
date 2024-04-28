@@ -5,6 +5,7 @@ import static io.odysz.transact.sql.parts.condition.ExprPart.constr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -586,7 +587,7 @@ public class Query extends Statement<Query> {
 				orderby(order[0], order.length > 1 ? order[1] : "asc");
 		return this;
 	}
-
+	
 	public Query having(String scond, Object... args) {
 		return having(Sql.condt(scond, args));
 	}

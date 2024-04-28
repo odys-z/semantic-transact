@@ -7,10 +7,10 @@ import java.util.Arrays;
 
 import io.odysz.transact.x.TransException;
 
-/**Radix 64 (String) v.s. int converter
- * @version '=' is replaced by '-' for easyui compatibility (last '=' in id makes trouble).
+/**
+ * Radix 64 (String) v.s. int converter
+ * 
  * @author ody
- *
  */
 public class Radix64 {
 	/**The same table as in db table ir_radix64 <br>
@@ -52,7 +52,7 @@ public class Radix64 {
 	/**
 	 * @since 1.4.25
 	 * @param v
-	 * @param digits max digits (Radix string length, fill higher with '0')
+	 * @param digits max digits (Radix string length, fill more significant with '0')
 	 * @param radix 32 or 64 only
 	 * @param radchar the lookup table
 	 * @return Radix 64/32 string

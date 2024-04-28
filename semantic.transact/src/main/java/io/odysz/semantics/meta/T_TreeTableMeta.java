@@ -1,12 +1,12 @@
 package io.odysz.semantics.meta;
 
-public class TreeTableMeta extends TableMeta {
+public class T_TreeTableMeta extends TableMeta {
 
 	protected final String parent;
 	protected String fullpath;
 	protected String sort;
 
-	public TreeTableMeta(String tbl, String pk, String parent, String[] conn) {
+	public T_TreeTableMeta(String tbl, String pk, String parent, String[] conn) {
 		super(tbl, conn);
 		
 		this.pk 	  = pk; // "pk";
@@ -15,12 +15,12 @@ public class TreeTableMeta extends TableMeta {
 		this.sort     = "sort";
 	}
 	
-	public TreeTableMeta sort(String field) {
+	public T_TreeTableMeta sort(String field) {
 		this.sort = field;
 		return this;
 	}
 
-	public TreeTableMeta fullpath(String field) {
+	public T_TreeTableMeta fullpath(String field) {
 		this.fullpath = field;
 		return this;
 	}

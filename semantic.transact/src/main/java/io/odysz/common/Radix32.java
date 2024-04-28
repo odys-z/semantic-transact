@@ -5,11 +5,11 @@ import static io.odysz.common.LangExt.indexOf;
 
 import io.odysz.transact.x.TransException;
 
-/**For Windows file system not distinguish upper lower cases.
+/**
+ * For Windows file system not distinguishing upper lower cases.
  * Radix 32 (String) v.s. int converter
- * @version '=' is replaced by '-' for easyui compatibility (last '=' in id makes trouble).
+ * 
  * @author ody
- *
  */
 public class Radix32 {
 	/**The same table as in db table ir_radix64 <br>
