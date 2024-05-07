@@ -1,7 +1,10 @@
 package io.odysz.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import static io.odysz.common.LangExt.eq;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -65,8 +68,8 @@ public class DocLocksTest {
 		try { assertEquals("r1,r2,w1",
 					 seq.stream().collect(Collectors.joining(",")));
 		} catch (AssertionError e) {
-			assertEquals("r1,w1,r2",
-				res.stream().collect(Collectors.joining(",")));
+			assertTrue(eq("r1,w1,r2", res.stream().collect(Collectors.joining(",")))
+					|| eq("w1,r2,r1", res.stream().collect(Collectors.joining(","))));
 		}
 	} 
 

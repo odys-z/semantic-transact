@@ -15,27 +15,30 @@ public class TableMeta {
 	/**
 	 * <p>A helper for test on sqlite.</p>
 	 * 
-	 * Subclass must override this like:
-	 * <pre>static {
+	 * Subclass must load this like in constructor:
+	 * <pre>{
 	 * 	ddlSqlite = Utils.loadTxt(Subclass.class, \"file-path\")");
 	 * }</pre>
 	 * 
 	 * @throws TransException 
 	 * @since 1.4.25
 	 */
-	public static String ddlSqlite;
+	public String ddlSqlite;
 
-	private HashMap<String, ColMeta> types;
+	/** {col-name: {@link ColMeta}} */
+	protected HashMap<String, ColMeta> ftypes;
+	public HashMap<String, ColMeta> ftypes() { return ftypes; }
+
 	/**
 	 * Is the column types already loaded from DB?
 	 * @since 1.4.25
 	 * @return true if there are some types
 	 */
 	public boolean typesInited() {
-		return types != null && types.size() > 0;
+		return ftypes != null && ftypes.size() > 0;
 	}
 
-	public String tbl;
+	public final String tbl;
 	public String pk;
 
 	protected String conn;
@@ -47,18 +50,18 @@ public class TableMeta {
 
 	public TableMeta(String tbl, String ... conn) {
 		this.tbl = tbl;
-		types = new HashMap<String, ColMeta>();
+		ftypes = new HashMap<String, ColMeta>();
 		this.conn = isNull(conn) ? null : conn[0];
 	}
 
 	public TableMeta col(String col, coltype t) {
-		types.put(col, new ColMeta(t));
+		ftypes.put(col, new ColMeta(t));
 		return this;
 	}
 	
 	public boolean isQuoted(String col) {
-		return types.containsKey(col) ? 
-				types.get(col).isQuoted()
+		return ftypes.containsKey(col) ? 
+				ftypes.get(col).isQuoted()
 				: true;
 	}
 
@@ -71,7 +74,7 @@ public class TableMeta {
 	 */
 	public TableMeta col(String coln, String t, int len) {
 		ColMeta cm = new ColMeta(t);
-		types.put(coln, cm.tlen(len));
+		ftypes.put(coln, cm.tlen(len));
 		return this;
 	}
 
@@ -80,8 +83,8 @@ public class TableMeta {
 	}
 
 	public coltype coltype(String col) {
-		return types != null && types.containsKey(col) ?
-				types.get(col).type() : null; //coltype.text;
+		return ftypes != null && ftypes.containsKey(col) ?
+				ftypes.get(col).type() : null; //coltype.text;
 	}
 
 	/**
@@ -95,10 +98,10 @@ public class TableMeta {
 	@SuppressWarnings("unchecked")
 	public TableMeta clone(TableMeta from) throws TransException {
 		if (!eqs(conn, from.conn, tbl, from.tbl))
-			throw new TransException("Table name or connection Id are not identical, %s : %s; %s : %s",
+			throw new TransException("[TableMeta#clone()] Table name or connection Id are not identical, %s : %s; %s : %s",
 					conn, from.conn, tbl, from.tbl);
 
-		types = from.types;
+		ftypes = from.ftypes;
 		
 		Class<? extends TableMeta> clazz = getClass();
 		Field[] fields = getClass().getDeclaredFields();
@@ -110,9 +113,13 @@ public class TableMeta {
 	    			if (String.class != f.getType())
 	    				continue;
 					String fv = (String) f.get(this);
-					if (!types.containsKey(fv))
-						Utils.warn("Field %s#%s(value: %s) is not defined in table '%s'.",
-	    					clazz.getTypeName(), f.getName(), fv, tbl);
+					if (!ftypes.containsKey(fv)) {
+						Semantation ann = f.getAnnotation(Semantation.class);
+						if (ann == null || !ann.noDBExists())
+						Utils.warn("[TableMeta#clone()] Meta field %s#%s(value: %s) is not defined in table '%s' (conn %s)."
+								+ "\nTo suppress this warning, add @Semantation (notDBExists = true) to the field.",
+	    					clazz.getTypeName(), f.getName(), fv, tbl, conn);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

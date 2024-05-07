@@ -15,7 +15,7 @@ public class Alias extends AbsPart {
 	public String sql(ISemantext ctx) {
 		if (ctx != null && ctx.dbtype() == dbtype.oracle)
 			return "\"" + a + "\"";
-		return a;
+		return a == null ? "" : a;
 	}
 
 	public String toUpperCase() {

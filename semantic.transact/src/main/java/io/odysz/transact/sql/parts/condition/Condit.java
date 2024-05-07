@@ -31,7 +31,7 @@ search_condition_not
 	 */
 
 	public Condit(op op, String lop, String rop) {
-		super(op, lop, rop);
+		super(op, lop, rop); // FIXME op = eq, lop = e.pid, rop = ch.entfk, line 1:8 mismatched input '<EOF>' expecting '.'
 		this.logitype = Logic.type.empty;
 	}
 
@@ -55,6 +55,23 @@ search_condition_not
 		super(op, lop, rop);
 		this.logitype = Logic.type.empty;
 	}
+	
+	/**
+	 * Generate a "in" condition for: lop in ('constr[0]', 'constr[1]', ...)
+	 * @param lop
+	 * @param constvs
+	 * @return Condit instance
+	 * @since 1.4.36
+	public static Condit in(String lop, String[] constr) {
+		if (constr != null) {
+			ArrayList<ExprPart> rops = new ArrayList<ExprPart>(constr.length); 
+			for (String c : constr)
+				rops.add(Funcall.constr(c));
+			return new Condit(op.in, lop, rops);
+		}
+		return null;
+	}
+	 */
 
 	public boolean isEmpty() {
 		return (condts == null || condts.size() == 0) && super.empty;
@@ -148,7 +165,7 @@ search_condition_not
 	}
 
 	/**<p>Sometimes conditions's table name or alias are ignored by client.
-	 * This method can be called by {@link io.odysz.transact.sql.parts.select.JoinTabl}
+	 * This method can be called by {@link io.odysz.transact.sql.parts.JoinTabl}
 	 * to supply additional information when generating sql.<p>
 	 * <p><b>TODO DESIGN MEMO</b><br>
 	 * {@link Condit}s are parsed from sometimes from where clause, sometimes from join-on clause,

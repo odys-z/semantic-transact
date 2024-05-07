@@ -4,11 +4,16 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
-/**<p>Transaction Context, also can be take as a Transaction / Batching SQL builder creator.</p> 
+/**
+ * <p>Transaction builder, also can be take as a Transaction / Batching SQL builder,
+ * with semantics context's creator.</p> 
  * <p>A Transcxt is typically plugged in with ISemantext, which is the handler of semantics.</p>
  * <p>When building sql, events like onInserting, etc. are fired to ISemantext.
+ * TODO this is supposed to be renamed as TransBuilder in the future.
+ * 
  * @author odys-z@github.com
  */
 public class Transcxt {
@@ -16,7 +21,8 @@ public class Transcxt {
 	protected ISemantext basictx;
 	public ISemantext basictx() { return basictx; }
 
-	/**Get a {@link ISemantext} that typically handle configured semantics,
+	/**
+	 * Get a {@link ISemantext} that typically handle configured semantics,
 	 * @param conn not used
 	 * @param usr the session user
 	 * @return a new instance for building sql, resulving sql, etc.
@@ -26,7 +32,8 @@ public class Transcxt {
 		return basictx == null ? null : basictx.clone(usr).connId(conn == null ? basictx.connId() : conn);
 	}
 
-	/**Create a statements manager.
+	/**
+	 * Create a statements manager.
 	 * @param staticSemantext A static semantic providing basic DB access, used to generate autoID etc.
 	 */
 	public Transcxt(ISemantext staticSemantext) {
@@ -34,11 +41,17 @@ public class Transcxt {
 	}
 	
 	public Query select(String tabl, String ... alias) {
-		return new Query(this, tabl, alias);
+		Query q = new Query(this, tabl, alias).with(withClause);
+		this.withClause = null;
+		return q;
 	}
 	
 	public Insert insert(String tabl) {
 		return new Insert(this, tabl);
+	}
+
+	public InsertExp insertExp(String tbl) {
+		return new InsertExp(this, tbl);
 	}
 	
 	public Update update(String tabl) {
@@ -79,5 +92,86 @@ public class Transcxt {
 	 */
 	public AbsPart quotation(Object v, String conn, String tabl, String col) {
 		throw new NullPointerException("This method must be ovrriden by DA layser.");
+	}
+
+	/**
+	 * With clausse for query. Will be cleared when consumed by select().
+	 * 
+	 * @since 1.4.36 tested with SQLite.
+	 */
+	private WithClause withClause;
+
+	/**
+	 * <h5>With clause for multiple tables without recursive query.</h5>
+	 * <ol>
+	 * 	<li><a href='https://www.sqlite.org/lang_with.html'>SQLite, The WITH Clause</a></li>
+	 * 	<li><a href='https://dev.mysql.com/doc/refman/8.0/en/with.html'>
+	 * MySql 8.0, 13.2.20 WITH (Common Table Expressions)</a></li>
+	 * 	<li><a href='https://oracle-base.com/articles/misc/with-clause'>
+	 * Oracle, WITH Clause : Subquery Factoring in Oracle</a></li>
+	 * 	<li><a href='https://learn.microsoft.com/en-us/sql/t-sql/queries/with-common-table-expression-transact-sql?view=sql-server-ver16'>
+	 * WITH common_table_expression (Transact-SQL)</a></li>
+	 * </ol>
+	 * <pre>
+	 *  st.with(st
+	 *       .select("a_users", "u")
+	 *       .j("h_photo_org", "ho", "ho.oid=u.orgId")
+	 *       .whereEq("u.userId", "ody"))
+	 *   .select("h_photos", "p")
+	 *   .col(avg("filesize"), "notes")
+	 *   .je("p", null, "u", "shareby", "userId")
+	 *   .commit(st.instancontxt(null, null), sqls);
+	 *
+	 *   assertEquals("with " +
+	 *       "u as (select * from a_users u join h_photo_org ho on ho.oid = u.orgId where u.userId = 'ody') " +
+	 *       "select avg(filesize) notes from h_photos p join  u on p.shareby = u.userId",
+	 *       sqls.get(0));</pre>
+	 * @since 1.4.36
+	 * @param q0
+	 * @param qi
+	 * @return this
+	 */
+	public Transcxt with(Query q0, Query... qi) {
+		if (this.withClause == null)
+			this.withClause = new WithClause(false);
+		this.withClause.with(q0, qi);
+		return this;
+	}
+
+	/**
+	 * For adding a recursive table.
+	 * <pre>
+    st.with(true,
+        "orgrec(orgId, parent, deep)", 
+        "values('kerson', 'ur-zsu', 0)",
+        st.select("a_orgs", "p")
+            .col("p.orgId").col("p.parent").col(Funcall.add("ch.deep", 1))
+            .je("p", "orgrec", "ch", "orgId", "parent"))
+      .select("a_orgs", "o")
+      .cols("orgName", "deep")
+      .je("o", null, "orgrec", "orgId")
+      .orderby("deep")
+      .commit(st.instancontxt(null, null), sqls);
+        
+    assertEquals("with recursive "
+      + "orgrec(orgId, parent, deep) as (values('kerson', 'ur-zsu', 0) union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
+      + "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
+        sqls.get(0));
+     * </pre>
+     * 
+     * The generated clause will be cleared after calling {@link #select(String, String...)}.
+	 * 
+	 * @param recursive
+	 * @param recurTabl recursive table name, e. g. orgrec
+	 * @param rootValue starting value, e. g. "values('kerson', 'ur-zsu', 0)"
+	 * @param q the query used to union within this recursive table
+	 * @return this
+	 * @since 1.4.36 tested with SQLite.
+	 */
+	public Transcxt with(boolean recursive, String recurTabl, String rootValue, Query q) {
+		if (withClause == null)
+			this.withClause = new WithClause(recursive);
+		withClause.with(recurTabl, rootValue, q);
+		return this;
 	}
 }

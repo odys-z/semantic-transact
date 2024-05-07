@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
@@ -23,7 +24,12 @@ import io.odysz.transact.sql.parts.insert.InsertValues;
 import io.odysz.transact.sql.parts.insert.InsertValuesOrcl;
 import io.odysz.transact.x.TransException;
 
-/**sql: insert into tabl(...) values(...) / select ...
+/**
+ * sql: insert into tabl(...) values(...) / select ...
+ * 
+ * @since 1.4.40, this class support where clause, which can be helpful when insert or
+ * update a record. (Not the same usage for different DB) 
+ * 
  * @author ody
  *
  */
@@ -42,6 +48,8 @@ public class Insert extends Statement<Insert> {
 	 * TODO let's deprecate this - all new nv are appended to last of valuesNv.
 	 */
 	private ArrayList<Object[]> currentRowNv;
+	
+	protected Query existsQuery;
 
 	/**
 	 * Insert statement intialization, not come with a post operation for committing SQL.
@@ -79,8 +87,10 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
+	/**
+	 * Instead of using {@link #nv(String, AbsPart)} to setup columns, sometimes we use insert tabl(col) select ...<br>
 	 * This method is used to setup cols in the latter case.
+	 * 
 	 * @param col0
 	 * @param cols
 	 * @return this
@@ -111,8 +121,10 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**Append values (a row) after cols been set (call {@link Insert#cols(String, String...) cols(...)} first):<br>
+	/**
+	 * Append values (a row) after cols been set (call {@link Insert#cols(String, String...) cols(...)} first):<br>
 	 * [[col1, val1], [col2, val2], ...]
+	 * 
 	 * @param val pairs of col-val
 	 * @return this
 	 * @throws TransException
@@ -193,6 +205,25 @@ public class Insert extends Statement<Insert> {
 
 		return this;
 	}
+	
+	/**
+	 * @param nvs a row's n-v pairs, e.g. col-A, val-A, col-B, val-B, ...
+	 * @return
+	 * @throws TransException 
+	 */
+	public Insert value(Object ... nvs) throws TransException {
+		if (nvs != null) {
+			ArrayList<Object[]> row = new ArrayList<Object[]>(nvs.length / 2);
+			ArrayList<String> cols = new ArrayList<String>(nvs.length / 2);
+			for (int i = 0; i < nvs.length; i += 2) {
+				row.add(new Object[] {nvs[i], nvs[i + 1]});
+				cols.add((String) nvs[i]);
+			}
+			cols(cols.toArray(new String[0]));
+			return value(row);
+		}
+		return this;
+	}
 
 	@SuppressWarnings("unchecked")
 	public Insert values(ArrayList<ArrayList<Object[]>> arrayList) throws TransException {
@@ -202,7 +233,17 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**select clause in sql: insert into tabl() <b>select ...</b>
+	/**
+	 * select clause in sql: insert into tabl() <b>select ...</b>
+	 * <pre>e. g.
+	st.insert("a_role_funcs")
+	  .select(st.select("a_functions", "f")
+	    .cols("f.funcId", "'admin' roleId", "'c,r,u,d'")
+	    .j("a_roles", "r", "r.roleId='%s'", "admin"))
+	// insert into a_role_funcs  
+	// select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'"
+	 * </pre>
+	 * @see {@link TestTransc#testInsertSelectPostUpdate()}
 	 * @param values
 	 * @return this
 	 * @throws TransException
@@ -214,7 +255,64 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	/**sql: insert into tabl(...) values(...) / select ...
+	/**
+	 * <p>Sql for Oracle:</p>
+	 * <pre> update maintbl set ... where exists (select * from maintbl where ...) and and-wheres;
+	 * insert into maintbl (email, campaign_id)
+	 *   select 'mom@cox.net',100 from dual where not exists
+	 *   (select * from maintbl where ...);</pre>
+	 * See <a href="https://stackoverflow.com/a/16639922/7362888">
+	 * StackOverflow: Oracle insert if not exists statement</a>.
+	 * 
+	 * <p>Sql for MySql:</p>
+	 * <pre> update maintbl set ... where exists (select * from maintbl where ...) and and-wheres;
+	 * insert into maintbl (name, address, tele)
+	 *   select * from (select 'john', 'doe', '022') as tmp
+	 *   where not exists (select name from maintbl where ...);
+	 * </pre>
+	 * See <a href="https://stackoverflow.com/a/3164741/7362888">
+	 * StackOverflow: MySQL: Insert record if not exists in table [duplicate]</a>.
+	 * 
+	 * <p>Sql for sqlite</p>
+	 * <pre> update maintbl set ... where ...(and-wheres) and exists (select 1 from maintbl where ...);
+	 * insert into memos(id,text) 
+	 *   select 5, 'text to insert'
+	 *   where not exists (select 1 from maintbl where ...);</pre>
+	 * 
+	 * <p>Sql for ms sql server</p>
+	 * <pre> update maintbl ...
+	 * insert  maintbl (SoftwareName, SoftwareSystemType)
+	 *   select  @SoftwareName, @SoftwareType wherenot exists 
+	 *   select  1 from    tblSoftwareTitles
+	 *   where   softwarename = @softwarename
+	 *   and     SoftwareSystemType = @Softwaretype);</pre>
+	 *
+	 * <h5>NOTE</h5>
+	 * <ol>
+	 * <li>The Update statement is not generated by this statement. It's user's responsibility to append this
+	 * Insert to the Update statement.</li>  
+	 * <li>It's users' responsibility to make sure the Select query for updating returns 1 row if exists.</li>
+	 * <li>Open an issue if supporting {@code Merge} is necessary. But after tried Upsert by {@link InsertExp}</li>
+	 * </ol>
+	 * 
+	 * <h5>Reference</h5>
+	 * A performance experiment: <a href='https://cc.davelozinski.com/sql/fastest-way-to-insert-new-records-where-one-doesnt-already-exist'>
+	 * SQL: Fastest way to insert new records where one doesn’t already exist</a>
+	 * @param select
+	 * @return this
+	 */
+	public Insert notExists(Query select) {
+//		if (orUpdate)
+//			throw new TransException("This method can only be called once.");
+//		orUpdate    = true;
+//		orUpdateNvs = nvs;
+		existsQuery = select;
+		return this;
+	}
+
+	/**
+	 * sql: insert into tabl(...) values(...) / select ...
+	 * 
 	 * @see io.odysz.transact.sql.parts.AbsPart#sql(ISemantext)
 	 */
 	@Override
@@ -223,34 +321,36 @@ public class Insert extends Statement<Insert> {
 				&& valuesNv.size() > 0
 				&& valuesNv.get(0) != null
 				&& valuesNv.get(0).size() > 0;
-		if (!hasVals && selectValues == null) return "";
+		if (!hasVals && selectValues == null) {
+			Utils.warn("[Insert#sql()] Trying to stream a Insert statement without values, table %s, conn %s.",
+					this.mainTabl.name(), sctx.connId());
+			return "";
+		}
 
-		// insert into tabl(...) values(...) / select ...
-		Stream<String> s = Stream.concat(
-			// insert into tabl(...)
-			Stream.of(new ExprPart("insert into"), mainTabl, mainAlias,
-					// (...)
-					new ColumnList(insertCols)
-			   // values(...) / select ...
-			), Stream.concat(
-				// values (...)
-				// whether 'values()' appears or not is the same as value valuesNv
-				Stream.of(// new ExprPart("values"),
-						// 'v1', 'v2', ...)
-					sctx != null && sctx.dbtype() == dbtype.oracle ?
-							new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
-							new InsertValues(mainTabl.name(), insertCols, valuesNv)
-				).filter(w -> hasVals),
-				// select ...
-				Stream.of(selectValues).filter(w -> selectValues != null))
-			).map(m -> {
-				try {
-					return m == null ? "" : m.sql(sctx);
-				} catch (TransException e) {
-					e.printStackTrace();
-					return "";
-				}
-			});
+		Stream<String> s = Stream.of(
+			new ExprPart("insert into"),
+			mainTabl, mainAlias,
+			// (...)
+			new ColumnList(insertCols),
+			// values(...)
+			hasVals
+				? sctx != null && sctx.dbtype() == dbtype.oracle ?
+					new InsertValuesOrcl(mainTabl.name(), insertCols, valuesNv) :
+					new InsertValues(mainTabl.name(), insertCols, valuesNv)
+				: null,
+			selectValues,
+			
+			where == null ? null : new ExprPart("where"),
+			where
+		).filter(w -> w != null)
+		.map(m -> {
+			try {
+				return m == null ? "" : m.sql(sctx);
+			} catch (TransException e) {
+				e.printStackTrace();
+				return "";
+			}
+		});
 
 		return s.collect(Collectors.joining(" "));
 	}

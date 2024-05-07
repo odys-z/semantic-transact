@@ -12,9 +12,11 @@ import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.semantics.meta.TableMeta;
+import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Query;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
@@ -48,7 +50,7 @@ public class SemanticsTest {
 			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
+			"insert into a_functions (funcId, funcName, sibling, parentId, fullpath) values ('AUTO', 'Test 001', 10, '0', 'fullpath 0.0 AUTO')",
 			sqls.get(0));
 		
 		ArrayList<ArrayList<Object[]>> vals = new ArrayList<ArrayList<Object[]>>();
@@ -68,7 +70,7 @@ public class SemanticsTest {
 			.value(r2)
 			.commit(st.instancontxt(null, null), sqls);
 
-		assertEquals("insert into a_role_funcs  (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
+		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f01'), ('r02', 'f02'), ('r02', 'f02')",
 				sqls.get(1));
 		Utils.logi(sqls);
 	}
@@ -128,7 +130,7 @@ public class SemanticsTest {
 			.value(row1)
 			.commit(orclCxt, sqls);
 
-		assertEquals("insert into \"a_functions\"  (\"funcName\", \"funcId\", \"fullpath\") select 'oracle 01', 'orcl-01', 'fullpath null.sibling orcl-01' from dual union select 'oracle 02', 'orcl-02', 'fullpath null.sibling orcl-02' from dual",
+		assertEquals("insert into \"a_functions\" (\"funcName\", \"funcId\", \"fullpath\") select 'oracle 01', 'orcl-01', 'fullpath null.sibling orcl-01' from dual union select 'oracle 02', 'orcl-02', 'fullpath null.sibling orcl-02' from dual",
 				sqls.get(0));
 		
 		ArrayList<Object[]> user = new ArrayList<Object[]>(2);
@@ -140,7 +142,7 @@ public class SemanticsTest {
 			.value(user)
 			.commit(orclCxt, sqls);
 
-		assertEquals("insert into \"a_users\"  (\"userName\", \"userId\") values ('user 01', 'u-01')",
+		assertEquals("insert into \"a_users\" (\"userName\", \"userId\") values ('user 01', 'u-01')",
 				sqls.get(1));
 	}
 
@@ -239,26 +241,26 @@ public class SemanticsTest {
 		st.insert("a_functions")
 			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
 			.nv("funcName", "")						// type text,		blank 		=> ''
-			.nv("sibling", ExprPart.constStr(null))	// type number,		null 		=> null
+			.nv("sibling", ExprPart.constr(null))	// type number,		null 		=> null
 			.nv("someDat", "")						// type datetime,	blank 		=> ''
-			.nv("parentId", ExprPart.constStr(null))// type text,		null		=> null
+			.nv("parentId", ExprPart.constr(null))	// type text,		null		=> null
 			.commit(st.instancontxt(null, null), sqls);
 		
-		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
-			"values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')",
-			sqls.get(0));
+		String expected_1 = "insert into a_functions (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+							"values ('AUTO', '', null, '', null, 'fullpath null.null AUTO')";
+		assertEquals(expected_1.length(), sqls.get(0).length());
+		assertEquals(expected_1, sqls.get(0));
 
 		st.insert("a_functions")
 			.nv("funcId", "AUTO")					// no coltype,		not empty	=> 'AUTO'
-			.nv("funcName", ExprPart.constStr(null))// type text,		null 		=> null
+			.nv("funcName", ExprPart.constr(null))	// type text,		null 		=> null
 			.nv("sibling", "")						// type number,		blank 		=> 0
-			.nv("someDat", ExprPart.constStr(null))	// type datetime,	null 		=> null
+			.nv("someDat", ExprPart.constr(null))	// type datetime,	null 		=> null
 			.nv("parentId", "")						// type text,		blank		=> ''
 			.commit(st.instancontxt(null, null), sqls);
 		
 		assertEquals(
-			"insert into a_functions  (funcId, funcName, sibling, someDat, parentId, fullpath) " +
+			"insert into a_functions (funcId, funcName, sibling, someDat, parentId, fullpath) " +
 			"values ('AUTO', null, 0, null, '', 'fullpath . AUTO')",
 			sqls.get(1));
 	}
@@ -310,5 +312,76 @@ public class SemanticsTest {
 				.col("sibling", coltype.number)
 				.col("someDat", coltype.datetime)
 				.col("parentId", coltype.text);
+	}
+	
+	@Test
+	public void testUpsert() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+
+		// mysql
+		Insert upd = st.insertExp("a_users")
+				.onDuplicate("userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people")
+				.where("=", "userId", "'admin'");
+		upd.commit(mysqlCxt, sqls);
+		
+		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on duplicate key update userName='Zelenskyy', orgId='URA'",
+				sqls.get(0));
+
+		// sqlite
+		upd = st.insertExp("a_users")
+				.onConflict(new String[] {"userId"}, "userName", constr("Zelenskyy"), "orgId", constr("URA"))
+				.value("userId", "admin", "userName", "ody", "orgId", "chaoayng people");
+		upd.commit(sqlitCxt, sqls);
+		
+		assertEquals("insert into a_users (userId, userName, orgId) values ('admin', 'ody', 'chaoayng people') on conflict(userId) do update set userName='Zelenskyy', orgId='URA'",
+				sqls.get(1));
+
+		upd = st.insertExp("a_role_funcs")
+				.onConflict(new String[] {"roleId", "funcId"}, "funcId", constr("8964"))
+				.value("roleId", "r01", "funcId", "f001-del");
+		upd.commit(sqlitCxt, sqls);
+		
+		assertEquals("insert into a_role_funcs (roleId, funcId) values ('r01', 'f001-del') on conflict(roleId, funcId) do update set funcId='8964'",
+				sqls.get(2));
+	}
+	
+	@Test
+	public void testInsertSelectConstr() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Insert i = st.insert("a_users")
+			.cols("userName", "orgId", "pswd", "userId")
+			.select(st.select(null).cols("'Ody'", null, "", "'odyz'"))
+			.where(op.notexists, null,
+				st.select("a_users")
+					.whereEq("userId", "odyz"));
+
+		i.commit(mysqlCxt, sqls);
+		assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' )",
+				sqls.get(0));
+	}
+	
+	@Test
+	public void testInsertWhereExists() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Insert i = st.insert("a_users")
+			.cols("userName", "userId")
+			.select(st.select(null).cols("'Ody'", "'odyz'"))
+			.where(op.notexists, null,
+				st.select("a_users")
+					.whereEq("userId", "odyz")
+					.limit(1));
+
+		i.commit(mysqlCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+				sqls.get(0));
+
+		i.commit(sqlitCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+				sqls.get(1));
+
+		i.commit(ms2kCxt, sqls);
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select top(1)  * from a_users  where userId = 'odyz' )",
+				sqls.get(2));
 	}
 }

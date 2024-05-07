@@ -146,21 +146,27 @@ public interface ISemantext {
 	}
 	 */
 
-	/**Get the dbtype handled by the context
+	/**
+	 * Get the dbtype handled by the context
+	 * 
 	 * @return db type
 	 */
 	public dbtype dbtype();
 
-	/**Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
+	/**
+	 * Generate an auto increasing ID for tabl.col, where connection is initialized when constructing this implementation.<br>
 	 * The new generated value is managed in this implementation class (for future resolving).<br>
+	 * 
 	 * <b>side effect</b>: generated auto key already been put into autoVals, can be referenced later.
+	 * 
 	 * @param tabl
 	 * @param col
+	 * @param prefixCol optional for key's prefix, must fed with data when auto-key generation triggered
 	 * @return new auto key.
 	 * @throws SQLException
 	 * @throws TransException
 	 */
-	String genId(String tabl, String col) throws SQLException, TransException;
+	String genId(String conn, String tabl, String col, String ... prefixCol) throws SQLException, TransException;
 
 	/**Create a new instance for a semantics processing.
 	 * @param usr

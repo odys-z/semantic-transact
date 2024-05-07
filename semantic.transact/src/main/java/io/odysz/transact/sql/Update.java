@@ -84,6 +84,17 @@ public class Update extends Statement<Update> {
 		return this;
 	}
 	
+	public Update nvs(Object... nvs) throws TransException {
+		if (nvs == null || nvs.length == 0)
+			return this;
+
+		ArrayList<Object[]> l = new ArrayList<Object[]>(nvs.length / 2);
+		for (int i = 0; i < nvs.length; i += 2)
+			l.add(new Object[] {nvs[i], nvs[i + 1]});
+
+		return nvs(l);
+	}
+	
 	/**<p>Update Limited Rows.</p>
 	 * <ul><li>ms sql 2k: update top(lmtExpr) ... see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#DML'>
 	 * 		Limiting the rows affected by DELETE, INSERT, or UPDATE</a></li>
@@ -118,7 +129,9 @@ public class Update extends Statement<Update> {
 		return upd;
 	}
 
-	/**Commit updating sql(s) to db.
+	/**
+	 * Commit updating sql(s) to db.
+	 * 
 	 * @param stx semantext instance
 	 * @return semanticObject, return of postOp; null if no postOp.
 	 * @throws TransException

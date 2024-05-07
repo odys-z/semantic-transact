@@ -4,6 +4,7 @@ package io.odysz.common;
 import static io.odysz.common.AESHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,13 +20,13 @@ public class AESHelperTest {
 	/**
 	 * C# Debug Trace:<pre>
 	Check this at server side:
-	Cypher:
+	Cipher:
 	4VGdDR9qJlq36bQGI+Sx3A==
 	Key:
 	io.github.odys-z
 	IV:
 	DITVJZA2mSDAw496hBz6BA==
-	Expacting:
+	Expecting:
 	Plain Text</pre>
 
 	 * Case 2: user pswd (why c# AES padded an extra block in CBC?)<pre>
@@ -120,5 +121,18 @@ public class AESHelperTest {
 		ifs.close();
 		
 		return b.toString();
+	}
+	
+	@Test
+	public void testSessionToken() throws Exception {
+		String uid = "ody", pswd = "io.github.odys-z";
+		String[] response = AESHelper.packSessionKey(pswd);
+		String knowledge = response[1];
+		assertEquals(24, knowledge.length());
+		assertEquals(69, response[0].length()); // 44 + 1 + 24
+		
+		String request = AESHelper.repackSessionToken((String) response[0], pswd, uid);
+		
+		assertTrue(AESHelper.verifyToken(request, knowledge, uid, pswd));
 	}
 }
