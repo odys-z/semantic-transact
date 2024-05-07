@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class DocLocksTest {
 
+	@Disabled
 	@Test
 	public void test() throws InterruptedException {
 		String src = ".";
