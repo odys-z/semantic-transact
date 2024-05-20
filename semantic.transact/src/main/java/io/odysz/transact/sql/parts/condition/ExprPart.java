@@ -198,7 +198,15 @@ public class ExprPart extends AbsPart {
 	}
 
 	/**
-	 * @deprecated since 1.4.36 replaced with {@link #constr(String)}
+	 * @since 1.4.40
+	 * @param n
+	 */
+	public ExprPart(Number n) {
+		this(String.valueOf(n));
+	}
+
+	/**
+	 * @deprecated since 1.4.36 is renamed as {@link #constr(String)}
 	 * @param v
 	 * @return constant expr
 	 */

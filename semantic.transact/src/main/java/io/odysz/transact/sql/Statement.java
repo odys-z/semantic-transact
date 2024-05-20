@@ -357,6 +357,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public T whereEq(String col, Object v) {
 		if (v instanceof String)
 			return where_("=", col, (String)v);
+		else if (v instanceof Number)
+			return where(Sql.condt(Logic.op.eq, col, new ExprPart((Number)v)));
 		else
 			return where(Sql.condt(Logic.op.eq, col, (ExprPart)v));
 	}

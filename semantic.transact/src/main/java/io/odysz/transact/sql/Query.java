@@ -5,7 +5,6 @@ import static io.odysz.transact.sql.parts.condition.ExprPart.constr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,6 +15,7 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.transact.sql.parts.AbsPart;
+import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.JoinTabl;
 import io.odysz.transact.sql.parts.JoinTabl.join;
 import io.odysz.transact.sql.parts.Logic.op;
@@ -128,7 +128,9 @@ public class Query extends Statement<Query> {
 		}
 	}
 
-	/**String Array Index definition. Data using array instead of java field for compliance with JS (without user type).
+	/**
+	 * String Array Index definition. Data using array instead of java field for compliance with JS (without user type).
+	 * 
 	 * @author odys-z@github.com
 	 */
 	public static class Ix {
@@ -476,9 +478,13 @@ public class Query extends Statement<Query> {
 	 * sctx.select(userMeta.tbl, "u")
 	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
 	 *    
-	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
+	 * @since 1.4.25 Additional columns can be append as AND predict in join clause. 
 
-	 * Since 1.4.40 the right operand can be a function expression, e.g.
+	 * @since 1.4.40 The right operand can be a function expression, e.g.
+	 * 
+	 * @since 1.4.40 This method is depreacated, and be replaced by {@link #je_(String, String, Object...)}.
+	 * (No need for parameter {@code mainAlias} 
+	 * 
 	 * <pre>
 	 * je("ent", chgm.tbl, "ch", chgm.uids, Funcall.concat(trsb.synode + chgm.UIDsep + chgm.pk), chgm.uids, chgm.synoder, trsb.synode)
 	 * </pre>
@@ -532,9 +538,44 @@ public class Query extends Statement<Query> {
 		return j(withTbl, withAlias, ands);
 	}
 	
-	public Query je2(String withTbl, String withAlias, Object ... onCols ) throws TransException {
-		Condit ands = null;
+	/**
+	 * Add join clause on equals condition.
+	 * @param withTbl
+	 * @param withAlias
+	 * @param onCols on conditions
+	 * @return this
+	 * @throws TransException
+	 */
+	public Query je_(String withTbl, String withAlias, Object ... onCols ) throws TransException {
+//		Condit ands = null;
+//		Condit and = null;
+//
+//		for (int i = 0; i < onCols.length; i+=2) {
+//			Object rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
+//			String lop = onCols[i] instanceof ExprPart
+//					? ((ExprPart) onCols[i]).sql(null)
+//					: isblank(mainAlias) ? onCols[i].toString() : String.format("%s.%s", mainAlias.sql(null), onCols[i]);
+//
+//			if (rop instanceof ExprPart)
+//				and = Sql.condt(op.eq, lop, (ExprPart)rop);
+//			else
+//				and = Sql.condt(op.eq, lop,
+//					String.format("%s.%s", withAlias, rop));
+//
+//			if (ands != null)
+//				ands = ands.and(and);
+//			else ands = and;
+//		}
+		
+		Condit ands = toAndsCondit(mainAlias, withAlias, onCols);
+
+		return j(withTbl, withAlias, ands);
+	}
+
+	
+	static Condit toAndsCondit(Alias mainAlias, String withAlias, Object[] onCols) throws TransException {
 		Condit and = null;
+		Condit ands = null;
 
 		for (int i = 0; i < onCols.length; i+=2) {
 			Object rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
@@ -552,8 +593,11 @@ public class Query extends Statement<Query> {
 				ands = ands.and(and);
 			else ands = and;
 		}
+		return ands;
+	}
 
-		return j(withTbl, withAlias, ands);
+	public Query l_(String withTbl, String alias, Object ... onCols) throws TransException {
+		return j(join.l, withTbl, alias, toAndsCondit(mainAlias, alias, onCols));
 	}
 	
 	public Query groupby(String expr) {
@@ -609,7 +653,7 @@ public class Query extends Statement<Query> {
 	 * <ul><li>ms sql 2k: select [TOP (expression) [PERCENT]  [ WITH TIES ] ] ...
 	 * 		see <a href='https://docs.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql?view=sql-server-2017#syntax'>
 	 * 		Transact-SQL Syntax</a><br>
-	 * 		<b>Note: percent, with ties not supported by this method, user {@link #limit(String, String)}.</b></li>
+	 * 		<b>Note: where percent, with ties are not supported by this method. Use {@link #limit(String, String)}.</b></li>
 	 * 		<li>mysql: update ... limit N, see <a href='https://dev.mysql.com/doc/refman/8.0/en/select.html'>
 	 * 			Mysql Manual: 13.2.12 SELECT Syntax</a><br>
 	 * 			<b>Note: only 1 pair of offset rowcount is supported</b></li>
@@ -633,12 +677,12 @@ public class Query extends Statement<Query> {
 	 * For sqlite only, set limit expr OFFSET expr2 clause.<br>
 	 * see <a href='https://www.sqlite.org/lang_select.html'>SQL As Understood By SQLite - SELECT</a>
 	 * @see #limit(String, int)
-	 * @param lmtExpr
-	 * @param xpr2
+	 * @param cnt
+	 * @param offset
 	 * @return this
 	 */
-	public Query limit(String lmtExpr, String xpr2) {
-		this.limit = new String[] {lmtExpr, xpr2};
+	public Query limit(String cnt, String offset) {
+		this.limit = new String[] {cnt, offset};
 		return this;
 	}
 

@@ -497,7 +497,7 @@ public class TestTransc {
 	public void testDeleteWith( ) throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
 		st.with(st.select("syn_change", "cl")
-				.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+				.je_("syn_subscribe", "ss", constr("X"), "synodee", "org")
 				.whereEq("nyquence", new ExprPart(1)))
 		  .delete("syn_change")
 		  .where(op.exists, null,
@@ -515,7 +515,7 @@ public class TestTransc {
 		st.delete("syn_change")
 		  .where(op.exists, null,
 			st.with(st.select("syn_change", "cl")
-					.je2("syn_subscribe", "ss", constr("X"), "synodee", "org")
+					.je_("syn_subscribe", "ss", constr("X"), "synodee", "org")
 					.whereEq("nyquence", new ExprPart(1)))
 			  .select("cl")
 				.whereEq("cl.org", new ExprPart("org"))
