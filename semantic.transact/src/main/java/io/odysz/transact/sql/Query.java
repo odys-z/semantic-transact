@@ -161,13 +161,21 @@ public class Query extends Statement<Query> {
 		public static final int orderAsc = 1;
 	}
 
+	/**
+	 * @since 1.4.40
+	 * 
+	 * For refence, see <a href='https://www.sqlite.org/lang_select.html'>SELECT</a>
+	 * &amp; <a href='https://www.sqlite.org/syntax/table-or-subquery.html'>table-or-subquery</a>
+	 */
+	protected Query subquery;
+
 	private List<SelectElem> selectList;
 	private List<JoinTabl> joins;
 	private ArrayList<String[]> orderList;
 	private ArrayList<String> groupList;
-	private long pg;
+	protected long pg;
 	public long page() { return pg; }
-	long pgSize;
+	protected long pgSize;
 	public long size() { return pgSize; }
 
 	protected Condit havings;
@@ -182,7 +190,7 @@ public class Query extends Statement<Query> {
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre>
 	 * */
-	private boolean isQueryExpr = false;
+	protected boolean isQueryExpr = false;
 
 	/**Array of unioned query [[0] union | except | intersect, [1] Query], ...<br>
 	 * grammar reference: <pre>sql_union
@@ -192,6 +200,11 @@ public class Query extends Statement<Query> {
 
 	Query(Transcxt transc, String tabl, String... alias) {
 		super(transc, tabl, alias == null || alias.length == 0 ? null : alias[0]);
+	}
+
+	public Query(Transcxt transc, Query sub, String[] alias) {
+		super(transc, null, alias == null || alias.length == 0 ? null : alias[0]);
+		this.subquery = sub;
 	}
 
 	/**
@@ -547,31 +560,9 @@ public class Query extends Statement<Query> {
 	 * @throws TransException
 	 */
 	public Query je_(String withTbl, String withAlias, Object ... onCols ) throws TransException {
-//		Condit ands = null;
-//		Condit and = null;
-//
-//		for (int i = 0; i < onCols.length; i+=2) {
-//			Object rop = onCols.length > i+1 ? onCols[i+1] : onCols[i];
-//			String lop = onCols[i] instanceof ExprPart
-//					? ((ExprPart) onCols[i]).sql(null)
-//					: isblank(mainAlias) ? onCols[i].toString() : String.format("%s.%s", mainAlias.sql(null), onCols[i]);
-//
-//			if (rop instanceof ExprPart)
-//				and = Sql.condt(op.eq, lop, (ExprPart)rop);
-//			else
-//				and = Sql.condt(op.eq, lop,
-//					String.format("%s.%s", withAlias, rop));
-//
-//			if (ands != null)
-//				ands = ands.and(and);
-//			else ands = and;
-//		}
-		
 		Condit ands = toAndsCondit(mainAlias, withAlias, onCols);
-
 		return j(withTbl, withAlias, ands);
 	}
-
 	
 	static Condit toAndsCondit(Alias mainAlias, String withAlias, Object[] onCols) throws TransException {
 		Condit and = null;
@@ -755,6 +746,12 @@ public class Query extends Statement<Query> {
 
 	@Override
 	public String sql(ISemantext sctx) {
+		return isQueryExpr
+			? sqlstream(sctx).collect(Collectors.joining(" ", "(", ")"))
+			: sqlstream(sctx).collect(Collectors.joining(" "));
+	}
+	
+	protected Stream<String> sqlstream(ISemantext sctx) {
 		dbtype dbtp = sctx == null ? null : sctx.dbtype();
 		Stream<String> s = Stream.of(
 				withs,
@@ -769,7 +766,15 @@ public class Query extends Statement<Query> {
 					: null,
 				new SelectList(selectList),
 				// from ... join ...
-				new JoinTabl(join.main, mainTabl, mainAlias),
+				isblank(mainTabl) || mainTabl.isblank() ? null : new JoinTabl(join.main, mainTabl, mainAlias),
+				
+				// needing a sub-query AST node
+				subquery != null ? new ExprPart("from") : null,
+//				subquery != null ? new ExprPart("(") : null,
+				subquery,
+//				subquery != null ? new ExprPart(")") : null,
+				subquery != null ? mainAlias : null,
+
 				// join can be null
 				joins != null && joins.size() > 0 ? new JoinList(joins) : null,
 				// where ... group by ... order by ...
@@ -809,9 +814,7 @@ public class Query extends Statement<Query> {
 					}
 				}));
 		
-		return isQueryExpr
-				? s.collect(Collectors.joining(" ", "(", ")"))
-				: s.collect(Collectors.joining(" "));
+		return s;
 	}
 	
 	/**<p>Use this method to do post operation, a. k. a. for {@link Query} getting selected results -

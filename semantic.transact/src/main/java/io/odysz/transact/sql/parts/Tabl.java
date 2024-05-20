@@ -21,5 +21,9 @@ public class Tabl extends AbsPart {
 	public String name() {
 		return tbl;
 	}
+	
+	public boolean isblank() {
+		return isblank(tbl);
+	}
 
 }

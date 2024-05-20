@@ -46,6 +46,24 @@ public class Transcxt {
 		return q;
 	}
 	
+	public Query select(Query sub, String ... alias) {
+		Query q = new Query(this, sub.asQueryExpr(true), alias).with(withClause);
+		this.withClause = null;
+		return q;
+	}
+	
+	public Query selectPage(String tabl, String ... alias) {
+		Query q = new QueryPage(this, tabl, alias).with(withClause);
+		this.withClause = null;
+		return q;
+	}
+
+	public Query selectPage(Query sub, String ... alias) {
+		Query q = new QueryPage(this, sub.asQueryExpr(true), alias).with(withClause);
+		this.withClause = null;
+		return q;
+	}
+
 	public Insert insert(String tabl) {
 		return new Insert(this, tabl);
 	}
@@ -75,7 +93,7 @@ public class Transcxt {
 	 * @throws TransException
 	 */
 	public TableMeta tableMeta(String conn, String tabl) throws TransException {
-		throw new TransException("This method must be ovrriden by DA layser.");
+		throw new TransException("This method must be ovrriden by a DA layer.");
 	}
 
 	/**
@@ -91,7 +109,7 @@ public class Transcxt {
 	 * @return Sql AST node for generating sql.
 	 */
 	public AbsPart quotation(Object v, String conn, String tabl, String col) {
-		throw new NullPointerException("This method must be ovrriden by DA layser.");
+		throw new NullPointerException("This method must be ovrriden by a DA layer.");
 	}
 
 	/**

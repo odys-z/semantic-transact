@@ -88,6 +88,12 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		this.mainAlias = alias == null ? null : new Alias(alias);
 	}
 
+//	public Statement(Transcxt transc, Query sub, String alias) {
+//		this.transc = transc;
+//		this.subquery = sub;
+//		this.mainAlias = alias == null ? null : new Alias(alias);
+//	}
+
 	private ArrayList<Object[]> attaches;
 	public ArrayList<Object[]> attaches() { return attaches; }
 
@@ -390,10 +396,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @param col
 	 * @param q the static query - query can't be generated with context.
 	 * @return this
+	 * @throws TransException 
 	 * @since 1.4.36
 	 */
-	public T whereIn(String col, Query q) {
-		return where(Sql.condt(Logic.op("in"), col, q.sql(null)));
+	public T whereIn(String col, Query q) throws TransException {
+		return where(Sql.condt(Logic.op("in"), col, q));
 	}
 
 	/**

@@ -756,8 +756,7 @@ public class TestTransc {
 	
 		assertEquals("update  a_role_func  set roleId=3 * 2 "
 				+ "where exists ( select * from changes c where c.entity = a_role_func.roleId ) "
-				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
-				+ "",
+				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) ",
 				sqls.get(0));
 	}
 }

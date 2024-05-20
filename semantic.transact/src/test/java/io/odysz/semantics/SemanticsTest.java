@@ -351,13 +351,13 @@ public class SemanticsTest {
 		ArrayList<String> sqls = new ArrayList<String>();
 		Insert i = st.insert("a_users")
 			.cols("userName", "orgId", "pswd", "userId")
-			.select(st.select(null).cols("'Ody'", null, "", "'odyz'"))
+			.select(st.select("").cols("'Ody'", null, "", "'odyz'"))
 			.where(op.notexists, null,
 				st.select("a_users")
 					.whereEq("userId", "odyz"));
 
 		i.commit(mysqlCxt, sqls);
-		assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' )",
+		assertEquals("insert into a_users (userName, orgId, pswd, userId) select 'Ody', null, '', 'odyz' where not exists ( select * from a_users  where userId = 'odyz' )",
 				sqls.get(0));
 	}
 	
@@ -366,22 +366,40 @@ public class SemanticsTest {
 		ArrayList<String> sqls = new ArrayList<String>();
 		Insert i = st.insert("a_users")
 			.cols("userName", "userId")
-			.select(st.select(null).cols("'Ody'", "'odyz'"))
+			.select(st.select("").cols("'Ody'", "'odyz'"))
 			.where(op.notexists, null,
 				st.select("a_users")
 					.whereEq("userId", "odyz")
 					.limit(1));
 
 		i.commit(mysqlCxt, sqls);
-		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz' where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
 				sqls.get(0));
 
 		i.commit(sqlitCxt, sqls);
-		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz' where not exists ( select * from a_users  where userId = 'odyz' limit 1 )",
 				sqls.get(1));
 
 		i.commit(ms2kCxt, sqls);
-		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz'  where not exists ( select top(1)  * from a_users  where userId = 'odyz' )",
+		assertEquals("insert into a_users (userName, userId) select 'Ody', 'odyz' where not exists ( select top(1)  * from a_users  where userId = 'odyz' )",
 				sqls.get(2));
+	}
+
+	@Test
+	public void testSelectSubpage() throws TransException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Query q = st.select(st
+				.selectPage("a_users", "ch")
+				.cols("ch.*")
+				.page(0, 3))
+			.cols("userName", "userId");
+		
+		q.commit(mysqlCxt, sqls);
+		assertEquals("select userName, userId from (select * from (select t.*, @ic_num := @ic_num + 1 as rnum from (select ch.* from a_users ch) t, (select @ic_num := 0) ic_t) t1 where rnum > 0 and rnum <= 3)",
+				sqls.get(0));
+		
+		q.commit(sqlitCxt, sqls);
+		assertEquals("select userName, userId from (select * from (select ch.* from a_users ch) limit 3 offset 0)",
+				sqls.get(1));
 	}
 }

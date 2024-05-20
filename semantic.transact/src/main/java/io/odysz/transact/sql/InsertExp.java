@@ -20,7 +20,7 @@ import io.odysz.transact.x.TransException;
  * 
  * Experimental version for supporting onDuplicate (UPSERT).
  * 
- * @author ody
+ * @author Ody
  *
  */
 public class InsertExp extends Insert {
