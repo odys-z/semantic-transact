@@ -162,7 +162,8 @@ public class Update extends Statement<Update> {
 						where == null ? null : new ExprPart("where"),
 						where,
 						limit != null && db == dbtype.mysql ? new ExprPart("limit " + limit) : null
-				).map(m -> {
+				).filter(x -> x != null)
+				 .map(m -> {
 					try {
 						return m == null ? "" : m.sql(sctx);
 					} catch (TransException e) {
@@ -170,7 +171,6 @@ public class Update extends Statement<Update> {
 						return "";
 					}
 				});
-
 
 		return s1.collect(Collectors.joining(" "));
 	}

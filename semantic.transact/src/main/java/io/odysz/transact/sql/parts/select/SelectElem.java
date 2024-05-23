@@ -78,8 +78,24 @@ public class SelectElem extends ExprPart {
 		return sql;
 	}
 
-	public void as(String alias) {
+	/**
+	 * @since 1.4.40
+	 * @param alias
+	 * @return this
+	 */
+	public SelectElem tableAlias(String alias) {
+		this.tabl = new Alias(alias);
+		return this;
+	}
+
+	/**
+	 * @since 1.4.40
+	 * @param alias
+	 * @return this
+	 */
+	public SelectElem as(String alias) {
 		this.alias = new Alias(alias);
+		return this;
 	}
 
 }

@@ -330,8 +330,8 @@ public class Query extends Statement<Query> {
 	/**
 	 * @since 1.4.40
 	 * @param tblAlias
-	 * @param col_ases
-	 * @return
+	 * @param col_ases array for sql, e.g. to sql SELECT tblAlias.col_ases[0], tblAlias.col_ases[1], ...
+	 * @return this
 	 * @throws TransException
 	 */
 	public Query cols_byAlias(String tblAlias, String[] col_ases) throws TransException {
@@ -343,6 +343,33 @@ public class Query extends Statement<Query> {
 					col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
 				else if (cass != null)
 					col(String.format("%s.%s", tblAlias, cass[0]));
+			}
+		return this;
+	}
+
+	/**
+	 * Convert cols like:<br>
+	 * {@code SELECT tblAlias.col_ases[0] as col_ases[1], tblAlias.col_ases[2] as col_ases[3], ...}
+	 * 
+	 * @param tblAlias
+	 * @param col_ases array for sql, e.g. to sql
+	 * @return this
+	 * @throws TransException
+	 * @since 1.4.40
+	 */
+	public Query col_ases(String tblAlias, Object... col_ases) throws TransException {
+		if (col_ases != null)
+			for (int pair = 0; pair < col_ases.length; pair++) {
+				Object expr  = col_ases[pair];
+				if (expr == null) continue;
+				String alias = pair < col_ases.length ? (String)col_ases[pair] : null;
+
+				if (expr instanceof String)
+					col(String.format("%s.%s", tblAlias, (String)expr), alias);
+				else if (expr instanceof ExprPart)
+					col(new SelectElem((ExprPart) expr).tableAlias(tblAlias), alias);
+				else 
+					col(String.format("%s.%s", tblAlias, expr.toString()), alias);
 			}
 		return this;
 	}
