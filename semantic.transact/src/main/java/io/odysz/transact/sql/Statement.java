@@ -22,6 +22,7 @@ import io.odysz.transact.sql.Query.Ix;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.Logic;
+import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.condition.Condit;
@@ -296,9 +297,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @param col
 	 * @param constv will add "'"
 	 * @return this
+	 * @since 1.4.40 If {@code constv} is null, will force to use "{@code col is null}"
+	 * If "{@code col = null}" is needed, use {@link #where(String, String, String)} instead.
 	 */
 	public T whereEq(String col, String constv) {
-		return where_("=", col, constv);
+		if (constv == null)
+			return where(Sql.condt(op.isnull, col, "null"));
+		else
+			return where_("=", col, constv);
 	}
 
 	public T whereEq(String tabl, String col, String constv) {

@@ -157,7 +157,7 @@ public class SemanticsTest {
 			.where("=", "roleId", "'admin'")
 			.commit(st.instancontxt(null, null), sqls);
 
-		assertEquals("update  a_roles  set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin' ",
+		assertEquals("update a_roles set roleName=roleName || 'add 0 ' || 'add 1' where roleId = 'admin'",
 				sqls.get(0));
 		
 		st.select("a_roles")
@@ -199,7 +199,7 @@ public class SemanticsTest {
 			.commit(orclCxt, sqls);
 
 		// update  "a_roles"  set "roleName"=roleName || 'add 0 ' || 'add 1' where "roleId" = 'admin' AND "r"."stamp" > dateDiff("day", "r"."stamp", "sysdate")
-		assertEquals("update  \"a_roles\"  set \"roleName\"=\"roleName\" || 'add 0 ' || 'add 1' where \"roleId\" = 'admin' AND \"r\".\"stamp\" > dateDiff(day, \"r\".\"stamp\", sysdate) ",
+		assertEquals("update \"a_roles\" set \"roleName\"=\"roleName\" || 'add 0 ' || 'add 1' where \"roleId\" = 'admin' AND \"r\".\"stamp\" > dateDiff(day, \"r\".\"stamp\", sysdate)",
 				sqls.get(0));
 		
 		// WHERE decode("r"."stamp", NULL, sysdate, "r"."stamp") - sysdate > -0.1
@@ -284,16 +284,16 @@ public class SemanticsTest {
 		Utils.logi(sqls);
 		
 		// mysql
-		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin' limit 3 + 1",
+		assertEquals("update a_users set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin' limit 3 + 1",
 				sqls.get(0));
 		// sqlite
-		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin' ",
+		assertEquals("update a_users set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin' limit 3 * 2, 5) where userId = 'admin'",
 				sqls.get(1));
 		// ms2k
-		assertEquals("update top(3 + 1) a_users  set userName=(select top(3 * 2) 5 count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
+		assertEquals("update top(3 + 1) a_users set userName=(select top(3 * 2) 5 count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin'",
 				sqls.get(2));
 		// orcl
-		assertEquals("update  \"a_users\"  set \"userName\"=(select count(\"funcId\") \"c\" from \"a_functions\" \"f\" where \"f\".\"funcName\" = 'admin') where \"userId\" = 'admin' ",
+		assertEquals("update \"a_users\" set \"userName\"=(select count(\"funcId\") \"c\" from \"a_functions\" \"f\" where \"f\".\"funcName\" = 'admin') where \"userId\" = 'admin'",
 				sqls.get(3));
 	}
 

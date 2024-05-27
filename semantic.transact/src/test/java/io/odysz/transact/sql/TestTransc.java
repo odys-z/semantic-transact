@@ -455,7 +455,7 @@ public class TestTransc {
 
 		// update a_users  set userName='abc-x01' where userId = 'admin'
 		// Utils.logi(sqls);
-		assertEquals("update  a_users  set userName='abc-x01' where userId = 'admin' ",
+		assertEquals("update a_users set userName='abc-x01' where userId = 'admin'",
 				sqls.get(0));
 		
 		sqls.clear();
@@ -465,7 +465,7 @@ public class TestTransc {
 								.where_("=", "f.funcName", "admin"))
 			.where("=", "userId", "'admin'")
 			.commit(sqls);
-		assertEquals("update  a_users  set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin' ",
+		assertEquals("update a_users set userName=(select count(funcId) c from a_functions f where f.funcName = 'admin') where userId = 'admin'",
 				sqls.get(0));
 
 	}
@@ -538,7 +538,7 @@ public class TestTransc {
 			.where(Sql.condt("userName = 'Washington' or userName = 'Washinton'"))
 			.commit(sqls);
 
-		assertEquals("update  a_users  set userName='abc-x01' where userId = 'admin' AND (userName = 'Washington' OR userName = 'Washinton') ",
+		assertEquals("update a_users set userName='abc-x01' where userId = 'admin' AND (userName = 'Washington' OR userName = 'Washinton')",
 				sqls.get(0));
 
 		st.select("a_users", "u")
@@ -597,7 +597,7 @@ public class TestTransc {
 		assertEquals("insert into a_role_funcs  select f.funcId, 'admin' roleId, 'c,r,u,d' from a_functions f join a_roles r on r.roleId = 'admin'",
 				sqls.get(0));
 
-		assertEquals("update  a_roles  set funcount=(select count(funcId) from a_role_funcs  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin' ",
+		assertEquals("update a_roles set funcount=(select count(funcId) from a_role_funcs  where roleId = 'admin'), roleName=roleName || 'abc' where roleId = 'admin'",
 				sqls.get(1));
 	}
 
@@ -629,7 +629,7 @@ public class TestTransc {
 		// insert into a_role_funcs  (funcId, roleId) values ( 'f-01', 'AUTO #2018-12-02 10:02:30' )
 		// Utils.logi(sqls);
 		assertTrue(sqls.get(0).startsWith("insert into a_roles"));
-		assertTrue(sqls.get(1).startsWith("update  a_role_funcs"));
+		assertTrue(sqls.get(1).startsWith("update a_role_funcs"));
 		assertTrue(sqls.get(2).startsWith("insert into a_roles"));
 		assertTrue(sqls.get(3).startsWith("insert into a_role_funcs"));
 	}
@@ -646,7 +646,7 @@ public class TestTransc {
 							.nv("funcId", "f 001")
 							.nv("roleId", "role 01")))
 			.commit(sqls);
-		assertEquals("update  a_roles  set roleName='role-21' where roleId = 'role 01' ",
+		assertEquals("update a_roles set roleName='role-21' where roleId = 'role 01'",
 				sqls.get(0));
 		assertEquals("delete from a_role_funcs where roleId = 'role 01'",
 				sqls.get(1));
@@ -688,7 +688,7 @@ public class TestTransc {
 		
 		assertEquals("insert into a_roles (roleName, roleId, s1, s2, s3) values ('roleName''-new', roleName + 3, '''s - %''x', '''''', '%%')",
 				sqls.get(0));
-		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01' ",
+		assertEquals("update a_role_funcs set roleId=3 * 2 where roleName = 'roleName-old''' AND roleId = 'role 01'",
 				sqls.get(1));
 
 		st.update("a_roles")
@@ -697,7 +697,7 @@ public class TestTransc {
 				{add(new Object[] {"roleId", 1});} })
 			.where_("=", "roleId", "role 01")
 			.commit(sqls);
-		assertEquals("update  a_roles  set roleId=1 where roleId = 'role 01' ",
+		assertEquals("update a_roles set roleId=1 where roleId = 'role 01'",
 				sqls.get(2));
 	}
 	
@@ -709,7 +709,7 @@ public class TestTransc {
 			.whereIn("roleId", new String[] {"01", "bb"})
 			.commit(sqls);
 
-		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in ('01', 'bb') ",
+		assertEquals("update a_role_funcs set roleId=3 * 2 where roleId in ('01', 'bb')",
 				sqls.get(0));
 	}
 
@@ -721,7 +721,7 @@ public class TestTransc {
 			.whereIn("roleId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
 			.commit(sqls);
 
-		assertEquals("update  a_role_funcs  set roleId=3 * 2 where roleId in (select distinct roleId from a_roles  where roleId = 'a') ",
+		assertEquals("update a_role_funcs set roleId=3 * 2 where roleId in  ( select distinct roleId from a_roles  where roleId = 'a' )",
 				sqls.get(0));
 	}
 	
@@ -736,11 +736,11 @@ public class TestTransc {
 			.where(op.notin, "funcId", st.select("a_roles").col(count("roleId")).whereEq("roleId", "b"))
 			.commit(sqls);
 
-		assertEquals("update  a_role_func  set roleId=3 * 2 "
+		assertEquals("update a_role_func set roleId=3 * 2 "
 				+ "where funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) "
 				+ "AND 3 >=  ( select count(roleId) from a_roles  where roleId = 'b' ) "
 				+ "AND roleId in  ( select distinct roleId from a_roles  where roleId = 'b' ) "
-				+ "AND funcId not in  ( select count(roleId) from a_roles  where roleId = 'b' ) ",
+				+ "AND funcId not in  ( select count(roleId) from a_roles  where roleId = 'b' )",
 				sqls.get(0));
 	}
 	
@@ -754,9 +754,9 @@ public class TestTransc {
 			.whereEq("funcId", st.select("a_roles").distinct().col("roleId").whereEq("roleId", "a"))
 			.commit(sqls);
 	
-		assertEquals("update  a_role_func  set roleId=3 * 2 "
+		assertEquals("update a_role_func set roleId=3 * 2 "
 				+ "where exists ( select * from changes c where c.entity = a_role_func.roleId ) "
-				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' ) ",
+				+ "AND funcId =  ( select distinct roleId from a_roles  where roleId = 'a' )",
 				sqls.get(0));
 	}
 }
