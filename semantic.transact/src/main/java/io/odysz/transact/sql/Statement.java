@@ -245,6 +245,28 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	/**
+	 * @since 1.4.40
+	 * @param op
+	 * @param l
+	 * @param r
+	 * @return this
+	 */
+	public T where(op op, ExprPart l, ExprPart r) {
+		return where(Sql.condt(op, l, r));
+	}
+
+	/**
+	 * @since 1.4.40
+	 * @param op
+	 * @param l
+	 * @param r
+	 * @return this
+	 */
+	public T where(op op, ExprPart l, Number r) {
+		return where(Sql.condt(op, l, new ExprPart(r)));
+	}
+
+	/**
 	 * E.g. where t.id in select id from tab. 
 	 * @param logic
 	 * @param loperand

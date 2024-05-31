@@ -40,6 +40,11 @@ search_condition_not
 		this.logitype = Logic.type.empty;
 	}
 
+	public Condit(op op, ExprPart lop, ExprPart rop) {
+		super(op, lop, rop);
+		this.logitype = Logic.type.empty;
+	}
+
 	public Condit(Logic.type type, List<Condit> condts) {
 		super();
 		this.logitype = type;

@@ -44,6 +44,28 @@ public class Sql {
 	public static Condit condt(op op, String loperand, Query q) throws TransException {
 		return new Condit(op, loperand, q);
 	}
+
+	/**
+	 * @since 1.4.40
+	 * @param op
+	 * @param loperand
+	 * @param part
+	 * @return condition
+	 */
+	public static Condit condt(op op, ExprPart lop, ExprPart rop) {
+		return new Condit(op, lop, rop);
+	}
+
+	/**
+	 * @since 1.4.40
+	 * @param op
+	 * @param loperand
+	 * @param part
+	 * @return condition
+	 */
+	public static Condit condt(op op, ExprPart lop, String rop) {
+		return new Condit(op, lop, new ExprPart(rop));
+	}
 	
 	/**Filtering out "'", replaced with "''".
 	 * @param v
