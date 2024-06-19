@@ -225,6 +225,21 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 	
+	/**
+	 * Insert a row.
+	 * {@code Example}
+	 * <pre> trb
+	 * .insert(entm.tbl, trb.synrobot())
+	 * .cols(rs.getFlatColumns0())
+	 * .row(rs.getColnames(), rs.index0(pk).getRowById(chuids))
+	 * </pre>
+	 * <p>Now {@code row} is ready to be inserted into {@code entm.tbl}.</p>
+	 * @since 1.4.40
+	 * @param colnames
+	 * @param row
+	 * @return this
+	 * @throws TransException
+	 */
 	public Insert row(HashMap<String, Object[]> colnames, ArrayList<Object> row) throws TransException {
 		if (insertCols == null)
 			throw new TransException("Insert#row(): must call cols() first to set columns.");
@@ -333,10 +348,6 @@ public class Insert extends Statement<Insert> {
 	 * @return this
 	 */
 	public Insert notExists(Query select) {
-//		if (orUpdate)
-//			throw new TransException("This method can only be called once.");
-//		orUpdate    = true;
-//		orUpdateNvs = nvs;
 		existsQuery = select;
 		return this;
 	}
