@@ -22,6 +22,7 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.Colname;
+import io.odysz.transact.sql.parts.Resulving;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.x.TransException;
 
@@ -652,14 +653,16 @@ public class Funcall extends ExprPart {
 	 * @return function expression, e.g. in sqlite, 'v' || 'with[0]' || 'with[1]' ... 
 	 * @since 1.4.40
 	 */
-	public static Funcall concatstr(String v, String... with) {
+	public static Funcall concatstr(String v, Object... with) {
 		Funcall f = new Funcall(Func.concat);
 		
 		f.args = Stream
 				.concat(Stream.of(v), Stream.of(with))
 				.filter(c -> !isblank(c))
 				.map(c -> {
-					return constr(c);
+					return c instanceof Resulving ? ((Resulving) c).asConstr()
+						: c instanceof AbsPart ? c
+						: constr(c.toString());
 				})
 				.toArray();
 		return f;

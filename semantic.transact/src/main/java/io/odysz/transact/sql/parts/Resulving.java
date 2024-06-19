@@ -20,6 +20,8 @@ public class Resulving extends ExprPart {
 
 	private String autok;
 	private String tabl;
+	
+	private boolean asConstr = false;
 
 	public Resulving(String tabl, String autok) {
 		// super(op.eq, null, null);
@@ -35,7 +37,8 @@ public class Resulving extends ExprPart {
 			throw new TransException("Can't resolve auto Id - %s.%s. Possible error: wrong configure; empty row (no insertion triggered)", tabl, autok);
 		if (o instanceof AbsPart)
 			try {
-				return ((AbsPart) o).sql(context);
+				// return ((AbsPart) o).sql(context);
+				return asConstr ? "'" + ((AbsPart) o).sql(context) + "'" : ((AbsPart) o).sql(context);
 			} catch (TransException e) {
 				e.printStackTrace();
 				return "'" + tabl + "." + autok + "'";
@@ -51,6 +54,11 @@ public class Resulving extends ExprPart {
 		if (smtx == null)
 			return "'" + tabl + "." + autok + "'";
 		return (String) smtx.resulvedVal(tabl, autok);
+	}
+
+	public Resulving asConstr() {
+		asConstr = true;
+		return this;
 	}
 
 }

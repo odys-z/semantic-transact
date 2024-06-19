@@ -41,7 +41,8 @@ abstract public class AbsPart {
 
 	public static boolean isblank(Object obj, String... takeAsNull) {
 		if (obj instanceof AbsPart)
-			return LangExt.isblank(obj.toString(), "null");
+			return obj instanceof Resulving ?
+				obj == null : LangExt.isblank(obj.toString(), "null");
 		else return LangExt.isblank(obj, takeAsNull);
 	}
 }

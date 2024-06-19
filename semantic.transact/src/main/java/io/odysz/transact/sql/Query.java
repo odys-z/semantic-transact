@@ -716,7 +716,7 @@ public class Query extends Statement<Query> {
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;</pre>
 	 * @param with
-	 * @param isExpression
+	 * @param isExpression the {@code with} query as is an expression (wraped with "()")
 	 * @return this
 	 */
 	public Query union(Query with, boolean ... isExpression) {

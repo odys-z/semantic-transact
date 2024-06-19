@@ -5,6 +5,7 @@ import static io.odysz.common.LangExt.eqs;
 import static io.odysz.common.LangExt.isNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
 import io.odysz.common.Utils;
@@ -113,11 +114,12 @@ public class TableMeta {
 	    			if (String.class != f.getType())
 	    				continue;
 					String fv = (String) f.get(this);
-					if (!ftypes.containsKey(fv)) {
+					if (!Modifier.isStatic(f.getModifiers()) && !ftypes.containsKey(fv)) {
 						Semantation ann = f.getAnnotation(Semantation.class);
 						if (ann == null || !ann.noDBExists())
-						Utils.warn("[TableMeta#clone()] Meta field %s#%s(value: %s) is not defined in table '%s' (conn %s)."
-								+ "\nTo suppress this warning, add @Semantation (notDBExists = true) to the field.",
+						Utils.warnT(new Object() {},
+							"Meta field %s#%s(value: %s) is not defined in table '%s' (conn %s).\n" +
+							"To suppress this warning, add @Semantation (notDBExists = true) to the field.",
 	    					clazz.getTypeName(), f.getName(), fv, tbl, conn);
 					}
 				} catch (Exception e) {

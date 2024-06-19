@@ -2,6 +2,7 @@ package io.odysz.transact.sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -212,7 +213,7 @@ public class Insert extends Statement<Insert> {
 	 */
 	public Insert value(Object ... nvs) throws TransException {
 		if (nvs != null) {
-			ArrayList<Object[]> row = new ArrayList<Object[]>(nvs.length / 2);
+			ArrayList<Object[]> row = new ArrayList<Object[]>(nvs.length / 2); // FIXME length?
 			ArrayList<String> cols = new ArrayList<String>(nvs.length / 2);
 			for (int i = 0; i < nvs.length; i += 2) {
 				row.add(new Object[] {nvs[i], nvs[i + 1]});
@@ -220,6 +221,37 @@ public class Insert extends Statement<Insert> {
 			}
 			cols(cols.toArray(new String[0]));
 			return value(row);
+		}
+		return this;
+	}
+	
+	public Insert row(HashMap<String, Object[]> colnames, ArrayList<Object> row) throws TransException {
+		if (insertCols == null)
+			throw new TransException("Insert#row(): must call cols() first to set columns.");
+
+		if (row != null) {
+			if (valuesNv == null)
+				valuesNv = new ArrayList<ArrayList<Object[]>>();
+			
+			if (currentRowNv != null && currentRowNv.size() > 0) {
+				// append current row, then append new vals 
+				valuesNv.add(currentRowNv);
+				currentRowNv = null;
+			}
+
+			TableMeta mt = transc.tableMeta(mainTabl.name());
+			ArrayList<Object[]> nvs = new ArrayList<Object[]>(Collections.nCopies(row.size(), null));
+			for (String n : insertCols.keySet()) {
+				int i = insertCols.get(n);
+				if (i + 1 != (int)colnames.get(n.toUpperCase())[0])
+					Utils.warnT(new Object() {},
+						"Expecting column %s at index [%s], but got %s.",
+						n, i, (int)colnames.get(n.toUpperCase())[0]);
+				Object v = row.get(i);
+				nvs.set(i, new Object[] {n, composeVal(v, mt, n)});
+			}
+
+			valuesNv.add(nvs);
 		}
 		return this;
 	}
