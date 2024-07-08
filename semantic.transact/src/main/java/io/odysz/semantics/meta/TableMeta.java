@@ -39,7 +39,7 @@ public class TableMeta {
 		return ftypes != null && ftypes.size() > 0;
 	}
 
-	public final String tbl;
+	public String tbl;
 	public String pk;
 
 	protected String conn;
