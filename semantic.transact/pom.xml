@@ -46,7 +46,7 @@
     <dependency>
     	<groupId>io.github.odys-z</groupId>
     	<artifactId>antson</artifactId>
-    	<version>[0.9.71,)</version>
+    	<version>[0.9.74,)</version>
     </dependency>
 
     <dependency>
