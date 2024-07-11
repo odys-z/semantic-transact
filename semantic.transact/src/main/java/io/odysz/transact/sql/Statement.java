@@ -1,5 +1,7 @@
 package io.odysz.transact.sql;
 
+import static io.odysz.common.LangExt.eq;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -548,6 +550,14 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public Map<String, Integer> getColumns() { return null; }
 
 	public static ExprPart composeVal(Object v, TableMeta mt, String col) {
+		try {
+			if (verbose && v instanceof String && eq(mt.pk, col, true) && eq((String)v, "AUTO"))
+				Utils.warnT(new Object() {},
+					"Using AUTO for auto pk is no longer supported since 1.4.40. Please use Resulving object instead, or leave the field empty.");
+		} catch(Exception e) {
+			Utils.warnT(new Object() {}, e.getMessage());
+		}
+	
 		boolean isQuoted = mt == null || mt.isQuoted(col);
 		if (mt == null || isQuoted)
 			return ExprPart.constr((String)v);
