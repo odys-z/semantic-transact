@@ -86,10 +86,11 @@ public class Semantext1 implements ISemantext {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object resulvedVal(String tabl, String col) {
+	public List<Object> resulvedVals(String tabl, String col) {
 		return autoVals == null ? null
-				: ((SemanticObject)autoVals.get(tabl)).get(col);
+				: (List<Object>)((SemanticObject)autoVals.get(tabl)).get(col);
 	}
 
 	@Override

@@ -126,7 +126,7 @@ public class Semantext2 implements ISemantext {
 	public ISemantext update(Update update, String mainTabl, IUser usr) { return null; }
 
 	@Override
-	public Object resulvedVal(String tabl, String col) { return null; }
+	public List<Object> resulvedVals(String tabl, String col) { return null; }
 
 	@Override
 	public dbtype dbtype() { return dbtype.sqlite; }
@@ -140,9 +140,6 @@ public class Semantext2 implements ISemantext {
 	public ISemantext clone(IUser usr) {
 		return new Semantext2(tabl, semantics, metas);
 	}
-
-	@Override
-	public ISemantext reset() { return this; }
 
 	@Override
 	public SemanticObject resulves() { return null; }

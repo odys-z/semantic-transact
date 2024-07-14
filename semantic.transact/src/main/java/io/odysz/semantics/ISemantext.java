@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.common.LangExt;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.Delete;
@@ -116,14 +117,32 @@ public interface ISemantext {
 	 */
 	public ISemantext onPost(Statement<?> stmt, String mainTabl, ArrayList<Object[]> row, ArrayList<String> sqls) throws TransException;
 
-	/**Get results from handling semantics.<br>
+	/**
+	 * Get results from semantics' handling context.<br>
 	 * Typically it's a new inserting records' auto Id,
 	 * which should usually let the caller / client know about it.
+	 * 
 	 * @param table
 	 * @param col
-	 * @return RESULt resoLVED VALue in tabl.col, or null if not exists.
+	 * @param idx element index, -1 for the last one, -2 for the last 2nd, and so on.
+	 * @return RESULt resoLVED VALues in tabl.col, or null if not exists.
+	 * @since 1.4.40 The resulved value is from an ArrayList, indexed by {@code idx}.
 	 */
-	Object resulvedVal(String table, String col);
+	default Object resulvedVal(String table, String col, int idx) {
+		List<Object> lst = resulvedVals(table, col);
+		if (LangExt.isNull(lst))
+			return null;
+		return idx < 0 ? lst.get(lst.size() + idx) : lst.get(idx);
+	}
+
+	/**
+	 * Get results from semantics' handling context.
+	 * 
+	 * @param table
+	 * @param col
+	 * @return the list of resulved values
+	 */
+	List<Object> resulvedVals(String table, String col);
 
 	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
 	 * Find and return referee.
@@ -266,8 +285,8 @@ public interface ISemantext {
 	/**
 	 * Reset resulves
 	 * @return this
-	 */
 	public ISemantext reset();
+	 */
 
 	/**
 	 * Get table meta. The returned meta is a semantics extended meta.
@@ -278,7 +297,21 @@ public interface ISemantext {
 	 * @param tbl
 	 * @return meta
 	 */
-	public default TableMeta getTableMeta(String tbl) { return null; };
+	public default TableMeta getTableMeta(String tbl) { return null; }
+
+	/**
+	 * Push auto-pk resolvings or so on.
+	 * @return this
+	 * @since 1.4.40
+	public default ISemantext beginPostCommit(String parentName) { return this; }
+	 */
+
+	/**
+	 * Pop auto-pk resolvings or so on.
+	 * @return this
+	 * @since 1.4.40
+	public default ISemantext endPostCommit() { return this; }
+	 */
 
 	/**Set resultset's current row's column's value.<br>
 	 * The current row is actually iterated over by {@link #onSelected(Object)}.

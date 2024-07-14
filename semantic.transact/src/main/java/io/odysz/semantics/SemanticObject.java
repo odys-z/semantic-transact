@@ -220,8 +220,11 @@ public class SemanticObject extends Anson {
 		out.println("");
 	}
 
-	public String resulve(String tabl, String pk) {
-		return (String) ((SemanticObject) ((SemanticObject) get("resulved")).get(tabl)).get(pk);
+	public String resulve(String tabl, String pk, int idx) {
+		@SuppressWarnings("unchecked")
+		List<String> ids = (List<String>)((SemanticObject)((SemanticObject) get("resulved")).get(tabl)).get(pk);
+		return ids != null && ids.size() > idx
+			? ids.get(idx > 0 ? idx : ids.size() + idx) : null;
 	}
 
 	public int getInt(String n) {
@@ -235,7 +238,7 @@ public class SemanticObject extends Anson {
 	 * @return resolved resource
 	 * @since 1.4.40
 	 */
-	public String resulve(TableMeta entm) {
-		return resulve(entm.tbl, entm.pk);
+	public String resulve(TableMeta entm, int idx) {
+		return resulve(entm.tbl, entm.pk, idx);
 	}
 }

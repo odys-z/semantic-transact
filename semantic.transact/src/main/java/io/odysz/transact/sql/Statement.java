@@ -503,7 +503,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-		prepare(cxt);
+		// prepare(cxt);
 
 		// sql() calling onDelete (generating before sentences), must called before "before"
 		String itself = sql(cxt);
@@ -535,8 +535,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * Called when starting preparing sql, works like preparing auto generated key etc. should go here.
 	 * 
 	 * @param ctx
-	 */
 	void prepare(ISemantext ctx) { }
+	 */
 
 	@Override
 	public abstract String sql(ISemantext context) throws TransException;
