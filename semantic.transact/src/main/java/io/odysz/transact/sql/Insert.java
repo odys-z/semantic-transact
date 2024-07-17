@@ -82,7 +82,7 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
-	public Insert nv(String n, ArrayList<String> lst) {
+	public Insert nv(String n, Iterable<String> lst) {
 		nv(n, lst == null ? "null" : String.join(",", lst));
 		return this;
 	}

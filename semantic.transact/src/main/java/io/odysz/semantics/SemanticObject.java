@@ -221,10 +221,17 @@ public class SemanticObject extends Anson {
 	}
 
 	public String resulve(String tabl, String pk, int idx) {
-		@SuppressWarnings("unchecked")
-		List<String> ids = (List<String>)((SemanticObject)((SemanticObject) get("resulved")).get(tabl)).get(pk);
+		List<String> ids = resulve(tabl, pk);
 		return ids != null && ids.size() > idx
 			? ids.get(idx > 0 ? idx : ids.size() + idx) : null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> resulve(String tabl, String pk) {
+		return (List<String>)((SemanticObject) ((SemanticObject)
+				get("resulved"))
+				.get(tabl))
+				.get(pk);
 	}
 
 	public int getInt(String n) {
