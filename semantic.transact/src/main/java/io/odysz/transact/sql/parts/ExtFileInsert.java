@@ -111,9 +111,9 @@ public class ExtFileInsert extends AbsPart {
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
-		try {
-			byte[] b = AESHelper.decode64(b64);
+		byte[] b = AESHelper.decode64(b64);
 
+		try {
 			DocLocks.writing(f);;
 			Files.write(f, b);
 

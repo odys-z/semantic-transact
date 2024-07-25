@@ -12,6 +12,7 @@ import io.odysz.transact.sql.Insert;
 import io.odysz.transact.sql.Statement;
 import io.odysz.transact.sql.Statement.IPostOptn;
 import io.odysz.transact.sql.Statement.IPostSelectOptn;
+import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.Update;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.condition.Condit;
@@ -144,26 +145,9 @@ public interface ISemantext {
 	 */
 	List<Object> resulvedVals(String table, String col);
 
-	/**If parameter is a string in patter of "RESOLVE x.y" (formated by {@link #formatResulv(String, String)},
-	 * Find and return referee.
-	 * @param ref
-	 * @return resolved value from restult
-	public Object resulvedVal(String ref);
-	 */
-
 	/**Get all the resolved results,
 	 * a.k.a return value of {@link Update#doneOp(io.odysz.transact.sql.Statement.IPostOptn)}.*/
 	public SemanticObject resulves();
-
-	/**Format special escaping string that will be resolve value later.
-	 * @see #refPattern
-	 * @param tabl
-	 * @param pk
-	 * @return resolving string: "RESULVE tabl.pk"
-	public default String formatResulv(String tabl, String pk) {
-		return String.format("RESULVE %s.%s", tabl, pk);
-	}
-	 */
 
 	/**
 	 * Get the dbtype handled by the context
@@ -283,12 +267,6 @@ public interface ISemantext {
 	};
 
 	/**
-	 * Reset resulves
-	 * @return this
-	public ISemantext reset();
-	 */
-
-	/**
 	 * Get table meta. The returned meta is a semantics extended meta.
 	 * E.g. the SyntityMeta will register itself for handling synchronizing semantics.
 	 *
@@ -300,28 +278,14 @@ public interface ISemantext {
 	public default TableMeta getTableMeta(String tbl) { return null; }
 
 	/**
-	 * Push auto-pk resolvings or so on.
-	 * @return this
-	 * @since 1.4.40
-	public default ISemantext beginPostCommit(String parentName) { return this; }
+	 * Set the creating builder as basic builder.
+	 * A helper for switching semantics hander.
+	 * In 2.0.0, only builder used by semantics handler should return itself
+	 * by implementing this.
+	 * 
+	 * @since 2.0.0
+	 * @param  creator
+	 * @return 
 	 */
-
-	/**
-	 * Pop auto-pk resolvings or so on.
-	 * @return this
-	 * @since 1.4.40
-	public default ISemantext endPostCommit() { return this; }
-	 */
-
-	/**Set resultset's current row's column's value.<br>
-	 * The current row is actually iterated over by {@link #onSelected(Object)}.
-	 * Because the semantic.transact is designed as independent of SReulstset, so it's handler
-	 * needing a helper function (this function) to handler selected results.<br>
-	 * This makes the selected event handling very tricky, and it should be improved.
-	 * @param resultset
-	 * @param col
-	 * @param v
-	 * @throws SQLException setting value failed
-	public void setRs(Object resultset, String col, String v) throws SQLException;
-	 */
+	public default <B extends Transcxt>  ISemantext creator(B creator) { return this; } 
 }

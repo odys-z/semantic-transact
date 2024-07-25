@@ -48,6 +48,7 @@ public class DocLocks {
 	}
 
 	public static void writing(String fullpath) {
+		Utils.warn("lock:   %s", fullpath);
 		if (!locks.containsKey(fullpath))
 			locks.put(fullpath, new ReentrantReadWriteLock());
 		locks.get(fullpath).writeLock().lock();
@@ -58,6 +59,7 @@ public class DocLocks {
 	}
 
 	public static void writen(String fullpath) {
+		Utils.warn("unlock: %s", fullpath);
 		try {
 			locks.get(fullpath).writeLock().unlock();
 		} catch (Throwable t) {

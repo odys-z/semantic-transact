@@ -36,8 +36,10 @@ public class Transcxt {
 	 * Create a statements manager.
 	 * @param staticSemantext A static semantic providing basic DB access, used to generate autoID etc.
 	 */
-	public Transcxt(ISemantext staticSemantext) {
-		basictx = staticSemantext;
+	public Transcxt(ISemantext semantext) {
+		basictx = semantext;
+		if (semantext != null)
+			semantext.creator(this);
 	}
 	
 	public Query select(String tabl, String ... alias) {
