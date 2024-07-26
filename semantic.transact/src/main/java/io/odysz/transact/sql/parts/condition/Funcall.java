@@ -247,7 +247,7 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	public static Funcall extfile(String[] args) {
+	public static Funcall extfile(String... args) {
 		Funcall f = new Funcall(Func.extFile);
 		f.args = args;
 		return f;
@@ -552,10 +552,10 @@ public class Funcall extends ExprPart {
 	 * The same as client query with string "extfile(t.uri)" - already used in Query.
 	 * @param uri
 	 * @return extfile(uri)
-	 */
 	public static String extFile(String uri) {
 		return String.format("%s(%s)", Func.extFile.name(), uri);
 	}
+	 */
 
 	/**Create a function decoding null value, e.g. for oracle: decode (colElem, null, ifTrue, orElse).
 	 * @param colElem can only be a full column name.

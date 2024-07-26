@@ -111,7 +111,16 @@ public class ExtFileInsert extends AbsPart {
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
-		byte[] b = AESHelper.decode64(b64);
+		byte[] b;// = AESHelper.decode64(b64);
+		try {
+			b = AESHelper.decode64(b64);
+		} catch (Exception e) {
+			b = b64.getBytes();
+			Utils.warnT(new Object() {},
+				"Cannot decode uri in base64.\npath: %s,\nuri: %s ...",
+				f.toAbsolutePath(), b64 == null ? "" : b64.substring(0, 32) );
+			e.printStackTrace();
+		}
 
 		try {
 			DocLocks.writing(f);;
