@@ -283,9 +283,9 @@ public interface ISemantext {
 	 * In 2.0.0, only builder used by semantics handler should return itself
 	 * by implementing this.
 	 * 
-	 * @since 2.0.0
+	 * @since 1.4.41
 	 * @param  creator
-	 * @return 
+	 * @return this
 	 */
 	public default <B extends Transcxt>  ISemantext creator(B creator) { return this; } 
 }

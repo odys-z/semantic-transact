@@ -22,4 +22,7 @@ public class Alias extends AbsPart {
 		return a == null ? "" : a.toUpperCase();
 	}
 
+	public String toString() {
+		return a;
+	}
 }

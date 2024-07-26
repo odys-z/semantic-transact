@@ -224,8 +224,6 @@ public class Query extends Statement<Query> {
 	 * @since 1.4.40, {@code col} can be null or empty, and will be used as "null" or "''".
 	 */
 	public Query col(Object col, String... alias) throws TransException {
-//		if (col == null)
-//			throw new TransException("col is null");
 		if (selectList == null)
 			selectList = new ArrayList<SelectElem>();
 
@@ -328,21 +326,25 @@ public class Query extends Statement<Query> {
 	}
 
 	/**
-	 * @since 1.4.40
+	 * @since 1.4.41
 	 * @param tblAlias
 	 * @param col_ases array for sql, e.g. to sql SELECT tblAlias.col_ases[0], tblAlias.col_ases[1], ...
 	 * @return this
 	 * @throws TransException
 	 */
-	public Query cols_byAlias(String tblAlias, String[] col_ases) throws TransException {
+	public Query cols_byAlias(String tblAlias, Object[] col_ases) throws TransException {
 		if (col_ases != null)
-			for (String col_as : col_ases) {
+			for (Object col_as : col_ases) {
 				if (col_as == null) continue;
-				String[] cass = col_as.split(" ([Aa][Ss] )?");
-				if (cass != null && cass.length > 1)
-					col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
-				else if (cass != null)
-					col(String.format("%s.%s", tblAlias, cass[0]));
+				if (col_as instanceof String) {
+					String[] cass = ((String)col_as).split(" ([Aa][Ss] )?");
+					if (cass != null && cass.length > 1)
+						col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
+					else if (cass != null)
+						col(String.format("%s.%s", tblAlias, cass[0]));
+				}
+				else // must be ExprPart
+					col(col_as);
 			}
 		return this;
 	}
@@ -359,21 +361,40 @@ public class Query extends Statement<Query> {
 	 */
 	public Query col_ases(String tblAlias, Object... col_ases) throws TransException {
 		if (col_ases != null)
-			for (int pair = 0; pair < col_ases.length; pair++) {
-				Object expr  = col_ases[pair];
+			for (int ax = 0; ax < col_ases.length; ax++) {
+				Object expr  = col_ases[ax];
 				if (expr == null) continue;
-				String alias = pair < col_ases.length ? (String)col_ases[pair] : null;
+				// String alias = ax < col_ases.length ? (String)expr : null;
 
 				if (expr instanceof String)
-					col(String.format("%s.%s", tblAlias, (String)expr), alias);
+					col(String.format("%s.%s", tblAlias, (String)expr), (String)expr);
 				else if (expr instanceof ExprPart)
-					col(new SelectElem((ExprPart) expr).tableAlias(tblAlias), alias);
-				else 
-					col(String.format("%s.%s", tblAlias, expr.toString()), alias);
+					col(new SelectElem((ExprPart) expr).tableAlias(tblAlias));
+				else  // something wrong
+					col(String.format("%s.%s", tblAlias, expr.toString()), expr.toString());
 			}
 		return this;
 	}
 	
+	/**
+	 * <pre>select
+	 * .col_ases(a, entCols())
+	 * .replacol(uri, extfile(a + "." + uri));</pre>
+	 * @param uri
+	 * @param extfile
+	 * @return this
+	 * @throws TransException 
+	 * @since 2.0.0
+	public Query col_replace(String uri, ExprPart with) throws TransException {
+		if (selectList == null)
+			throw new TransException("cols are null, nothing to replace.");
+		
+		for (int ix = 0; ix < selectList.size(); ix++)
+			if (selectList.get(ix).col != null)
+		return this;
+	}
+	 */
+
 	public Query l(String withTabl, String alias, String onCondit) throws TransException {
 		return j(join.l, withTabl, alias, onCondit);
 	}
