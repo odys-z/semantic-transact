@@ -61,7 +61,7 @@ public class SelectElem extends ExprPart {
 			else if (elemtype == ElemType.expr) {
 				if (expr instanceof Funcall)
 					// extFile() needing handle post selected results,
-					// it's needing to know the alias to find out the results to be replaced 
+					// it is needing to know the alias to find out the results to be replaced 
 					((Funcall)expr).selectElemAlias(alias);
 				sql = expr == null ? "null" : expr.sql(sctx); // + " " + alias;
 			}

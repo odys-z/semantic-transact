@@ -358,7 +358,6 @@ public class Query extends Statement<Query> {
 	 * @return this
 	 * @throws TransException
 	 * @since 1.4.40
-	 */
 	public Query col_ases(String tblAlias, Object... col_ases) throws TransException {
 		if (col_ases != null)
 			for (int ax = 0; ax < col_ases.length; ax++) {
@@ -375,6 +374,7 @@ public class Query extends Statement<Query> {
 			}
 		return this;
 	}
+	 */
 	
 	/**
 	 * <pre>select

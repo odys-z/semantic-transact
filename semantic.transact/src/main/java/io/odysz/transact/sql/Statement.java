@@ -559,8 +559,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		}
 	
 		boolean isQuoted = mt == null || mt.isQuoted(col);
-		if (mt == null || isQuoted)
-			return ExprPart.constr((String)v);
+		if (v != null && (mt == null || isQuoted))
+			return ExprPart.constr(String.valueOf(v));
 		else if (mt != null && !isQuoted && v == null)
 			return ExprPart.constVal(null);
 		else if (mt != null && !isQuoted && LangExt.isblank(v, "''", "null"))

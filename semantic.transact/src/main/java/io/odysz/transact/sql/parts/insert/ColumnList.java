@@ -36,6 +36,7 @@ public class ColumnList extends AbsPart {
 			return "";
 		else
 			return "(" + Arrays.stream(cols)
+				.filter(c -> c != null)
 				.map(c -> {
 					try {
 						return c.sql(context);
