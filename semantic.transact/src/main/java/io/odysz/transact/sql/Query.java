@@ -175,6 +175,19 @@ public class Query extends Statement<Query> {
 	private ArrayList<String> groupList;
 	protected long pg;
 	public long page() { return pg; }
+	
+	public Query page(long page, long pgSize) {
+		this.pg = page;
+		this.pgSize = pgSize;
+		return this;
+	}
+
+	public Query page(PageInf page) {
+		if (page != null)
+			return page(page.page, page.size);
+		else return page(0, -1);
+	}
+	
 	protected long pgSize;
 	public long size() { return pgSize; }
 
@@ -215,6 +228,12 @@ public class Query extends Statement<Query> {
 	WithClause withs;
 
 	boolean distinct;
+
+
+	public Query clos_clear() {
+		selectList = null;
+		return this;
+	}
 
 	/**
 	 * @param col example: f.funcId, count(*), ifnull(f.roleId, '0')
@@ -276,20 +295,6 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
-	public Query page(long page, long pgSize) {
-		// paging
-		this.pg = page;
-		this.pgSize = pgSize;
-
-		return this;
-	}
-
-	public Query page(PageInf page) {
-		if (page != null)
-			return page(page.page, page.size);
-		else return page(0, -1);
-	}
-
 	/**
 	 * @param col_ases 'col as alias' or 'col_name'
 	 * @return this
@@ -332,7 +337,7 @@ public class Query extends Statement<Query> {
 	 * @return this
 	 * @throws TransException
 	 */
-	public Query cols_byAlias(String tblAlias, Object[] col_ases) throws TransException {
+	public Query cols_byAlias(String tblAlias, Object... col_ases) throws TransException {
 		if (col_ases != null)
 			for (Object col_as : col_ases) {
 				if (col_as == null) continue;
