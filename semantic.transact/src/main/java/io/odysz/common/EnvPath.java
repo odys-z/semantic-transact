@@ -31,12 +31,18 @@ public class EnvPath {
 	static String regSrc = "\\$(\\w+)";
 	static Regex reg = new Regex(regSrc);
 
-	/**Repace environment variable, e.g. used for setting up file paths.
+	/**
+	 * Repace environment variable, e.g. used for setting up file paths.
+	 * 
 	 * <h6>FYI.</h6>
-	 * Semantic-* will be used in the future mainly in docker container.
-	 * In docker, volume can not mounted to tomcat/webapp's sub folder - will prevent war unpacking.
-	 * See <a href='https://stackoverflow.com/q/15113700'>this problem</a>.
-	 * So it's necessary have file paths not only relative, but also can be parsed for replacing environment variables.
+	 * 
+	 * <p>Semantic-* will be used in the future mainly in docker container.
+	 * In docker, volume can not be mounted to tomcat/webapp's sub folder - will prevent war unpacking.
+	 * See <a href='https://stackoverflow.com/q/15113700'>this problem</a>.</p>
+	 * 
+	 * <p>So it's necessary have file paths not only relative, but also can be
+	 * parsed for replacing environment variables.
+	 * 
 	 * @param src string have bash style variable to be replaced, e.g. $HOME/volume.sqlite
 	 * @return string replaced with environment variables
 	 */
@@ -76,6 +82,14 @@ public class EnvPath {
 		return decodeUri(stx.containerRoot(), uri);
 	}
 
+	/**
+	 * Replace env token in {@code root} and concat the path.
+	 * 
+	 * @param root
+	 * @param subpath
+	 * @param filename
+	 * @return return of {@link FilenameUtils#concat(String, String...)}
+	 */
 	public static String decodeUri(String root, String subpath, String filename) {
 		root = root == null ? "" : root;
 		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
