@@ -44,12 +44,21 @@ public class PageInf extends Anson {
 		this.mapCondts = new HashMap<String, Object>();
 	}
 	
+	/**
+	 * @param page
+	 * @param size
+	 * @param condt n0, v0, n1, v1, ...
+	 */
 	public PageInf(long page, long size, String... condt) {
 		this.page = page;
 		this.size = size;
 		this.arrCondts = new ArrayList<String[]>();
+
 		if (!isNull(condt))
-			arrCondts.add(condt);
+			// arrCondts.add(condt);
+			for (int cx = 0; cx < condt.length; cx+=2)
+				arrCondts.add(new String[] {condt[cx], condt[cx+1]});
+
 		mapCondts = new HashMap<String, Object>();
 	}
 
