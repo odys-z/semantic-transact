@@ -1,6 +1,8 @@
 package io.odysz.common;
 
 import static io.odysz.common.LangExt.isNull;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +10,8 @@ import org.apache.commons.io_odysz.FilenameUtils;
 
 import io.odysz.semantics.ISemantext;
 
-/**<p>A helper to handler environment variable affected file path.</p>
+/**
+ * <p>A helper to handler environment variable affecting file path.</p>
  * Suppose $VOLUME_HOME = "/home/ody/volume"
  * <pre>
  args: $VOLUME_HOME/shares,uri,userId,cate,docName
@@ -31,6 +34,18 @@ public class EnvPath {
 	static String regSrc = "\\$(\\w+)";
 	static Regex reg = new Regex(regSrc);
 
+	static Map<String, String> sysenv;
+
+	static { sysenv = System.getenv(); }
+	
+	public static void extendEnv(String k, String v) {
+		Map<String, String> env2 = new HashMap<String, String>(sysenv.size() + 1);
+		for (String sk : sysenv.keySet())
+			env2.put(sk, sysenv.get(sk));
+		env2.put(k, v);
+		sysenv = env2;
+	}
+
 	/**
 	 * Repace environment variable, e.g. used for setting up file paths.
 	 * 
@@ -47,9 +62,29 @@ public class EnvPath {
 	 * @return string replaced with environment variables
 	 */
 	public static String replaceEnv(String src) {
+//		List<String> envs = reg.findGroups(src);
+//		if (envs != null) {
+//			Map<String, String> sysenvs = System.getenv();
+//
+//			for (String env : envs) {
+//				String v = System.getProperty(env);
+//				v = v == null ? sysenvs.get(env) : v;
+//				if (v != null) // still can be null
+//					src = src.replaceAll("\\$" + env, v);
+//				else
+//					src = src.replaceAll("\\$" + env, "");
+//			}
+//		}
+//		if (src.startsWith("\\$"))
+//			Utils.warn("Requried env variable may not parsed correctly: %s", src);
+//		return src;
+		return replaceEnv(src, sysenv);
+	}
+	
+	public static String replaceEnv(String src, Map<String, String> sysenvs) {
 		List<String> envs = reg.findGroups(src);
 		if (envs != null) {
-			Map<String, String> sysenvs = System.getenv();
+			// Map<String, String> sysenvs = System.getenv();
 
 			for (String env : envs) {
 				String v = System.getProperty(env);
@@ -63,6 +98,7 @@ public class EnvPath {
 		if (src.startsWith("\\$"))
 			Utils.warn("Requried env variable may not parsed correctly: %s", src);
 		return src;
+	
 	}
 
 	/**Decode URI - convert file records' uri into absolute path, according to env.

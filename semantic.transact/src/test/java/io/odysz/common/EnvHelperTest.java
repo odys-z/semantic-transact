@@ -26,7 +26,8 @@ public class EnvHelperTest {
 
 	@Test
 	public void testExtfilePathHandler() throws Exception {
-		setEnv2("VOLUME_HOME", "/home/ody/volume");
+		// setEnv2("VOLUME_HOME", "/home/ody/volume");
+		EnvPath.extendEnv("VOLUME_HOME", "/home/ody/volume");
 
 		String[] args = "$VOLUME_HOME/shares,uri,userId,cate,docName".split(",");
 		String extroot = args[0];
@@ -51,18 +52,22 @@ public class EnvHelperTest {
 		FilenameUtilsTest.assertPathEquals("/home/alice/vol/shares/admin/000002 f.txt", abspath);
 	}
 	
-	/**Only Linux/MacOs
+	/**
+	 * @deprecated no longer works in JDK 17.
+	 * 
+	 * Only Linux/MacOs
 	 * https://stackoverflow.com/a/40682052/7362888
 	 * @param newenv
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
-	public static void setEnv2(String key, String value) {
+	@SuppressWarnings({ "unchecked", "unused" })
+	private static void setEnv2(String key, String value) {
 	    try {
 	        Map<String, String> env = System.getenv();
 	        Class<?> cl = env.getClass();
 	        Field field = cl.getDeclaredField("m");
-	        field.setAccessible(true);
+	        // field.setAccessible(true);
+	        field.trySetAccessible();
 	        Map<String, String> writableEnv = (Map<String, String>) field.get(env);
 	        writableEnv.put(key, value);
 	    } catch (Exception e) {
