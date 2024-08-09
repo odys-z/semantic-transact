@@ -1,5 +1,11 @@
 package io.odysz.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+
+import org.apache.commons.io_odysz.FilenameUtils;
 import org.apache.commons.io_odysz.FilenameUtilsTest;
 import org.junit.jupiter.api.Test;
 
@@ -15,10 +21,15 @@ public class EnvHelperTest {
 			home = "~";
 			System.setProperty("HOME", home);
 		}
-		FilenameUtilsTest.assertPathEquals(home + "/v", EnvPath.replaceEnv("$HOME/v"));
+		FilenameUtilsTest.assertPathEquals(FilenameUtils.winpath2unix(home + "/v"), EnvPath.replaceEnv("$HOME/v"));
 		
 		System.setProperty("VOLUME", "volume");
 		FilenameUtilsTest.assertPathEquals("volume/v", EnvPath.replaceEnv("$VOLUME/v"));
+		
+		assertEquals("c:/Alice/sqlite-main.db", FilenameUtils.winpath2unix("c:\\Alice\\sqlite-main.db"));
+		
+		EnvPath.extendEnv("VOLUME_HOME", "c:\\Alice");
+		FilenameUtilsTest.assertPathEquals("c:/Alice/v", EnvPath.replaceEnv("$VOLUME_HOME/v"));
 	}
 
 	@Test
