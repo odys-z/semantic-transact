@@ -90,7 +90,7 @@ public class EnvPath {
 				String v = System.getProperty(env);
 				v = v == null ? sysenvs.get(env) : v;
 				if (v != null) // still can be null
-					src = src.replaceAll("\\$" + env, v);
+					src = src.replaceAll("\\$" + env, winpath2unix(v));
 				else
 					src = src.replaceAll("\\$" + env, "");
 			}
@@ -180,4 +180,8 @@ public class EnvPath {
 		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
 
+	public static String winpath2unix(String win) {
+		return win == null ? null :
+			win.replaceAll("\\\\", "/");
+	}
 }

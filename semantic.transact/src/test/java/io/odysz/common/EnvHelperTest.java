@@ -1,5 +1,9 @@
 package io.odysz.common;
 
+import static io.odysz.common.EnvPath.winpath2unix;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -22,6 +26,11 @@ public class EnvHelperTest {
 		
 		System.setProperty("VOLUME", "volume");
 		FilenameUtilsTest.assertPathEquals("volume/v", EnvPath.replaceEnv("$VOLUME/v"));
+		
+		assertEquals("c:/Alice/sqlite-main.db", winpath2unix("c:\\Alice\\sqlite-main.db"));
+		
+		EnvPath.extendEnv("VOLUME_HOME", "c:\\Alice");
+		FilenameUtilsTest.assertPathEquals("c:/Alice/v", EnvPath.replaceEnv("$VOLUME_HOME/v"));
 	}
 
 	@Test
