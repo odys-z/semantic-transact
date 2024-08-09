@@ -38,6 +38,11 @@ public class EnvPath {
 
 	static { sysenv = System.getenv(); }
 	
+	/**
+	 * Extend system variables.
+	 * @param k
+	 * @param v
+	 */
 	public static void extendEnv(String k, String v) {
 		Map<String, String> env2 = new HashMap<String, String>(sysenv.size() + 1);
 		for (String sk : sysenv.keySet())
@@ -47,7 +52,19 @@ public class EnvPath {
 	}
 
 	/**
-	 * Repace environment variable, e.g. used for setting up file paths.
+	 * Format a replaced string with the configured map of environment variables.
+	 * @see #replaceEnv(String, Map)
+	 * @see #extendEnv(String, String)
+	 * @since 1.5.0
+	 * @param src
+	 * @return string replaced with environment variables
+	 */
+	public static String replaceEnv(String src) {
+		return replaceEnv(src, sysenv);
+	}
+	
+	/**
+	 * Replace environment variable, e.g. used for setting up file paths.
 	 * 
 	 * <h6>FYI.</h6>
 	 * 
@@ -60,27 +77,8 @@ public class EnvPath {
 	 * 
 	 * @param src string have bash style variable to be replaced, e.g. $HOME/volume.sqlite
 	 * @return string replaced with environment variables
+	 * @since 1.5.0
 	 */
-	public static String replaceEnv(String src) {
-//		List<String> envs = reg.findGroups(src);
-//		if (envs != null) {
-//			Map<String, String> sysenvs = System.getenv();
-//
-//			for (String env : envs) {
-//				String v = System.getProperty(env);
-//				v = v == null ? sysenvs.get(env) : v;
-//				if (v != null) // still can be null
-//					src = src.replaceAll("\\$" + env, v);
-//				else
-//					src = src.replaceAll("\\$" + env, "");
-//			}
-//		}
-//		if (src.startsWith("\\$"))
-//			Utils.warn("Requried env variable may not parsed correctly: %s", src);
-//		return src;
-		return replaceEnv(src, sysenv);
-	}
-	
 	public static String replaceEnv(String src, Map<String, String> sysenvs) {
 		List<String> envs = reg.findGroups(src);
 		if (envs != null) {
@@ -90,7 +88,7 @@ public class EnvPath {
 				String v = System.getProperty(env);
 				v = v == null ? sysenvs.get(env) : v;
 				if (v != null) // still can be null
-					src = src.replaceAll("\\$" + env, winpath2unix(v));
+					src = src.replaceAll("\\$" + env, FilenameUtils.winpath2unix(v));
 				else
 					src = src.replaceAll("\\$" + env, "");
 			}
@@ -178,10 +176,5 @@ public class EnvPath {
 
 	public static String xml(String xml) {
 		return FilenameUtils.concat(workdir, webINF(), xml);
-	}
-
-	public static String winpath2unix(String win) {
-		return win == null ? null :
-			win.replaceAll("\\\\", "/");
 	}
 }

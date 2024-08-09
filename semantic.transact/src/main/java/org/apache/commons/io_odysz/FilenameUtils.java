@@ -1657,4 +1657,9 @@ public class FilenameUtils {
 				p = concat(p, s);
 		return p;
 	}
+
+	public static String winpath2unix(String win) {
+		return win == null ? null :
+			win.replaceAll("\\\\", "/");
+	}
 }
