@@ -42,7 +42,7 @@ public class Logic {
 						? "(" + ((Query)r).sql(sctx) + ")"
 						: r instanceof AbsPart 
 						? ((AbsPart)r).sql(sctx)
-						: r.toString();
+						: r == null ? "" : r.toString();
 			} catch (TransException e) {
 				e.printStackTrace();
 				rop = r.toString();

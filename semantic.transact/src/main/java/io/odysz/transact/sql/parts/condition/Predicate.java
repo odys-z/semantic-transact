@@ -1,5 +1,8 @@
 package io.odysz.transact.sql.parts.condition;
 
+import static io.odysz.transact.sql.parts.Logic.op.eq;
+import static io.odysz.transact.sql.parts.Logic.op.isnull;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -166,7 +169,9 @@ public class Predicate extends AbsPart {
 			if (l == null) throw new TransException(
 					"Predictat sql can't built with null left operand. op: %s", op.name());
 			return String.format("%s %s", l.escape(escape).sql(sctx),
-					op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx)));
+					op == eq && r == null
+					? isnull.sql(sctx, isnull, null)
+					: op.sql(sctx, op, r == null ? "" : r.escape(escape).sql(sctx)));
 		}
 	}
 
