@@ -42,6 +42,7 @@ public class EnvPath {
 	 * Extend system variables.
 	 * @param k
 	 * @param v
+	 * @since 1.4.45
 	 */
 	public static void extendEnv(String k, String v) {
 		Map<String, String> env2 = new HashMap<String, String>(sysenv.size() + 1);
