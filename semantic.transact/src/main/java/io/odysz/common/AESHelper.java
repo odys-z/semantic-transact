@@ -266,37 +266,27 @@ public class AESHelper {
 			throw new IOException ("Block size must be multple of 12.");
 
 		byte[] chunk = new byte[blockSize];
-		/*
-		BufferedInputStream in = new BufferedInputStream(ifs, blockSize);
-		Base64.Encoder encoder = Base64.getEncoder();
 
-
-		int len = in.read(chunk);
-
-		if (len >= 0)
-			return encoder.encodeToString(chunk);
-		else return null;
-		*/
 		return encode64(chunk, ifs, 0, blockSize);
 	}
 
 	/**
 	 * Usage example: <pre>
-	 *
-	byte[] buf = new byte[n * 3];
-	int index = 0;
-	while (index &lt; file_size) {
-		int readlen  = Math.min(buf.length, size - index);
-		String str64 = encode64(buf, ifs, index, readlen);
-		index += readlen;
-		// consumption of str64
-		...
-	}</pre>
+	 * byte[] buf = new byte[n * 3];
+	 * int index = 0;
+	 * while (index &lt; file_size) {
+	 * 	int readlen  = Math.min(buf.length, size - index);
+	 * 	String str64 = encode64(buf, ifs, index, readlen);
+	 * 	index += readlen;
+	 * 	// consumption of str64
+	 * 	...
+	 * }</pre>
+	 * 
 	 * @param buf
 	 * @param ifs file input stream
 	 * @param start
 	 * @param len
-	 * @return encoded string
+	 * @return encoded string, length 0 if read nothing.
 	 * @throws IOException
 	 * @throws TransException buffer length is not multiple of 3.
 	 */

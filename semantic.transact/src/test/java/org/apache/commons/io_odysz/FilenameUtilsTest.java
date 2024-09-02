@@ -15,9 +15,9 @@ public class FilenameUtilsTest {
 	     assertPathEquals("C:/bar", concat("/foo", "C:/bar"));
 	     assertPathEquals("C:bar", concat("/foo", "C:bar"));
 	     assertPathEquals("/foo/bar", concat("/foo/a/", "../bar"));
+	     assertPathEquals("/bar", concat("/foo/..", "/bar"));
 	     assertPathEquals(null, concat("/foo/", "../../bar"));
 	     assertPathEquals("/bar", concat("/foo/", "/bar"));
-	     assertPathEquals("/bar", concat("/foo/..", "/bar"));
 	     assertPathEquals("/foo/bar/c.txt", concat("/foo", "bar/c.txt"));
 	     assertPathEquals("/foo/c.txt/bar", concat("/foo/c.txt", "bar"));
 	     

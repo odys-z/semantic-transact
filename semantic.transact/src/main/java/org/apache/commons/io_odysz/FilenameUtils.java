@@ -26,6 +26,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.odysz.common.Utils;
+
 /**
  * General file name and file path manipulation utilities.
  * <p>
@@ -413,6 +415,7 @@ public class FilenameUtils {
             if (array[i] == separator && array[i - 1] == '.' && array[i - 2] == '.' &&
                     (i == prefix + 2 || array[i - 3] == separator)) {
                 if (i == prefix + 2) {
+                	Utils.warnT(new Object() {}, "Cannot resolve %s, e. g. for unknown parent folder.", fileName);
                     return null;
                 }
                 if (i == size - 1) {
