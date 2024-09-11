@@ -287,8 +287,12 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			throw new TransException("Don't use this way. (statement must be a Query object)");
 	}
 
-	/**This is a wraper of {@link #where(String, String, String)} for convenient
-	 * - the third arg is taken as a string constant and added single quotes at begin and end.
+	/**
+	 * This is a wraper of {@link #where(String, String, String)} for convenient.
+	 * 
+	 * 
+	 * For the third arg to be taken as a string constant, use {@link #where_(op, String, String)}.
+	 * 
 	 * @param op
 	 * @param loperand left column
 	 * @param roperand right constant will NOT be adding single quotes "''"
