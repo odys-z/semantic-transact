@@ -136,11 +136,10 @@ public class AESHelper {
         return b64;
 	}
 
-	//-------------ody:io.github.odys-z
-
 	/**
+	 * FIXME delete these comments by the future.
 	 * 10 Dec 2024:<br>
-	 * This line causes trouble in JDK 15, Open JDK x64.
+	 * This line causes trouble in JDK 15, Open JDK x64 - fixed by adding a lock.
 	 * 
 	 * @param input
 	 * @param key
@@ -155,7 +154,7 @@ public class AESHelper {
 
         //Initializes the cipher with ENCRYPT_MODE, key and iv.
         try {
-        	lock.lock();
+        	lock.lock(); // can't concurrently work in Open JDK 15 for x64 
 
 			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
