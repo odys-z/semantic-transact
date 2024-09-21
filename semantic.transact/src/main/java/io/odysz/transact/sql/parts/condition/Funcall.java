@@ -54,7 +54,7 @@ public class Funcall extends ExprPart {
 		concat("concat"),
 		/**
 		 * Concatenate multiple (string) columns in a "\n" separated string.
-		 * The result can be splited by {@link LangExt#uncombine(String)}
+		 * The result can be splited by {@link io.odysz.common.LangExt#uncombine(String)}
 		 */
 		compound("compound"),
 
