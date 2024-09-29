@@ -823,9 +823,7 @@ public class Query extends Statement<Query> {
 				
 				// needing a sub-query AST node
 				subquery != null ? new ExprPart("from") : null,
-//				subquery != null ? new ExprPart("(") : null,
 				subquery,
-//				subquery != null ? new ExprPart(")") : null,
 				subquery != null ? mainAlias : null,
 
 				// join can be null
