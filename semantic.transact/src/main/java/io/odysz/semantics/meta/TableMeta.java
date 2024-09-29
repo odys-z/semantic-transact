@@ -13,6 +13,8 @@ import io.odysz.semantics.meta.ColMeta.coltype;
 import io.odysz.transact.x.TransException;
 
 public class TableMeta {
+	public static boolean debug = false;
+
 	/**
 	 * <p>A helper for test on sqlite.</p>
 	 * 
