@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
@@ -28,6 +29,8 @@ public class Delete extends Statement<Delete>  {
 			commit(stx, sqls);
 			return postOp.onCommitOk(stx, sqls);
 		}
+		else
+			Utils.warn("On operation for built sqls. Intend to call subclass' Delete(tbl, user)?");
 		return null;
 	}
 
