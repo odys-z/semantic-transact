@@ -191,17 +191,21 @@ public class AESHelper {
 
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 
+		
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
-        encipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
-        byte[] output = new byte[((input.length)/ 16 + 2) * 16];
+        try {
+        	lock.lock(); // can't concurrently work in Open JDK 15 for x64 
+			encipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+			byte[] output = new byte[((input.length)/ 16 + 2) * 16];
 
-        int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
+			int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 
-        encipher.close();
+			encipher.close();
 
-        return Arrays.copyOf(output, finalBytes);
+			return Arrays.copyOf(output, finalBytes);
+        } finally { lock.unlock(); }
 	}
 
 	/**
