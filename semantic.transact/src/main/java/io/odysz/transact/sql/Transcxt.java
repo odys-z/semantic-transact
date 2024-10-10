@@ -85,9 +85,10 @@ public class Transcxt {
 
 	public TableMeta tableMeta(String tabl) {
 		if (basictx != null && basictx.tablType(tabl) == null)
-			Utils.warn("ERROR Table information doesn't exist. Table %s, Connectsion: %s." +
-				"\nSince 1.5.0, table metas are loaded for differenct connections respectively -Cann't references from each other.",
-				tabl, basictx == null ? null : basictx.connId());
+			Utils.warn("[%s]\nERROR: Table information doesn't exist.\n" +
+				"Table: %s, Connection: %s." +
+				"\nSince 1.5.0, table metas are loaded for differenct connections respectively - can't reference across connections.",
+				basictx.connId(), tabl, basictx == null ? null : basictx.connId());
 		return basictx == null ? null :
 			basictx.tablType(tabl).conn(basictx.connId());
 	}
