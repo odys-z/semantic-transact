@@ -427,6 +427,8 @@ public class Insert extends Statement<Insert> {
 			commit(ctx, sqls);
 			return postOp.onCommitOk(ctx, sqls);
 		}
+		else
+			Utils.warn("On operation for built sqls. Intend to call subclass' Insert(tbl, user)?");
 		return null;
 	}
 	

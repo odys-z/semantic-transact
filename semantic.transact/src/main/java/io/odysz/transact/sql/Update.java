@@ -144,6 +144,8 @@ public class Update extends Statement<Update> {
 			// Connects.commit() usually return this for update
 			return postOp.onCommitOk(stx, sqls);
 		}
+		else
+			Utils.warn("On operation for built sqls. Intend to call subclass' Update(tbl, user)?");
 		return null;
 	}
 
