@@ -61,23 +61,6 @@ search_condition_not
 		this.logitype = Logic.type.empty;
 	}
 	
-	/**
-	 * Generate a "in" condition for: lop in ('constr[0]', 'constr[1]', ...)
-	 * @param lop
-	 * @param constvs
-	 * @return Condit instance
-	 * @since 1.4.36
-	public static Condit in(String lop, String[] constr) {
-		if (constr != null) {
-			ArrayList<ExprPart> rops = new ArrayList<ExprPart>(constr.length); 
-			for (String c : constr)
-				rops.add(Funcall.constr(c));
-			return new Condit(op.in, lop, rops);
-		}
-		return null;
-	}
-	 */
-
 	public boolean isEmpty() {
 		return (condts == null || condts.size() == 0) && super.empty;
 	}
