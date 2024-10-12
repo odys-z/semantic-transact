@@ -127,12 +127,17 @@ public class EnvPath {
 	 */
 	public static String decodeUri(String root, String subpath, String filename) {
 		root = root == null ? "" : root;
-		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), filename);
+		return FilenameUtils.concat(replaceEnv(root),
+					replaceEnv(subpath),
+					filename);
 	}
 
-	public static String decodeUri(String root, String subpath, String folder2, String filename) {
+	public static String decodeUri(String root, String subpath, String folder, String filename) {
 		root = root == null ? "" : root;
-		return FilenameUtils.concat(replaceEnv(root), replaceEnv(subpath), replaceEnv(folder2), filename);
+		return FilenameUtils.concat(replaceEnv(root),
+					replaceEnv(subpath),
+					replaceEnv(folder),
+					filename);
 	}
 
 	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
