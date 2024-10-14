@@ -553,6 +553,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 */
 	public Map<String, Integer> getColumns() { return null; }
 
+	/**
+	 * Compose v into field value, where:<br>
+	 * String: constr<br>
+	 * null  : ExprPart(null)<br>
+	 * "", null    : "0" (not quoted field defined by TableMeta),  FIXME This is not tampering data?<br>
+	 * else  : ExprPart(v) 
+	 * 
+	 * @param v
+	 * @param mt
+	 * @param col
+	 * @return
+	 */
 	public static ExprPart composeVal(Object v, TableMeta mt, String col) {
 		try {
 			if (verbose && v instanceof String && eq(mt.pk, col, true) && eq((String)v, "AUTO"))
@@ -568,7 +580,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		else if (mt != null && !isQuoted && v == null)
 			return ExprPart.constVal(null);
 		else if (mt != null && !isQuoted && LangExt.isblank(v, "''", "null"))
-			return ExprPart.constVal("0"); // FIXME This not tampering data?
+			return ExprPart.constVal("0"); // FIXME This is not tampering data?
 		else
 			return new ExprPart(String.valueOf(v));
 	}
