@@ -1,6 +1,7 @@
 package io.odysz.transact.sql;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.isNull;
 import static io.odysz.transact.sql.parts.condition.ExprPart.constr;
 
 import java.sql.SQLException;
@@ -301,6 +302,7 @@ public class Query extends Statement<Query> {
 	 * @throws TransException
 	 * 
 	 * @since 1.4.40, this method will have {@link SelectElem} generate null and '' for null or empty columns.
+	 * <p>col_ases can only be string or list of strings.</p>
 	 * <pre> Insert i = st.insert("a_users")
 	 *  .cols("userName", "orgId", "pswd", "userId")
 	 *  .select(st.select(null).cols("'Ody'", null, "", "'odyz'"))
@@ -324,6 +326,15 @@ public class Query extends Statement<Query> {
 						col(cass[0], cass[1]);
 					else if (cass != null)
 						col(cass[0]);
+				}
+				else if (!isNull(col_ases) && col_ases[0] instanceof Iterable) {
+					for (Object c : (Iterable<?>)col_ases[0]) {
+						String[] cass = ((String)c).split(" ([Aa][Ss] )?");
+						if (cass != null && cass.length > 1)
+							col(cass[0], cass[1]);
+						else if (cass != null)
+							col(cass[0]);
+					}
 				}
 				else col(col_as);
 			}

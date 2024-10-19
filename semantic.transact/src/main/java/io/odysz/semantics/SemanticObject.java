@@ -228,10 +228,12 @@ public class SemanticObject extends Anson {
 
 	@SuppressWarnings("unchecked")
 	public List<String> resulve(String tabl, String pk) {
-		return (List<String>)((SemanticObject) ((SemanticObject)
+		return get("resulved") != null && ((SemanticObject)get("resulved")).get(tabl) != null ?
+				(List<String>)((SemanticObject) ((SemanticObject)
 				get("resulved"))
 				.get(tabl))
-				.get(pk);
+				.get(pk)
+			  : null;
 	}
 
 	public int getInt(String n) {
