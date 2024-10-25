@@ -96,21 +96,31 @@ public interface IUser {
 	
 	IUser logAct(String funcName, String funcId);
 
+	/**
+	 * @return farewell message, default null
+	 */
 	default SemanticObject logout() { return null; }
 
 	default void writeJsonRespValue(Object writer) throws IOException {}
 
-	/**Add notifyings
+	/**
+	 * Add notifyings
+	 * @deprecated since 1.5.0, this is not necessary for session management,
+	 * and user's notifications can be implemented in the business layer.
 	 * @param note
 	 * @return this
 	 * @throws TransException 
 	 */
-	public IUser notify(Object note) throws TransException;
+	default public IUser notify(Object note) throws TransException { return this; };
 
-	/**Get notified string list.
+	/**
+	 * Get notified string list.
+	 * 
+	 * @deprecated since 1.5.0, this is not necessary for session management,
+	 * and user's notifications can be implemented in the business layer.
 	 * @return notifyings
 	 */
-	public List<Object> notifies();
+	default public List<Object> notifies() { return null; }
 
 	/**
 	 * Set session key, not session-id.
