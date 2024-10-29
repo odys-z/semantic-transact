@@ -123,12 +123,12 @@ public interface IUser {
 	default public List<Object> notifies() { return null; }
 
 	/**
-	 * Set session key, not session-id.
+	 * Set session key, not session-id, called by {@link #getClientSessionInf(IUser)}.
 	 * @since 1.4.37
-	 * @param ssid
+	 * @param token
 	 * @return this
 	 */
-	public default IUser sessionKey(String ssid) { return this; }
+	public default IUser sessionKey(String token) { return this; }
 
 	/**
 	 * Set session knowledge for token verification.
@@ -137,8 +137,8 @@ public interface IUser {
 	 * @since 1.4.37
 	 * @param knowledge
 	 * @return this
-	 */
 	public default IUser sessionKey(byte[] knowledge) { return this; }
+	 */
 
 	/**
 	 * Get session key
@@ -185,7 +185,9 @@ public interface IUser {
 	public default String roleId() { return null; }
 
 	/**
-	 * Get a session object for client. Implementation can not reveal server side knowledge in this object.
+	 * Get a session object for client. Implementation must not reveal server side knowledge in this object.
+	 * 
+	 * This method calls {@link #sessionKey()} for setting tokens.
 	 * 
 	 * @param usr
 	 * @return the session information
