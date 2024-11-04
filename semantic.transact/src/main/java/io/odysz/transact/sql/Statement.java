@@ -489,7 +489,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T commit(ArrayList<String> sqls, IUser... usrInfo) throws TransException {
-		// ISemantext context = transc.ctx((T) this, mainTabl, usrInfo);
 		ISemantext context = transc.instancontxt(
 				transc != null && transc.basictx != null ? transc.basictx.connId() : null,
 				usrInfo == null || usrInfo.length == 0 ? null : usrInfo[0]);
@@ -507,8 +506,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-		// prepare(cxt);
-
 		// sql() calling onDelete (generating before sentences), must called before "before"
 		String itself = sql(cxt);
 
@@ -534,13 +531,6 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public void doneOp(IPostOptn operatn) {
 		postOp = operatn;
 	}
-
-	/**
-	 * Called when starting preparing sql, works like preparing auto generated key etc. should go here.
-	 * 
-	 * @param ctx
-	void prepare(ISemantext ctx) { }
-	 */
 
 	@Override
 	public abstract String sql(ISemantext context) throws TransException;
