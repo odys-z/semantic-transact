@@ -237,4 +237,18 @@ public interface IUser {
 	 */
 	public default String pswd() throws TransException { throw new TransException("Must be overriden by subclass."); }
 
+	/**
+	 * @since 1.5.0
+	 * @param string
+	 * @return this
+	 */
+	default IUser orgId(String string) { return this; }
+
+	/**
+	 * @since 1.5.0
+	 * @param string
+	 * @return this
+	 */
+	default IUser roleId(String string) { return this; }
+
 }
