@@ -1,6 +1,7 @@
 package io.odysz.transact.sql;
 
-import io.odysz.common.Utils;
+import static io.odysz.common.LangExt.f;
+
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.meta.TableMeta;
@@ -85,10 +86,12 @@ public class Transcxt {
 
 	public TableMeta tableMeta(String tabl) {
 		if (basictx != null && basictx.tablType(tabl) == null)
-			Utils.warn("[%s]\nERROR: Table information doesn't exist.\n" +
+			// Utils.warn(
+			throw new NullPointerException(f(
+				"[%s]\nERROR: Table information doesn't exist.\n" +
 				"Table: %s, Connection: %s." +
 				"\nSince 1.5.0, table metas are loaded for differenct connections respectively - can't reference across connections.",
-				basictx.connId(), tabl, basictx == null ? null : basictx.connId());
+				basictx.connId(), tabl, basictx == null ? null : basictx.connId()));
 		return basictx == null ? null :
 			basictx.tablType(tabl).conn(basictx.connId());
 	}

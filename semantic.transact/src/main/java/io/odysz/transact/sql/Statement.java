@@ -109,9 +109,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return (T) this;
 	}
 
-	/**A wrapper that setting values to {@link Update} and {@link Insert}.<br>
+	/**
+	 * A wrapper that setting values to {@link Update} and {@link Insert}.<br>
 	 * The null/empty values are handled differently according data meta.<br>
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
+	 * 
 	 * @param n
 	 * @param v
 	 * @return this statement
