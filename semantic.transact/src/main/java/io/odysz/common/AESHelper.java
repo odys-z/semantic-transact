@@ -360,7 +360,7 @@ public class AESHelper {
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 * @since 1.4.37
-	 * @see AESHelperTest#testSessionToken() source
+	 * @see AESHelperTest#testSessionToken()
 	 */
 	public static String[] packSessionKey(String key) 
 			throws GeneralSecurityException, IOException {

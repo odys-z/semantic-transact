@@ -48,8 +48,8 @@ public class Sql {
 	/**
 	 * @since 1.4.40
 	 * @param op
-	 * @param loperand
-	 * @param part
+	 * @param lop
+	 * @param rop
 	 * @return condition
 	 */
 	public static Condit condt(op op, ExprPart lop, ExprPart rop) {
@@ -59,8 +59,7 @@ public class Sql {
 	/**
 	 * @since 1.4.40
 	 * @param op
-	 * @param loperand
-	 * @param part
+	 * @param lop
 	 * @return condition
 	 */
 	public static Condit condt(op op, ExprPart lop, String rop) {

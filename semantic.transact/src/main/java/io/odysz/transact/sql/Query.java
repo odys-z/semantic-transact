@@ -411,6 +411,14 @@ public class Query extends Statement<Query> {
 	}
 	 */
 
+	/**
+	 * 
+	 * @param withTabl
+	 * @param alias
+	 * @param onCondit
+	 * @return
+	 * @throws TransException
+	 */
 	public Query l(String withTabl, String alias, String onCondit) throws TransException {
 		return j(join.l, withTabl, alias, onCondit);
 	}

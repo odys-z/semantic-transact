@@ -31,7 +31,7 @@ abstract public class AbsPart {
 	public abstract String sql(ISemantext context) throws TransException;
 	
 	/**
-	 * This should optimize performance. {@link #sql(ISemantext, OutputStream) will be replaced by this.
+	 * This should optimize performance. {@link #sql(ISemantext, OutputStream)} will be replaced by this.
 	 * @since 1.6.0
 	 * @param context
 	 * @param os

@@ -270,7 +270,7 @@ public interface ISemantext {
 	 * Get table meta. The returned meta is a semantics extended meta.
 	 * E.g. the SyntityMeta will register itself for handling synchronizing semantics.
 	 *
-	 * All metas are managed by {@link io.odysz.semantic.DA.Connects}, so not usable
+	 * All metas are managed by {@code Semantic.DA/io.odysz.semantic.DA.Connects}, so not usable
 	 * without a Semantic.DA layer.
 	 * @param tbl
 	 * @return meta

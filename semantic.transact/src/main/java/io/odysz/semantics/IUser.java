@@ -12,7 +12,7 @@ import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
 
-/**<p>Provide user e.g. servlet session information to modify some data in AST.</p>
+/**<p>Provide a user instance, e.g. servlet session information, to operate data in database.</p>
  * <h5>Usage</h5>
  * <p>
  * 1. Configure the implementations class name in config.xml.<br>
@@ -23,7 +23,7 @@ import io.odysz.transact.x.TransException;
  * want to set user information like fingerpirnt for modified records, this can be used
  * to let semantic-transact providing user identity to the semantics handler.</p>
  * 
- * <p>In v1.1.1, sessionId is read only. If a new password have been updated,
+ * @since 1.1.1, sessionId is read only. If a new password have been updated,
  * just remove then re-login</p>
  * 
  * @author ody
@@ -44,7 +44,6 @@ public interface IUser {
 	 * is think it's the logging sql.</p>
 	 * <b>Make sure the committed sqls is not returned, only logging sqls are needed.</b><br>
 	 * @param sqls
-	 * @param logger
 	 * @return SQLs for logging, null for nothing to do
 	 * @throws TransException 
 	 */
@@ -157,7 +156,6 @@ public interface IUser {
 	public default IUser onCreate(Anson sessionReqBody) throws GeneralSecurityException { return this; }
 
 	/**
-	 * @param folder
 	 * @param uid
 	 * @param folder
 	 * @param ssid

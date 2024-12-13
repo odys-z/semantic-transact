@@ -54,7 +54,7 @@ public class InsertExp extends Insert {
 	 * <p>Solution for UPSERT.</p>
 	 * <h5>NOTE:</h5>
 	 * <p>UPSERT is not a standard SQL syntax (April 2024), and currently only sql for
-	 *  Sqlite3 are verified (call {@link #onConflict(String, Object...)}, not this).
+	 *  Sqlite3 are verified (call {@link #onConflict(String[], Object...)}, not this).
 	 *  For MS Sql Server, must use {@link #onDuplicate(Query)}.
 	 *  Open an issue at <a href="https://github.com/odys-z/semantic-transact/issues">Github</a>
 	 * if the features are needed.</p>
@@ -122,7 +122,6 @@ public class InsertExp extends Insert {
 	/**
 	 * For Sqlite's UPSERT only.
 	 * @see #onDuplicate(ArrayList)
-	 * @param select
 	 * @return this
 	 * @since 1.4.40
 	 */
@@ -134,7 +133,6 @@ public class InsertExp extends Insert {
 	/**
 	 * For Sqlite' UPSERT only.
 	 * @see #onDuplicate(ArrayList)
-	 * @param select
 	 * @return this
 	 */
 	public InsertExp onConflict(String[] fields, Object ... nvs) {

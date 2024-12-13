@@ -23,7 +23,6 @@ public class TableMeta {
 	 * 	ddlSqlite = Utils.loadTxt(Subclass.class, \"file-path\")");
 	 * }</pre>
 	 * 
-	 * @throws TransException 
 	 * @since 1.4.25
 	 */
 	public String ddlSqlite;

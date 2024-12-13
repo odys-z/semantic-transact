@@ -20,7 +20,7 @@ import io.odysz.transact.x.TransException;
 /**External file representation - mapping URI and file path back and forth.<br>
  * An ExtFile can only been used as a setting value in update/insert statement.
  * <p>This class is only used for update and insert. For reading,
- * use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) Funcall.extFile(String)} </p>
+ * use {@link io.odysz.transact.sql.parts.condition.Funcall#extfile(String...) Funcall.extfile(String...)} </p>
  * <h4>Note</h4>
  * The {@link #sql(ISemantext)} method can be only used as insert mode. The DASemantics.ShExtFile only place this
  * class in insert statement.
@@ -47,8 +47,11 @@ public class ExtFileInsert extends AbsPart {
 	}
 
 	/**
-	 * Set the absolute root path. This path is used to access file together with the relative path set by {@link ExtFileInsert#prefixPath(String)}.<br>
+	 * Set the absolute root path. This path is used to access file together with the relative path set
+	 * by {@link ExtFileInsert#prefixPath(String, String...)}.<br>
+	 * 
 	 * The argument doesn't have to be absolute path if the runtime can access a file from a relative path.<br>
+	 * 
 	 * But servlet containers needing absolute paths to access file, so this must been set to the absolute path,
 	 * such as the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
