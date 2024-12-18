@@ -81,6 +81,8 @@ public class EnvPath {
 	 * @since 1.5.0
 	 */
 	public static String replaceEnv(String src, Map<String, String> sysenvs) {
+		if (src == null) return null;
+		
 		List<String> envs = reg.findGroups(src);
 		if (envs != null) {
 			// Map<String, String> sysenvs = System.getenv();
