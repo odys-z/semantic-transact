@@ -126,7 +126,7 @@ public class ExtFileInsert extends AbsPart {
 		}
 
 		try {
-			DocLocks.writing(f);;
+			DocLocks.writing(f);
 			Files.write(f, b);
 
 			// mysql doesn't like windows' path separator

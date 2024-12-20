@@ -92,8 +92,11 @@ public class EnvPath {
 				v = v == null ? sysenvs.get(env) : v;
 				if (v != null) // still can be null
 					src = src.replaceAll("\\$" + env, FilenameUtils.winpath2unix(v));
-				else
+				else {
 					src = src.replaceAll("\\$" + env, "");
+					Utils.warn("Requried env variable cannot found repleacement from environment: %s\nsrc:%s",
+							env, src);
+				}
 			}
 		}
 		if (src.startsWith("\\$"))
