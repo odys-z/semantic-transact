@@ -115,9 +115,10 @@ public interface IUser {
 	/**
 	 * Get notified string list.
 	 * 
-	 * @deprecated since 1.5.0, this is not necessary for session management,
+	 * Since 1.5.0, this is not necessary for session management,
 	 * and user's notifications can be implemented in the business layer.
-	 * @return notifyings
+	 * 
+	 * @return notifications. Default null.
 	 */
 	default public List<Object> notifies() { return null; }
 
@@ -128,16 +129,6 @@ public interface IUser {
 	 * @return this
 	 */
 	public default IUser sessionKey(String token) { return this; }
-
-	/**
-	 * Set session knowledge for token verification.
-	 * @see AESHelper#packSessionKey(String)
-	 * @deprecated for experiment
-	 * @since 1.4.37
-	 * @param knowledge
-	 * @return this
-	public default IUser sessionKey(byte[] knowledge) { return this; }
-	 */
 
 	/**
 	 * Get session key
