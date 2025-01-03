@@ -14,6 +14,9 @@ import io.odysz.anson.Anson;
  * 
  * <p>This type should presented in all request with A = records in the near future.</p>
  * 
+ * TODO move general query conditions to PageInf<br>
+ * Actually, all query submitted via Anson are paged. 
+ * 
  * <h6>Use case:</h6>
  * 1. Semantic.jserv/io.oz.spreadsheet.SpreadsheetReq.pageInf,<br>
  *    Anclient.ts:<br>
@@ -47,17 +50,18 @@ public class PageInf extends Anson {
 	/**
 	 * @param page
 	 * @param size
-	 * @param condt n0, v0, n1, v1, ...
+	 * @param whereqs (n0, v0), (n1, v1), ..., must be even number of elements.
 	 */
-	public PageInf(long page, long size, String... condt) {
+	public PageInf(long page, long size, String... whereqs) {
 		this.page = page;
 		this.size = size;
 		this.arrCondts = new ArrayList<String[]>();
 
-		if (!isNull(condt))
-			// arrCondts.add(condt);
-			for (int cx = 0; cx < condt.length; cx+=2)
-				arrCondts.add(new String[] {condt[cx], condt[cx+1]});
+		if (!isNull(whereqs))
+			for (int cx = 0; cx < whereqs.length; cx+=2)
+				arrCondts.add(
+						new String[] {whereqs[cx],
+						cx+1 < whereqs.length ? whereqs[cx+1] : null});
 
 		mapCondts = new HashMap<String, Object>();
 	}
