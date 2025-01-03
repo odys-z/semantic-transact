@@ -183,6 +183,7 @@ public class Query extends Statement<Query> {
 		return this;
 	}
 
+	// TODO move general query conditions to PageInf
 	public Query page(PageInf page) {
 		if (page != null)
 			return page(page.page, page.size);
