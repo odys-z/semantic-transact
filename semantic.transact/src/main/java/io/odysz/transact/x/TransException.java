@@ -14,6 +14,8 @@ public class TransException extends Exception {
 	@Override
 	public String getMessage() {
 		String s = super.getMessage();
-		return LangExt.isblank(s) ? super.getCause().getMessage() : s;
+		return LangExt.isblank(s)
+			? super.getCause() == null
+			? "" : super.getCause().getMessage() : s;
 	}
 }
