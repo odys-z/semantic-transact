@@ -30,6 +30,7 @@ import io.odysz.transact.sql.parts.Tabl;
 import io.odysz.transact.sql.parts.condition.Condit;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.sql.parts.condition.Predicate;
+import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**Statement like insert, update - the structured API.<br>
@@ -62,6 +63,13 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		void onSelected (ISemantext ctx, ArrayList<Object> row,
 				HashMap<String, Object[]> cols) throws TransException, SQLException;
 	}
+
+	WithClause withs;
+	public Statement<T> with(WithClause withClause) {
+		this.withs = withClause;
+		return this;
+	}
+
 
 	protected Tabl mainTabl;
 	public Tabl mainTabl() { return mainTabl; }

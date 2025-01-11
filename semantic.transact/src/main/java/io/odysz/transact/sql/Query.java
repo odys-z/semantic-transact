@@ -32,7 +32,6 @@ import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.sql.parts.select.SelectElem.ElemType;
 import io.odysz.transact.sql.parts.select.SelectList;
 import io.odysz.transact.sql.parts.select.SqlUnion;
-import io.odysz.transact.sql.parts.select.WithClause;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -227,7 +226,7 @@ public class Query extends Statement<Query> {
 	 * 
 	 * for temporary storage when composing query. 
 	 */
-	WithClause withs;
+	// WithClause withs;
 
 	boolean distinct;
 
@@ -927,10 +926,10 @@ public class Query extends Statement<Query> {
 		return null;
 	}
 
-	public Query with(WithClause withClause) {
-		this.withs = withClause;
-		return this;
-	}
+//	public Query with(WithClause withClause) {
+//		this.withs = withClause;
+//		return this;
+//	}
 
 	/** 
 	 * Whether use distinct or not, to generate "select distinct ... "

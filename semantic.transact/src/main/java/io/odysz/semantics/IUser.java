@@ -193,20 +193,6 @@ public interface IUser {
 	}
 
 	/**
-	 * Sign and encrypt session-key for login reply. The sskey is used for
-	 * verifying jserv requests' headers.
-	 * 
-	 * @since 1.4.37
-	 * @param sskey
-	 * @return encrypt(sskey, pswd)
-	 * @throws Exception 
-	default String signSessionKey(String sskey)
-			throws GeneralSecurityException, IOException {
-		return sskey;
-	}
-	 */
-
-	/**
 	 * @since 1.4.36
 	 * @return
 	 */

@@ -51,11 +51,15 @@ public class Delete extends Statement<Delete>  {
 		
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s = // Stream.concat(
-					Stream.of(  new ExprPart("delete from"),
-								mainTabl,
-								where == null ? null : new ExprPart("where"), 
-								where
-					).map(m -> {
+					Stream.of(
+							withs,
+							new ExprPart("delete from"),
+							mainTabl,
+							where == null ? null : new ExprPart("where"), 
+							where
+					)
+					.filter(x -> x != null)
+					.map(m -> {
 					try {
 						return m == null ? "" : m.sql(sctx);
 					} catch (TransException e) {

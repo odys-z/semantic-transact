@@ -44,26 +44,32 @@ public class Transcxt {
 			semantext.creator(this);
 	}
 	
+	private WithClause removeWiths() {
+		WithClause w = withClause;
+		withClause = null;
+		return w;
+	}
+	
 	public Query select(String tabl, String ... alias) {
-		Query q = new Query(this, tabl, alias).with(withClause);
+		Query q = (Query) new Query(this, tabl, alias).with(removeWiths());
 		this.withClause = null;
 		return q;
 	}
 	
 	public Query select(Query sub, String ... alias) {
-		Query q = new Query(this, sub.asQueryExpr(true), alias).with(withClause);
+		Query q = (Query) new Query(this, sub.asQueryExpr(true), alias).with(removeWiths());
 		this.withClause = null;
 		return q;
 	}
 	
 	public Query selectPage(String tabl, String ... alias) {
-		Query q = new QueryPage(this, tabl, alias).with(withClause);
+		Query q = (Query) new QueryPage(this, tabl, alias).with(removeWiths());
 		this.withClause = null;
 		return q;
 	}
 
 	public Query selectPage(Query sub, String ... alias) {
-		Query q = new QueryPage(this, sub.asQueryExpr(true), alias).with(withClause);
+		Query q = (Query) new QueryPage(this, sub.asQueryExpr(true), alias).with(removeWiths());
 		this.withClause = null;
 		return q;
 	}
@@ -77,11 +83,11 @@ public class Transcxt {
 	}
 	
 	public Update update(String tabl) {
-		return new Update(this, tabl);
+		return (Update) new Update(this, tabl).with(removeWiths());
 	}
 	
 	public Delete delete(String tabl) {
-		return new Delete(this, tabl);
+		return (Delete) new Delete(this, tabl).with(removeWiths());
 	}
 
 	public TableMeta tableMeta(String tabl) {

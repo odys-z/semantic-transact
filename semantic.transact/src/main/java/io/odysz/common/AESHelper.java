@@ -351,7 +351,7 @@ public class AESHelper {
 	 * <pre>
 	 * iv = random(16)
 	 * token = encrypt(random, key, iv), len(random) = 24
-	 * return token : iv,
+	 * return [token : iv, token]
 	 * where len(token) = [(24 + 15) / 16] * 16 * [4/3] = 32 * [4/3] = 44
 	 * </pre>
 	 * 

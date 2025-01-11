@@ -156,6 +156,7 @@ public class Update extends Statement<Update> {
 		
 		// update tabl t set col = 'val' where t.col = 'val'
 		Stream<String> s1 = Stream.of(
+						withs,
 						new ExprPart("update"),
 						limit != null && db == dbtype.ms2k ? new ExprPart("top(" + limit + ")") : null,
 						mainTabl, mainAlias,

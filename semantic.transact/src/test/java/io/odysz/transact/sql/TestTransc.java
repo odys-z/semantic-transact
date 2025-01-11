@@ -1,14 +1,21 @@
 package io.odysz.transact.sql;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import static io.odysz.transact.sql.parts.condition.Funcall.*;
+import static io.odysz.transact.sql.parts.condition.ExprPart.constr;
+import static io.odysz.transact.sql.parts.condition.Funcall.add;
+import static io.odysz.transact.sql.parts.condition.Funcall.avg;
+import static io.odysz.transact.sql.parts.condition.Funcall.concat;
+import static io.odysz.transact.sql.parts.condition.Funcall.count;
+import static io.odysz.transact.sql.parts.condition.Funcall.minus;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.Semantext2;
@@ -266,7 +273,7 @@ public class TestTransc {
 			fail(e);
 		}
 	}
-	
+
 	@Test
 	public void testInsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
@@ -496,12 +503,12 @@ public class TestTransc {
 	@Test
 	public void testDeleteWith( ) throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();
-		st.with(st.select("syn_change", "cl")
+		st.delete("syn_change")
+		  .where(op.exists, null,
+			st.with(st.select("syn_change", "cl")
 				.je_("syn_subscribe", "ss", constr("X"), "synodee", "org")
 				.whereEq("nyquence", new ExprPart(1)))
-		  .delete("syn_change")
-		  .where(op.exists, null,
-			st.select("cl")
+			.select("cl")
 			.whereEq("cl.org", new ExprPart("org"))
 			.whereEq("cl.tabl", new ExprPart("syn_change.tabl"))
 			.whereEq("cl.uids", new ExprPart("syn_change.uids")))
@@ -527,6 +534,35 @@ public class TestTransc {
 				+ "( with cl as (select * from syn_change cl join syn_subscribe ss on 'X' = ss.synodee AND cl.org = ss.org where nyquence = 1) "
 				+ "select * from cl  where cl.org = org AND cl.tabl = syn_change.tabl AND cl.uids = syn_change.uids )",
 			sqls.get(1));
+	}
+
+	@Test
+	public void testWithDelete( ) throws TransException {
+			ArrayList<String> sqls = new ArrayList<String>();
+			st.with(st.select("syn_subscribe", "sb")
+						.je_("syn_peers", "nv", "sb.synodee", "synid", "nv.peer", constr("X"))
+						.je_("syn_change", "ch", "ch.table", constr("h_photos"), "ch.cid", "sb.changeId")
+						.where(op.le, minus("ch.nyquence", "nv.nyq"), 0))
+			  .delete("syn_subscribe")
+			  .where(op.exists, null, st
+					.select("sb")
+					.col("synid")
+					.je_("syn_subscribe", "ex",
+						"sb.synodee", "ex.synodee",
+						"sb.peer", constr("X")))
+	
+			.commit(st.instancontxt(null, null), sqls);
+	
+			Utils.logi(sqls.get(0));
+			assertEquals("with sb as ("
+					+ "select * from syn_subscribe sb "
+					+ "join syn_peers nv on sb.synodee = nv.synid AND nv.peer = 'X' "
+					+ "join syn_change ch on ch.table = 'h_photos' AND ch.cid = sb.changeId "
+					+ "where (ch.nyquence - nv.nyq) <= 0) "
+					+ "delete from syn_subscribe where exists ( select synid from sb  join syn_subscribe ex on sb.synodee = ex.synodee AND sb.peer = 'X' )",
+					sqls.get(0));
+	
+	
 	}
 
 	@Test
