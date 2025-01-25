@@ -454,8 +454,8 @@ public class FilenameUtils {
     /**
      * Concatenates a fileName to a base path using normal command line style rules.
      * <p>
-     * The effect is equivalent to resultant directory after changing
-     * directory to the first argument, followed by changing directory to
+     * The effect is equivalent to get a result directory after changing
+     * the directory to the first argument, followed by changing directory to
      * the second argument.
      * <p>
      * The first argument is the base path, the second is the path to concatenate.
