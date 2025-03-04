@@ -22,9 +22,11 @@ public class DocLocks {
 	}
 	
 	public static void reading(String fullpath) {
-		if (!locks.containsKey(fullpath))
-			locks.put(fullpath, new ReentrantReadWriteLock());
-		locks.get(fullpath).readLock().lock();
+		synchronized(locks) {
+			if (!locks.containsKey(fullpath))
+				locks.put(fullpath, new ReentrantReadWriteLock());
+			locks.get(fullpath).readLock().lock();
+		}
 	}
 
 	public static void reading(Path p) {
@@ -32,15 +34,17 @@ public class DocLocks {
 	}
 
 	public static void readed(String fullpath) {
-		try {
-			if (locks.containsKey(fullpath))
-				locks.get(fullpath).readLock().unlock();
-		} catch (Throwable t) {
-			Utils.warn("Unlock error: %s", fullpath);
-			t.printStackTrace();
+		synchronized(locks) {
+			try {
+					if (locks.containsKey(fullpath))
+						locks.get(fullpath).readLock().unlock();
+			} catch (Throwable t) {
+				Utils.warn("Unlock error: %s", fullpath);
+				t.printStackTrace();
+			}
+			try { locks.remove(fullpath); }
+			catch (Throwable t) {}
 		}
-		try { locks.remove(fullpath); }
-		catch (Throwable t) {}
 	}
 
 	public static void readed(Path p) {
@@ -48,10 +52,11 @@ public class DocLocks {
 	}
 
 	public static void writing(String fullpath) {
-		// Utils.warn("lock:   %s", fullpath);
-		if (!locks.containsKey(fullpath))
-			locks.put(fullpath, new ReentrantReadWriteLock());
-		locks.get(fullpath).writeLock().lock();
+		synchronized(locks) {
+			if (!locks.containsKey(fullpath))
+				locks.put(fullpath, new ReentrantReadWriteLock());
+			locks.get(fullpath).writeLock().lock();
+		}
 	}
 
 	public static void writing(Path p) {
@@ -59,9 +64,10 @@ public class DocLocks {
 	}
 
 	public static void writen(String fullpath) {
-		// Utils.warn("unlock: %s", fullpath);
 		try {
-			locks.get(fullpath).writeLock().unlock();
+			synchronized(locks) {
+				locks.get(fullpath).writeLock().unlock();
+			}
 		} catch (Throwable t) {
 			Utils.warn("Unlock error: %s", fullpath);
 			t.printStackTrace();

@@ -44,7 +44,7 @@ public class SemanticObject extends Anson {
 	}
 
 	public String getString(String prop) {
-		return props == null ? null : (String) props.get(prop);
+		return props == null ? null : String.valueOf(props.get(prop));
 	}
 
 	public SemanticObject data() {
@@ -68,7 +68,7 @@ public class SemanticObject extends Anson {
 	}
 	
 	public String code() {
-		return (String) get("code");
+		return String.valueOf(get("code"));
 	}
 	
 	public SemanticObject port(String port) {
@@ -76,7 +76,7 @@ public class SemanticObject extends Anson {
 	}
 
 	public String msg() {
-		return (String) get("msg");
+		return String.valueOf(get("msg"));
 	}
 	
 	public SemanticObject msg(String msg, Object... args) {
