@@ -1,6 +1,6 @@
 package org.apache.commons.io_odysz;
 
-import static org.apache.commons.io_odysz.FilenameUtils.*;
+import static io.odysz.common.FilenameUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;

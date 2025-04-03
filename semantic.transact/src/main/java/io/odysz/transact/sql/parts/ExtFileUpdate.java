@@ -8,9 +8,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Random;
 
-import org.apache.commons.io_odysz.FilenameUtils;
-
 import io.odysz.common.DocLocks;
+import io.odysz.common.FilenameUtils;
 import io.odysz.common.Radix32;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
