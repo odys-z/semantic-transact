@@ -55,7 +55,7 @@ public class EnvPath {
 	 * @see #replaceEnv(String, Map)
 	 * @see #extendEnv(String, String)
 	 * @since 1.5.0
-	 * @param src
+	 * @param src string have bash $ variable to be replaced, e.g. $HOME/volume.sqlite
 	 * @return string replaced with environment variables
 	 */
 	public static String replaceEnv(String src) {
@@ -74,7 +74,7 @@ public class EnvPath {
 	 * <p>So it's necessary have file paths not only relative, but also can be
 	 * parsed for replacing environment variables.
 	 * 
-	 * @param src string have bash style variable to be replaced, e.g. $HOME/volume.sqlite
+	 * @param src string have bash $ variable to be replaced, e.g. $HOME/volume.sqlite
 	 * @return string replaced with environment variables
 	 * @since 1.5.0
 	 */
