@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.anson.Anson;
+import io.odysz.anson.AnsonException;
 import io.odysz.anson.IJsonable;
 import io.odysz.anson.JsonOpt;
-import io.odysz.anson.x.AnsonException;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
