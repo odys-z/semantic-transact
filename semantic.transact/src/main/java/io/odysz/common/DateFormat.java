@@ -19,8 +19,9 @@ public class DateFormat {
 	public static SimpleDateFormat yy_MM = new SimpleDateFormat("yyyy_MM");
 	public static SimpleDateFormat yyMM = new SimpleDateFormat("yyyy-MM");
 
-	/**yyyy-MM-dd-hhmmss or %Y-%M-%e ...*/
+	/**yyyy-MM-dd-hhmmss.millis or %Y-%M-%e ...*/
 	public static SimpleDateFormat sdflong_sqlite = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.0");
+	/**yyyy-MM-dd-hhmmss or %Y-%M-%e ...*/
 	public static SimpleDateFormat sdflong_mysql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	/**yyyy-MM-dd
 	 * @param d
@@ -40,6 +41,10 @@ public class DateFormat {
 
 	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
 
+	/**
+	 * @param d
+	 * @return yyyy-MM-dd HH:mm:ss, see {@link #sdflong_mysql}
+	 */
 	static public String formatime(FileTime d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(new Date(d.toMillis())); }
 
 	/**yyyy-MM-dd
