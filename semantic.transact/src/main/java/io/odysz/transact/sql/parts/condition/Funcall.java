@@ -21,6 +21,7 @@ import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Alias;
+import io.odysz.transact.sql.parts.AnDbField;
 import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.Resulving;
 import io.odysz.transact.sql.parts.Sql;
@@ -60,11 +61,21 @@ public class Funcall extends ExprPart {
 
 		div("div"), add("add"), minus("minus"), mul("mul"),
 
-		/**Function extFile(uri):<br>
+		/**
+		 * Function extFile(uri):<br>
 		 * Handle external file when reading - a post operation is added to the on-select-ok event,
 		 * which will replace the uri with content of external file. 
 		 */
 		extFile("extfile"),
+		
+		/**
+		 * Function file reference(uri):<br>
+		 * Handle external file when reading - a deserializable object for user,
+		 * e.g. file reference for asynchronous synchronization,
+		 * which will replace the uri with string of the object for the uri content. 
+		 * @since 1.5.60
+		 */
+		refile("refile"),
 
 		/** such as max, probably are the same for various DB */
 		dbSame("func");
@@ -98,6 +109,8 @@ public class Funcall extends ExprPart {
 				return datetime;
 			else if (extFile.fid.equals(funcName) || "ext".equals(funcName))
 				return extFile;
+			else if (refile.fid.equals(funcName))
+				return refile;
 			else if (concat.fid.equals(funcName))
 				return concat;
 			
@@ -252,6 +265,18 @@ public class Funcall extends ExprPart {
 		f.args = args;
 		return f;
 	}
+	
+	/**
+	 * File reference. Got a serialized Anson object, ReourceRef for resolving later.
+	 * @param args
+	 * @return the function
+	 * @since 1.5.60
+	 */
+	public static Funcall refile(AnDbField obj) {
+		Funcall f = new Funcall(Func.refile);
+		f.args = new Object[] {obj};
+		return f;
+	}
 
 	/**
 	 * Concatenate col values into a splitable text value
@@ -292,6 +317,8 @@ public class Funcall extends ExprPart {
 			return sqlDatetime(context, args);
 		else if (func == Func.extFile)
 			return sqlExtFile(context, args);
+		else if (func == Func.refile)
+			return sqlRefile(context, args);
 		else if (func == Func.concat)
 			return sqlConcat(context, args);
 		else if (func == Func.add)
@@ -357,6 +384,19 @@ public class Funcall extends ExprPart {
 			f += ", " + args[i];
 
 		return f + ")";
+	}
+	
+	/**
+	 * Get sql for select the serialized string of the field.
+	 * 
+	 * <p>ISSUE, without using param args is a sign of wrong design the switch in {@link #sql(ISemantext)}?</p>
+	 * @param context
+	 * @param args
+	 * @return
+	 * @throws TransException 
+	 */
+	private String sqlRefile(ISemantext context, Object[] args) throws TransException {
+		return ((AnDbField) this.args[0]).sql(context);
 	}
 
 	/**
@@ -548,16 +588,9 @@ public class Funcall extends ExprPart {
 	}
 
 	/**
-	 * Wrapper for triggering action of read files after uri is resolved - must have context.
-	 * The same as client query with string "extfile(t.uri)" - already used in Query.
-	 * @param uri
-	 * @return extfile(uri)
-	public static String extFile(String uri) {
-		return String.format("%s(%s)", Func.extFile.name(), uri);
-	}
-	 */
-
-	/**Create a function decoding null value, e.g. for oracle: decode (colElem, null, ifTrue, orElse).
+	 * Create a function decoding null value,
+	 * e.g. for oracle: decode (colElem, null, ifTrue, orElse).
+	 * 
 	 * @param colElem can only be a full column name.
 	 * @param ifTrue
 	 * @param orElse
@@ -569,7 +602,8 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	/**Create a function decoding value, e.g. for oracle: decode (colElem, logic, ifTrue, orElse).
+	/**
+	 * Create a function decoding value, e.g. for oracle: decode (colElem, logic, ifTrue, orElse).
 	 * @param logic the boolean expression
 	 * @param ifTrue
 	 * @param orElse
@@ -581,7 +615,8 @@ public class Funcall extends ExprPart {
 		return f;
 	}
 
-	/**@see #ifElse(Predicate, Object, Object)
+	/**
+	 * @see #ifElse(Predicate, Object, Object)
 	 * @param logic
 	 * @param ifTrue
 	 * @param orElse
