@@ -101,7 +101,7 @@ public class ExtFileInsert extends AbsPart {
 	}
 
 	/**
-	 * Save file to pathname, generate sql.
+	 * Decode this.b64, then save to file at pathname, and generate the sql snippet.
 	 * 
 	 * @see io.odysz.transact.sql.parts.AbsPart#sql(io.odysz.semantics.ISemantext)
 	 */

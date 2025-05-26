@@ -3,6 +3,7 @@ package io.odysz.transact.sql.parts.condition;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.odysz.anson.Anson;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Logic.op;
@@ -302,5 +303,10 @@ public class ExprPart extends AbsPart {
 
 	public boolean isNull() {
 		return isNull;
+	}
+	
+	/** Is the lexp string starting as an Anson envelope? */
+	public boolean isEvelope() {
+		return lexp != null && lexp instanceof String && Anson.startEnvelope((String)lexp); //
 	}
 }
