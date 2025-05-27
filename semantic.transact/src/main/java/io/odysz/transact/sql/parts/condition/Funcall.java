@@ -268,13 +268,13 @@ public class Funcall extends ExprPart {
 	
 	/**
 	 * File reference. Got a serialized Anson object, ReourceRef for resolving later.
-	 * @param args
+	 * @param ansonObjs
 	 * @return the function
 	 * @since 1.5.60
 	 */
-	public static Funcall refile(AnDbField obj) {
+	public static Funcall refile(AnDbField ansonObj) {
 		Funcall f = new Funcall(Func.refile);
-		f.args = new Object[] {obj};
+		f.args = new Object[] {ansonObj};
 		return f;
 	}
 
