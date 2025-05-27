@@ -51,6 +51,11 @@ public class SelectElem extends ExprPart {
 		this.expr = expr;
 	}
 
+	public SelectElem(ExprPart expr, String as) {
+		this(expr);
+		as(as);
+	}
+
 	@Override
 	public String sql(ISemantext sctx) {
 		String sql = "";

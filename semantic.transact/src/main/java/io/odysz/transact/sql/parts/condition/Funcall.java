@@ -25,6 +25,7 @@ import io.odysz.transact.sql.parts.AnDbField;
 import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.Resulving;
 import io.odysz.transact.sql.parts.Sql;
+import io.odysz.transact.sql.parts.select.SelectElem;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -277,9 +278,14 @@ public class Funcall extends ExprPart {
 		f.args = new Object[] {ansonObj};
 		return f;
 	}
+	
+	public static SelectElem refile(AnDbField ansonObj, String as) {
+		return new SelectElem(refile(ansonObj), as);
+	}
+
 
 	/**
-	 * Concatenate col values into a splitable text value
+	 * Concatenate col values into a split-able text value
 	 * @param col
 	 * @param withs
 	 * @return
