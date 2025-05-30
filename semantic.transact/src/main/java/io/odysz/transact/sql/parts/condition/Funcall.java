@@ -1,5 +1,7 @@
 package io.odysz.transact.sql.parts.condition;
 
+import static io.odysz.common.LangExt._0;
+import static io.odysz.common.LangExt.f_funcall;
 import static io.odysz.common.LangExt.ifnull;
 import static io.odysz.common.LangExt.join;
 import static io.odysz.common.LangExt.split;
@@ -54,6 +56,7 @@ public class Funcall extends ExprPart {
 		ifNullElse("ifNullElse"),
 		datetime("datetime"),
 		concat("concat"),
+		subStr("substr"),
 		/**
 		 * Concatenate multiple (string) columns in a "\n" separated string.
 		 * The result can be splited by {@link io.odysz.common.LangExt#uncombine(String)}
@@ -283,6 +286,22 @@ public class Funcall extends ExprPart {
 		return new SelectElem(refile(ansonObj), as);
 	}
 
+	public static Funcall subStr(Object col, int start, int end) {
+		Funcall f = new Funcall(Func.subStr);
+		f.args = new Object[] {col, start, end};
+		return f;
+	}
+
+	/**
+	 * This function doesn't has a func type id as it is a wrapping of
+	 * {@link #ifElse(Predicate, Object, Object)}.
+	 * 
+	 * @param col
+	 * @return the function for be used in a Query or other statements.
+	 */
+	public static ExprPart isEnvelope(Object col) {
+		return ifElse(Predicate.eq(Funcall.subStr(col, 1, 8), "{\"type\":"), 1, 0);
+	}
 
 	/**
 	 * Concatenate col values into a split-able text value
@@ -336,6 +355,8 @@ public class Funcall extends ExprPart {
 		else if (func == Func.div)
 			return sqlDiv(context, args);
 		
+		else if (func == Func.subStr)
+			return sqlSubstr(context, args);
 		else if (func == Func.compound)
 			return sqlCompound(context, args);
 		else
@@ -361,6 +382,16 @@ public class Funcall extends ExprPart {
 
 	protected String sqlDiv(ISemantext context, String[] args) {
 		return Stream.of(args).collect(Collectors.joining(" / ", "(", ")"));
+	}
+	
+	protected String sqlSubstr(ISemantext context, String[] args) throws TransException {
+		dbtype dt = context.dbtype();
+		if (dt == dbtype.sqlite || dt == dbtype.oracle)
+			return f_funcall("substr", args);
+		else if (dt == dbtype.mysql || dt == dbtype.ms2k)
+			return f_funcall("substring", args);
+		else
+			throw new TransException ("Funcall#subStr(): substr() are not implemented for db type: %s", dt.name());
 	}
 
 	protected String sqlCompound(ISemantext context, String[] args) throws TransException {
@@ -454,7 +485,7 @@ public class Funcall extends ExprPart {
 		}
 		return args[0];
 	}
-
+	
 	public void selectElemAlias(Alias alias) {
 		this.resultAlias = alias;
 	}
@@ -507,7 +538,7 @@ public class Funcall extends ExprPart {
 		}
 	}
 
-	protected static String sqlIfNullElse(ISemantext context, String[] args) {
+	protected static String sqlIfNullElse(ISemantext context, String[] args) throws TransException {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.mysql)
 			return String.format("if(%s is null, %s, %s)",
@@ -515,6 +546,7 @@ public class Funcall extends ExprPart {
 		else  if (dt == dbtype.sqlite)
 			return String.format("case when %s is null then %s else %s end",
 					args[0], args[1], args[2]);
+			// return sqls(context, "case when",  args[0], "is null then", args[1], "else", args[2], "end");
 		else if (dt == dbtype.ms2k)
 			return String.format("case when %s is null then %s else %s end",
 					args[0], args[1], args[2]);
@@ -529,14 +561,29 @@ public class Funcall extends ExprPart {
 		}
 	}
 
+//	private static String sqls(ISemantext ctx, Object... exprs) {
+//		return LangExt.isNull(exprs) ? "" :
+//			Stream.of(exprs)
+//				.filter(v -> v != null)
+//				.map((Object v) -> {
+//					try {
+//						return v instanceof AbsPart ? ((AbsPart) v).sql(ctx) : v instanceof String ? (String)v : v.toString();
+//					} catch (TransException e) {
+//						e.printStackTrace();
+//						return v.toString();
+//					}})
+//				.collect(Collectors.joining(" "));	
+//	}
+
 	protected static String sqlIfElse(ISemantext context, String exp, String then, String otherwise) {
 		return sqlIfElse(context, new String[] {exp, then, otherwise});
 	}
 
-	protected static String sqlIfElse(ISemantext context, String[] args) {
+	protected static String sqlIfElse(ISemantext context, Object[] args) {
 		dbtype dt = context.dbtype();
 		if (dt == dbtype.sqlite || dt == dbtype.ms2k || dt == dbtype.oracle)
 			return String.format("case when %s then %s else %s end", args[0], args[1], args[2]);
+			// return sqls(context, "case when", args[0], "then", args[1], "else", args[2], "end");
 		else if (dt == dbtype.mysql)
 			return String.format("if(%s, %s, %s)", args[0], args[1], args[2]);
 		else {
@@ -708,5 +755,4 @@ public class Funcall extends ExprPart {
 				.toArray();
 		return f;
 	}
-
 }

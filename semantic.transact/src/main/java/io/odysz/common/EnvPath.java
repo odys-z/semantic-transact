@@ -143,12 +143,10 @@ public class EnvPath {
 					filename);
 	}
 
-	/**<p>Convert raw uri to saving uri for DB persisting - can be decoded according to env.</p>
-	 * E.g.<br>
-	 * configRoot: $VOLUME_HOME/shares, uri: f.jpg <br>
-	 * --&gt; /home/ody/volume/shares/f.jpg <br>
-	 * configRoot: upload/a_users, uri: f.jpg <br>
-	 * --&gt; [webroot/]upload/a_users/f.jpg
+	/**
+	 * <p>Convert raw uri to saving uri for DB persisting - can be decoded according to env,
+	 * the reverse is {@link #decodeUri}.</p>
+	 * 
 	 * @param configRoot relative/absolute path with env variables
 	 * @param uri sub-path(s), file path, in concatenating order
 	 * @return encoded uri (with env variable) for DB persisting

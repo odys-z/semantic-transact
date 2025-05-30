@@ -16,10 +16,14 @@ import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
-/**External file representation - mapping URI and file path back and forth.<br>
+/**
+ * An external file representation - mapping URI and file path back and forth.<br>
+ * 
  * An ExtFile can only been used as a setting value in update/insert statement.
+ * 
  * <p>This class is only used for update and insert. For reading,
  * use {@link io.odysz.transact.sql.parts.condition.Funcall#extfile(String...) Funcall.extfile(String...)} </p>
+ * 
  * <h4>Note</h4>
  * The {@link #sql(ISemantext)} method can be only used as insert mode. The DASemantics.ShExtFile only place this
  * class in insert statement.
@@ -36,7 +40,7 @@ public class ExtFileInsert extends AbsPart {
 
 	/**
 	 * @param resulvingPath e.g. Id Resulve + client name.
-	 * @param configRoot root path in config.xml
+	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
 	 */
 	public ExtFileInsert(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
@@ -46,7 +50,8 @@ public class ExtFileInsert extends AbsPart {
 	}
 
 	/**
-	 * Set the absolute root path. This path is used to access file together with the relative path set
+	 * Create an exteranl file representation by setting the absolute root path.
+	 * This path is used to access file together with the relative path set
 	 * by {@link ExtFileInsert#prefixPath(String, String...)}.<br>
 	 * 
 	 * The argument doesn't have to be absolute path if the runtime can access a file from a relative path.<br>
@@ -55,8 +60,8 @@ public class ExtFileInsert extends AbsPart {
 	 * such as the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
 	 * 
-	 * @param fn file name to be resolved
-	 * @param configRoot root path in config.xml
+	 * @param file id to be resolved as prefix of filename
+	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx instance of run time context
 	 */
 	public ExtFileInsert(Resulving fn, String configRoot, ISemantext stx) {
@@ -65,7 +70,7 @@ public class ExtFileInsert extends AbsPart {
 
 	/**@see #ExtFileInsert(Resulving, String, ISemantext)
 	 * @param resulvingPath
-	 * @param configRoot root path in config.xml
+	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx
 	 */
 	public ExtFileInsert(ExprPart resulvingPath, String configRoot, ISemantext stx) {

@@ -195,4 +195,12 @@ public class Predicate extends AbsPart {
 	public static Predicate eq(String col, String constv) {
 		return new Predicate(Logic.op.eq, col, "'" + constv + "'");
 	}
+
+	public static Predicate eq(ExprPart lop, Object const_or_expval) {
+		return const_or_expval instanceof ExprPart
+				? new Predicate(Logic.op.eq, lop, (ExprPart)const_or_expval)
+				: new Predicate(Logic.op.eq, lop, const_or_expval instanceof String
+												? "'" + (String) const_or_expval + "'"
+												: const_or_expval.toString());
+	}
 }
