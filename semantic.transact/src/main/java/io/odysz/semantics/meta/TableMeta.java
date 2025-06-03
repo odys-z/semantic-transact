@@ -157,4 +157,15 @@ public class TableMeta {
 			this.pk = col;
 		return this;
 	}
+
+	/**
+	 * Expose the column name mapping algorithm.
+	 * @since 1.5.60
+	 * @param colnames
+	 * @param field
+	 * @return col index
+	 */
+	public static int colx(HashMap<String, Object[]> colnames, String field) {
+		return (int)colnames.get(field.toUpperCase())[0];
+	}
 }

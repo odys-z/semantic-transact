@@ -258,10 +258,12 @@ public class Insert extends Statement<Insert> {
 			ArrayList<Object[]> nvs = new ArrayList<Object[]>(Collections.nCopies(row.size(), null));
 			for (String n : insertCols.keySet()) {
 				int i = insertCols.get(n);
-				if (i + 1 != (int)colnames.get(n.toUpperCase())[0])
+				// if (i + 1 != (int)colnames.get(n.toUpperCase())[0])
+				if (i + 1 != TableMeta.colx(colnames, n))
 					Utils.warnT(new Object() {},
 						"Expecting column %s at index [%s], but got %s.",
-						n, i, (int)colnames.get(n.toUpperCase())[0]);
+						// n, i, (int)colnames.get(n.toUpperCase())[0]);
+						n, i, TableMeta.colx(colnames, n));
 				Object v = row.get(i);
 				nvs.set(i, new Object[] {n, composeVal(v, mt, n)});
 			}
