@@ -343,21 +343,21 @@ public class Query extends Statement<Query> {
 
 	/**
 	 * @since 1.4.41
-	 * @param tblAlias
+	 * @param tableAlias
 	 * @param col_ases array for sql, e.g. to sql SELECT tblAlias.col_ases[0], tblAlias.col_ases[1], ...
 	 * @return this
 	 * @throws TransException
 	 */
-	public Query cols_byAlias(String tblAlias, Object... col_ases) throws TransException {
+	public Query cols_byAlias(String tableAlias, Object... col_ases) throws TransException {
 		if (col_ases != null)
 			for (Object col_as : col_ases) {
 				if (col_as == null) continue;
 				if (col_as instanceof String) {
 					String[] cass = ((String)col_as).split(" ([Aa][Ss] )?");
 					if (cass != null && cass.length > 1)
-						col(String.format("%s.%s", tblAlias, cass[0]), cass[1]);
+						col(String.format("%s.%s", tableAlias, cass[0]), cass[1]);
 					else if (cass != null)
-						col(String.format("%s.%s", tblAlias, cass[0]));
+						col(String.format("%s.%s", tableAlias, cass[0]));
 				}
 				else // must be ExprPart
 					col(col_as);

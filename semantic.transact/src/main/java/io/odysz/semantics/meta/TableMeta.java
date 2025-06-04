@@ -6,6 +6,7 @@ import static io.odysz.common.LangExt.isNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.odysz.common.Utils;
@@ -167,5 +168,17 @@ public class TableMeta {
 	 */
 	public static int colx(HashMap<String, Object[]> colnames, String field) {
 		return (int)colnames.get(field.toUpperCase())[0];
+	}
+
+	/**
+	 * Get cell string at col, by mapping column names from colnames, starting index at 1.
+	 * 
+	 * @param colnames
+	 * @param row
+	 * @param col
+	 * @return value at row(index).
+	 */
+	public static String cellstr(HashMap<String, Object[]> colnames, ArrayList<Object> row, String col) {
+		return (String) row.get(TableMeta.colx(colnames, col) - 1);
 	}
 }
