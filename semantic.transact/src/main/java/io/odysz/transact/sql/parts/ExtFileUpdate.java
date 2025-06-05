@@ -18,12 +18,12 @@ import io.odysz.transact.x.TransException;
 /**
  * External file representation - mapping URI and file path back and forth.<br>
  * @see ExtFileInsert
- * 
+ * @deprecated
  * @author odys-z@github.com
  */
 public class ExtFileUpdate extends ExprPart {
 	private String runtimePath;
-	private String configRoot;
+	String configRoot;
 	private String prefix;
 	private String nameId;
 	private String filename;
@@ -79,7 +79,7 @@ public class ExtFileUpdate extends ExprPart {
 		this.oldUri = uri;
 		return this;
 	}
-
+	
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
 		if (oldUri == null) throw new TransException("No uri (file) to move. Called oldUri() ?");

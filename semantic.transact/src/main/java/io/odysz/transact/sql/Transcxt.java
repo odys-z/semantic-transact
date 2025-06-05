@@ -1,6 +1,8 @@
 package io.odysz.transact.sql;
 
 import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.Utils.logi;
 
 import io.odysz.semantics.ISemantext;
 import io.odysz.semantics.IUser;
@@ -19,6 +21,33 @@ import io.odysz.transact.x.TransException;
  * @author odys-z@github.com
  */
 public class Transcxt {
+
+	protected static String cfgroot; 
+	public static String cfgroot() {
+		mustnonull(cfgroot, "Ever called configRoot()?");
+		return cfgroot;
+	}
+
+	protected static String runtimepath;
+	public static String runtimeRoot() {
+		mustnonull(runtimepath, "Ever called configRoot()?");
+		return runtimepath;
+	}
+
+	/**
+	 * Configuration's root
+	 * @since 1.4.25 will using EnvPath for this.
+	 * @param cfgRoot
+	 * @param absRuntimeRoot absolute path to current dir (test) or container root (web app)
+	 */
+	public static void configRoot(String cfgRoot, String absRuntimeRoot) {
+		cfgroot = cfgRoot;
+		runtimepath = absRuntimeRoot;
+		
+		logi("Configuration root path: %s", cfgRoot);
+		logi("Runtime root path: %s", absRuntimeRoot);
+	}
+
 
 	protected ISemantext basictx;
 	public ISemantext basictx() { return basictx; }

@@ -8,9 +8,7 @@ import java.nio.file.Paths;
 
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
-import io.odysz.common.EnvPath;
 import io.odysz.common.FilenameUtils;
-import io.odysz.common.LangExt;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
@@ -28,28 +26,29 @@ import io.odysz.transact.x.TransException;
  * The {@link #sql(ISemantext)} method can be only used as insert mode. The DASemantics.ShExtFile only place this
  * class in insert statement.
  * 
- * @deprecated since 1.5.60, replaced by ExtFileInsertv2.
+ * @since 1.5.60 experimental for modularize file path encode / decode with environment variables,
+ * and experimenting new b64 encode / decode in stream mode.
  * 
  * @author odys-z@github.com
  */
-public class ExtFileInsert extends AbsPart {
+public class ExtFileInsertv2 extends AbsPart {
 	private String b64;
 	/** File Id Resulve or constant string used for filename prefix. */
 	private ExprPart resulv_const_path;
 	private String prefix;
 	private String filename;
 	private String configRoot;
-	private String runtimePath;
+//	private String runtimePath;
 
 	/**
 	 * @param resulvingPath e.g. Id Resulve + client name.
 	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
 	 */
-	public ExtFileInsert(ExprPart resulvingPath, String configRoot, String runtimeRoot) {
+	public ExtFileInsertv2(ExprPart resulvingPath, String configRoot) {
 		this.resulv_const_path = resulvingPath;
 		this.configRoot = configRoot;
-		this.runtimePath = runtimeRoot;
+//		this.runtimePath = runtimeRoot;
 	}
 
 	/**
@@ -67,8 +66,8 @@ public class ExtFileInsert extends AbsPart {
 	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx instance of run time context
 	 */
-	public ExtFileInsert(Resulving fn, String configRoot, ISemantext stx) {
-		this(fn, configRoot, stx.containerRoot());
+	public ExtFileInsertv2(Resulving fn, String configRoot, ISemantext stx) {
+		this(fn, configRoot);
 	}
 
 	/**@see #ExtFileInsert(Resulving, String, ISemantext)
@@ -76,8 +75,8 @@ public class ExtFileInsert extends AbsPart {
 	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx
 	 */
-	public ExtFileInsert(ExprPart resulvingPath, String configRoot, ISemantext stx) {
-		this(resulvingPath, configRoot, stx.containerRoot());
+	public ExtFileInsertv2(ExprPart resulvingPath, String configRoot, ISemantext stx) {
+		this(resulvingPath, configRoot);
 	}
 
 	/**Set the sub-path of the file - semantically sub-path of uploading.
@@ -85,20 +84,20 @@ public class ExtFileInsert extends AbsPart {
 	 * @param path
 	 * @param subs
 	 * @return this
-	 */
-	public ExtFileInsert prefixPath(String path, String...subs) {
+	public ExtFileInsertv2 prefixPath(String path, String...subs) {
 		this.prefix = FilenameUtils.concat(path, subs);
 		return this;
 	}
+	 */
 	
-	public ExtFileInsert appendSubFolder(Object sub) {
-		if (sub != null)
-			this.prefix = FilenameUtils
-				.concat(this.prefix == null ? "" : this.prefix, sub.toString());
-		return this;
-	}
+//	public ExtFileInsertv2 appendSubFolder(Object sub) {
+//		if (sub != null)
+//			this.prefix = FilenameUtils
+//				.concat(this.prefix == null ? "" : this.prefix, sub.toString());
+//		return this;
+//	}
 	
-	public ExtFileInsert filename(String name) {
+	public ExtFileInsertv2 filename(String name) {
 		this.filename = name;
 		return this;
 	}
@@ -111,11 +110,13 @@ public class ExtFileInsert extends AbsPart {
 	 * @param b64
 	 * @return
 	 */
-	public ExtFileInsert b64(String b64) {
-		this.b64 = b64;
+	public ExtFileInsertv2 b64(Object b64) {
+		this.b64 = b64.toString();
 		return this;
 	}
 
+	ExtFilePaths extpaths;
+	
 	/**
 	 * Decode this.b64, then save to file at pathname, and generate the sql snippet.
 	 * 
@@ -125,8 +126,12 @@ public class ExtFileInsert extends AbsPart {
 	 */
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
-		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
-		String absoluteFn = absolutePath(ctx);
+//		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
+//		String absoluteFn = absolutePath(ctx);
+
+//		extpaths = new ExtFilePaths(resulv_const_path, ctx, filename)
+//								.subpath(configRoot, prefix);
+		String absoluteFn = extpaths.abspath();
 
 		touchDir(FilenameUtils.getFullPath(absoluteFn));
 
@@ -147,7 +152,8 @@ public class ExtFileInsert extends AbsPart {
 			Files.write(f, b);
 
 			// mysql doesn't like windows' path separator
-			return "'" + relatvFn.replaceAll("\\\\", "/") + "'";
+			// return "'" + relatvFn.replaceAll("\\\\", "/") + "'";
+			return "'" + extpaths.dburi(true) + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "''";
@@ -155,9 +161,16 @@ public class ExtFileInsert extends AbsPart {
 		finally { DocLocks.writen(f); }
 	}
 	
+	/**
+	 * 
+	 * @param ctx
+	 * @return concat({@link #runtimePath} / {@link #configRoot} / {@link #prefix} / {@link #resulv_const_path}-{@link #filename}).replace-env()
+	 * @throws TransException
+	 */
 	public String absolutePath(ISemantext ctx) throws TransException {
-		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
-		return decodeUri(runtimePath, relatvFn);
+//		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
+//		return decodeUri(runtimePath, relatvFn);
+		return extpaths.abspath();
 	}
 	
 	/**
@@ -166,9 +179,8 @@ public class ExtFileInsert extends AbsPart {
 	 * @param prefix
 	 * @param filename
 	 * @param ctx
-	 * @return cfgRoot[without-env]/prefix/resulved filename
+	 * @return cfgRoot/prefix/resulved filename
 	 * @throws TransException
-	 */
 	public static String encodeUri(ExprPart resulv, String cfgRoot, String prefix, String filename,
 			ISemantext ctx) throws TransException {
 
@@ -180,24 +192,30 @@ public class ExtFileInsert extends AbsPart {
 		
 		return encodeUri(relatvFn, cfgRoot, prefix, filename);
 	}
+	 */
 	
 	/**
 	 * @param nameId
 	 * @param cfgRoot
 	 * @param prefix
 	 * @param filename
-	 * @return cfgRoot(without-env)/prefix/nameId filename
-	 */
+	 * @return cfgRoot/prefix/nameId filename
 	public static String encodeUri(String nameId, String cfgRoot, String prefix, String filename) {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
 			nameId += " " + filename;
 		// return EnvPath.encodeUri(cfgRoot, prefix, nameId);
 		return FilenameUtils.concat(cfgRoot, prefix, nameId);
 	}
+	 */
 	
+	/**
+	 * @param runtimePath
+	 * @param dbUri
+	 * @return (runtimePath / dbUri).replace-env
 	public static String decodeUri(String runtimePath, String dbUri) {
 		 return EnvPath.decodeUri(runtimePath, dbUri);
 	}
+	 */
 
 	public static void touchDir(String dir) {
 		File f = new File(dir);
@@ -209,5 +227,9 @@ public class ExtFileInsert extends AbsPart {
 		else
 			// must be a file
 			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
+	}
+
+	public void subpaths(int startx, String[] args) {
+		
 	}
 }

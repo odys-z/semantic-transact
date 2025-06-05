@@ -150,10 +150,10 @@ public class EnvPath {
 	 * @param configRoot relative/absolute path with env variables
 	 * @param uri sub-path(s), file path, in concatenating order
 	 * @return encoded uri (with env variable) for DB persisting
-	 */
 	public static String encodeUri(String configRoot, String... uri) {
 		return FilenameUtils.concat(configRoot, uri);
 	}
+	 */
 
 	//// task 1.5.0
 	static String workdir = "";

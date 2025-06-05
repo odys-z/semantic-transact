@@ -123,7 +123,8 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * See the <a href='https://odys-z.github.io/notes/semantics/ref-transact.html#ref-transact-empty-vals'>discussions</a>.
 	 * 
 	 * @param n
-	 * @param v
+	 * @param v whether quoted or not is depending on the table's field,
+	 * by being figured out from the TableMeta.
 	 * @return this statement
 	 * @throws TransException
 	 */
@@ -554,7 +555,7 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	public Map<String, Integer> getColumns() { return null; }
 
 	/**
-	 * Compose v into field value, where:<br>
+	 * Compose v into field value, in cases:<br>
 	 * String: constr<br>
 	 * null  : ExprPart(null)<br>
 	 * "", null    : "0" (not quoted field defined by TableMeta),  FIXME This is not tampering data?<br>

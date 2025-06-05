@@ -36,15 +36,16 @@ public class EnvHelperTest {
 		String[] args = "$VOLUME_HOME/shares,uri,userId,cate,docName".split(",");
 		String extroot = args[0];
 
-		String encoded = EnvPath.encodeUri(extroot, "ody", "000001 f.txt");
-		
+		// String encoded = EnvPath.encodeUri(extroot, "ody", "000001 f.txt");
+		String encoded = FilenameUtils.concat(extroot, "ody", "000001 f.txt");
 		FilenameUtilsTest.assertPathEquals("$VOLUME_HOME/shares/ody/000001 f.txt", encoded);
 
 		String abspath = EnvPath.decodeUri("", encoded);
 		FilenameUtilsTest.assertPathEquals("/home/ody/volume/shares/ody/000001 f.txt", abspath);
 		
 		args = "upload,uri,userId,cate,docName".split(",");
-		encoded = EnvPath.encodeUri(extroot, "admin", "000002 f.txt");
+		// encoded = EnvPath.encodeUri(extroot, "admin", "000002 f.txt");
+		encoded = FilenameUtils.concat(extroot, "admin", "000002 f.txt");
 		FilenameUtilsTest.assertPathEquals("$VOLUME_HOME/shares/admin/000002 f.txt", encoded);
 
 		abspath = EnvPath.decodeUri(rtroot, encoded);
