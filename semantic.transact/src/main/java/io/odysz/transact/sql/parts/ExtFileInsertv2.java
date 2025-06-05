@@ -1,10 +1,13 @@
 package io.odysz.transact.sql.parts;
 
+import static io.odysz.common.LangExt.isNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
@@ -35,7 +38,7 @@ public class ExtFileInsertv2 extends AbsPart {
 	private String b64;
 	/** File Id Resulve or constant string used for filename prefix. */
 	private ExprPart resulv_const_path;
-	private String prefix;
+//	private String prefix;
 	private String filename;
 	private String configRoot;
 //	private String runtimePath;
@@ -46,8 +49,9 @@ public class ExtFileInsertv2 extends AbsPart {
 	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
 	 */
 	public ExtFileInsertv2(ExprPart resulvingPath, String configRoot) {
-		this.resulv_const_path = resulvingPath;
+//		this.resulv_const_path = resulvingPath;
 		this.configRoot = configRoot;
+
 //		this.runtimePath = runtimeRoot;
 	}
 
@@ -229,7 +233,9 @@ public class ExtFileInsertv2 extends AbsPart {
 			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
 	}
 
-	public void subpaths(int startx, String[] args) {
-		
+	public ExtFileInsertv2 subpaths(int startx, String[] args) {
+		if (!isNull(args) && args.length > startx)
+			extpaths.subpath(Arrays.copyOfRange(args, startx, args.length));
+		return this;
 	}
 }
