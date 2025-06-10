@@ -152,28 +152,29 @@ public class Logic {
 		oper = oper.toLowerCase();
 		// check SearchExprs.g4, ?0, !?0, etc. are not working
 		op jc = "=".equals(oper) || "eq".equals(oper) ? op.eq
-					 : "*".equals(oper) ? op.mul
-					 : "/".equals(oper) ? op.div
-					 : "+".equals(oper) ? op.add
-					 : "-".equals(oper) ? op.minus
-	   				 : "%".equals(oper) || "like".equals(oper) ? op.like
-	   				 // FIXME modify SearchExprs.g4
-	   				 // : "!%".equals(oper) || "not like".equals(oper) ? op.notlike
-	   				 : "not %".equals(oper) || "not like".equals(oper) ? op.notlike
-	   				 : "~%".equals(oper) || "rlike".equals(oper) ? op.rlike // =% is not correct
-	   				 : "%~".equals(oper) || "llike".equals(oper) ? op.llike // %= is assignment operator
-   					 : "<=".equals(oper) || "le".equals(oper) ? op.le
-   					 : "<".equals(oper) || "lt".equals(oper) ? op.lt
-   					 : ">=".equals(oper) || "ge".equals(oper) ? op.ge
-   					 : ">".equals(oper) || "gt".equals(oper) ? op.gt
-   		   			 : "><".equals(oper) || "[]".equals(oper) || "in".equals(oper) ? op.in
-   		   	   		 : "][".equals(oper) || "notin".equals(oper) || "not in".equals(oper) ? op.notin
-   		   	   		 : "?0".equals(oper) || "is null".equals(oper) ? op.isnull
-   		   	   		 : "!?0".equals(oper) || "?!0".equals(oper) || "!0".equals(oper) || "?!".equals(oper) ? op.isNotnull
-   		   	   		 : "<>".equals(oper) || "!=".equals(oper) ? op.ne //; // <> !=
-   		   	   		 : "exists".equals(oper) ? op.exists
-   		   	   		 : "notexists".equals(oper) || "nonexists".equals(oper) ? op.notexists
-   		   	   		 : null; // unknown
+				: "*".equals(oper) ? op.mul
+				: "/".equals(oper) ? op.div
+				: "+".equals(oper) ? op.add
+				: "-".equals(oper) ? op.minus
+				: "%".equals(oper) || "like".equals(oper) ? op.like
+				// FIXME modify SearchExprs.g4
+				// : "!%".equals(oper) || "not like".equals(oper) ? op.notlike
+				: "not %".equals(oper) || "not like".equals(oper) ? op.notlike
+				: "~%".equals(oper) || "rlike".equals(oper) ? op.rlike // =% is not correct
+				: "%~".equals(oper) || "llike".equals(oper) ? op.llike // %= is assignment operator
+				: "<=".equals(oper) || "le".equals(oper) ? op.le
+				: "<".equals(oper) || "lt".equals(oper) ? op.lt
+				: ">=".equals(oper) || "ge".equals(oper) ? op.ge
+				: ">".equals(oper) || "gt".equals(oper) ? op.gt
+				: "><".equals(oper) || "[]".equals(oper) || "in".equals(oper) ? op.in
+				: "][".equals(oper) || "notin".equals(oper) || "not in".equals(oper) ? op.notin
+				: "?0".equals(oper) || "is null".equals(oper) ? op.isnull
+				: "!?0".equals(oper) || "?!0".equals(oper) || "!0".equals(oper) || "?!".equals(oper) ? op.isNotnull
+				: "<>".equals(oper) || "!=".equals(oper) ? op.ne //; // <> !=
+				: "exists".equals(oper) ? op.exists
+				: "notexists".equals(oper) || "nonexists".equals(oper) ? op.notexists
+				: null; // unknown
+
 		if (withNot != null && withNot.length > 0 && withNot[0] == true) {
 			jc  = jc == op.like ? op.notlike
 				: jc == op.eq ? op.ne

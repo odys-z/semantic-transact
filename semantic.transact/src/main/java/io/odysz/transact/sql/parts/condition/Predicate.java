@@ -203,4 +203,21 @@ public class Predicate extends AbsPart {
 												? "'" + (String) const_or_expval + "'"
 												: const_or_expval.toString());
 	}
+	
+	/**Helper for creating a equal predicate.
+	 * @param col
+	 * @param constv
+	 * @return predicate for col = 'constv'
+	 */
+	public static Predicate ne(String col, String constv) {
+		return new Predicate(Logic.op.ne, col, "'" + constv + "'");
+	}
+
+	public static Predicate ne(ExprPart lop, Object const_or_expval) {
+		return const_or_expval instanceof ExprPart
+				? new Predicate(Logic.op.ne, lop, (ExprPart)const_or_expval)
+				: new Predicate(Logic.op.ne, lop, const_or_expval instanceof String
+												? "'" + (String) const_or_expval + "'"
+												: const_or_expval.toString());
+	}
 }

@@ -1,6 +1,5 @@
 package io.odysz.transact.sql.parts.condition;
 
-import static io.odysz.common.LangExt._0;
 import static io.odysz.common.LangExt.f_funcall;
 import static io.odysz.common.LangExt.ifnull;
 import static io.odysz.common.LangExt.join;
