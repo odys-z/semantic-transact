@@ -30,7 +30,7 @@ public class Transcxt {
 
 	protected static String runtimepath;
 	public static String runtimeRoot() {
-		mustnonull(runtimepath, "Ever called configRoot()?");
+		mustnonull(runtimepath, "Have ever called with configRoot(..., abs-runtime-root)?");
 		return runtimepath;
 	}
 

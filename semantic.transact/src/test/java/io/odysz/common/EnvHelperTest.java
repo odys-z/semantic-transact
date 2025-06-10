@@ -1,6 +1,8 @@
 package io.odysz.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
+import static io.odysz.common.LangExt.eq;
 
 import org.apache.commons.io_odysz.FilenameUtilsTest;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,10 @@ public class EnvHelperTest {
 		
 		EnvPath.extendEnv("VOLUME_HOME", "c:\\Alice");
 		FilenameUtilsTest.assertPathEquals("c:/Alice/v", EnvPath.replaceEnv("$VOLUME_HOME/v"));
+
+		System.setProperty("VOLUME_Y", "../deploy-Y");
+		assertTrue(eq("../deploy-Y/ody/0001 1.jpg", EnvPath.replaceEnv("$VOLUME_Y/ody/0001 1.jpg"))
+				|| eq("..\\deploy-Y\\ody\\0001 1.jpg", EnvPath.replaceEnv("$VOLUME_Y/ody/0001 1.jpg")));
 	}
 
 	@Test
