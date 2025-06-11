@@ -15,7 +15,7 @@ import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**
- * External file representation - mapping URI and file path back and forth.<br>
+ * External file representation - mapping URI and file paths back and forth.<br>
  * @see ExtFileInsert
  * 
  * @author odys-z@github.com
@@ -75,7 +75,6 @@ public class ExtFileUpdatev2 extends ExprPart {
 			DocLocks.writing(f);
 			Files.move(old, f, StandardCopyOption.ATOMIC_MOVE);
 
-			// mysql doesn't like windows' path separator
 			return "'" + extpaths.dburi(true) + "'";
 		} catch (IOException e) {
 			e.printStackTrace();
