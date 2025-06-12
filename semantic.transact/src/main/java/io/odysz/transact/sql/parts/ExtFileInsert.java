@@ -1,6 +1,5 @@
 package io.odysz.transact.sql.parts;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -128,7 +127,7 @@ public class ExtFileInsert extends AbsPart {
 		String relatvFn = encodeUri(resulv_const_path, configRoot, prefix, filename, ctx);
 		String absoluteFn = absolutePath(ctx);
 
-		touchDir(FilenameUtils.getFullPath(absoluteFn));
+		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
 		byte[] b;// = AESHelper.decode64(b64);
@@ -199,15 +198,15 @@ public class ExtFileInsert extends AbsPart {
 		 return EnvPath.decodeUri(runtimePath, dbUri);
 	}
 
-	public static void touchDir(String dir) {
-		File f = new File(dir);
-		if (f.isDirectory())
-			return;
-		else if (!f.exists())
-			// create dir
-			f.mkdirs();
-		else
-			// must be a file
-			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
-	}
+//	public static void touchDir(String dir) {
+//		File f = new File(dir);
+//		if (f.isDirectory())
+//			return;
+//		else if (!f.exists())
+//			// create dir
+//			f.mkdirs();
+//		else
+//			// must be a file
+//			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
+//	}
 }

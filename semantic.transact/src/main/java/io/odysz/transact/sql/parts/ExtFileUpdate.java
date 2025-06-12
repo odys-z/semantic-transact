@@ -11,6 +11,7 @@ import java.util.Random;
 import io.odysz.common.DocLocks;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Radix32;
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
@@ -91,7 +92,7 @@ public class ExtFileUpdate extends ExprPart {
 		if (absoluteOld.equals(absoluteFn))
 			return "'" + relatvFn.replaceAll("\\\\", "/") + "'";
 
-		ExtFileInsert.touchDir(FilenameUtils.getFullPath(absoluteFn));
+		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 		
 		Path f = Paths.get(absoluteFn);
 		Path old = Paths.get(absoluteOld);

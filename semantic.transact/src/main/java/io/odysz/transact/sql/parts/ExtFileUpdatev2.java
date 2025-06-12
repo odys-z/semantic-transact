@@ -10,6 +10,7 @@ import java.util.Map;
 
 import io.odysz.common.DocLocks;
 import io.odysz.common.FilenameUtils;
+import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
@@ -55,13 +56,13 @@ public class ExtFileUpdatev2 extends ExprPart {
 	public String sql(ISemantext ctx) throws TransException {
 		if (oldUri == null) throw new TransException("No uri (file) to move. Called oldUri() ?");
 		
-		String absoluteFn = extpaths.abspath();
+		String absoluteFn = extpaths.decodeUriPath();
 		String absoluteOld = ExtFilePaths.decodeUri(ctx.containerRoot(), oldUri);
 
 		if (absoluteOld.equals(absoluteFn))
 			return "'" + extpaths.dburi(true) + "'";
 
-		ExtFileInsertv2.touchDir(FilenameUtils.getFullPath(absoluteFn));
+		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 		
 		Path f = Paths.get(absoluteFn);
 		Path old = Paths.get(absoluteOld);

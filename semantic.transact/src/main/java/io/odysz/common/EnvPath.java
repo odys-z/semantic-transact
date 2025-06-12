@@ -184,4 +184,16 @@ public class EnvPath {
 	public static String xml(String xml) {
 		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
+
+//	public static void touchDir(String dir) {
+//		File f = new File(dir);
+//		if (f.isDirectory())
+//			return;
+//		else if (!f.exists())
+//			// create dir
+//			f.mkdirs();
+//		else
+//			// must be a file
+//			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
+//	}
 }

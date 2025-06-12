@@ -1,6 +1,5 @@
 package io.odysz.transact.sql.parts;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +12,6 @@ import io.odysz.common.DocLocks;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.semantics.ISemantext;
-import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
 /**
@@ -44,10 +42,10 @@ public class ExtFileInsertv2 extends AbsPart {
 	 * @param ctx 
 	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
 	 * @throws TransException 
-	 */
 	public ExtFileInsertv2(String volume, ExprPart resulvingId, ISemantext ctx) throws TransException {
 		this.extpaths = new ExtFilePaths(volume, resulvingId.sql(ctx), null);
 	}
+	 */
 
 	/**
 	 * Create an exteranl file representation by setting the absolute root path.
@@ -64,9 +62,12 @@ public class ExtFileInsertv2 extends AbsPart {
 	 * @param volume e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx instance of run time context
 	 * @throws TransException 
-	 */
 	public ExtFileInsertv2(String volume, Resulving fn, ISemantext stx) throws TransException {
 		this(volume, (ExprPart)fn, stx);
+	}
+	 */
+	public ExtFileInsertv2(ExtFilePaths extpaths) throws TransException {
+		this.extpaths = extpaths; //new ExtFilePaths(volume, resulvingId.sql(ctx), null);
 	}
 
 	public ExtFileInsertv2 filename(String name) {
@@ -98,9 +99,9 @@ public class ExtFileInsertv2 extends AbsPart {
 	 */
 	@Override
 	public String sql(ISemantext ctx) throws TransException {
-		String absoluteFn = extpaths.abspath();
+		String absoluteFn = extpaths.decodeUriPath();
 
-		touchDir(FilenameUtils.getFullPath(absoluteFn));
+		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 
 		Path f = Paths.get(absoluteFn);
 		byte[] b;
@@ -134,21 +135,9 @@ public class ExtFileInsertv2 extends AbsPart {
 	 * @throws TransException
 	 */
 	public String absolutePath(ISemantext ctx) throws TransException {
-		return extpaths.abspath();
+		return extpaths.decodeUriPath();
 	}
 	
-	public static void touchDir(String dir) {
-		File f = new File(dir);
-		if (f.isDirectory())
-			return;
-		else if (!f.exists())
-			// create dir
-			f.mkdirs();
-		else
-			// must be a file
-			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
-	}
-
 	public ExtFileInsertv2 subpaths(String[] args, Map<String, Integer> cols, ArrayList<Object[]> row) throws TransException {
 			extpaths.subpath(args, cols, row);
 		return this;
