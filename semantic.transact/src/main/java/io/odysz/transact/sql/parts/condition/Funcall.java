@@ -296,7 +296,7 @@ public class Funcall extends ExprPart {
 	 * {@link #ifElse(Predicate, Object, Object)}.
 	 * 
 	 * @param col
-	 * @return the function for be used in a Query or other statements.
+	 * @return the function for be used in a Query or other statements. The sql function returns 1 : 0. 
 	 */
 	public static ExprPart isEnvelope(Object col) {
 		return ifElse(Predicate.eq(Funcall.subStr(col, 1, 8), "{\"type\":"), 1, 0);

@@ -92,18 +92,17 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	protected IPostOptn postOp;
 
 	protected ArrayList<Statement<?>> before;
+	/** @since 1.5.60 */
+	protected int beforeSqls;
+	/** @since 1.5.60 */
+	public int beforeSqlsize() { return beforeSqls; }
 
 	public Statement(Transcxt transc, String tabl, String alias) {
 		this.transc = transc;
 		this.mainTabl = new Tabl(tabl);
 		this.mainAlias = alias == null ? null : new Alias(alias);
+		this.beforeSqls = 0;
 	}
-
-//	public Statement(Transcxt transc, Query sub, String alias) {
-//		this.transc = transc;
-//		this.subquery = sub;
-//		this.mainAlias = alias == null ? null : new Alias(alias);
-//	}
 
 	private ArrayList<Object[]> attaches;
 	public ArrayList<Object[]> attaches() { return attaches; }
@@ -254,6 +253,10 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	}
 
 	public T where(Logic.op op, String loperand, ExprPart roperand) {
+		return where(Sql.condt(op, loperand, roperand));
+	}
+
+	public T where(Logic.op op, ExprPart loperand, String roperand) {
 		return where(Sql.condt(op, loperand, roperand));
 	}
 
@@ -448,6 +451,11 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 		return where(Sql.condt(Logic.op("in"), col, q));
 	}
 
+	public T whereNotIn(String col, Query q) throws TransException {
+		return where(Sql.condt(Logic.op("not in"), col, q));
+	}
+
+
 	/**
 	 * <p>Add post semantics after the parent statement,
 	 * like add children after insert new parent.</p>
@@ -517,12 +525,15 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 	 * @throws TransException
 	 */
 	public T commit(ISemantext cxt, ArrayList<String> sqls) throws TransException {
-		// sql() calling onDelete (generating before sentences), must called before "before"
-		String itself = sql(cxt);
+		// sql() calling onDelete (generating before sentences), must called before "before" ????????
 
 		if (before != null)
 			for (Statement<?> bf : before)
 				bf.commit(cxt, sqls);
+
+		this.beforeSqls = sqls.size();
+
+		String itself = sql(cxt);
 
 		if (!LangExt.isblank(itself))
 			sqls.add(itself);

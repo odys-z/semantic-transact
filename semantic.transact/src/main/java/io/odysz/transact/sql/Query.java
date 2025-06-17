@@ -366,52 +366,6 @@ public class Query extends Statement<Query> {
 	}
 
 	/**
-	 * Convert cols like:<br>
-	 * {@code SELECT tblAlias.col_ases[0] as col_ases[1], tblAlias.col_ases[2] as col_ases[3], ...}
-	 * 
-	 * @param tblAlias
-	 * @param col_ases array for sql, e.g. to sql
-	 * @return this
-	 * @throws TransException
-	 * @since 1.4.40
-	public Query col_ases(String tblAlias, Object... col_ases) throws TransException {
-		if (col_ases != null)
-			for (int ax = 0; ax < col_ases.length; ax++) {
-				Object expr  = col_ases[ax];
-				if (expr == null) continue;
-				// String alias = ax < col_ases.length ? (String)expr : null;
-
-				if (expr instanceof String)
-					col(String.format("%s.%s", tblAlias, (String)expr), (String)expr);
-				else if (expr instanceof ExprPart)
-					col(new SelectElem((ExprPart) expr).tableAlias(tblAlias));
-				else  // something wrong
-					col(String.format("%s.%s", tblAlias, expr.toString()), expr.toString());
-			}
-		return this;
-	}
-	 */
-	
-	/**
-	 * <pre>select
-	 * .col_ases(a, entCols())
-	 * .replacol(uri, extfile(a + "." + uri));</pre>
-	 * @param uri
-	 * @param extfile
-	 * @return this
-	 * @throws TransException 
-	 * @since 2.0.0
-	public Query col_replace(String uri, ExprPart with) throws TransException {
-		if (selectList == null)
-			throw new TransException("cols are null, nothing to replace.");
-		
-		for (int ix = 0; ix < selectList.size(); ix++)
-			if (selectList.get(ix).col != null)
-		return this;
-	}
-	 */
-
-	/**
 	 * 
 	 * @param withTabl
 	 * @param alias
@@ -520,37 +474,6 @@ public class Query extends Statement<Query> {
 	public Query j(String withTabl, String alias, String on, Object...args) {
 		return j(withTabl, alias, Sql.condt(on, args));
 	}
-
-	/**
-	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
-	 * 
-	 * <p>Example</p>
-	 * <pre>sctx.select(usrMeta.tbl, "u")
-	 *    .je("u", usrMeta.roleTbl, "r", usrMeta.role)
-	 *    .je("u", usrMeta.orgTbl, "o", usrMeta.org);
-	 * //   
-	 * sctx.select(userMeta.tbl, "u")
-	 *    .je("u", orgMeta.tbl, "o", m.org, orgMeta.pk);</pre>
-	 *    
-	 * @since 1.4.25, additional columns can be append as AND predict in join clause. 
-	 * @param mainAlias e.g. u
-	 * @param withTbl e.g. r
-	 * @param withAlias
-	 * @param onCols, in pairs, e.g. if a, b, c, d, where have condition u.a = r.b and u.c = r.d
-	 * @return this
-	public Query je(String mainAlias, String withTbl, String withAlias, String... onCols) {
-		Condit ands = Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, onCols[0]),
-				String.format("%s.%s", withAlias, onCols.length > 1 ? onCols[1] : onCols[0]));
-
-		for (int i = 2; i < onCols.length; i+=2) {
-			ands.and(Sql.condt(op.eq,
-				String.format("%s.%s", mainAlias, onCols[i]),
-				String.format("%s.%s", withAlias, onCols.length > i+1 ? onCols[i+1] : onCols[i])));
-		}
-		return j(withTbl, withAlias, ands);
-	}
-	 */
 
 	/**
 	 * AST for "join withTbl withAlias on mainTbl.colMaintbl = withalias.colWith[colMaintbl]".
@@ -925,11 +848,6 @@ public class Query extends Statement<Query> {
 		}
 		return null;
 	}
-
-//	public Query with(WithClause withClause) {
-//		this.withs = withClause;
-//		return this;
-//	}
 
 	/** 
 	 * Whether use distinct or not, to generate "select distinct ... "

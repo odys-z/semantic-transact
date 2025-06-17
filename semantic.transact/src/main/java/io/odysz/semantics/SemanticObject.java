@@ -220,10 +220,16 @@ public class SemanticObject extends Anson {
 		out.println("");
 	}
 
+	/**
+	 * @param tabl
+	 * @param pk
+	 * @param idx start at 0, negative for backward indexing.
+	 * @return resulved value
+	 */
 	public String resulve(String tabl, String pk, int idx) {
 		List<String> ids = resulve(tabl, pk);
 		return ids != null && ids.size() > idx
-			? ids.get(idx > 0 ? idx : ids.size() + idx) : null;
+			? ids.get(idx >= 0 ? idx : ids.size() + idx) : null;
 	}
 
 	@SuppressWarnings("unchecked")
