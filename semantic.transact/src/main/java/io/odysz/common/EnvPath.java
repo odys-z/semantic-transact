@@ -143,19 +143,6 @@ public class EnvPath {
 					filename);
 	}
 
-	/**
-	 * <p>Convert raw uri to saving uri for DB persisting - can be decoded according to env,
-	 * the reverse is {@link #decodeUri}.</p>
-	 * 
-	 * @param configRoot relative/absolute path with env variables
-	 * @param uri sub-path(s), file path, in concatenating order
-	 * @return encoded uri (with env variable) for DB persisting
-	public static String encodeUri(String configRoot, String... uri) {
-		return FilenameUtils.concat(configRoot, uri);
-	}
-	 */
-
-	//// task 1.5.0
 	static String workdir = "";
 	static String web_inf = "WEB-INF";
 
@@ -184,16 +171,4 @@ public class EnvPath {
 	public static String xml(String xml) {
 		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
-
-//	public static void touchDir(String dir) {
-//		File f = new File(dir);
-//		if (f.isDirectory())
-//			return;
-//		else if (!f.exists())
-//			// create dir
-//			f.mkdirs();
-//		else
-//			// must be a file
-//			Utils.warn("FATAL ExtFile can't create a folder, a same named file exists: ", dir);
-//	}
 }
