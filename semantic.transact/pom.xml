@@ -119,6 +119,7 @@
 			<systemPropertyVariables>
 				<xmlOutputDir>${project.build.directory}/surefire</xmlOutputDir>
 			</systemPropertyVariables>
+          	<argLine>-Dfile.encoding=UTF-8</argLine>
 		</configuration>
 	  </plugin>
 
