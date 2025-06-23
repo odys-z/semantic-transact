@@ -271,7 +271,7 @@ public class Funcall extends ExprPart {
 	
 	/**
 	 * File reference. Got a serialized Anson object, ReourceRef for resolving later.
-	 * @param ansonObjs
+	 * @param ansonObj
 	 * @return the function
 	 * @since 1.5.60
 	 */

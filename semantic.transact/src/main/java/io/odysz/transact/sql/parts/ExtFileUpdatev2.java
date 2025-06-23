@@ -28,9 +28,8 @@ public class ExtFileUpdatev2 extends ExprPart {
 
 	/**
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
+	 * @param volume, i.e. config-root, root path in config.xml
 	 * @param recId
-	 * @param configRoot, root path in config.xml
-	 * @param stx instance of run time context
 	 */
 	public ExtFileUpdatev2(String volume, String recId, String filename) {
 		this.extpaths = new ExtFilePaths(volume, recId, filename);
