@@ -1,6 +1,7 @@
 package io.odysz.common;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.f;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -401,12 +402,15 @@ public class AESHelper {
 	
 	public static String encodeRange(File file, long start, long length) throws IOException {
 		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			stream(file, Base64.getEncoder().wrap(baos), start, length);
+			stream64(file, baos, start, length);
 			return baos.toString();
 		}
 	}
 
 	public static long stream64(File file, OutputStream output, long start, long length) throws IOException {
+		if (length % 3 != 0) throw new IOException(
+			f("length %s | 3 != 0. Blocks to be encoded must be in length of 3*n - and you cannot start at a breakpoint index other than multiple of 3.",
+			  length));
 		return stream(file, Base64.getEncoder().wrap(output), start, length);
 	}
 

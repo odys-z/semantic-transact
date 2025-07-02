@@ -5,6 +5,8 @@ import static io.odysz.common.AESHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -205,6 +207,13 @@ public class AESHelperTest {
 
 		s  = encodeRange(f219, 0, 555);
 		assertEquals(s, s219b64);
+		
+		
+		try {
+			s = encodeRange(f219, 0, 32);
+			fail("Expecting 3 * n length.");
+		}
+		catch (IOException e) {}
 	}
 	
 	@Test
