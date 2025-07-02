@@ -3,9 +3,20 @@ package io.odysz.common;
 import static io.odysz.common.LangExt.eq;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -259,8 +270,9 @@ public class AESHelper {
 	/**
 	 * @param ifs
 	 * @param blockSize default 3 * 1024 * 1024;
-	 * @return
+	 * @return encoded string
 	 * @throws IOException
+	 * ISSUE: we need a stream mode version
 	 */
 	public static String encode64(final InputStream ifs, int blockSize) throws IOException {
 		blockSize = blockSize > 0 ? blockSize : 3 * 1024 * 1024;
@@ -270,10 +282,11 @@ public class AESHelper {
 
 		byte[] chunk = new byte[blockSize];
 
-		return encode64(chunk, ifs, 0, blockSize);
+		return encode63(chunk, ifs, 0, blockSize);
 	}
 
 	/**
+	 * @deprecated bug fixed by {@link #encode64(byte[], InputStream, int, int)}.
 	 * Usage example: <pre>
 	 * byte[] buf = new byte[n * 3];
 	 * int index = 0;
@@ -293,7 +306,7 @@ public class AESHelper {
 	 * @throws IOException
 	 * @throws TransException buffer length is not multiple of 3.
 	 */
-	public static String encode64(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
+	public static String encode63(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
 		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
 		Base64.Encoder encoder = Base64.getEncoder();
 
@@ -307,6 +320,20 @@ public class AESHelper {
 			return encoder.encodeToString(Arrays.copyOf(buf, readLen));
 	}
 
+	public static String encode64(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
+		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
+		Base64.Encoder encoder = Base64.getEncoder();
+
+		int readLen = in.read(buf, start, len);
+
+		if (readLen <= 0)
+			return null;
+		else if (readLen == buf.length)
+			return encoder.encodeToString(buf);
+		else // (readLen < buf.length)
+			return encoder.encodeToString(Arrays.copyOf(buf, readLen));
+	}
+	
 	public static byte[] decode64(String str) {
         return Base64.getDecoder().decode(str);
 	}
@@ -369,4 +396,59 @@ public class AESHelper {
 		String token = AESHelper.encode64(knows);
 		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
 	}
+	
+	static int Range_Size = 1024 * 8;
+	
+	public static String encodeRange(File file, long start, long length) throws IOException {
+		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			stream(file, Base64.getEncoder().wrap(baos), start, length);
+			return baos.toString();
+		}
+	}
+
+	public static long stream64(File file, OutputStream output, long start, long length) throws IOException {
+		return stream(file, Base64.getEncoder().wrap(output), start, length);
+	}
+
+	public static long stream(File file, OutputStream output, long start, long length) throws IOException {
+		if (start == 0 && length >= file.length()) {
+			try ( ReadableByteChannel inputChannel = Channels.newChannel(new FileInputStream(file));
+				  WritableByteChannel outputChannel = Channels.newChannel(output)) {
+				ByteBuffer buffer = ByteBuffer.allocateDirect(Range_Size);
+				long size = 0;
+
+				while (inputChannel.read(buffer) != -1) {
+					buffer.flip();
+					size += outputChannel.write(buffer);
+					buffer.clear();
+				}
+
+				return size;
+			}
+		}
+		else {
+			try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+				WritableByteChannel outputChannel = Channels.newChannel(output);
+				ByteBuffer buffer = ByteBuffer.allocateDirect(Range_Size);
+				long size = 0;
+
+				while (fileChannel.read(buffer, start + size) != -1) {
+					buffer.flip();
+
+					if (size + buffer.limit() > length) {
+						buffer.limit((int) (length - size));
+					}
+
+					size += outputChannel.write(buffer);
+
+					if (size >= length) break;
+
+					buffer.clear();
+				}
+
+				return size;
+			}
+		}
+	}
+	
 }

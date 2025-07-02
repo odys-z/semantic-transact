@@ -5,10 +5,19 @@ import static io.odysz.common.AESHelper.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +26,7 @@ import io.odysz.transact.x.TransException;
 
 public class AESHelperTest {
 
+	static final String s219b64 = "iVBORw0KGgoAAAANSUhEUgAAALYAAAB5CAMAAACjkCtXAAAAFVBMVEX+1QABW7sAW7sAUcGWnmj/2wABXLkr7EQMAAAAgUlEQVR4nO3SyQ3DAAgAQZyr/5JTgy15I6IZvjzQijlWmuNxYu5bPrk+v+52jdoltUtql9QuqV1Su6R2Se2S2iW1S2qX1C6pXVK7pHZJ7ZLaJbVLapfWnu1JOmqX1C6pXVK7pHZJ7ZLapfmsNM+V5rXSvFcaAAAAAAAAAAAAAP7XFzzwP8UnEJ9SAAAAAElFTkSuQmCC";
 	/**
 	 * C# Debug Trace:<pre>
 	Check this at server side:
@@ -82,7 +92,6 @@ public class AESHelperTest {
 	
 	@Test
 	public void testEncodeFile() throws Exception {
-		String s219b64 = "iVBORw0KGgoAAAANSUhEUgAAALYAAAB5CAMAAACjkCtXAAAAFVBMVEX+1QABW7sAW7sAUcGWnmj/2wABXLkr7EQMAAAAgUlEQVR4nO3SyQ3DAAgAQZyr/5JTgy15I6IZvjzQijlWmuNxYu5bPrk+v+52jdoltUtql9QuqV1Su6R2Se2S2iW1S2qX1C6pXVK7pHZJ7ZLaJbVLapfWnu1JOmqX1C6pXVK7pHZJ7ZLapfmsNM+V5rXSvFcaAAAAAAAAAAAAAP7XFzzwP8UnEJ9SAAAAAElFTkSuQmCC";
 		int size = 219;
 		
 		byte[] buf = new byte[201];
@@ -114,13 +123,88 @@ public class AESHelperTest {
 		int index = 0;
 		while (index < size) {
 			int readlen  = Math.min(buf.length, size - index);
-			String str64 = encode64(buf, ifs, index, readlen);
+			@SuppressWarnings("deprecation")
+			String str64 = encode63(buf, ifs, index, readlen);
 			b.append(str64);
 			index += readlen;
 		}
 		ifs.close();
 		
 		return b.toString();
+	}
+	
+	@Test
+	public void testByteArrayOutputStream () throws IOException {
+		int blocksize = 3 * 16;
+		String fn = "decode-s219b64.png";
+		Path p = Paths.get(fn);
+		if (Files.exists(p))
+				Files.delete(p);;
+
+		byte[] b = s219b64.getBytes();
+		try ( ByteArrayInputStream bais = new ByteArrayInputStream(b);
+			  InputStream is = Base64.getDecoder().wrap(bais)) {
+
+			byte[] buff = new byte[blocksize];
+			int start = 0, len = blocksize;
+			try (FileOutputStream fs = new FileOutputStream(fn)){
+				while(start < b.length && len > 0) {
+					len = is.read(buff, 0, blocksize);
+					if (len > 0) {
+						start += len;
+						fs.write(buff, 0, len);
+					}
+				}
+			}
+			assertEquals(73 * 3, Files.size(p));
+		}
+
+		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			  OutputStream os = Base64.getEncoder().wrap(baos);
+			  FileInputStream fs = new FileInputStream(fn)
+			) {
+
+			byte[] buff = new byte[blocksize];
+			int start = 0, len = blocksize;
+
+			while(start < b.length && len > 0) {
+				len = fs.read(buff, 0, blocksize);
+				if (len > 0) {
+					start += len;
+					os.write(buff, 0, len);
+				}
+			}
+
+			String s = baos.toString();
+
+			assertEquals(73 * 4, s.length());
+			assertEquals(s219b64, s);
+		}
+		
+		AESHelper.Range_Size = 32;
+		
+		File f219 = new File(fn);
+		String
+		s  = encodeRange(f219, 0, 3);
+		s += encodeRange(f219, 3, 12);
+		s += encodeRange(f219, 3+12, 219 - 3 - 12);
+		assertEquals(s, s219b64);
+
+		s  = encodeRange(f219, 0, 6);
+		s += encodeRange(f219, 6, 24);
+		s += encodeRange(f219, 6+24, 219 - 6 - 24);
+		assertEquals(s, s219b64);
+
+		s  = encodeRange(f219, 0, 9);
+		s += encodeRange(f219, 9, 36);
+		s += encodeRange(f219, 9+36, 219 - 9 - 36);
+		assertEquals(s, s219b64);
+
+		s  = encodeRange(f219, 0, 219);
+		assertEquals(s, s219b64);
+
+		s  = encodeRange(f219, 0, 555);
+		assertEquals(s, s219b64);
 	}
 	
 	@Test
