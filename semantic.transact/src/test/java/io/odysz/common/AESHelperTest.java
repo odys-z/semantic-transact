@@ -183,7 +183,7 @@ public class AESHelperTest {
 			assertEquals(s219b64, s);
 		}
 		
-		AESHelper.Range_Size = 32;
+		AESHelper.Block_Size = 32;
 		
 		File f219 = new File(fn);
 		String

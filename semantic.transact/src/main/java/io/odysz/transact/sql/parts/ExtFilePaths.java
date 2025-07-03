@@ -29,6 +29,7 @@ import io.odysz.transact.x.TransException;
 public class ExtFilePaths {
 
 	String volume;
+	/** The entire sub-path in $VOLUME/sub.../.../PID resname.typ */ 
 	String prefix;
 	public ExtFilePaths prefix(String docref_uri) {
 		this.prefix = docref_uri;
@@ -83,10 +84,10 @@ public class ExtFilePaths {
 		return escapeSep ? relatvFn.replaceAll("\\\\", "/") : relatvFn;
 	}
 
-	public static String encodeUri(String volume, String prefix, String nameId, String filename) {
+	public static String encodeUri(String volume, String prefix, String id4name, String filename) {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
-			nameId += " " + filename;
-		return concat(volume, prefix, nameId);
+			id4name += " " + filename;
+		return concat(volume, prefix, id4name);
 	}
 	
 	public static String decodeUri(String runtimePath, String dbUri) {

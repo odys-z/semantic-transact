@@ -398,7 +398,8 @@ public class AESHelper {
 		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
 	}
 	
-	static int Range_Size = 1024 * 8;
+	static int Block_Size = 1024 * 8;
+	public static int blockSize() { return Block_Size; }
 	
 	public static String encodeRange(File file, long start, long length) throws IOException {
 		try ( ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -418,7 +419,7 @@ public class AESHelper {
 		if (start == 0 && length >= file.length()) {
 			try ( ReadableByteChannel inputChannel = Channels.newChannel(new FileInputStream(file));
 				  WritableByteChannel outputChannel = Channels.newChannel(output)) {
-				ByteBuffer buffer = ByteBuffer.allocateDirect(Range_Size);
+				ByteBuffer buffer = ByteBuffer.allocateDirect(Block_Size);
 				long size = 0;
 
 				while (inputChannel.read(buffer) != -1) {
@@ -433,7 +434,7 @@ public class AESHelper {
 		else {
 			try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
 				WritableByteChannel outputChannel = Channels.newChannel(output);
-				ByteBuffer buffer = ByteBuffer.allocateDirect(Range_Size);
+				ByteBuffer buffer = ByteBuffer.allocateDirect(Block_Size);
 				long size = 0;
 
 				while (fileChannel.read(buffer, start + size) != -1) {
@@ -454,5 +455,4 @@ public class AESHelper {
 			}
 		}
 	}
-	
 }
