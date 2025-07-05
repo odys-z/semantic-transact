@@ -439,6 +439,18 @@ public abstract class Statement<T extends Statement<T>> extends AbsPart {
 			return whereIn(col, constvs.toArray(new String[0]));
 	}
 
+	public T whereNotIn(String col, String... constv) {
+		ExprPart inOp = new ExprPart(constv);
+		return where(Sql.condt(Logic.op.notin, col, inOp));
+	}
+
+	public T whereNotIn(String col, List<String> constvs) {
+		if (isblank(constvs))
+			return (T) this;
+		else
+			return whereNotIn(col, constvs.toArray(new String[0]));
+	}
+	
 	/**
 	 * where clause for "In Select".
 	 * @param col

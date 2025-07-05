@@ -16,11 +16,27 @@ import io.odysz.transact.x.TransException;
 /**
  * Db field using Anson supporting Non-sql.
  * 
+ * AnDbField, implementing IJsonable, can not be deserialized unless registered a factory like:
+ * <pre>static {
+	JSONAnsonListener.registFactory(DocRef.class, 
+		(s) -> {
+			try {
+				return new DocRef().toJson(new StringBuffer(s));
+			} catch (AnsonException | IOException e) {
+				e.printStackTrace();
+				return new DocRef();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+		});	
+	}</pre>
  * @since 1.4.25
  * @author Ody Z
  */
 public abstract class AnDbField extends ExprPart implements IJsonable {
-	
+
 	public static final JsonOpt jopt = new JsonOpt().escape4DB(true);
 
 	@Override
@@ -30,7 +46,7 @@ public abstract class AnDbField extends ExprPart implements IJsonable {
 
 	@Override
 	public IJsonable toJson(StringBuffer buf) throws IOException, AnsonException {
-		return Anson.toJson(buf, this);
+		return Anson.fromJson(buf.toString());
 	}
 
 	@Override

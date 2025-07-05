@@ -17,6 +17,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -407,17 +408,47 @@ public class AESHelper {
 			return baos.toString();
 		}
 	}
-
+	
 	public static long stream64(File file, OutputStream output, long start, long length) throws IOException {
 		if (length % 3 != 0) throw new IOException(
 			f("length %s | 3 != 0. Blocks to be encoded must be in length of 3*n - and you cannot start at a breakpoint index other than multiple of 3.",
 			  length));
-		return stream(file, Base64.getEncoder().wrap(output), start, length);
+		return stream206(file, Base64.getEncoder().wrap(output), start, length);
 	}
 
-	public static long stream(File file, OutputStream output, long start, long length) throws IOException {
-		if (start == 0 && length >= file.length()) {
-			try ( ReadableByteChannel inputChannel = Channels.newChannel(new FileInputStream(file));
+	/**
+	 * @param file
+	 * @param output plain output stream. For base64, will be wrapped for encoding.
+	 * @param start
+	 * @param length
+	 * @return read length
+	 * @throws IOException
+	 */
+	public static long stream206(File file, OutputStream output,
+			long start, long length) throws IOException {
+		return stream(file.toPath(), new FileInputStream(file), file.length(), output, start, length);
+	}
+
+	/**
+	 * Android evquivalent of {@link #encodeRange(Path, FileInputStream, long, long)}.
+	 * @param filepath
+	 * @param file
+	 * @param filesize
+	 * @param start
+	 * @param length
+	 * @return read length
+	 * @throws IOException
+	 */
+	public static long encodeRange(Path filepath, FileInputStream file,
+			long filesize, OutputStream baos, long start, long length) throws IOException {
+		return stream(filepath, file, filesize, Base64.getEncoder().wrap(baos), start, length);
+	}
+	
+	protected static long stream(Path filepath, FileInputStream file, long siz,
+			OutputStream output, long start, long length) throws IOException {
+
+		if (start == 0 && length >= siz) {
+			try ( ReadableByteChannel inputChannel = Channels.newChannel(file);
 				  WritableByteChannel outputChannel = Channels.newChannel(output)) {
 				ByteBuffer buffer = ByteBuffer.allocateDirect(Block_Size);
 				long size = 0;
@@ -432,7 +463,7 @@ public class AESHelper {
 			}
 		}
 		else {
-			try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+			try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(filepath, StandardOpenOption.READ)) {
 				WritableByteChannel outputChannel = Channels.newChannel(output);
 				ByteBuffer buffer = ByteBuffer.allocateDirect(Block_Size);
 				long size = 0;

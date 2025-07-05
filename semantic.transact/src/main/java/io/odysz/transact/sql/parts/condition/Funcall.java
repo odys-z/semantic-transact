@@ -24,6 +24,7 @@ import io.odysz.transact.sql.parts.AbsPart;
 import io.odysz.transact.sql.parts.Alias;
 import io.odysz.transact.sql.parts.AnDbField;
 import io.odysz.transact.sql.parts.Colname;
+import io.odysz.transact.sql.parts.ExtFilePaths;
 import io.odysz.transact.sql.parts.Resulving;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.select.SelectElem;
@@ -463,7 +464,10 @@ public class Funcall extends ExprPart {
 							c--; // in SResultset, column index start at 1
 							String fn = (String) row.get(c);
 							if (!isblank(fn, "\\.", "\\*")) {
-								fn = EnvPath.decodeUri(stx.containerRoot(), fn);
+								// 2025-07-05
+								// fn = EnvPath.decodeUri(stx.containerRoot(), fn);
+								fn = ExtFilePaths.decodeUri(stx.containerRoot(), fn);
+
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {
 									try {
