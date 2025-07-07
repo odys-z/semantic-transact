@@ -399,7 +399,7 @@ public class AESHelper {
 		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
 	}
 	
-	static int Block_Size = 1024 * 8;
+	static int Block_Size = 1024 * 3;
 	public static int blockSize() { return Block_Size; }
 	
 	public static String encodeRange(File file, long start, long length) throws IOException {
