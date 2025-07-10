@@ -194,6 +194,8 @@ public interface ISemantext {
 
 	/**Get the container's runtime root path<br>
 	 * For servlet, return the absolute WEB-ROOT, for java application, return the starting relative dir.
+	 * 
+	 * @deprecated TODO FIXME redundant to {@link Transcxt#runtimeRoot()}
 	 * @return the root path
 	 */
 	public String containerRoot();
