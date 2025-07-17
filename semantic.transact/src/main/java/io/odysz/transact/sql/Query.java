@@ -174,6 +174,7 @@ public class Query extends Statement<Query> {
 	private ArrayList<String[]> orderList;
 	private ArrayList<String> groupList;
 	protected long pg;
+	/** @deprecated To be moved to QueryPage */
 	public long page() { return pg; }
 	
 	public Query page(long page, long pgSize) {
