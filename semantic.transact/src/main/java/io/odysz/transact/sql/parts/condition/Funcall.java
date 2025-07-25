@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DateFormat;
 import io.odysz.common.DocLocks;
-import io.odysz.common.EnvPath;
 import io.odysz.common.Utils;
 import io.odysz.common.dbtype;
 import io.odysz.semantics.ISemantext;
@@ -466,7 +465,8 @@ public class Funcall extends ExprPart {
 							if (!isblank(fn, "\\.", "\\*")) {
 								// 2025-07-05
 								// fn = EnvPath.decodeUri(stx.containerRoot(), fn);
-								fn = ExtFilePaths.decodeUri(stx.containerRoot(), fn);
+								// fn = ExtFilePaths.decodeUri(stx.containerRoot(), fn);
+								fn = ExtFilePaths.decodeUriPath(fn);
 
 								Path f = Paths.get(fn);
 								if (Files.exists(f) && !Files.isDirectory(f)) {

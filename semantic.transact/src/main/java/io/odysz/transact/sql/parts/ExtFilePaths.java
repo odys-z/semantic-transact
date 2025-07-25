@@ -2,6 +2,7 @@ package io.odysz.transact.sql.parts;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.mustnonull;
 import static io.odysz.common.FilenameUtils.concat;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.EnvPath;
+import io.odysz.common.FilenameUtils;
 import io.odysz.common.LangExt;
 import io.odysz.common.Radix32;
 import io.odysz.semantics.ISemantext;
@@ -39,6 +41,24 @@ public class ExtFilePaths {
 	final String fileId;
 
 	String filename;
+
+	/**
+	 * This is used for bridge the discrepancy between WEB-INF and container root path,
+	 * which is used to decode volume root.
+	 * 
+	 * <p>Details: The volume path is now configured in WEB-INF/setting.json, 
+	 * of which the relative path can be more readable to human if it is starting there.
+	 * But this makes resolve the path incorrect if from runtime root, which is know
+	 * to the system.</p>
+	protected static String config_root;
+	 */
+	/**
+	 * @param webinf relative path from runtime root to WEB-INF, or the configuring folder.
+	public static void init(String webinf) {
+		config_root = webinf;
+	}
+	 */
+
 	public ExtFilePaths filename(String f) {
 		this.filename = f;
 		return this;
@@ -74,9 +94,19 @@ public class ExtFilePaths {
 	}
 	
 	public String decodeUriPath() {
+//		mustnonull(config_root, "ExtFilePaths.condig_root is null. Call ExtFilePaths.init(config_root) first.\n"
+//				+ "This is used for bridge the discrepancy between WEB-INF and container root path, which is used to decode volume root.");
+
 		String relatvFn = dburi(false);
-		String root = Transcxt.runtimeRoot();
+
+		// String root = Transcxt.runtimeRoot();
+		String root = Transcxt.cfgroot();
 		return decodeUri(eq(root, ".") ? "" : root, relatvFn);
+	}
+	
+	public static String decodeUriPath(String dburi) {
+		String root = Transcxt.cfgroot();
+		return decodeUri(eq(root, ".") ? "" : root, dburi);
 	}
 	
 	public String dburi(boolean escapeSep) {
@@ -90,7 +120,7 @@ public class ExtFilePaths {
 		return concat(volume, prefix, id4name);
 	}
 	
-	public static String decodeUri(String runtimePath, String dbUri) {
+	protected static String decodeUri(String runtimePath, String dbUri) {
 		return EnvPath.decodeUri(runtimePath, dbUri);
 	}
 

@@ -55,8 +55,9 @@ public class ExtFileUpdatev2 extends ExprPart {
 	public String sql(ISemantext ctx) throws TransException {
 		if (oldUri == null) throw new TransException("No uri (file) to move. Called oldUri() ?");
 		
-		String absoluteFn = extpaths.decodeUriPath();
-		String absoluteOld = ExtFilePaths.decodeUri(ctx.containerRoot(), oldUri);
+		String absoluteFn = decodeUriPath();
+		// String absoluteOld = ExtFilePaths.decodeUri(ctx.containerRoot(), oldUri);
+		String absoluteOld = ExtFilePaths.decodeUriPath(oldUri);
 
 		if (absoluteOld.equals(absoluteFn))
 			return "'" + extpaths.dburi(true) + "'";
@@ -77,10 +78,29 @@ public class ExtFileUpdatev2 extends ExprPart {
 
 			return "'" + extpaths.dburi(true) + "'";
 		} catch (IOException e) {
+			// TODO FIXME
+			// This is a data integrate breach. Must be fixed by moving this, moving the file, to postOps.
+			// See ShExtFile.onDelete()
 			e.printStackTrace();
 			return "''";
 		}
 		finally { DocLocks.writen(f); }
+	}
+
+	/**
+	 * For insert, get ext-path
+	 * @return
+	 */
+	public String decodeUriPath() {
+		return extpaths.decodeUriPath();
+	}
+	
+	/**
+	 * For update/delete, get ext-path
+	 * @return
+	 */
+	public static String decodeUriPath(String dburi) {
+		return ExtFilePaths.decodeUriPath(dburi);
 	}
 
 	public void subpaths(String[] subcols, Map<String, Integer> colnames,
