@@ -2,7 +2,6 @@ package io.odysz.transact.sql.parts;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
-import static io.odysz.common.LangExt.mustnonull;
 import static io.odysz.common.FilenameUtils.concat;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.EnvPath;
-import io.odysz.common.FilenameUtils;
 import io.odysz.common.LangExt;
 import io.odysz.common.Radix32;
 import io.odysz.semantics.ISemantext;
@@ -94,12 +92,7 @@ public class ExtFilePaths {
 	}
 	
 	public String decodeUriPath() {
-//		mustnonull(config_root, "ExtFilePaths.condig_root is null. Call ExtFilePaths.init(config_root) first.\n"
-//				+ "This is used for bridge the discrepancy between WEB-INF and container root path, which is used to decode volume root.");
-
 		String relatvFn = dburi(false);
-
-		// String root = Transcxt.runtimeRoot();
 		String root = Transcxt.cfgroot();
 		return decodeUri(eq(root, ".") ? "" : root, relatvFn);
 	}

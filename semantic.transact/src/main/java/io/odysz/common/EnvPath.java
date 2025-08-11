@@ -2,11 +2,11 @@ package io.odysz.common;
 
 import static io.odysz.common.LangExt.isNull;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.odysz.semantics.ISemantext;
+import java.util.Properties;
 
 /**
  * <p>A helper to handler environment variable affecting file path.</p>
@@ -34,7 +34,17 @@ public class EnvPath {
 
 	static Map<String, String> sysenv;
 
-	static { sysenv = System.getenv(); }
+	static {
+		// 0.7.6
+		sysenv = new HashMap<String, String>(System.getenv());
+		Properties pros = System.getProperties();
+		if (pros != null)
+		for(Object p : pros.keySet()) {
+			if (p instanceof String)
+				sysenv.put((String)p, pros.get(p).toString());
+			
+		}
+	}
 	
 	/**
 	 * Extend system variables.
@@ -103,6 +113,10 @@ public class EnvPath {
 	
 	}
 
+	public static String abspath(String p) {
+		return new File(replaceEnv(p)).getAbsolutePath();
+	}
+
 	/**Decode URI - convert file records' uri into absolute path, according to env.
 	 *
 	 * @see FilenameUtils#concat(String, String)
@@ -121,10 +135,10 @@ public class EnvPath {
 	 * @param stx
 	 * @param uri
 	 * @return
-	 */
 	public static String decodeUri(ISemantext stx, String uri) {
 		return decodeUri(stx.containerRoot(), uri);
 	}
+	 */
 
 	/**
 	 * Replace env token in {@code root} and concat the path.
