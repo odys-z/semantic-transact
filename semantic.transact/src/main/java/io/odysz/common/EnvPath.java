@@ -191,4 +191,12 @@ public class EnvPath {
 	public static String xml(String xml) {
 		return FilenameUtils.concat(workdir, webINF(), xml);
 	}
+
+	public static String concat(String workdir, String... rels) {
+		String work = FilenameUtils.rel2abs(replaceEnv(workdir));
+		if (!isNull(rels))
+			for (String sub : rels)
+				work = FilenameUtils.concat(work, EnvPath.replaceEnv(sub));
+		return work;
+	}
 }
