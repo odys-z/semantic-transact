@@ -24,7 +24,7 @@ import java.util.Properties;
  encoded: /home/ody/upload/admin/000003 f.txt
  decoded: /home/ody/upload/admin/000003 f.txt</pre>
 
- * Since v1.4.2, system property has higher priority than environment variable.
+ * Since v1.5.65, system properties are been merged with environment variable.
  * @author Odys Zhou
  *
  */
@@ -105,6 +105,7 @@ public class EnvPath {
 					Utils.warn("Cannot found repleacement for environment variable: %s\nsrc:%s",
 							env, src);
 				}
+				// TODO replace Linux user home, ~.
 			}
 		}
 		if (src.startsWith("\\$"))

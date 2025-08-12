@@ -4,3 +4,4 @@ main.net
 .classpath
 bin
 .settings
+decode-*.*
