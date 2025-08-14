@@ -59,6 +59,10 @@ public class EnvPath {
 		env2.put(k, v);
 		sysenv = env2;
 	}
+	
+	public static String getEnv(String k) {
+		return sysenv == null ? null : sysenv.get(k);
+	}
 
 	/**
 	 * Format a replaced string with the configured map of environment variables.
