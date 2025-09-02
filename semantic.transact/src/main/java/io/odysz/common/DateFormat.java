@@ -6,10 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Date formatting and parsing helper.
+ * All format() are using default time zone.
  * @author ody
  */
 public class DateFormat {
@@ -39,7 +41,23 @@ public class DateFormat {
 	static public String formatYY_mm(FileTime d) { return d == null ? " - - " : yy_MM.format(new Date(d.toMillis())); }
 	static public String formatYYmm(FileTime d) { return d == null ? " - - " : yyMM.format(new Date(d.toMillis())); }
 
+	/**
+	 * @deprecated replaced by {@link #formatime(String, Date)} 	
+	 * @param d
+	 * @return
+	 */
 	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
+	
+	/**
+	 * IMPORTANT This method will change the static data formatter's time zone.
+	 * @param timezone, e.g. 'UTC'
+	 * @param d
+	 * @return date-time string in timezone
+	 */
+	static public String formatime(String timezone, Date d) {
+		sdflong_mysql.setTimeZone(TimeZone.getTimeZone(timezone));
+		return sdflong_mysql.format(d);
+	}
 
 	/**
 	 * @param d
