@@ -637,7 +637,7 @@ public class Funcall extends ExprPart {
 		else if (dt == dbtype.oracle)
 			return "sysdate";
 		else {
-			String s = DateFormat.formatime(new Date());
+			String s = DateFormat.formatime_utc(new Date());
 			Utils.warn("Formating now() for unknown db type: %s as %s", dt.name(), s);
 			return "'" + s + "'";
 		}

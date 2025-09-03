@@ -29,24 +29,24 @@ public class DateFormat {
 	 * @param d
 	 * @return formatted string
 	 */
-	static public String format(Date d) { return d == null ? " - - " : sdf.format(d); }
+	public static String format(Date d) { return d == null ? " - - " : sdf.format(d); }
 
 	/**
 	 * @param d
 	 * @return yyyy_MM
 	 */
-	static public String formatYY_mm(Date d) { return d == null ? " - - " : yy_MM.format(d); }
-	static public String formatYYmm(Date d) { return d == null ? " - - " : yyMM.format(d); }
+	public static String formatYY_mm(Date d) { return d == null ? " - - " : yy_MM.format(d); }
+	public static String formatYYmm(Date d) { return d == null ? " - - " : yyMM.format(d); }
 
-	static public String formatYY_mm(FileTime d) { return d == null ? " - - " : yy_MM.format(new Date(d.toMillis())); }
-	static public String formatYYmm(FileTime d) { return d == null ? " - - " : yyMM.format(new Date(d.toMillis())); }
+	public static String formatYY_mm(FileTime d) { return d == null ? " - - " : yy_MM.format(new Date(d.toMillis())); }
+	public static String formatYYmm(FileTime d) { return d == null ? " - - " : yyMM.format(new Date(d.toMillis())); }
 
 	/**
 	 * @deprecated replaced by {@link #formatime(String, Date)} 	
 	 * @param d
 	 * @return
 	 */
-	static public String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
+	public static String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
 	
 	/**
 	 * IMPORTANT This method will change the static data formatter's time zone.
@@ -54,16 +54,22 @@ public class DateFormat {
 	 * @param d
 	 * @return date-time string in timezone
 	 */
-	static public String formatime(String timezone, Date d) {
+	public static String formatime(String timezone, Date d) {
 		sdflong_mysql.setTimeZone(TimeZone.getTimeZone(timezone));
 		return sdflong_mysql.format(d);
+	}
+
+	public static String formatime_default(Date d) {
+		return formatime(TimeZone.getDefault().getID(), d);
 	}
 
 	/**
 	 * @param d
 	 * @return yyyy-MM-dd HH:mm:ss, see {@link #sdflong_mysql}
 	 */
-	static public String formatime(FileTime d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(new Date(d.toMillis())); }
+	public static String formatime(FileTime d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(new Date(d.toMillis())); }
+
+	public static String formatime_utc(Date date) { return formatime("UTC", date); }
 
 	/**yyyy-MM-dd
 	 * @param text
