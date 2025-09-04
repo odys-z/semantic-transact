@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
  * @author ody
  */
 public class DateFormat {
+	public static String jour0 = "1911-10-10";
+	
 	/**yyyy-MM-dd or %Y-%M-%e*/
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -132,6 +134,27 @@ public class DateFormat {
 			return -1;
 		long diff = d2.getTime() - d1.getTime();
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+	}
+	
+	/**
+	 * Is pre early than nxt ?
+	 * @param pre
+	 * @param nxt
+	 * @return pre is early
+	 * @throws ParseException
+	 */
+	public static boolean early(String pre, String nxt) throws ParseException {
+		nxt = LangExt.ifnull(nxt, jour0);
+		Date mercredi = null;
+		try { mercredi = DateFormat.parseDateTime(nxt); }
+		catch (ParseException e) { mercredi = DateFormat.parse(nxt); }
+
+		Date vendredi = null;
+		pre = LangExt.ifnull(pre, jour0);
+		try { vendredi = DateFormat.parseDateTime(pre); }
+		catch (ParseException e) { vendredi = DateFormat.parse(pre); }
+
+		return mercredi.after(vendredi);
 	}
 
 	public static String getTimeStampYMDHms(dbtype drvType) {
