@@ -273,6 +273,12 @@ public class Insert extends Statement<Insert> {
 		return this;
 	}
 
+	/**
+	 * 
+	 * @param arrayList rows of array or n-v pairs, [[n, v], ...].
+	 * @return this
+	 * @throws TransException
+	 */
 	@SuppressWarnings("unchecked")
 	public Insert values(ArrayList<ArrayList<Object[]>> arrayList) throws TransException {
 		if (arrayList != null)
