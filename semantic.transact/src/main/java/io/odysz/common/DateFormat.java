@@ -163,4 +163,11 @@ public class DateFormat {
 			return sdflong_sqlite.format(now);
 		return sdflong_mysql.format(now);
 	}
+
+	/**
+	 * @return current time in UTC
+	 */
+	public static String now() {
+		return DateFormat.formatime_utc(new Date());
+	}
 }
