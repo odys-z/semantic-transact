@@ -326,7 +326,15 @@ public class Funcall extends ExprPart {
 	
 	@Override
 	public String sql(ISemantext context) throws TransException {
+		// 2025-09-19
+		// This previous comments is not understandable.
 		// function parameters are handled before this AST node handling, making ExprPart's sql available.
+		// Test case will fail:
+		// select().where(op.ge, Funcall.toDate(Funcall.isnull(synm.jserv_utc, Funcall.toDate(DateFormat.jour0))), Funcall.toDate(ifnull(utc, DateFormat.jour0)))
+		// The alway of call args preparations is not correct. The final sql is:
+		// select ... where datetime('ifnull(optime, datetime('1911-10-10'))') >= datetime('1911-10-10')
+		// Should iterate the AST while serializing the statement.
+
 		String args[] = argsql(this.args, context);
 
 		if (func == Func.now)
