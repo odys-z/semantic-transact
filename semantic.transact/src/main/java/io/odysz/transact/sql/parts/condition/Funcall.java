@@ -331,7 +331,7 @@ public class Funcall extends ExprPart {
 		// function parameters are handled before this AST node handling, making ExprPart's sql available.
 		// Test case will fail:
 		// select().where(op.ge, Funcall.toDate(Funcall.isnull(synm.jserv_utc, Funcall.toDate(DateFormat.jour0))), Funcall.toDate(ifnull(utc, DateFormat.jour0)))
-		// The alway of call args preparations is not correct. The final sql is:
+		// The way of call args preparations is not correct. The final sql is:
 		// select ... where datetime('ifnull(optime, datetime('1911-10-10'))') >= datetime('1911-10-10')
 		// Should iterate the AST while serializing the statement.
 
