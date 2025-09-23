@@ -1,7 +1,6 @@
 package io.odysz.transact.sql.parts;
 
 import static io.odysz.common.LangExt.eq;
-import static io.odysz.common.LangExt.f;
 import static io.odysz.common.FilenameUtils.concat;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -57,13 +56,10 @@ public class ExtFilePaths {
 	}
 	
 	public ExtFilePaths(String volume, ExprPart resulv_const_path, ISemantext ctx, String filename) throws TransException {
-		this.volume = volume;
-		this.fileId = resulv_const_path.sql(ctx);
-		this.filename = filename;
-	}
-
-	private ExtFilePaths(String volume, String nameId, Random random, String filename) {
-		this(volume, nameId, f("%s %s", Radix32.toString(random.nextInt(), 4), filename));
+//		this.volume = volume;
+//		this.fileId = resulv_const_path.sql(ctx);
+//		this.filename = filename;
+		this(volume, resulv_const_path.sql(ctx), filename);
 	}
 
 	ExtFilePaths subpath(String[] subs, Map<String, Integer> cols, ArrayList<Object[]> row) throws TransException {

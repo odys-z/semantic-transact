@@ -56,7 +56,6 @@ public class ExtFileUpdatev2 extends ExprPart {
 		if (oldUri == null) throw new TransException("No uri (file) to move. Called oldUri() ?");
 		
 		String absoluteFn = decodeUriPath();
-		// String absoluteOld = ExtFilePaths.decodeUri(ctx.containerRoot(), oldUri);
 		String absoluteOld = ExtFilePaths.decodeUriPath(oldUri);
 
 		if (absoluteOld.equals(absoluteFn))
@@ -64,7 +63,6 @@ public class ExtFileUpdatev2 extends ExprPart {
 
 		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 		
-//		Path f = Paths.get(absoluteFn);
 		Path f = null;
 		Path old = Paths.get(absoluteOld);
 
@@ -72,8 +70,6 @@ public class ExtFileUpdatev2 extends ExprPart {
 			throw new TransException("Uri (file) doesn't exits - committing sql or updating mulitple times?");
 
 		try {
-			// FIXME shouldn't call this before creating 'f'?
-			// System.err.println("FIXME shouldn't call this before creating 'f'?");
 			absoluteFn = extpaths.avoidConflict(absoluteFn);
 			f = Paths.get(absoluteFn);
 

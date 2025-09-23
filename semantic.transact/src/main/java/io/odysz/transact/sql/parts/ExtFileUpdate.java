@@ -38,7 +38,6 @@ public class ExtFileUpdate extends ExprPart {
 	 * @param stx instance of run time context
 	 */
 	public ExtFileUpdate(String recId, String configRoot, ISemantext stx) {
-		// this.resulv_const_path = resulvingPath;
 		this.nameId = recId;
 		this.configRoot = configRoot;
 		this.runtimePath = stx.containerRoot();
