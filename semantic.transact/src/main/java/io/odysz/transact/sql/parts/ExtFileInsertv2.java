@@ -37,17 +37,6 @@ public class ExtFileInsertv2 extends AbsPart {
 	private String b64;
 
 	/**
-	 * @param resulvingId e.g. docId Resulve.
-	 * @param volume e. g. args[0] in semantics.xml, $VOLUME_HOME
-	 * @param ctx 
-	 * @param runtimeRoot typically the return of {@link ISemantext#containerRoot()}
-	 * @throws TransException 
-	public ExtFileInsertv2(String volume, ExprPart resulvingId, ISemantext ctx) throws TransException {
-		this.extpaths = new ExtFilePaths(volume, resulvingId.sql(ctx), null);
-	}
-	 */
-
-	/**
 	 * Create an exteranl file representation by setting the root path.
 	 * This path is used to access file together with the relative path set
 	 * by {@link ExtFileInsert#prefixPath(String, String...)}.<br>
@@ -68,7 +57,7 @@ public class ExtFileInsertv2 extends AbsPart {
 	/**
 	 * set b64 string value, for write to file.
 	 * 
-	 * FIXME Performance problem: stream mode is needed
+	 * ISSUE Performance problem: a stream mode is needed
 	 * 
 	 * @param b64
 	 * @return

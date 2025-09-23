@@ -29,8 +29,14 @@ import io.odysz.transact.x.TransException;
 public class ExtFilePaths {
 
 	String volume;
+
 	/** The entire sub-path in $VOLUME/sub.../.../PID resname.typ */ 
 	String prefix;
+	/**
+	 * Change the file's sub-paths.
+	 * This should only happens when handling doc-refs from different synodes.
+	 * <p>NOTE: The one for db version is {@link #subpath(String[], Map, ArrayList)}.</p>
+	 */
 	public ExtFilePaths prefix(String docref_uri) {
 		this.prefix = docref_uri;
 		return this;
@@ -39,24 +45,6 @@ public class ExtFilePaths {
 	final String fileId;
 
 	String filename;
-
-	/**
-	 * This is used for bridge the discrepancy between WEB-INF and container root path,
-	 * which is used to decode volume root.
-	 * 
-	 * <p>Details: The volume path is now configured in WEB-INF/setting.json, 
-	 * of which the relative path can be more readable to human if it is starting there.
-	 * But this makes resolve the path incorrect if from runtime root, which is know
-	 * to the system.</p>
-	protected static String config_root;
-	 */
-	/**
-	 * @param webinf relative path from runtime root to WEB-INF, or the configuring folder.
-	public static void init(String webinf) {
-		config_root = webinf;
-	}
-	 */
-
 	public ExtFilePaths filename(String f) {
 		this.filename = f;
 		return this;
@@ -74,11 +62,11 @@ public class ExtFilePaths {
 		this.filename = filename;
 	}
 
-	public ExtFilePaths(String volume, String nameId, Random random, String filename) {
+	private ExtFilePaths(String volume, String nameId, Random random, String filename) {
 		this(volume, nameId, f("%s %s", Radix32.toString(random.nextInt(), 4), filename));
 	}
 
-	public ExtFilePaths subpath(String[] subs, Map<String, Integer> cols, ArrayList<Object[]> row) throws TransException {
+	ExtFilePaths subpath(String[] subs, Map<String, Integer> cols, ArrayList<Object[]> row) throws TransException {
 		for (String subname : subs) {
 			if (!cols.containsKey(subname)) 
 				throw new TransException("To insert (create file), all required fields must be provided by user (missing %s).\nConfigured fields: %s.\nGot cols: %s",
@@ -107,17 +95,17 @@ public class ExtFilePaths {
 		return escapeSep ? relatvFn.replaceAll("\\\\", "/") : relatvFn;
 	}
 
-	public static String encodeUri(String volume, String prefix, String id4name, String filename) {
+	static String encodeUri(String volume, String prefix, String id4name, String filename) {
 		if (!LangExt.isblank(filename, "\\.", "\\*"))
 			id4name += " " + filename;
 		return concat(volume, prefix, id4name);
 	}
 	
-	protected static String decodeUri(String runtimePath, String dbUri) {
+	static String decodeUri(String runtimePath, String dbUri) {
 		return EnvPath.decodeUri(runtimePath, dbUri);
 	}
 
-	public String avoidConflict(String absoluteFn) {
+	String avoidConflict(String absoluteFn) {
 		String fn = this.filename;
 		Path f = Paths.get(this.decodeUriPath());
 		while (Files.exists(f, LinkOption.NOFOLLOW_LINKS)) {

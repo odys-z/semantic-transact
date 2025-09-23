@@ -71,6 +71,8 @@ public class ExtFileUpdatev2 extends ExprPart {
 			throw new TransException("Uri (file) doesn't exits - committing sql or updating mulitple times?");
 
 		try {
+			// FIXME shouldn't call this before creating 'f'?
+			System.err.println("FIXME shouldn't call this before creating 'f'?");
 			absoluteFn = extpaths.avoidConflict(absoluteFn);
 
 			DocLocks.writing(f);
