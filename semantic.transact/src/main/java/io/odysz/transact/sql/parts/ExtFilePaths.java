@@ -56,9 +56,6 @@ public class ExtFilePaths {
 	}
 	
 	public ExtFilePaths(String volume, ExprPart resulv_const_path, ISemantext ctx, String filename) throws TransException {
-//		this.volume = volume;
-//		this.fileId = resulv_const_path.sql(ctx);
-//		this.filename = filename;
 		this(volume, resulv_const_path.sql(ctx), filename);
 	}
 
