@@ -64,7 +64,8 @@ public class ExtFileUpdatev2 extends ExprPart {
 
 		Utils.touchDir(FilenameUtils.getFullPath(absoluteFn));
 		
-		Path f = Paths.get(absoluteFn);
+//		Path f = Paths.get(absoluteFn);
+		Path f = null;
 		Path old = Paths.get(absoluteOld);
 
 		if (!Files.exists(old))
@@ -72,8 +73,9 @@ public class ExtFileUpdatev2 extends ExprPart {
 
 		try {
 			// FIXME shouldn't call this before creating 'f'?
-			System.err.println("FIXME shouldn't call this before creating 'f'?");
+			// System.err.println("FIXME shouldn't call this before creating 'f'?");
 			absoluteFn = extpaths.avoidConflict(absoluteFn);
+			f = Paths.get(absoluteFn);
 
 			DocLocks.writing(f);
 			Files.move(old, f, StandardCopyOption.ATOMIC_MOVE);
@@ -86,7 +88,7 @@ public class ExtFileUpdatev2 extends ExprPart {
 			e.printStackTrace();
 			return "''";
 		}
-		finally { DocLocks.writen(f); }
+		finally { if (f != null) DocLocks.writen(f); }
 	}
 
 	/**
