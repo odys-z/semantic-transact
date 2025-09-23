@@ -1,6 +1,7 @@
 package io.odysz.transact.sql.parts;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.FilenameUtils.concat;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -13,8 +14,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.odysz.common.EnvPath;
+import io.odysz.common.FilenameUtils;
 import io.odysz.common.LangExt;
 import io.odysz.common.Radix32;
+import io.odysz.common.Regex;
 import io.odysz.semantics.ISemantext;
 import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.parts.condition.ExprPart;
@@ -110,5 +113,12 @@ public class ExtFilePaths {
 			f = Paths.get(this.decodeUriPath());
 		}
 		return f.toAbsolutePath().toString();
+	}
+
+	// TODO Refactor Move to ExtFilePaths 
+	public static String relativeFolder(String uri64, String abs) {
+		return isblank(uri64) ? uri64
+				: FilenameUtils.getPathNoEndSeparator(
+				  Regex.removeVolumePrefix(uri64, abs));
 	}
 }
