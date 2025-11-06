@@ -389,7 +389,7 @@ public class AESHelper {
 	 * @throws GeneralSecurityException
 	 * @throws IOException
 	 * @since 1.4.37
-	 * @see AESHelperTest#testSessionToken()
+	 * see AESHelperTest#testSessionToken()
 	 */
 	public static String[] packSessionKey(String key) 
 			throws GeneralSecurityException, IOException {
@@ -431,7 +431,7 @@ public class AESHelper {
 	}
 
 	/**
-	 * Android evquivalent of {@link #encodeRange(Path, FileInputStream, long, long)}.
+	 * Android evquivalent of {@link #stream(Path, FileInputStream, long, OutputStream, long, long)}
 	 * @param filepath
 	 * @param file
 	 * @param filesize

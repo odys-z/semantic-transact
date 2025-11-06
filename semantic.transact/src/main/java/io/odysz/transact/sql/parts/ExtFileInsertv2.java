@@ -108,9 +108,8 @@ public class ExtFileInsertv2 extends AbsPart {
 	}
 	
 	/**
-	 * 
 	 * @param ctx
-	 * @return concat({@link #runtimePath} / {@link #volume} / {@link #prefix} / {@link #resulv_const_path}-{@link #filename}).replace-env()
+	 * @return {@link #extpaths}.decodeUriPath()
 	 * @throws TransException
 	 */
 	public String absolutePath(ISemantext ctx) throws TransException {

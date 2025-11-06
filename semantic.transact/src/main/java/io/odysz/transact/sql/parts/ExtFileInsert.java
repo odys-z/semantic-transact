@@ -62,7 +62,7 @@ public class ExtFileInsert extends AbsPart {
 	 * such as the return of <a href='https://docs.oracle.com/javaee/6/api/javax/servlet/ServletContext.html'>
 	 * javax.servlet.ServletContext#getRealPath(String)</a>.<br>
 	 * 
-	 * @param file id to be resolved as prefix of filename
+	 * @param fn id to be resolved as prefix of filename
 	 * @param configRoot e. g. args[0] in semantics.xml, $VOLUME_HOME
 	 * @param stx instance of run time context
 	 */
