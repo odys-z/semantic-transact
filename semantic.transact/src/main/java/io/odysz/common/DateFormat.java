@@ -27,6 +27,9 @@ public class DateFormat {
 	public static SimpleDateFormat sdflong_sqlite = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.0");
 	/**yyyy-MM-dd-hhmmss or %Y-%M-%e ...*/
 	public static SimpleDateFormat sdflong_mysql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	/** yyyy-MM-dd HH.mm.ss, for widows file name */
+	public static SimpleDateFormat sdflong_winfile = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
 	/**yyyy-MM-dd
 	 * @param d
 	 * @return formatted string
