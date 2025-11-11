@@ -136,16 +136,6 @@ public class EnvPath {
 	}
 
 	/**
-	 * @deprecated This must be removed immediately
-	 * @param stx
-	 * @param uri
-	 * @return
-	public static String decodeUri(ISemantext stx, String uri) {
-		return decodeUri(stx.containerRoot(), uri);
-	}
-	 */
-
-	/**
 	 * Replace env token in {@code root} and concat the path.
 	 * 
 	 * @param root

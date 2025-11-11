@@ -27,6 +27,8 @@ import io.odysz.transact.x.TransException;
  * Ext-file's paths pair, for handling volume path mapping.
  * 
  * @since 1.5.60
+ * 
+ * @since 1.5.76 This class should never access database, and only explain the rules.
  */
 public class ExtFilePaths {
 
