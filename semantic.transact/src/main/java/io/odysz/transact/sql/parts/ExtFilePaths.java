@@ -99,7 +99,7 @@ public class ExtFilePaths {
 		return concat(volume, prefix, id4name);
 	}
 	
-	static String decodeUri(String runtimePath, String dbUri) {
+	public static String decodeUri(String runtimePath, String dbUri) {
 		return EnvPath.decodeUri(runtimePath, dbUri);
 	}
 
