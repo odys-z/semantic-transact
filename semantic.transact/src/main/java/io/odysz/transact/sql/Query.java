@@ -70,7 +70,7 @@ query_specification
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
       (GROUP BY (ALL)? group_by_item (',' group_by_item)*)?
 
-      // TODO 'having' is useful, see
+      // 'having', see
       // see http://www.mysqltutorial.org/mysql-having.aspx
       // and https://docs.microsoft.com/en-us/sql/t-sql/queries/select-having-transact-sql?view=sql-server-2017
       // (HAVING having=search_condition)?
