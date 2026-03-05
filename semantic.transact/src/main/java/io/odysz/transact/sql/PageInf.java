@@ -87,6 +87,11 @@ public class PageInf extends Anson {
 	/**
 	 * Reshape 2D array of n-v pairs to string array for string.format().
 	 * 
+	 * <p>Notes 2026-03-05:</p>
+	 * Such functions shouldn't present if the client is auto-generated,
+	 * of which there cannot has double data structures for the same semantics,
+	 * i.e. {@link #mapCondts} and {@link #arrCondts}.
+	 * 
 	 * @return args array
 	 */
 	public String[] arrCondts2args() {
@@ -97,6 +102,11 @@ public class PageInf extends Anson {
 		return args.toArray(new String[0]);
 	}
 	
+	/**
+	 * @param argName
+	 * @return arg value
+	 * @see #arrCondts2args() Notes
+	 */
 	public String getArg(String argName) {
 		if (mapCondts != null && mapCondts.containsKey(argName))
 			return (String)mapCondts.get(argName);
