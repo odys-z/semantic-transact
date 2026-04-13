@@ -282,7 +282,7 @@ public interface ISemantext {
 	/**
 	 * Set the creating builder as basic builder.
 	 * A helper for switching semantics hander.
-	 * In 2.0.0, only builder used by semantics handler should return itself
+	 * In 1.5.0, only builder used by semantics handler should return itself
 	 * by implementing this.
 	 * 
 	 * @since 1.4.41
