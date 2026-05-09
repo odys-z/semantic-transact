@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
@@ -36,10 +37,12 @@ import org.apache.commons.crypto.utils.Utils;
 
 /**
  * Static helpers for encrypt/decipher string.
- * @deprecated 1.5.77, use AESHelper2 instead.
+ * 
+ * @since 1.5.77: Fix for utf-8 strings.
+ * 
  * @author ody
  */
-public class AESHelper {
+public class AESHelper2 {
     static Properties randomProperties = new Properties();
     /**
      * Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
@@ -47,7 +50,8 @@ public class AESHelper {
      * This makes trouble when negotiation with those API.
      * Solution: using no padding here, round the text to 16 or 32 ASCII bytes.
      */
-    static final String transform = "AES/CBC/NoPadding";
+    static final String transform = //"AES/CBC/NoPadding";
+    								"AES/CBC/PKCS5Padding";
     static CryptoCipher encipher;
 
     static ReentrantLock lock;
@@ -57,8 +61,6 @@ public class AESHelper {
     			CryptoRandomFactory.RandomProvider.JAVA.getClassName());
 
         Properties cipherProperties = new Properties();
-        // causing problem for different environment:
-        // cipherProperties.setProperty(CryptoCipherFactory.CLASSES_KEY, CipherProvider.JCE.getClassName());
     	try {
 			encipher = Utils.getCipherInstance(transform, cipherProperties);
 		} catch (IOException e) {
@@ -71,18 +73,19 @@ public class AESHelper {
     }
 
 	/**
-	 * @param args
+	 * @param args 0: " Героям слава!"
 	 */
 	public static void main(String[] args) {
-		byte[] iv = getRandom();
 		try {
-			System.out.println("iv:\t\t" + Base64.getEncoder().encodeToString(iv));
+			System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
+			byte[] iv = getRandom();
+			System.out.println("iv:\t" + Base64.getEncoder().encodeToString(iv));
 
 			String cipher = encrypt(args[0], "infochange", iv);
-			System.out.println("cipher:\t\t" + cipher);
+			System.out.println("cipher:\t" + cipher);
 
 			String plain = decrypt(cipher, "infochange", iv);
-			System.out.println("plain-text:\t" + plain);
+			System.out.println("plain:\t" + plain);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -115,15 +118,15 @@ public class AESHelper {
 	 */
 	public static String[] dencrypt(String cypher, String decryptK, String decryptIv,
 			String encryptK) throws GeneralSecurityException, IOException {
-		byte[] iv = AESHelper.decode64(decryptIv);
-		byte[] input = AESHelper.decode64(cypher);
-		byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // won't work for non ASCII
+		byte[] iv = AESHelper2.decode64(decryptIv);
+		byte[] input = AESHelper2.decode64(cypher);
+		byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // FIXME won't work for non ASCII
 		byte[] plain = decryptEx(input, dkb, iv);
 		byte[] eiv = getRandom();
-		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // won't work for non ASCII
+		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
 		byte[] output = encryptEx(plain, ekb, eiv);
         String b64 = Base64.getEncoder().encodeToString(output);
-        return new String[] {b64, AESHelper.encode64(eiv)};
+        return new String[] {b64, AESHelper2.encode64(eiv)};
 	}
 
 	/**
@@ -141,19 +144,20 @@ public class AESHelper {
 		if (!plain.trim().equals(plain))
 			throw new GeneralSecurityException("Plain text to be encrypted can not begin or end with space.");
 
-		key = pad16_32(key);
-		plain = pad16_32(plain);
 		
+		MessageDigest sha = MessageDigest.getInstance("SHA-256");
+		byte[] kb = sha.digest(key.getBytes(StandardCharsets.UTF_8));
 		byte[] input = getUTF8Bytes(plain);
-		byte[] kb = getUTF8Bytes(key);
 		byte[] output = encryptEx(input, kb, iv);
-        String b64 = Base64.getEncoder().encodeToString(output);
-        return b64;
+        return Base64.getEncoder().encodeToString(output);
 	}
 
 	/**
-	 * 10 Dec 2024:<br>
-	 * This line causes trouble in JDK 15, Open JDK x64 - fixed by adding a lock.
+	 * 09 May 2026, Слава Україні!
+	 * <p>Fix string other than ASCII will fail. </p>
+	 * 
+	 * 10 Dec 2024:
+	 * <p>Concurrency causes trouble in JDK 15, Open JDK x64 - fixed by adding a lock.</p>
 	 * 
 	 * @param input
 	 * @param key
@@ -161,23 +165,20 @@ public class AESHelper {
 	 * @return result bytes
 	 * @throws GeneralSecurityException
 	 * @throws IOException
+	 * @see <a href='https://commons.apache.org/proper/commons-crypto/userguide.html'>Apache Common Crpyto User guide</a>
+	 * and <a href='https://commons.apache.org/proper/commons-crypto/xref-test/org/apache/commons/crypto/examples/CipherByteArrayExample.html'>the example</a>
+	 * 
 	 */
 	static byte[] encryptEx(byte[] input, byte[] key, byte[]iv) throws GeneralSecurityException, IOException {
 		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
 		final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
-        //Initializes the cipher with ENCRYPT_MODE, key and iv.
         try {
-        	lock.lock(); // can't concurrently work in Open JDK 15 for x64 
+        	lock.lock();
 
 			encipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 
-			byte[] output = new byte[((input.length)/16 + 2) * 16];
-			// int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
-			// above code is incorrect (not working with PKCS#7 padding),
-			// check Apache Common Crypto User Guide:
-			// https://commons.apache.org/proper/commons-crypto/userguide.html
-			// Usage of Byte Array Encryption/Decryption, CipherByteArrayExample.java
+			byte[] output = new byte[input.length + 32];
 			int updateBytes = encipher.update(input, 0, input.length, output, 0);
 			int finalBytes  = encipher.doFinal(input, 0, 0, output, updateBytes);
 
@@ -195,8 +196,11 @@ public class AESHelper {
 	public static String decrypt(String cypher, String key, byte[] iv)
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
-		// ISSUE fixed in AESHelper2: should padding bytes, not string.
-		byte[] kb = getUTF8Bytes(pad16_32(key)); // won't work for non ASCII
+
+
+		MessageDigest sha = MessageDigest.getInstance("SHA-256");
+		byte[] kb = sha.digest(key.getBytes(StandardCharsets.UTF_8));
+
 		byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
         // return p.replace("-", "");
@@ -212,7 +216,7 @@ public class AESHelper {
         try {
         	lock.lock(); // can't concurrently work in Open JDK 15 for x64 
 			encipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
-			byte[] output = new byte[((input.length)/ 16 + 2) * 16];
+			byte[] output = new byte[input.length + 32];
 
 			int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 
@@ -264,7 +268,6 @@ public class AESHelper {
      * @return converted result
      */
     private static String setUTF8Bytes(byte[] input) {
-    	// return new String(input, StandardCharsets.US_ASCII);
     	return new String(input, StandardCharsets.UTF_8);
     }
 
@@ -287,11 +290,12 @@ public class AESHelper {
 
 		byte[] chunk = new byte[blockSize];
 
-		return encode63(chunk, ifs, 0, blockSize);
+		return encode64(chunk, ifs, 0, blockSize);
 	}
 
 	/**
-	 * @deprecated bug fixed by {@link #encode64(byte[], InputStream, int, int)}.
+	 * deprecated
+	 * bug fixed by {@link #encode64(byte[], InputStream, int, int)}.
 	 * Usage example: <pre>
 	 * byte[] buf = new byte[n * 3];
 	 * int index = 0;
@@ -310,7 +314,6 @@ public class AESHelper {
 	 * @return encoded string, length 0 if read nothing.
 	 * @throws IOException
 	 * @throws TransException buffer length is not multiple of 3.
-	 */
 	public static String encode63(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
 		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
 		Base64.Encoder encoder = Base64.getEncoder();
@@ -324,7 +327,26 @@ public class AESHelper {
 		else // (readLen < buf.length)
 			return encoder.encodeToString(Arrays.copyOf(buf, readLen));
 	}
+	 */
 
+	/**
+	 * Example: <pre>
+	 * byte[] buf = new byte[n * 3];
+	 * int index = 0;
+	 * while (index &lt; file_size) {
+	 * 	int readlen  = Math.min(buf.length, size - index);
+	 * 	String str64 = encode64(buf, ifs, index, readlen);
+	 * 	index += readlen;
+	 * 	// consumption of str64
+	 * 	...
+	 * }</pre>
+	 * @param buf
+	 * @param ifs
+	 * @param start
+	 * @param len
+	 * @return
+	 * @throws IOException
+	 */
 	public static String encode64(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
 		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
 		Base64.Encoder encoder = Base64.getEncoder();
@@ -396,10 +418,10 @@ public class AESHelper {
 	 */
 	public static String[] packSessionKey(String key) 
 			throws GeneralSecurityException, IOException {
-		byte[] iv = AESHelper.getRandom();
-		byte[] knows = AESHelper.getRandom();
-		String token = AESHelper.encode64(knows);
-		return new String[] {AESHelper.encrypt(token, key, iv) + ":" + AESHelper.encode64(iv), token};
+		byte[] iv = AESHelper2.getRandom();
+		byte[] knows = AESHelper2.getRandom();
+		String token = AESHelper2.encode64(knows);
+		return new String[] {AESHelper2.encrypt(token, key, iv) + ":" + AESHelper2.encode64(iv), token};
 	}
 	
 	// tested case: static int Block_Size = 1024 * 3;
