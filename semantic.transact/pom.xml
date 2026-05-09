@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
-  <version>1.5.76</version>
+  <version>1.5.77-SNAPSHOT</version>
   <name>semantic sql builder</name>
   <description>semantic sql builder</description>
   <url>http://github.com/odys-z/semantic-transact</url>
@@ -34,7 +34,7 @@
 	<dependency>
     	<groupId>org.apache.commons</groupId>
     	<artifactId>commons-crypto</artifactId>
-    	<version>1.0.0</version>
+    	<version>1.1.0</version>
 	</dependency>
 
     <dependency>
@@ -50,10 +50,10 @@
     </dependency>
 
     <dependency>
-  	<groupId>org.junit.jupiter</groupId>
-  	<artifactId>junit-jupiter-engine</artifactId>
-  	<version>5.7.1</version>
-  	<scope>test</scope>
+		<groupId>org.junit.jupiter</groupId>
+		<artifactId>junit-jupiter-engine</artifactId>
+		<version>5.7.1</version>
+		<scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -94,6 +94,31 @@
 			</systemPropertyVariables>
           	<argLine>-Dfile.encoding=UTF-8</argLine>
 		</configuration>
+	  </plugin>
+
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-assembly-plugin</artifactId>
+		<version>3.7.1</version>
+		<configuration>
+			<archive>
+				<manifest>
+					<mainClass>io.odysz.common.AESHelper2</mainClass>
+				</manifest>
+			</archive>
+			<descriptorRefs>
+				<descriptorRef>jar-with-dependencies</descriptorRef>
+			</descriptorRefs>
+		</configuration>
+		<executions>
+			<execution>
+				<id>make-assembly</id>
+				<phase>package</phase> 
+				<goals>
+					<goal>single</goal>
+				</goals>
+			</execution>
+		</executions>
 	  </plugin>
 
 	  <plugin>
