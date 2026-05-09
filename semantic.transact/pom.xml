@@ -122,6 +122,34 @@
 	  </plugin>
 
 	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-dependency-plugin</artifactId>
+		<version>3.6.1</version>
+		<executions>
+			<execution>
+				<id>copy-jar-to-anclient.cmake</id>
+				<phase>package</phase>
+				<goals>
+					<goal>copy</goal>
+				</goals>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<type>${project.packaging}</type>
+							<classifier>jar-with-dependencies</classifier> 
+							<destFileName>semantics.transact-${project.version}.jar</destFileName>
+						</artifactItem>
+					</artifactItems>
+					<outputDirectory>${basedir}/../../anson.cmake/tests/res</outputDirectory>
+				</configuration>
+			</execution>
+		</executions>
+	  </plugin>
+
+	  <plugin>
 		  <groupId>org.sonatype.central</groupId>
 		  <artifactId>central-publishing-maven-plugin</artifactId>
 		  <version>0.8.0</version>

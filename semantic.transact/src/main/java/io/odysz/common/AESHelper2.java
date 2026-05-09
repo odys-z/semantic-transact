@@ -2,7 +2,7 @@ package io.odysz.common;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
-
+import static io.odysz.common.Utils.logi;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -79,24 +79,59 @@ public class AESHelper2 {
         lock = new ReentrantLock();
     }
 
-	/**
-	 * @param args 0: "Героям слава!"
-	 */
-	public static void main(String[] args) {
-		try {
-			System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
+    public static void cliEncrypt(String keystr, String plain) {
+    	try {
+    		logi("encrypt\n=======");
+
+			logi("key:\t\t" + keystr);
 			
 			byte[] iv = getRandom();
-			System.out.println("iv:\t" + Base64.getEncoder().encodeToString(iv));
+			logi("iv:\t\t" + Base64.getEncoder().encodeToString(iv));
 
-			String cipher = encrypt(args[0], "Героям слава!", iv);
-			System.out.println("cipher:\t" + cipher);
+			String cipher = encrypt(plain, keystr, iv);
+			logi("cipher:\t\t" + cipher);
 
-			String plain = decrypt(cipher, "Героям слава!", iv);
-			System.out.println("plain:\t" + plain);
+			String decrypt = decrypt(cipher, keystr, iv);
+			logi("re-decrpyted:\t" + decrypt);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public static void cliDecrypt(String keystr, String iv, String cipher) {
+ 		try {
+    		logi("decrypt\n=======");
+			logi("key:\t\t" + keystr);
+			logi("iv:\t\t" + iv);
+
+			byte[] ivb = decode64(iv);
+
+			String plain = decrypt(cipher, keystr, ivb);
+			logi("plain:\t\t" + plain);
+
+			String encrypted = encrypt(plain, keystr, ivb);
+			logi("re-encrypted:\t%s", encrypted);
+			logi("origin cipher:\t%s", cipher);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+
+	/**
+	 * @param args 0: encrypt | decrypt
+	 * 		  args 1: key
+	 * 		  args 2: string-iv (decrypt) | plain (encrypt)
+	 * 		  args 3: cipher (decrypt only)
+	 * e.g. decrypt "iv(16 bytes base16)" "Героям слава!"
+	 */
+	public static void main(String[] args) {
+		if (args.length == 3 && eq(args[0], "encrypt"))
+			cliEncrypt(args[1], args[2]);
+		else if (args.length == 4 && eq(args[0], "decrypt")) 
+			cliDecrypt(args[1], args[2], args[3]);
+		else
+			logi("Usage:\nencrypt plain-key plain-text\ndecrypt plain-key iv plain-text");
 	}
 
 	/**
@@ -205,7 +240,6 @@ public class AESHelper2 {
 			throws GeneralSecurityException, IOException {
 		byte[] input = Base64.getDecoder().decode(cypher);
 
-
 		MessageDigest sha = MessageDigest.getInstance("SHA-256");
 		byte[] kb = sha.digest(key.getBytes(StandardCharsets.UTF_8));
 
@@ -259,7 +293,6 @@ public class AESHelper2 {
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
 
-
     /**
      * Converts String to UTF8 bytes
      *
@@ -267,7 +300,6 @@ public class AESHelper2 {
      * @return UTF8 bytes
      */
     private static byte[] getUTF8Bytes(String input) {
-        // return input.getBytes(StandardCharsets.US_ASCII);
         return input.getBytes(StandardCharsets.UTF_8);
     }
 
