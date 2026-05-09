@@ -80,7 +80,7 @@ public class AESHelper2 {
     }
 
 	/**
-	 * @param args 0: " Героям слава!"
+	 * @param args 0: "Героям слава!"
 	 */
 	public static void main(String[] args) {
 		try {
@@ -89,10 +89,10 @@ public class AESHelper2 {
 			byte[] iv = getRandom();
 			System.out.println("iv:\t" + Base64.getEncoder().encodeToString(iv));
 
-			String cipher = encrypt(args[0], "infochange", iv);
+			String cipher = encrypt(args[0], "Героям слава!", iv);
 			System.out.println("cipher:\t" + cipher);
 
-			String plain = decrypt(cipher, "infochange", iv);
+			String plain = decrypt(cipher, "Героям слава!", iv);
 			System.out.println("plain:\t" + plain);
 		} catch (Exception e) {
 			e.printStackTrace();
