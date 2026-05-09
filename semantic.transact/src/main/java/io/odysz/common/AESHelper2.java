@@ -40,6 +40,13 @@ import org.apache.commons.crypto.utils.Utils;
  * 
  * @since 1.5.77: Fix for utf-8 strings.
  * 
+ * @tip Windows now can set system using utf-8 code page.
+ * 
+ * Control Panel > Region.<br>
+ * Administrative tab.<br>
+ * Change system locale....<br>
+ * Check: "Beta: Use Unicode UTF-8 for worldwide language support".
+ * 
  * @author ody
  */
 public class AESHelper2 {
@@ -78,6 +85,7 @@ public class AESHelper2 {
 	public static void main(String[] args) {
 		try {
 			System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
+			
 			byte[] iv = getRandom();
 			System.out.println("iv:\t" + Base64.getEncoder().encodeToString(iv));
 
