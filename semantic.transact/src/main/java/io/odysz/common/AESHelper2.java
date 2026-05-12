@@ -3,6 +3,8 @@ package io.odysz.common;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.Utils.logi;
+import static io.odysz.common.Utils.warn;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,13 +85,13 @@ public class AESHelper2 {
     	try {
     		logi("encrypt\n=======");
 
-			logi("key:\t\t" + keystr);
+			logi("key:\t\t\t" + keystr);
 			
 			byte[] iv = getRandom();
-			logi("iv:\t\t" + Base64.getEncoder().encodeToString(iv));
+			logi("iv:\t\t\t\t" + Base64.getEncoder().encodeToString(iv));
 
 			String cipher = encrypt(plain, keystr, iv);
-			logi("cipher:\t\t" + cipher);
+			logi("cipher:\t\t\t" + cipher);
 
 			String decrypt = decrypt(cipher, keystr, iv);
 			logi("re-decrpyted:\t" + decrypt);
@@ -101,13 +103,13 @@ public class AESHelper2 {
     public static void cliDecrypt(String keystr, String iv, String cipher) {
  		try {
     		logi("decrypt\n=======");
-			logi("key:\t\t" + keystr);
-			logi("iv:\t\t" + iv);
+			logi("key:\t\t\t" + keystr);
+			logi("iv:\t\t\t\t" + iv);
 
 			byte[] ivb = decode64(iv);
 
 			String plain = decrypt(cipher, keystr, ivb);
-			logi("plain:\t\t" + plain);
+			logi("plain:\t\t\t" + plain);
 
 			String encrypted = encrypt(plain, keystr, ivb);
 			logi("re-encrypted:\t%s", encrypted);
@@ -116,6 +118,18 @@ public class AESHelper2 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    }
+
+    public static String cliEncode64(String path) throws IOException {
+    	Path p = java.nio.file.Paths.get(path);
+        byte[] bins = Files.readAllBytes(p);
+//        return Base64.getEncoder().encodeToString(bins);
+        return encode64(bins);
+    }
+
+    public static void cliDecode64(String base64, String path) throws IOException {
+    	Path p = java.nio.file.Paths.get(path);
+        Files.write(p, decode64(base64));
     }
 
 	/**
@@ -130,8 +144,24 @@ public class AESHelper2 {
 			cliEncrypt(args[1], args[2]);
 		else if (args.length == 4 && eq(args[0], "decrypt")) 
 			cliDecrypt(args[1], args[2], args[3]);
+		else if (args.length == 3 && eq(args[0], "decode64")) 
+			try {
+				cliDecode64(args[1], args[2]);
+			} catch (IOException e) {
+				logi(e.getMessage());
+			}
+		else if (args.length == 2 && eq(args[0], "encode64"))
+			try {
+				System.out.print(cliEncode64(args[1])); // don't use logi()
+			} catch (IOException e) {
+				warn("Error: %s", e.getMessage());
+			}
 		else
-			logi("Usage:\nencrypt plain-key plain-text\ndecrypt plain-key iv plain-text");
+			logi("Usage:\n"
+					+ "\tencrypt plain-key plain-text\n"
+					+ "\tdecrypt plain-key iv plain-text\n"
+					+ "\tdecode64 base64-string bin-file-path\n"
+					+ "\tencode64 bin-file-path");
 	}
 
 	/**
@@ -332,42 +362,6 @@ public class AESHelper2 {
 
 		return encode64(chunk, ifs, 0, blockSize);
 	}
-
-	/**
-	 * deprecated
-	 * bug fixed by {@link #encode64(byte[], InputStream, int, int)}.
-	 * Usage example: <pre>
-	 * byte[] buf = new byte[n * 3];
-	 * int index = 0;
-	 * while (index &lt; file_size) {
-	 * 	int readlen  = Math.min(buf.length, size - index);
-	 * 	String str64 = encode64(buf, ifs, index, readlen);
-	 * 	index += readlen;
-	 * 	// consumption of str64
-	 * 	...
-	 * }</pre>
-	 * 
-	 * @param buf
-	 * @param ifs file input stream
-	 * @param start
-	 * @param len
-	 * @return encoded string, length 0 if read nothing.
-	 * @throws IOException
-	 * @throws TransException buffer length is not multiple of 3.
-	public static String encode63(byte[] buf, final InputStream ifs, int start, int len) throws IOException {
-		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
-		Base64.Encoder encoder = Base64.getEncoder();
-
-		int readLen = in.read(buf);
-
-		if (readLen <= 0)
-			return null;
-		else if (readLen == buf.length)
-			return encoder.encodeToString(buf);
-		else // (readLen < buf.length)
-			return encoder.encodeToString(Arrays.copyOf(buf, readLen));
-	}
-	 */
 
 	/**
 	 * Example: <pre>

@@ -6,3 +6,4 @@ bin
 .settings
 decode-*.*
 comments*
+iv-bytes.bin
