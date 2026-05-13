@@ -40,7 +40,7 @@ public class PageInf extends Anson {
 	public long size;
 	public long total;
 	public ArrayList<String[]> arrCondts;
-	public HashMap<String, ?> mapCondts;
+	public HashMap<String, Object> mapCondts;
 	
 	public PageInf() {
 		this.arrCondts = new ArrayList<String[]>();
