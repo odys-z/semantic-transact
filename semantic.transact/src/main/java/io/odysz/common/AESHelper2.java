@@ -197,7 +197,8 @@ public class AESHelper2 {
 		byte[] dkb = getUTF8Bytes(decryptK); // FIXME won't work for non ASCII
 		byte[] plain = decryptEx(input, dkb, iv);
 		byte[] eiv = getRandom();
-		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
+//		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
+		byte[] ekb = getUTF8Bytes(encryptK); // FIXME won't work for non ASCII
 		byte[] output = encryptEx(plain, ekb, eiv);
         String b64 = Base64.getEncoder().encodeToString(output);
         return new String[] {b64, AESHelper2.encode64(eiv)};
