@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.xml.sax.SAXException;
 
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 import io.odysz.transact.x.TransException;
 
@@ -461,7 +461,7 @@ public class Semantics2 {
 	 */
 	public String[] dencrypt(String pB64, String ivB64) throws SQLException {
 		try {
-			return AESHelper.dencrypt(pB64, decryptK, ivB64, encryptK);
+			return AESHelper2.dencrypt(pB64, decryptK, ivB64, encryptK);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new SQLException (e.getMessage()); 

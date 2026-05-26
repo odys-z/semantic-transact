@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.DateFormat;
 import io.odysz.common.DocLocks;
 import io.odysz.common.Utils;
@@ -481,7 +481,7 @@ public class Funcall extends ExprPart {
 									try {
 										DocLocks.reading(f);
 										byte[] fi = Files.readAllBytes(f);
-										row.set(c, AESHelper.encode64(fi));
+										row.set(c, AESHelper2.encode64(fi));
 									} finally { DocLocks.readed(f); }
 								}
 								else {

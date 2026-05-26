@@ -1,12 +1,13 @@
 package io.odysz.common;
 
 
-import static io.odysz.common.AESHelper.*;
+import static io.odysz.common.AESHelper2.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,8 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Base64;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.transact.x.TransException;
@@ -56,14 +59,19 @@ public class AESHelperTest {
 	 * @throws IOException
 	 * @throws GeneralSecurityException
 	 *
+	 * @ISSUE
+	 * TODO
+	 * TODO
+	 * TODO must enabled after typescript peer is brought up with PCKS5 Padding
 	 */
+	@Disabled
 	@Test
 	public void testDecrypt() throws GeneralSecurityException, IOException {
 		String cipher = "4VGdDR9qJlq36bQGI+Sx3A==";
 		String key = "io.github.odys-z";
 		String iv = "DITVJZA2mSDAw496hBz6BA==";
-		String plain = AESHelper.decrypt(cipher, key,
-							AESHelper.decode64(iv));
+		String plain = decrypt(cipher, key,
+							decode64(iv));
 		assertEquals("Plain Text", plain.trim());
 
 		plain = "-----------admin";
@@ -71,11 +79,11 @@ public class AESHelperTest {
 		iv = "ZqlZsmoC3SNd2YeTTCkbVw==";
 		// PCKS7 Padding results not suitable for here - AES-128/CBC/NoPadding
 		assertNotEquals("3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM=",
-				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
+				encrypt(plain, key, decode64(iv)));
 		
 		iv = "CTpAnB/jSRQTvelFwmJnlA==";
 		assertEquals("WQiXlFCt5AGCabjSCkVh0Q==",
-				AESHelper.encrypt(plain, key, AESHelper.decode64(iv)));
+				encrypt(plain, key, decode64(iv)));
 	}
 
 	@Test
@@ -85,10 +93,10 @@ public class AESHelperTest {
 		String iv = "CTpAnB/jSRQTvelFwmJnlA==";
 
 		// PCKS7 Padding results not suitable for here - AES-128/CBC/NoPadding
-		String cipher = AESHelper.encrypt(plain, key, AESHelper.decode64(iv));
+		String cipher = encrypt(plain, key, decode64(iv));
 		assertNotEquals("3A0hfZiaozpwMeYs3nXdAb8mGtVc1KyGTyad7GZI8oM=", cipher);
 		
-		String decipher = AESHelper.decrypt(cipher, key, AESHelper.decode64(iv));
+		String decipher = decrypt(cipher, key, decode64(iv));
 		assertEquals(plain, decipher);
 	}
 	
@@ -125,8 +133,7 @@ public class AESHelperTest {
 		int index = 0;
 		while (index < size) {
 			int readlen  = Math.min(buf.length, size - index);
-			@SuppressWarnings("deprecation")
-			String str64 = encode63(buf, ifs, index, readlen);
+			String str64 = encode64(buf, ifs, index, readlen);
 			b.append(str64);
 			index += readlen;
 		}
@@ -134,7 +141,7 @@ public class AESHelperTest {
 		
 		return b.toString();
 	}
-	
+
 	@Test
 	public void testByteArrayOutputStream () throws IOException {
 		int blocksize = 3 * 16;
@@ -183,7 +190,7 @@ public class AESHelperTest {
 			assertEquals(s219b64, s);
 		}
 		
-		AESHelper.Block_Size = 32;
+		AESHelper2.Block_Size = 32;
 		
 		File f219 = new File(fn);
 		String
@@ -219,13 +226,13 @@ public class AESHelperTest {
 	@Test
 	public void testSessionToken() throws Exception {
 		String uid = "ody", pswd = "io.github.odys-z";
-		String[] response = AESHelper.packSessionKey(pswd);
+		String[] response = packSessionKey(pswd);
 		String knowledge = response[1];
 		assertEquals(24, knowledge.length());
 		assertEquals(69, response[0].length()); // 44 + 1 + 24
 		
-		String request = AESHelper.repackSessionToken((String) response[0], pswd, uid);
+		String request = repackSessionToken((String) response[0], pswd, uid);
 		
-		assertTrue(AESHelper.verifyToken(request, knowledge, uid, pswd));
+		assertTrue(verifyToken(request, knowledge, uid, pswd));
 	}
 }

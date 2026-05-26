@@ -10,6 +10,6 @@ public class CheapIO {
 	public static String readB64(String filename) throws IOException {
 		Path p = Paths.get(filename);
 		byte[] f = Files.readAllBytes(p);
-		return AESHelper.encode64(f);
+		return AESHelper2.encode64(f);
 	}
 }

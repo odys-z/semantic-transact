@@ -193,7 +193,8 @@ public class AESHelper2 {
 			String encryptK) throws GeneralSecurityException, IOException {
 		byte[] iv = AESHelper2.decode64(decryptIv);
 		byte[] input = AESHelper2.decode64(cypher);
-		byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // FIXME won't work for non ASCII
+		// byte[] dkb = getUTF8Bytes(pad16_32(decryptK)); // FIXME won't work for non ASCII
+		byte[] dkb = getUTF8Bytes(decryptK); // FIXME won't work for non ASCII
 		byte[] plain = decryptEx(input, dkb, iv);
 		byte[] eiv = getRandom();
 		byte[] ekb = getUTF8Bytes(pad16_32(encryptK)); // FIXME won't work for non ASCII
@@ -275,8 +276,8 @@ public class AESHelper2 {
 
 		byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
-        // return p.replace("-", "");
-        return depad16_32(p);
+        // return depad16_32(p);
+        return p;
 	}
 
 	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv)
@@ -303,7 +304,7 @@ public class AESHelper2 {
 	 * @return 16 / 32 byte string
 	 * @throws GeneralSecurityException
 	 */
-	public static String pad16_32(String s) throws GeneralSecurityException {
+	private static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
 			return String.format("%1$16s", s).replaceAll(" ", "-");
@@ -385,7 +386,8 @@ public class AESHelper2 {
 		BufferedInputStream in = new BufferedInputStream(ifs, buf.length);
 		Base64.Encoder encoder = Base64.getEncoder();
 
-		int readLen = in.read(buf, start, len);
+		// int readLen = in.read(buf, start, len);
+		int readLen = in.read(buf);
 
 		if (readLen <= 0)
 			return null;
@@ -409,7 +411,8 @@ public class AESHelper2 {
 	public static boolean verifyToken(String requestoken, String myKnowledge, String uid, String key)
 			throws Exception {
 		String[] sstoken = requestoken.split(":");
-		String enciphered = encrypt(pad16_32(uid + ":" + myKnowledge), key, decode64(sstoken[1]));
+		// String enciphered = encrypt(pad16_32(uid + ":" + myKnowledge), key, decode64(sstoken[1]));
+		String enciphered = encrypt(uid + ":" + myKnowledge, key, decode64(sstoken[1]));
 		return eq(enciphered, sstoken[0]);
 	}
 
@@ -437,10 +440,10 @@ public class AESHelper2 {
 
 	/**
 	 * <pre>
-	 * iv = random(16)
-	 * token = encrypt(random, key, iv), len(random) = 24
-	 * return [token : iv, token]
-	 * where len(token) = [(24 + 15) / 16] * 16 * [4/3] = 32 * [4/3] = 44
+	 * iv, knows = random(16)
+	 * token = encrypt(knows, key, iv), PKCS5 Padding
+	 * return [token : iv, knows.64]
+	 * where len(token:iv) = 64, len(knows.64) = 24
 	 * </pre>
 	 * 
 	 * @param key

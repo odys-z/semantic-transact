@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.anson.Anson;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.EnvPath;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.x.TransException;
@@ -183,7 +183,7 @@ public interface IUser {
 	 * @throws Exception 
 	 */
 	public default SessionInf getClientSessionInf(IUser usr) throws Exception { 
-		Object[] session = AESHelper.packSessionKey(usr.pswd());
+		Object[] session = AESHelper2.packSessionKey(usr.pswd());
 		usr.sessionKey((String) session[1]);
 
 		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())

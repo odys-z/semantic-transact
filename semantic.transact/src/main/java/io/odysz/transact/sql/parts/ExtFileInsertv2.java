@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.DocLocks;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
@@ -85,7 +85,7 @@ public class ExtFileInsertv2 extends AbsPart {
 		Path f = Paths.get(absoluteFn);
 		byte[] b;
 		try {
-			b = AESHelper.decode64(b64); // Performance problem: stream mode is needed
+			b = AESHelper2.decode64(b64); // Performance problem: stream mode is needed
 		} catch (Exception e) {
 			b = b64.getBytes();
 			Utils.warnT(new Object() {},
