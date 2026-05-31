@@ -305,6 +305,7 @@ public class AESHelper2 {
 	 * @return 16 / 32 byte string
 	 * @throws GeneralSecurityException
 	 */
+	@SuppressWarnings("unused")
 	private static String pad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)
@@ -315,6 +316,7 @@ public class AESHelper2 {
 			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
 	}
 
+	@SuppressWarnings("unused")
 	private static String depad16_32(String s) throws GeneralSecurityException {
 		int l = s.length();
 		if (l <= 16)

@@ -232,5 +232,13 @@ public class AESHelperTest {
 		String request = repackSessionToken((String) response[0], pswd, uid);
 		
 		assertTrue(verifyToken(request, knowledge, uid, pswd));
+		
+		// 2026-05-29 ssToke response to Alient.cmake.
+		String ssToken_by_serv = "9ewQrDgVif1TRw58GxlIE7WXd8gxSx/wGefA32081uA=:P8Lz+vcOn5f6vskPWs4mXA==";
+		String[] ss = ssToken_by_serv.split(":");
+		String plain = decrypt(ss[0], "123456", decode64(ss[1])); // knowledge
+
+		request = repackSessionToken(ssToken_by_serv, "123456", "ody");
+		assertTrue(verifyToken(request, plain, "ody", "123456"));
 	}
 }
