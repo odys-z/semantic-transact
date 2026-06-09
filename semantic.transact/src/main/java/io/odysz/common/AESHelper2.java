@@ -466,6 +466,7 @@ public class AESHelper2 {
 	
 	// tested case: static int Block_Size = 1024 * 3;
 	static int Block_Size = 3 * 1024 * 1024;
+	/** default 3 MiB */
 	public static int blockSize() { return Block_Size; }
 	
 	public static String encodeRange(File file, long start, long length) throws IOException {
