@@ -446,7 +446,7 @@ public class AESHelper2 {
 	 * iv, knows = random(16)
 	 * token = encrypt(knows, key, iv), PKCS5 Padding
 	 * return [token : iv, knows.64]
-	 * where len(token:iv) = 64, len(knows.64) = 24
+	 * where len(token:iv) = 64 (32 + 1 + 16?), len(knows.64) = 24
 	 * </pre>
 	 * 
 	 * @param key
