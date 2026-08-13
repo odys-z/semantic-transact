@@ -123,15 +123,20 @@ public interface IUser {
 	default public List<Object> notifies() { return null; }
 
 	/**
-	 * Set session key, not session-id, called by {@link #getClientSessionInf(IUser)}.
+	 * Set session private knowledge, not session-id, for later verification.
+	 * Called by {@link #getClientSessionInf(IUser)}.
 	 * @since 1.4.37
 	 * @param token
 	 * @return this
 	 */
-	public default IUser sessionKey(String token) { return this; }
+	public default IUser privateKnowledge(String token) { return this; }
 
 	/**
-	 * Get session key
+	 * Get session key, the private knowledge.
+	 * 
+	 * An user Object is actually hasn't been send to clients.
+	 * It's only ssinf does.
+	 * 
 	 * @return this
 	 */
 	public default String sessionKey() { return null; }
@@ -176,20 +181,22 @@ public interface IUser {
 	/**
 	 * Get a session object for client. Implementation must not reveal server side knowledge in this object.
 	 * 
-	 * This method calls {@link #sessionKey()} for setting tokens.
+	 * This method calls {@link #privateKnowledge(String)} for setting tokens.
 	 * 
-	 * @param usr
+	 * [2026-08-13] Changing this needs to update {@link AESHelper2#main(String[])}.
+	 * 
+	 * @param usr with a side effect of change the private knowledge.
 	 * @return the session information
 	 * @throws Exception 
 	 */
 	public default SessionInf getClientSessionInf(IUser usr) throws Exception { 
-		Object[] session = AESHelper2.packSessionKey(usr.pswd());
-		usr.sessionKey((String) session[1]);
+		String[] session = AESHelper2.packSessionKey(usr.pswd());
+		usr.privateKnowledge(session[1]);
 
 		return new SessionInf(usr.sessionId(), usr.uid(), usr.roleId())
 				.device(usr.deviceId())
 				.userName(usr.userName())
-				.ssToken((String)session[0]);
+				.ssToken(session[0]);
 	}
 
 	/**

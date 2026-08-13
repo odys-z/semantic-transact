@@ -3,8 +3,6 @@ package io.odysz.common;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.Utils.logi;
-import static io.odysz.common.Utils.warn;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,6 +24,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.crypto.Cipher;
@@ -37,11 +36,23 @@ import org.apache.commons.crypto.random.CryptoRandom;
 import org.apache.commons.crypto.random.CryptoRandomFactory;
 import org.apache.commons.crypto.utils.Utils;
 
+import io.odysz.anson.JsonOpt;
+import io.odysz.semantics.SessionInf;
+
 /**
  * Static helpers for encrypt/decipher string.
  * 
- * @since 1.5.77: Fix for utf-8 strings.
+ * @since 1.5.77: Fix for utf-8 strings, and uses PCKS#7 Padding.
  * 
+ * AES is not appliable with PCK #5
+ * <pre>
+ * Cipher / Scheme          Block Size                      Compatible Padding
+ * PKCS#5 Standard          Strictly 8 bytes (64 bits)      Max 8 bytes
+ * Standard AES             Strictly 16 bytes               PKCS#7(appends 1 to 16 bytes)
+ * (128/192/256)            (128 bits)
+ * PKCS#7 Standard Limit    Up to 255 bytes                 Absolute limit of RFC 5652
+ *                          (2,040 bits)
+ * <pre>
  * @tip Windows now can set system using utf-8 code page.
  * 
  * Control Panel > Region.<br>
@@ -55,9 +66,11 @@ public class AESHelper2 {
     static Properties randomProperties = new Properties();
     /**
      * Deprecating static final String transform = "AES/CBC/PKCS5Padding";<br>
-     * Apache Common Crypto only support PKCS#5 padding, but most js lib support PKCS#7 padding,
-     * This makes trouble when negotiation with those API.
-     * Solution: using no padding here, round the text to 16 or 32 ASCII bytes.
+     * which is a design error.
+     * <p>Gemini: JDK 11 documents shows PKCS5Padding is actually a legacy of early version.
+     * What's under the hood is PCKS#7 Padding.</p>
+     * 
+     * - Is this AI is strengthening your ability?
      */
     static final String transform = //"AES/CBC/NoPadding";
     								"AES/CBC/PKCS5Padding";
@@ -132,36 +145,64 @@ public class AESHelper2 {
         Files.write(p, decode64(base64));
     }
 
+	public static String randomId() {
+		Random random = new Random();
+		// 2 ^ 48 = 64 ^ 8
+		String ssid = Radix64.toString((long)random.nextInt() * (short)random.nextInt(), 8);
+		return ssid;
+	}
+	
 	/**
-	 * @param args 0: encrypt | decrypt
-	 * 		  args 1: key
-	 * 		  args 2: string-iv (decrypt) | plain (encrypt)
-	 * 		  args 3: cipher (decrypt only)
-	 * e.g. decrypt "iv(16 bytes base16)" "Героям слава!"
+	 * @param args 0: encrypt | decrypt | login | verify
 	 */
 	public static void main(String[] args) {
+		try {
 		if (args.length == 3 && eq(args[0], "encrypt"))
 			cliEncrypt(args[1], args[2]);
 		else if (args.length == 4 && eq(args[0], "decrypt")) 
 			cliDecrypt(args[1], args[2], args[3]);
 		else if (args.length == 3 && eq(args[0], "decode64")) 
-			try {
-				cliDecode64(args[1], args[2]);
-			} catch (IOException e) {
-				logi(e.getMessage());
-			}
+			cliDecode64(args[1], args[2]);
 		else if (args.length == 2 && eq(args[0], "encode64"))
-			try {
-				System.out.print(cliEncode64(args[1])); // don't use logi()
-			} catch (IOException e) {
-				warn("Error: %s", e.getMessage());
+			System.out.print(cliEncode64(args[1])); // don't use logi()
+		else if (args.length == 3 && eq(args[0], "login")) {
+			// IUser.getClientSessionInf()
+			// String[] session = AESHelper2.packSessionKey(usr.pswd());
+			// usr.sessionKey(session[1]);
+			// return new SessionInf().ssToken(session[0]);
+			String[] session = AESHelper2.packSessionKey(args[2]);
+			SessionInf ssinf = new SessionInf(randomId(), args[1])
+									.ssToken(session[0]);
+			ssinf.toBlock(System.out, JsonOpt.beautify());
+			System.err.print("\n knows:\n" + session[1]);
+		}
+		else if (args.length == 5 && eq(args[0], "verify")) {
+			/*
+			 * Case can be generated with Anclient.cmake/t01.cpp
+			 ody    : 1+++++
+			 knows  : Z+v5FgoseFayMWr1viaW+w==
+			 ssToken: 3j7Sq1l9fJdkJ4F5LRxRuz4ekQFE63RuScdM6UYe0r8=:XmRKMr5fqz3P3cWLxbUnYw==
+			 */
+			String uid = args[1];
+			String pswd = args[2];
+			String token64 = args[3];
+			String myknows = args[4];
+			if (verifyToken(token64, myknows, uid, pswd)) {
+				System.out.print("OK");
 			}
+			else
+				System.out.print("FAILED");
+		}
 		else
 			logi("Usage:\n"
-					+ "\tencrypt plain-key plain-text\n"
-					+ "\tdecrypt plain-key iv plain-text\n"
-					+ "\tdecode64 base64-string bin-file-path\n"
-					+ "\tencode64 bin-file-path");
+					+ "\t encrypt plain-key plain-text\n"
+					+ "\t decrypt plain-key iv plain-text\n"
+					+ "\t decode64 base64-string bin-file-path\n"
+					+ "\t encode64 txt-file-path\n"
+					+ "\t login uid, pswd\n"
+					+ "\t verify uid, pswd, token-base64, your-knowledge");
+
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 	/**
@@ -264,68 +305,68 @@ public class AESHelper2 {
 			throw new GeneralSecurityException(e.getMessage());
 		}
         finally {
-        	lock.unlock();
+            lock.unlock();
         }
-	}
+    }
 
-	public static String decrypt(String cypher, String key, byte[] iv)
-			throws GeneralSecurityException, IOException {
-		byte[] input = Base64.getDecoder().decode(cypher);
+    public static String decrypt(String cypher, String key, byte[] iv)
+            throws GeneralSecurityException, IOException {
+        byte[] input = Base64.getDecoder().decode(cypher);
 
-		MessageDigest sha = MessageDigest.getInstance("SHA-256");
-		byte[] kb = sha.digest(key.getBytes(StandardCharsets.UTF_8));
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        byte[] kb = sha.digest(key.getBytes(StandardCharsets.UTF_8));
 
-		byte[] output = decryptEx(input, kb, iv);
+        byte[] output = decryptEx(input, kb, iv);
         String p = setUTF8Bytes(output);
         // return depad16_32(p);
         return p;
-	}
+    }
 
-	static byte[] decryptEx(byte[] input, byte[] key, byte[]iv)
-			throws GeneralSecurityException, IOException {
+    static byte[] decryptEx(byte[] input, byte[] key, byte[]iv)
+            throws GeneralSecurityException, IOException {
 
-		final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
-		final IvParameterSpec ivspec = new IvParameterSpec(iv);
+        final SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
+        final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         try {
-        	lock.lock(); // can't concurrently work in Open JDK 15 for x64 
-			encipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
-			byte[] output = new byte[input.length + 32];
+            lock.lock(); // can't concurrently work in Open JDK 15 for x64 
+            encipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+            byte[] output = new byte[input.length + 32];
 
-			int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
+            int finalBytes = encipher.doFinal(input, 0, input.length, output, 0);
 
-			encipher.close();
+            encipher.close();
 
-			return Arrays.copyOf(output, finalBytes);
+            return Arrays.copyOf(output, finalBytes);
         } finally { lock.unlock(); }
-	}
+    }
 
-	/**
-	 * @param s string of ASCII
-	 * @return 16 / 32 byte string
-	 * @throws GeneralSecurityException
-	 */
-	@SuppressWarnings("unused")
-	private static String pad16_32(String s) throws GeneralSecurityException {
-		int l = s.length();
-		if (l <= 16)
-			return String.format("%1$16s", s).replaceAll(" ", "-");
-		else if (l <= 32)
-			return String.format("%1$32s", s).replaceAll(" ", "-");
-		else
-			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
-	}
+    /**
+     * @param s string of ASCII
+     * @return 16 / 32 byte string
+     * @throws GeneralSecurityException
+     */
+    @SuppressWarnings("unused")
+    private static String pad16_32(String s) throws GeneralSecurityException {
+        int l = s.length();
+        if (l <= 16)
+            return String.format("%1$16s", s).replaceAll(" ", "-");
+        else if (l <= 32)
+            return String.format("%1$32s", s).replaceAll(" ", "-");
+        else
+            throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
+    }
 
-	@SuppressWarnings("unused")
-	private static String depad16_32(String s) throws GeneralSecurityException {
-		int l = s.length();
-		if (l <= 16)
-			return s.replaceAll("-", " ").trim();
-		else if (l <= 32)
-			return s.replaceAll("-", " ").trim();
-		else
-			throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
-	}
+    @SuppressWarnings("unused")
+    private static String depad16_32(String s) throws GeneralSecurityException {
+        int l = s.length();
+        if (l <= 16)
+            return s.replaceAll("-", " ").trim();
+        else if (l <= 32)
+            return s.replaceAll("-", " ").trim();
+        else
+            throw new GeneralSecurityException("Not supported block length(16B/32B): " + s);
+    }
 
     /**
      * Converts String to UTF8 bytes
@@ -342,19 +383,28 @@ public class AESHelper2 {
      * @return converted result
      */
     private static String setUTF8Bytes(byte[] input) {
-    	return new String(input, StandardCharsets.UTF_8);
+        return new String(input, StandardCharsets.UTF_8);
     }
 
-	public static String encode64(final byte[] bytes) {
+    public static String encode64(final byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
-	}
+    }
 
-	/**
-	 * @param ifs
-	 * @param blockSize default 3 * 1024 * 1024;
-	 * @return encoded string
-	 * @throws IOException
-	 * ISSUE: we need a stream mode version
+    /**
+     * @param ifs
+     * @param blockSize default 3 * 1024 * 1024;
+     * @return encoded string
+     * @throws IOException
+     * ISSUE: we need a stream mode version
+     * Notes: While implementing stream mode, be careful of Base64 code is not continuous to it's table index.
+     * <pre>
+     * BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+     * base64 index range   ASCII codes     contiguous?
+     * 0–25 (A–Z)            65–90l       yes, but starts at 65
+     * 26–51 (a–z)           97–122       yes, but starts at 97 — jumps past `[]^_``
+     * 52–61 (0–9)           48–57        yes, but this is lower than the A–Z block — a backwards jump
+     * 62–63 (+, /)          43, 47       isolated, non-adjacent to each other even
+     * </pre>
 	 */
 	public static String encode64(final InputStream ifs, int blockSize) throws IOException {
 		blockSize = blockSize > 0 ? blockSize : 3 * 1024 * 1024;
