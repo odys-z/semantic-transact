@@ -26,7 +26,9 @@ import io.odysz.semantics.meta.TableMeta;
 import io.odysz.transact.sql.parts.Logic.op;
 import io.odysz.transact.sql.parts.Sql;
 import io.odysz.transact.sql.parts.antlr.ExprsVisitor;
+import io.odysz.transact.sql.parts.Colname;
 import io.odysz.transact.sql.parts.condition.ExprPart;
+import io.odysz.transact.sql.parts.condition.Funcall;
 import io.odysz.transact.x.TransException;
 
 public class TestTransc {
@@ -268,6 +270,62 @@ public class TestTransc {
 					"select avg(filesize) notes from h_photos p join  u on p.shareby = 'ody' AND p.oid = '--' || u.orgId",
 					sqls.get(3));
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+
+	/**
+	 * Updating a subtree with a recursive with clause, by parent links,
+	 * the way semantic.jserv's SemanticTree.Reforest reshapes fullpaths and tags subtrees.
+	 * @since 1.5.79
+	 */
+	@Test
+	public void testWithUpdateSubtree() {
+		try {
+			ArrayList<String> sqls = new ArrayList<String>();
+
+			// reshape fullpath: child = parent.fullpath + '.' + 2 digits sort
+			st.with(true)
+				.withTable("tree_(nid, parent, fullpath)")
+				.withVal(st.select("doctree").cols("nid", "parent", "fullpath").whereEq("nid", "A"))
+				.unionAll(st.select("doctree", "me")
+						.col("me.nid").col("me.parent")
+						.col(new Funcall("concat", new ExprPart[] {
+								Colname.parseFullname("p.fullpath"), constr("."),
+								Funcall.subStr(new Funcall("concat", new ExprPart[] {
+									constr("00"), Colname.parseFullname("me.sort")}), -2, 2)}))
+						.je("me", "tree_", "p", "parent", "nid"))
+				.update(st.update("doctree"))
+				.nv("fullpath", st.select("tree_", "t").col("t.fullpath").whereEq("t", "nid", "doctree", "nid"))
+				.whereIn("nid", st.select("tree_").col("nid"))
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive tree_(nid, parent, fullpath) as ("
+					+ "select nid, parent, fullpath from doctree  where nid = 'A' union all "
+					+ "select me.nid, me.parent, p.fullpath || '.' || substr('00' || me.sort, -2, 2) "
+					+ "from doctree me join tree_ p on me.parent = p.nid) "
+					+ "update doctree set fullpath=(select t.fullpath from tree_ t where t.nid = doctree.nid) "
+					+ "where nid in  ( select nid from tree_  )",
+					sqls.get(0));
+
+			// tag a subtree
+			st.with(true)
+				.withTable("tag_(nid)")
+				.withVal(constr("A"))
+				.union(st.select("doctree", "me")
+						.col("me.nid")
+						.je("me", "tag_", "t", "parent", "nid"))
+				.update(st.update("doctree"))
+				.nv("tag", constr("A"))
+				.whereIn("nid", st.select("tag_").col("nid"))
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive tag_(nid) as (select 'A' union "
+					+ "select me.nid from doctree me join tag_ t on me.parent = t.nid) "
+					+ "update doctree set tag='A' where nid in  ( select nid from tag_  )",
+					sqls.get(1));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);

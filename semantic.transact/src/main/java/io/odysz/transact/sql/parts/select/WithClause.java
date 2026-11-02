@@ -168,6 +168,18 @@ public class WithClause extends AbsPart {
 	}
 
 	/**
+	 * The anchor (initial rows) of the recursive table, selected by the query, e. g.
+	 * <pre>st.select("doctree").cols("nid", "parent", "fullpath").whereEq("nid", "A")</pre>
+	 * @param anchor
+	 * @return this
+	 * @since 1.5.79
+	 */
+	public WithClause withVal(Query ancqr) {
+		this.buildingVal = ancqr;
+		return this;
+	}
+
+	/**
 	 * The anchor (initial row) of the recursive table, one value per column, each generated
 	 * by its expression, e.g. {@link ExprPart#constr(String)} for a quoted string,
 	 * {@link ExprPart#constVal(String)}, or a {@link io.odysz.transact.sql.parts.condition.Funcall}.
