@@ -274,6 +274,90 @@ public class TestTransc {
 		}
 	}
 
+	/**
+	 * Recursive with clause built by {@link Transcxt#with(boolean)}, attached to statements.
+	 * @since 1.5.79
+	 */
+	@Test
+	public void testWithBuilder() {
+		try {
+			ArrayList<String> sqls = new ArrayList<String>();
+
+			// ancestors, union (distinct): stops on cyclic parent links
+			st.with(true)
+				.withTable("anc_(nid)")
+				.withVal(constr("a21"))
+				.union(st.select("doctree", "me")
+						.col("me.parent")
+						.je("me", "anc_", "a", "nid", "nid"))
+				.select(st.select("anc_"))
+				.col("nid")
+				.whereEq("nid", "A")
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive anc_(nid) as (select 'a21' union "
+					+ "select me.parent from doctree me join anc_ a on me.nid = a.nid) "
+					+ "select nid from anc_ where nid = 'A'",
+					sqls.get(0));
+
+			// subtree, deleting
+			st.with(true)
+				.withTable("sub_(nid)")
+				.withVal(constr("a2"))
+				.union(st.select("doctree", "me")
+						.col("me.nid")
+						.je("me", "sub_", "s", "parent", "nid"))
+				.delete(st.delete("doctree"))
+				.whereIn("nid", st.select("sub_").col("nid"))
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive sub_(nid) as (select 'a2' union "
+					+ "select me.nid from doctree me join sub_ s on me.parent = s.nid) "
+					+ "delete from doctree where nid in (select nid from sub_)",
+					sqls.get(1));
+
+			// sql snippet as the anchor, union all, multiple values
+			st.with(true)
+				.withTable("orgrec(orgId, parent, deep)")
+				.withVal("values('kerson', 'ur-zsu', 0)")
+				.unionAll(st.select("a_orgs", "p")
+						.col("p.orgId").col("p.parent").col(add("ch.deep", 1))
+						.je("p", "orgrec", "ch", "orgId", "parent"))
+				.select(st.select("a_orgs", "o"))
+				.cols("orgName", "deep")
+				.je("o", null, "orgrec", "orgId")
+				.orderby("deep")
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive "
+					+ "orgrec(orgId, parent, deep) as (values('kerson', 'ur-zsu', 0) union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
+					+ "select orgName, deep from a_orgs o join  orgrec on o.orgId = orgrec.orgId order by deep asc",
+					sqls.get(2));
+
+			// expressions as the anchor values
+			st.with(true)
+				.withTable("orgrec(orgId, parent, deep)")
+				.withVal(constr("kerson"), constr("ur-zsu"), ExprPart.constVal("0"))
+				.unionAll(st.select("a_orgs", "p")
+						.col("p.orgId").col("p.parent").col(add("ch.deep", 1))
+						.je("p", "orgrec", "ch", "orgId", "parent"))
+				.select(st.select("orgrec"))
+				.commit(st.instancontxt(null, null), sqls);
+
+			assertEquals("with recursive "
+					+ "orgrec(orgId, parent, deep) as (select 'kerson', 'ur-zsu', 0 union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
+					+ "select * from orgrec",
+					sqls.get(3));
+
+			// the clause is not held by st
+			st.select("a_users", "u").commit(st.instancontxt(null, null), sqls);
+			assertEquals("select * from a_users u", sqls.get(4));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+
 	@Test
 	public void testInsert() throws TransException {
 		ArrayList<String> sqls = new ArrayList<String>();

@@ -238,4 +238,23 @@ public class Transcxt {
 		withClause.with(recurTabl, rootValue, q);
 		return this;
 	}
+
+	/**
+	 * Create a with clause to be built fluently, then attached to a statement by
+	 * {@link WithClause#select(Query)}, {@link WithClause#delete(Delete)} or {@link WithClause#update(Update)}.
+	 * Unlike {@link #with(boolean, String, String, Query)}, the clause is not held by this instance,
+	 * so it is safe when this instance is shared.
+	 * <pre>
+	 * st.with(true)
+	 *   .withTable("sub_(nid)")
+	 *   .withVal(constr("a2"))
+	 *   .union(st.select("doctree", "me").col("me.nid").je("me", "sub_", "s", "parent", "nid"))
+	 *   .select(st.select("sub_").col("nid"))</pre>
+	 * @param recursive
+	 * @return a new with clause
+	 * @since 1.5.79
+	 */
+	public WithClause with(boolean recursive) {
+		return new WithClause(recursive);
+	}
 }
