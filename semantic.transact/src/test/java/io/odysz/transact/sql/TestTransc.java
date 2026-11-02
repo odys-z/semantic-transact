@@ -398,7 +398,6 @@ public class TestTransc {
 					sqls.get(0));
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testInsertPartialRow() throws TransException {
 		String[] cols = new String[] {"funcId", "funcName", "uri", "css", "ext1", "ext2"};
