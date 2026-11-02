@@ -279,7 +279,7 @@ public class TestTransc {
 	 * @since 1.5.79
 	 */
 	@Test
-	public void testWithBuilder() {
+	public void testWithTransact() {
 		try {
 			ArrayList<String> sqls = new ArrayList<String>();
 
@@ -297,7 +297,7 @@ public class TestTransc {
 
 			assertEquals("with recursive anc_(nid) as (select 'a21' union "
 					+ "select me.parent from doctree me join anc_ a on me.nid = a.nid) "
-					+ "select nid from anc_ where nid = 'A'",
+					+ "select nid from anc_  where nid = 'A'",
 					sqls.get(0));
 
 			// subtree, deleting
@@ -313,7 +313,7 @@ public class TestTransc {
 
 			assertEquals("with recursive sub_(nid) as (select 'a2' union "
 					+ "select me.nid from doctree me join sub_ s on me.parent = s.nid) "
-					+ "delete from doctree where nid in (select nid from sub_)",
+					+ "delete from doctree where nid in  ( select nid from sub_  )",
 					sqls.get(1));
 
 			// sql snippet as the anchor, union all, multiple values
@@ -346,7 +346,7 @@ public class TestTransc {
 
 			assertEquals("with recursive "
 					+ "orgrec(orgId, parent, deep) as (select 'kerson', 'ur-zsu', 0 union all select p.orgId, p.parent, (ch.deep + 1) from a_orgs p join orgrec ch on p.orgId = ch.parent) "
-					+ "select * from orgrec",
+					+ "select * from orgrec ",
 					sqls.get(3));
 
 			// the clause is not held by st
