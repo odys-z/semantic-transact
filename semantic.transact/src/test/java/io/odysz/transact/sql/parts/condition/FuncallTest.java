@@ -63,6 +63,34 @@ class FuncallTest {
 	}
 
 	@Test
+	void testConcat() throws Exception {
+		ArrayList<String> sqls = new ArrayList<String>();
+
+		Query q = st.select("a_roles")
+			.col(Funcall.concat("roleName", "'-'", "roleId"), "fullname");
+
+		q.commit(st.instancontxt(null, null), sqls);
+		assertEquals("select roleName || '-' || roleId fullname from a_roles ",
+				sqls.get(0));
+
+		q.commit(mysqlCxt, sqls);
+		assertEquals("select concat(roleName, '-', roleId) fullname from a_roles ",
+				sqls.get(1));
+
+		q.commit(sqlitCxt, sqls);
+		assertEquals("select roleName || '-' || roleId fullname from a_roles ",
+				sqls.get(2));
+
+		q.commit(ms2kCxt, sqls);
+		assertEquals("select concat(roleName, '-', roleId) fullname from a_roles ",
+				sqls.get(3));
+
+		q.commit(orclCxt, sqls);
+		assertEquals("select \"roleName\" || '-' || \"roleId\" \"fullname\" from \"a_roles\" ",
+				sqls.get(4));
+	}
+
+	@Test
 	void testIfElse() throws Exception {
 		ArrayList<String> sqls = new ArrayList<String>();
 

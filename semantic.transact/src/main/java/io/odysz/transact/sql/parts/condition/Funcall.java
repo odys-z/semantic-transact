@@ -506,7 +506,7 @@ public class Funcall extends ExprPart {
 		if (dt == dbtype.sqlite || dt == dbtype.oracle)
 			return Stream.of(args).map(v -> v.toString()).collect(Collectors.joining(" || "));
 		else if (dt == dbtype.mysql || dt == dbtype.ms2k)
-			return Stream.of(args).map(v -> v.toString()).collect(Collectors.joining("concat(", ", ", ")"));
+			return Stream.of(args).map(v -> v.toString()).collect(Collectors.joining(", ", "concat(", ")"));
 		else
 			throw new TransException ("Funcall#sqlConcat(): concat() are not implemented for db type: %s", dt.name());
 	}
