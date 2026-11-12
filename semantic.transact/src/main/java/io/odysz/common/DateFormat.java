@@ -50,9 +50,8 @@ public class DateFormat {
 	 * @deprecated replaced by {@link #formatime_utc(Date)} 	
 	 * @param d
 	 * @return
-	 */
 	public static String formatime(Date d) { return formatime_utc(d); }
-//	public static String formatime(Date d) { return d == null ? " - - : 00.00.00" : sdflong_mysql.format(d); }
+	 */
 	
 	/**
 	 * IMPORTANT This method will change the static data formatter's time zone.
