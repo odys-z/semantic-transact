@@ -19,12 +19,12 @@ import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.x.TransException;
 
 /**
- * Resulving2: an auto key at an index of those generated in the context.
- * For the semantics resolving with it, see semantic.DA's DASemantextTest.testResulving2Tree().
+ * Resulving with an index: an auto key at an index of those generated in the context.
+ * For the semantics resolving with it, see semantic.DA's DASemantextTest.testResulvingTree().
  *
  * @since 1.5.81
  */
-public class Resulving2Test {
+public class ResulvingTest {
 
 	/** a context in which 4 keys have been generated for a_docnodes.nid, the first is the parent of the next two */
 	static class Ctx extends Semantext2 {
@@ -49,24 +49,24 @@ public class Resulving2Test {
 	public void testIndex() throws TransException {
 		ISemantext ctx = new Ctx();
 
-		assertEquals("'000001'", new Resulving2("a_docnodes", "nid", 0).sql(ctx));
-		assertEquals("'000003'", new Resulving2("a_docnodes", "nid", 2).sql(ctx));
-		assertEquals("'000004'", new Resulving2("a_docnodes", "nid", -1).sql(ctx));
-		assertEquals("'000003'", new Resulving2("a_docnodes", "nid", -2).sql(ctx));
+		assertEquals("'000001'", new Resulving("a_docnodes", "nid", 0).sql(ctx));
+		assertEquals("'000003'", new Resulving("a_docnodes", "nid", 2).sql(ctx));
+		assertEquals("'000004'", new Resulving("a_docnodes", "nid", -1).sql(ctx));
+		assertEquals("'000003'", new Resulving("a_docnodes", "nid", -2).sql(ctx));
 
-		// -1 is Resulving's
-		assertEquals(new Resulving("a_docnodes", "nid").sql(ctx), new Resulving2("a_docnodes", "nid", -1).sql(ctx));
+		// without an index: the last one, -1
+		assertEquals(new Resulving("a_docnodes", "nid").sql(ctx), new Resulving("a_docnodes", "nid", -1).sql(ctx));
 
-		assertEquals("000002", new Resulving2("a_docnodes", "nid", 1).resulved(ctx));
-		assertEquals("'a_docnodes.nid'", new Resulving2("a_docnodes", "nid", 1).resulved(null));
+		assertEquals("000002", new Resulving("a_docnodes", "nid", 1).resulved(ctx));
+		assertEquals("'a_docnodes.nid'", new Resulving("a_docnodes", "nid", 1).resulved(null));
 	}
 
 	@Test
 	public void testNotGenerated() {
 		ISemantext ctx = new Ctx();
-		assertThrows(TransException.class, () -> new Resulving2("a_docnodes", "nid", 4).sql(ctx));
-		assertThrows(TransException.class, () -> new Resulving2("a_docnodes", "nid", -5).sql(ctx));
-		assertThrows(TransException.class, () -> new Resulving2("a_docs", "docId", 0).sql(ctx));
+		assertThrows(TransException.class, () -> new Resulving("a_docnodes", "nid", 4).sql(ctx));
+		assertThrows(TransException.class, () -> new Resulving("a_docnodes", "nid", -5).sql(ctx));
+		assertThrows(TransException.class, () -> new Resulving("a_docs", "docId", 0).sql(ctx));
 	}
 
 	/** In a multi-row insert, each row refers to the key of its own parent, not the latest key. */
@@ -77,9 +77,9 @@ public class Resulving2Test {
 
 		ArrayList<ArrayList<Object[]>> vals = new ArrayList<ArrayList<Object[]>>();
 		vals.add(row("000001", "root",                                 "section"));
-		vals.add(row("000002", new Resulving2("a_docnodes", "nid", 0), "p1"));
-		vals.add(row("000003", new Resulving2("a_docnodes", "nid", 0), "sub"));
-		vals.add(row("000004", new Resulving2("a_docnodes", "nid", 2), "sub.p1"));
+		vals.add(row("000002", new Resulving("a_docnodes", "nid", 0), "p1"));
+		vals.add(row("000003", new Resulving("a_docnodes", "nid", 0), "sub"));
+		vals.add(row("000004", new Resulving("a_docnodes", "nid", 2), "sub.p1"));
 
 		assertEquals("insert into a_docnodes (nid, parentId, ptext) values "
 				+ "('000001', 'root', 'section'), "
