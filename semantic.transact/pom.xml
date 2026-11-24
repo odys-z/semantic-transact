@@ -1,6 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.odys-z</groupId>
+    <artifactId>semantics.java</artifactId>
+    <version>[0.0.2,)</version>
+    <relativePath/>
+  </parent>
+
   <groupId>io.github.odys-z</groupId>
   <artifactId>semantics.transact</artifactId>
   <version>1.5.81</version>
@@ -14,21 +22,6 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
-
-  <developers>
-    <developer>
-      <name>Ody Zhou</name>
-      <email>odys.zhou@gmail.com</email>
-      <organization>odys-z.github.io</organization>
-      <organizationUrl>https://odys-z.github.io</organizationUrl>
-    </developer>
-  </developers>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<maven.compiler.source>17</maven.compiler.source>
-	<maven.compiler.target>17</maven.compiler.target>
-  </properties>
 
   <dependencies>
 	<dependency>
@@ -50,11 +43,10 @@
     </dependency>
 
     <dependency>
-	  <groupId>org.junit.jupiter</groupId>
-	  <artifactId>junit-jupiter-engine</artifactId>
-	  <version>6.1.0</version>
-	  <scope>test</scope>
-	</dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <scm>
@@ -75,31 +67,19 @@
 	</testResources>
 
     <plugins>
-      <plugin>
-      	<artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-        </configuration>
-      </plugin>
-
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-surefire-plugin</artifactId>
-		<version>3.5.2</version>
 		<configuration>
 			<systemPropertyVariables>
 				<xmlOutputDir>${project.build.directory}/surefire</xmlOutputDir>
 			</systemPropertyVariables>
-          	<argLine>-Dfile.encoding=UTF-8</argLine>
 		</configuration>
 	  </plugin>
 
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-assembly-plugin</artifactId>
-		<version>3.7.1</version>
 		<configuration>
 			<archive>
 				<manifest>
@@ -124,7 +104,6 @@
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-dependency-plugin</artifactId>
-		<version>3.6.1</version>
 		<executions>
 			<!-- May be a local maven install first -->
 			<execution>
@@ -153,7 +132,6 @@
 	  <plugin>
 		  <groupId>org.sonatype.central</groupId>
 		  <artifactId>central-publishing-maven-plugin</artifactId>
-		  <version>0.8.0</version>
 		  <extensions>true</extensions>
 		  <configuration>
 			<publishingServerId>central</publishingServerId>
@@ -165,7 +143,6 @@
 	  <plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
 	      <artifactId>maven-source-plugin</artifactId>
-	      <version>2.2.1</version>
 	      <executions>
 	        <execution>
 	          <id>attach-sources</id>
@@ -179,7 +156,6 @@
 	  <plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
 	      <artifactId>maven-javadoc-plugin</artifactId>
-	      <version>3.5.0</version>
 	      <executions>
 	        <execution>
 	          <id>attach-javadocs</id>
@@ -206,7 +182,6 @@
 		  see https://dzone.com/articles/publish-your-artifacts-to-maven-central -->
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-gpg-plugin</artifactId>
-		<version>3.2.8</version>
 		<executions>
 			<execution>
 			  <id>semantics.transact</id>
